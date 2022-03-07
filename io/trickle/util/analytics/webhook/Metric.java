@@ -14,16 +14,25 @@ import io.vertx.core.json.JsonObject;
 import java.util.Arrays;
 
 public class Metric {
-    public String mode;
-    public String delays;
-    public String account;
-    public String sizeQty;
-    public String proxy;
-    public String email;
-    public String site;
-    public String orderNumber;
     public String sku;
+    public String account;
     public String product;
+    public String delays;
+    public String orderNumber;
+    public String proxy;
+    public String site;
+    public String mode;
+    public String email;
+    public String sizeQty;
+
+    public String asCsvEntry() {
+        String string = this.site + "," + String.format("\"%s\"", this.product) + "," + this.sku + "," + this.sizeQty + "," + this.delays + "," + this.mode + "," + this.proxy + "," + this.email + "," + this.account + "," + this.orderNumber;
+        return string.trim() + "\n";
+    }
+
+    public static String lambda$create$0(Task task) {
+        return Arrays.toString(task.getKeywords());
+    }
 
     public static Metric$Builder builder() {
         return new Metric$Builder();
@@ -42,14 +51,6 @@ public class Metric {
         this.orderNumber = string10;
     }
 
-    public JsonObject asApiForm() {
-        return new JsonObject().put("name", (Object)this.product).put("sku", (Object)this.sku).put("licenseKey", (Object)("trickle-" + Storage.ACCESS_KEY)).put("site", (Object)this.site).put("size", (Object)this.sizeQty).put("ts", (Object)System.currentTimeMillis());
-    }
-
-    public static String lambda$create$0(Task task) {
-        return Arrays.toString(task.getKeywords());
-    }
-
     public static Metric create(Task task, JsonObject jsonObject, String string) {
         Metric$Builder metric$Builder = Metric.builder();
         OrderDetails orderDetails = (OrderDetails)OrderDetails.getDetailsParser(task.getSite()).apply(jsonObject);
@@ -62,9 +63,8 @@ public class Metric {
         return metric$Builder.build();
     }
 
-    public String asCsvEntry() {
-        String string = this.site + "," + String.format("\"%s\"", this.product) + "," + this.sku + "," + this.sizeQty + "," + this.delays + "," + this.mode + "," + this.proxy + "," + this.email + "," + this.account + "," + this.orderNumber;
-        return string.trim() + "\n";
+    public JsonObject asApiForm() {
+        return new JsonObject().put("name", (Object)this.product).put("sku", (Object)this.sku).put("licenseKey", (Object)("trickle-" + Storage.ACCESS_KEY)).put("site", (Object)this.site).put("size", (Object)this.sizeQty).put("ts", (Object)System.currentTimeMillis());
     }
 }
 

@@ -14,6 +14,10 @@ public class CLI {
     public static String listenerID;
     public static boolean LOAD_GATE;
 
+    public static void lambda$deployObserver$0(String string) {
+        listenerID = string;
+    }
+
     public static void setTitle(String string) {
     }
 
@@ -21,17 +25,13 @@ public class CLI {
         VertxSingleton.INSTANCE.get().undeploy(listenerID);
     }
 
-    public static void lambda$deployObserver$0(String string) {
-        listenerID = string;
+    public static void deployObserver() {
+        VertxSingleton.INSTANCE.get().deployVerticle((Verticle)new CLI$CLIUpdater()).onSuccess(CLI::lambda$deployObserver$0);
     }
 
     static {
         LOAD_GATE = true;
         listenerID = null;
-    }
-
-    public static void deployObserver() {
-        VertxSingleton.INSTANCE.get().deployVerticle((Verticle)new CLI$CLIUpdater()).onSuccess(CLI::lambda$deployObserver$0);
     }
 }
 

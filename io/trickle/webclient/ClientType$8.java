@@ -14,17 +14,12 @@ public class ClientType$8
 implements X509TrustManager {
     public ClientType this$0;
 
-    public ClientType$8(ClientType clientType) {
-        this.this$0 = clientType;
-    }
-
     @Override
     public void checkClientTrusted(X509Certificate[] x509CertificateArray, String string) {
     }
 
-    @Override
-    public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[0];
+    public ClientType$8(ClientType clientType) {
+        this.this$0 = clientType;
     }
 
     @Override
@@ -40,6 +35,11 @@ implements X509TrustManager {
             }
             ++n2;
         }
+    }
+
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+        return new X509Certificate[0];
     }
 }
 

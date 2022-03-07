@@ -8,17 +8,17 @@ import io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus;
 
 public class Battery$ChargingStatus$2
 extends Battery$ChargingStatus {
-    public static float VOLTAGE_DEPLETION_FLUX = Float.intBitsToFloat(943080854);
     public static float VOLT_DROP_PER_MIN = Float.intBitsToFloat(983815946);
-
-    @Override
-    public float calculate(float f, int n, float f2, double d) {
-        return (float)(d - (double)(f2 * f + Float.intBitsToFloat(943080854) * (float)n * f));
-    }
+    public static float VOLTAGE_DEPLETION_FLUX = Float.intBitsToFloat(943080854);
 
     @Override
     public float changeVector() {
         return Battery.jitter(Float.intBitsToFloat(983815946), Float.intBitsToFloat(968184054));
+    }
+
+    @Override
+    public float calculate(float f, int n, float f2, double d) {
+        return (float)(d - (double)(f2 * f + Float.intBitsToFloat(943080854) * (float)n * f));
     }
 }
 

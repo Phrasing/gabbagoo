@@ -32,26 +32,9 @@ public class Script {
         return this.getContext();
     }
 
-    public Value execute(String string) {
-        Context context = this.getContext();
-        Value value = context.getBindings("js").getMember(string);
-        return value.execute(new Object[0]);
-    }
-
-    public static Script fromCode(String string) {
-        try {
-            return new Script(string);
-        }
-        catch (IOException iOException) {
-            System.out.println("Error loading script: " + iOException.getMessage());
-            return null;
-        }
-    }
-
-    public String call(String string, String ... stringArray) {
-        Context context = this.getContext();
-        Value value = context.getBindings("js").getMember(string);
-        return value.execute((Object[])stringArray).toString();
+    public Script(Reader reader) {
+        this.source = Source.newBuilder((String)"js", (Reader)reader, (String)"src.js").build();
+        this.jsCtx = new ThreadLocal();
     }
 
     public static Script fromStream(Reader reader) {
@@ -64,8 +47,10 @@ public class Script {
         }
     }
 
-    public static Context builder() {
-        return Context.newBuilder((String[])new String[0]).allowHostAccess(HostAccess.ALL).allowNativeAccess(true).allowPolyglotAccess(PolyglotAccess.ALL).build();
+    public Value execute(String string) {
+        Context context = this.getContext();
+        Value value = context.getBindings("js").getMember(string);
+        return value.execute(new Object[0]);
     }
 
     public Script(String string) {
@@ -73,9 +58,24 @@ public class Script {
         this.jsCtx = new ThreadLocal();
     }
 
-    public Script(Reader reader) {
-        this.source = Source.newBuilder((String)"js", (Reader)reader, (String)"src.js").build();
-        this.jsCtx = new ThreadLocal();
+    public String call(String string, String ... stringArray) {
+        Context context = this.getContext();
+        Value value = context.getBindings("js").getMember(string);
+        return value.execute((Object[])stringArray).toString();
+    }
+
+    public static Context builder() {
+        return Context.newBuilder((String[])new String[0]).allowHostAccess(HostAccess.ALL).allowNativeAccess(true).allowPolyglotAccess(PolyglotAccess.ALL).build();
+    }
+
+    public static Script fromCode(String string) {
+        try {
+            return new Script(string);
+        }
+        catch (IOException iOException) {
+            System.out.println("Error loading script: " + iOException.getMessage());
+            return null;
+        }
     }
 }
 

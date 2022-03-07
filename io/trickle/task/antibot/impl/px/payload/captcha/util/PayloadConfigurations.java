@@ -16,8 +16,8 @@ public class PayloadConfigurations {
     public static void configurePayload(MultiMap multiMap, ExtendedPayload extendedPayload) {
         Types types = extendedPayload.getType();
         Site site = extendedPayload.getSite();
-        switch (PayloadConfigurations$1.$SwitchMap$io$trickle$task$antibot$impl$px$Types[types.ordinal()]) {
-            case 1: {
+        switch (types) {
+            case DESKTOP: {
                 multiMap.set("payload", ExtendedPayload.encode(extendedPayload.desktopString(), 50));
                 switch (PayloadConfigurations$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
                     case 1: {
@@ -37,7 +37,7 @@ public class PayloadConfigurations {
                 }
                 return;
             }
-            case 2: {
+            case CAPTCHA_MOBILE: {
                 multiMap.set("payload", ExtendedPayload.encode(extendedPayload.toString(), 50));
                 switch (PayloadConfigurations$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
                     case 1: {
@@ -57,7 +57,7 @@ public class PayloadConfigurations {
                 }
                 return;
             }
-            case 3: {
+            case CAPTCHA_DESKTOP: {
                 multiMap.set("payload", ExtendedPayload.encode(extendedPayload.toString(), 50));
                 switch (PayloadConfigurations$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
                     case 1: {

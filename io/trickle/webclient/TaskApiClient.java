@@ -20,10 +20,6 @@ public abstract class TaskApiClient {
         return this.client.cookieStore();
     }
 
-    public TaskApiClient(ClientType clientType) {
-        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get(), clientType);
-    }
-
     public String proxyString() {
         ProxyOptions proxyOptions = this.client.getOptions().getProxyOptions();
         if (proxyOptions == null) {
@@ -52,12 +48,16 @@ public abstract class TaskApiClient {
         return this.client;
     }
 
-    public TaskApiClient(RealClient realClient) {
-        this.client = realClient;
-    }
-
     public TaskApiClient() {
         this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get());
+    }
+
+    public TaskApiClient(ClientType clientType) {
+        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get(), clientType);
+    }
+
+    public TaskApiClient(RealClient realClient) {
+        this.client = realClient;
     }
 
     public void close() {

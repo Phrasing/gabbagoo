@@ -16,9 +16,32 @@ import java.time.Instant;
 import java.util.Arrays;
 
 public class WebhookUtils {
-    public static String PUB_DECLINE = "https://discord.com/api/webhooks/822113112126914581/auCyRr4ObwUWqx2XCynGd_B_Yr6ZKmVZ_eIYI83Y_YpBZCua5Al_b9pkC3LGVrjR_Pfj";
-    public static String PUB_SUCCESS = "https://discord.com/api/webhooks/822112940714098719/9IO77xtVfjoad2wWTPpz3rU1AdWqVOP1WdZ_ruRC6ysRI1OeMemxXAOgEVEeXb6NCeVb";
     public static String PUB_SPAM = "https://webhooks.aycd.io/webhooks/api/v1/send/10414/b8c8e7d7-321c-4a80-acec-2c9c85acec8a";
+    public static String PUB_SUCCESS;
+    public static String PUB_DECLINE;
+    public static String PUB_TIDAL;
+
+    static {
+        PUB_DECLINE = "https://webhooks.aycd.io/webhooks/api/v1/send/14892/e4919db9-f1c9-4f94-b796-71b93acfc116";
+        PUB_SUCCESS = "https://webhooks.aycd.io/webhooks/api/v1/send/14890/aa27307c-00f8-4e74-a10f-626f63998187";
+        PUB_TIDAL = "https://webhooks.tidalmarket.com/e55301de-9d9c-11ec-82d2-42010aa80013/e55302b0-9d9c-11ec-82d2-42010aa80013/redirect";
+    }
+
+    public static String getIcon() {
+        return "https://cdn.shopify.com/s/files/1/2919/7736/files/vzFQZT_E_400x400_f51d7ec0-d8d6-4286-8c4d-5c43dcb7c4b1.jpg?v=1616019005";
+    }
+
+    public static JsonObject failureEmbed(Site site) {
+        return WebhookUtils.baseEmbed().put("title", (Object)("Trickle Failed Checkout || " + site.toString().replace("_", " "))).put("color", (Object)14943015);
+    }
+
+    public static JsonObject warningEmbed(String string, Site site) {
+        return WebhookUtils.baseEmbed().put("title", (Object)(string + " || " + site.toString().replace("_", " "))).put("color", (Object)0xFFFF00);
+    }
+
+    public static String lambda$buildEmbed$0(Task task) {
+        return Arrays.toString(task.getKeywords());
+    }
 
     public static JsonObject buildBasicEmbed(Task task, String string) {
         JsonArray jsonArray = new JsonArray();
@@ -32,45 +55,6 @@ public class WebhookUtils {
         JsonObject jsonObject = WebhookUtils.warningEmbed(string, task.getSite());
         jsonObject.put("fields", (Object)jsonArray);
         return jsonObject;
-    }
-
-    public static JsonObject warningEmbed(String string, Site site) {
-        return WebhookUtils.baseEmbed().put("title", (Object)(string + " || " + site.toString().replace("_", " "))).put("color", (Object)0xFFFF00);
-    }
-
-    public static JsonObject failureEmbed(Site site) {
-        return WebhookUtils.baseEmbed().put("title", (Object)("Trickle Failed Checkout || " + site.toString().replace("_", " "))).put("color", (Object)14943015);
-    }
-
-    public static JsonObject baseEmbed() {
-        return new JsonObject().put("timestamp", (Object)Instant.now().toString()).put("footer", (Object)new JsonObject().put("text", (Object)String.format("Trickle v%d.%d.%d", 1, 0, 238)).put("icon_url", (Object)WebhookUtils.getIcon()));
-    }
-
-    public static String lambda$buildEmbed$0(Task task) {
-        return Arrays.toString(task.getKeywords());
-    }
-
-    public static String getIcon() {
-        return "https://cdn.shopify.com/s/files/1/2919/7736/files/vzFQZT_E_400x400_f51d7ec0-d8d6-4286-8c4d-5c43dcb7c4b1.jpg?v=1616019005";
-    }
-
-    public static JsonObject successEmbed(Site site) {
-        return WebhookUtils.baseEmbed().put("title", (Object)("Trickle Successful Checkout || " + site.toString().replace("_", " "))).put("color", (Object)1439489);
-    }
-
-    public static JsonObject buildWebhook(JsonObject ... jsonObjectArray) {
-        JsonArray jsonArray = new JsonArray();
-        JsonObject[] jsonObjectArray2 = jsonObjectArray;
-        int n = jsonObjectArray2.length;
-        int n2 = 0;
-        while (n2 < n) {
-            JsonObject jsonObject = jsonObjectArray2[n2];
-            if (jsonObject != null && !jsonObject.isEmpty()) {
-                jsonArray.add((Object)jsonObject);
-            }
-            ++n2;
-        }
-        return new JsonObject().put("username", (Object)"Trickle").put("avatar_url", (Object)WebhookUtils.getIcon()).put("embeds", (Object)jsonArray);
     }
 
     public static JsonObject buildEmbed(boolean bl, Task task, String string, JsonObject jsonObject, String string2) {
@@ -114,6 +98,29 @@ public class WebhookUtils {
             // empty catch block
         }
         return jsonObject2;
+    }
+
+    public static JsonObject buildWebhook(JsonObject ... jsonObjectArray) {
+        JsonArray jsonArray = new JsonArray();
+        JsonObject[] jsonObjectArray2 = jsonObjectArray;
+        int n = jsonObjectArray2.length;
+        int n2 = 0;
+        while (n2 < n) {
+            JsonObject jsonObject = jsonObjectArray2[n2];
+            if (jsonObject != null && !jsonObject.isEmpty()) {
+                jsonArray.add((Object)jsonObject);
+            }
+            ++n2;
+        }
+        return new JsonObject().put("username", (Object)"Trickle").put("avatar_url", (Object)WebhookUtils.getIcon()).put("embeds", (Object)jsonArray);
+    }
+
+    public static JsonObject baseEmbed() {
+        return new JsonObject().put("timestamp", (Object)Instant.now().toString()).put("footer", (Object)new JsonObject().put("text", (Object)String.format("Trickle v%d.%d.%d", 1, 0, 241)).put("icon_url", (Object)WebhookUtils.getIcon()));
+    }
+
+    public static JsonObject successEmbed(Site site) {
+        return WebhookUtils.baseEmbed().put("title", (Object)("Trickle Successful Checkout || " + site.toString().replace("_", " "))).put("color", (Object)1439489);
     }
 }
 

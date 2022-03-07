@@ -35,16 +35,17 @@ import javax.mail.search.SearchTerm;
 
 public class MailClientImpl
 implements MailClient {
-    public static Properties mailProperties = new Properties();
-    public Vertx vertx;
-    public Store store;
-    public Date openTime;
     public Folder inbox;
     public Session session;
+    public static Properties mailProperties = new Properties();
+    public Vertx vertx;
+    public Date openTime;
+    public Store store;
 
-    public void close() {
+    @Override
+    public Future readInbox(SearchTerm searchTerm) {
         Context context = this.vertx.getOrCreateContext();
-        context.executeBlocking(this::lambda$close$2);
+        return context.executeBlocking(arg_0 -> this.lambda$readInbox$0(searchTerm, arg_0));
     }
 
     public void _close() {
@@ -56,19 +57,30 @@ implements MailClient {
         this.store.close();
     }
 
-    public void lambda$close$2(Promise promise) {
-        try {
-            this._close();
-        }
-        catch (MessagingException messagingException) {
-            // empty catch block
-        }
-        promise.tryComplete();
+    @Override
+    public CompletableFuture connectFut(String string, String string2) {
+        return this.connect(string, string2).toCompletionStage().toCompletableFuture();
     }
 
-    public MailClientImpl(Vertx vertx) {
-        this.vertx = vertx;
-        this.session = Session.getDefaultInstance((Properties)mailProperties, null);
+    @Override
+    public CompletableFuture readInboxFuture(SearchTerm searchTerm) {
+        return this.readInbox(searchTerm).toCompletionStage().toCompletableFuture();
+    }
+
+    public Message[] _readInbox(SearchTerm searchTerm) {
+        return this.getInbox().search(Objects.requireNonNullElseGet(searchTerm, this::getDefault), this.getReversedMessages());
+    }
+
+    public SearchTerm getDefault() {
+        return new MailClientImpl$1(this);
+    }
+
+    @Override
+    public Future connect(String string, String string2) {
+        Objects.requireNonNull(string, "Email can not be null");
+        Objects.requireNonNull(string2, "Password can not be null");
+        Context context = this.vertx.getOrCreateContext();
+        return context.executeBlocking(arg_0 -> this.lambda$connect$1(string, string2, arg_0));
     }
 
     public void _connect(String string, String string2) {
@@ -77,6 +89,41 @@ implements MailClient {
         }
         if (this.store.isConnected()) return;
         this.store.connect("imap.gmail.com", string, string2);
+    }
+
+    public MailClientImpl(Vertx vertx) {
+        this.vertx = vertx;
+        this.session = Session.getDefaultInstance((Properties)mailProperties, null);
+    }
+
+    public Folder getInbox() {
+        if (this.inbox == null) {
+            this.inbox = this.store.getFolder("Inbox");
+        }
+        if (this.inbox.isOpen()) return this.inbox;
+        this.inbox.open(1);
+        this.openTime = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L));
+        return this.inbox;
+    }
+
+    public void lambda$readInbox$0(SearchTerm searchTerm, Promise promise) {
+        try {
+            Message[] messageArray = this._readInbox(searchTerm);
+            promise.tryComplete((Object)messageArray);
+            return;
+        }
+        catch (MessagingException messagingException) {
+            promise.tryFail((Throwable)messagingException);
+        }
+    }
+
+    public void close() {
+        Context context = this.vertx.getOrCreateContext();
+        context.executeBlocking(this::lambda$close$2);
+    }
+
+    static {
+        mailProperties.setProperty("mail.store.protocol", "imaps");
     }
 
     public Message[] getReversedMessages() {
@@ -92,33 +139,6 @@ implements MailClient {
         return messageArray;
     }
 
-    static {
-        mailProperties.setProperty("mail.store.protocol", "imaps");
-    }
-
-    @Override
-    public Future connect(String string, String string2) {
-        Objects.requireNonNull(string, "Email can not be null");
-        Objects.requireNonNull(string2, "Password can not be null");
-        Context context = this.vertx.getOrCreateContext();
-        return context.executeBlocking(arg_0 -> this.lambda$connect$1(string, string2, arg_0));
-    }
-
-    public Folder getInbox() {
-        if (this.inbox == null) {
-            this.inbox = this.store.getFolder("Inbox");
-        }
-        if (this.inbox.isOpen()) return this.inbox;
-        this.inbox.open(1);
-        this.openTime = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L));
-        return this.inbox;
-    }
-
-    @Override
-    public CompletableFuture readInboxFuture(SearchTerm searchTerm) {
-        return this.readInbox(searchTerm).toCompletionStage().toCompletableFuture();
-    }
-
     public void lambda$connect$1(String string, String string2, Promise promise) {
         try {
             this._connect(string, string2);
@@ -130,34 +150,14 @@ implements MailClient {
         }
     }
 
-    public void lambda$readInbox$0(SearchTerm searchTerm, Promise promise) {
+    public void lambda$close$2(Promise promise) {
         try {
-            Message[] messageArray = this._readInbox(searchTerm);
-            promise.tryComplete((Object)messageArray);
-            return;
+            this._close();
         }
         catch (MessagingException messagingException) {
-            promise.tryFail((Throwable)messagingException);
+            // empty catch block
         }
-    }
-
-    @Override
-    public Future readInbox(SearchTerm searchTerm) {
-        Context context = this.vertx.getOrCreateContext();
-        return context.executeBlocking(arg_0 -> this.lambda$readInbox$0(searchTerm, arg_0));
-    }
-
-    @Override
-    public CompletableFuture connectFut(String string, String string2) {
-        return this.connect(string, string2).toCompletionStage().toCompletableFuture();
-    }
-
-    public Message[] _readInbox(SearchTerm searchTerm) {
-        return this.getInbox().search(Objects.requireNonNullElseGet(searchTerm, this::getDefault), this.getReversedMessages());
-    }
-
-    public SearchTerm getDefault() {
-        return new MailClientImpl$1(this);
+        promise.tryComplete();
     }
 }
 

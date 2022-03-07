@@ -41,22 +41,86 @@ import org.apache.logging.log4j.Logger;
 public class AutosolveHarvester
 implements SharedHarvester,
 Handler {
-    public LongAdder passes;
-    public Vertx vertx;
-    public LinkedHashMap<String, List<String>> requests;
-    public String currentSiteURL = null;
-    public HashMap<String, SharedCaptchaToken> referenceMap;
-    public AbstractAutoSolveManager solver;
+    public String sitekey;
+    public boolean started = false;
     public static Logger logger = LogManager.getLogger(AutosolveHarvester.class);
     public Promise<SharedCaptchaToken> solvePromise;
     public String action;
+    public LongAdder passes;
     public String id;
-    public boolean started = false;
-    public String sitekey;
+    public HashMap<String, SharedCaptchaToken> referenceMap;
+    public Vertx vertx;
+    public String currentSiteURL = null;
+    public AbstractAutoSolveManager solver;
+    public LinkedHashMap<String, List<String>> requests;
+
+    public void lambda$checkSolve$0(SharedCaptchaToken sharedCaptchaToken, Void void_) {
+        this.solvePromise.tryComplete((Object)sharedCaptchaToken);
+    }
+
+    public void lambda$startSolveLoop$3(Long l) {
+        this.checkSolve();
+    }
+
+    public void lambda$checkSolve$1(CaptchaToken captchaToken) {
+        if (captchaToken.isValid()) {
+            SharedCaptchaToken sharedCaptchaToken = new SharedCaptchaToken(this.currentSiteURL);
+            logger.info("Received AutoSolve Captcha: {}", (Object)captchaToken);
+            sharedCaptchaToken.setSolved(captchaToken.getToken(), null);
+            this.vertx.runOnContext(arg_0 -> this.lambda$checkSolve$0(sharedCaptchaToken, arg_0));
+            return;
+        }
+        this.solvePromise.tryFail("Invalid Captcha Solve");
+    }
+
+    @Override
+    public int passCount() {
+        if (this.passes != null) return this.passes.intValue();
+        return 0;
+    }
+
+    public void loadSitekey() {
+        this.sitekey = Engine.get().getClientConfiguration().getString("sitekeyV3", "6Lf34M8ZAAAAANgE72rhfideXH21Lab333mdd2d-");
+        this.action = Engine.get().getClientConfiguration().getString("actionV3", "yzysply_wr_pageview");
+    }
 
     public static List lambda$handle$2(Message message, String string, List list) {
         list.add(message.replyAddress());
         return list;
+    }
+
+    public void startSolveLoop() {
+        if (this.started) return;
+        this.vertx.setPeriodic(150L, this::lambda$startSolveLoop$3);
+        this.started = true;
+    }
+
+    @Override
+    public String id() {
+        return this.id;
+    }
+
+    public AutosolveHarvester(Vertx vertx, AbstractAutoSolveManager abstractAutoSolveManager) {
+        this(vertx, abstractAutoSolveManager, null);
+    }
+
+    public void handleSolved(SharedCaptchaToken sharedCaptchaToken) {
+        try {
+            Iterator<String> iterator = this.requests.get(sharedCaptchaToken.getDomain()).iterator();
+            this.requests.remove(sharedCaptchaToken.getDomain());
+            this.referenceMap.put(sharedCaptchaToken.getDomain(), sharedCaptchaToken);
+            while (iterator.hasNext()) {
+                String string = iterator.next();
+                if (string != null && !string.isEmpty()) {
+                    this.vertx.eventBus().send(string, (Object)sharedCaptchaToken);
+                }
+                iterator.remove();
+            }
+            return;
+        }
+        catch (Throwable throwable) {
+            logger.error("Error occurred handing solves: {}", (Object)throwable.getMessage());
+        }
     }
 
     public void handle(Message message) {
@@ -83,29 +147,6 @@ Handler {
         this.loadSitekey();
     }
 
-    public void handle(Object object) {
-        this.handle((Message)object);
-    }
-
-    @Override
-    public String id() {
-        return this.id;
-    }
-
-    public void lambda$checkSolve$0(SharedCaptchaToken sharedCaptchaToken, Void void_) {
-        this.solvePromise.tryComplete((Object)sharedCaptchaToken);
-    }
-
-    public void lambda$startSolveLoop$3(Long l) {
-        this.checkSolve();
-    }
-
-    public void startSolveLoop() {
-        if (this.started) return;
-        this.vertx.setPeriodic(150L, this::lambda$startSolveLoop$3);
-        this.started = true;
-    }
-
     public void checkSolve() {
         Iterator<String> iterator;
         if (this.solvePromise != null) {
@@ -128,49 +169,8 @@ Handler {
         this.solvePromise.future().onSuccess(this::handleSolved);
     }
 
-    public AutosolveHarvester(Vertx vertx, AbstractAutoSolveManager abstractAutoSolveManager) {
-        this(vertx, abstractAutoSolveManager, null);
-    }
-
-    public void handleSolved(SharedCaptchaToken sharedCaptchaToken) {
-        try {
-            Iterator<String> iterator = this.requests.get(sharedCaptchaToken.getDomain()).iterator();
-            this.requests.remove(sharedCaptchaToken.getDomain());
-            this.referenceMap.put(sharedCaptchaToken.getDomain(), sharedCaptchaToken);
-            while (iterator.hasNext()) {
-                String string = iterator.next();
-                if (string != null && !string.isEmpty()) {
-                    this.vertx.eventBus().send(string, (Object)sharedCaptchaToken);
-                }
-                iterator.remove();
-            }
-            return;
-        }
-        catch (Throwable throwable) {
-            logger.error("Error occurred handing solves: {}", (Object)throwable.getMessage());
-        }
-    }
-
-    public void lambda$checkSolve$1(CaptchaToken captchaToken) {
-        if (captchaToken.isValid()) {
-            SharedCaptchaToken sharedCaptchaToken = new SharedCaptchaToken(this.currentSiteURL);
-            logger.info("Received AutoSolve Captcha: {}", (Object)captchaToken);
-            sharedCaptchaToken.setSolved(captchaToken.getToken(), null);
-            this.vertx.runOnContext(arg_0 -> this.lambda$checkSolve$0(sharedCaptchaToken, arg_0));
-            return;
-        }
-        this.solvePromise.tryFail("Invalid Captcha Solve");
-    }
-
-    @Override
-    public int passCount() {
-        if (this.passes != null) return this.passes.intValue();
-        return 0;
-    }
-
-    public void loadSitekey() {
-        this.sitekey = Engine.get().getClientConfiguration().getString("sitekeyV3", "6Lf34M8ZAAAAANgE72rhfideXH21Lab333mdd2d-");
-        this.action = Engine.get().getClientConfiguration().getString("actionV3", "yzysply_wr_pageview");
+    public void handle(Object object) {
+        this.handle((Message)object);
     }
 }
 

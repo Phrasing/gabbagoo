@@ -42,12 +42,36 @@ import java.util.regex.Pattern;
 
 public class PXTokenAPI
 extends PXTokenBase {
-    public String sid;
-    public static Pattern BAKE_PATTERN = Pattern.compile("bake\\|.*?\\|.*?\\|(.*?)\\|");
+    public RealClient apiClient;
     public long requestTime;
     public String vid;
     public String uuid;
-    public RealClient apiClient;
+    public static Pattern BAKE_PATTERN = Pattern.compile("bake\\|.*?\\|.*?\\|(.*?)\\|");
+    public String sid;
+
+    public static JsonObject lambda$solveCaptcha$2(JsonObject jsonObject) {
+        return jsonObject.getJsonObject("result");
+    }
+
+    @Override
+    public boolean isTokenCaptcha() {
+        return false;
+    }
+
+    public CompletableFuture handleBundle(Supplier supplier) {
+        MultiMap multiMap = this.jsonToForm(supplier);
+        return this.requestExecutor(this::bundleReq, multiMap);
+    }
+
+    public Optional parseResult(String string) {
+        Matcher matcher = BAKE_PATTERN.matcher(string);
+        if (!matcher.find()) return Optional.empty();
+        return Optional.of("3:" + matcher.group(1));
+    }
+
+    public HttpRequest lambda$solveCaptcha$8() {
+        return this.apiCaptchaRequest(2, "https://www.hibbett.com/");
+    }
 
     /*
      * Unable to fully structure code
@@ -150,46 +174,72 @@ lbl51:
         throw new IllegalArgumentException();
     }
 
-    public HttpRequest lambda$solveCaptcha$8() {
-        return this.apiCaptchaRequest(2, "https://www.hibbett.com/");
+    @Override
+    public CompletableFuture reInit() {
+        return CompletableFuture.completedFuture(true);
     }
 
-    public Optional parseResult(String string) {
-        Matcher matcher = BAKE_PATTERN.matcher(string);
-        if (!matcher.find()) return Optional.empty();
-        return Optional.of("3:" + matcher.group(1));
-    }
-
-    public static JsonObject lambda$solveCaptcha$7(JsonObject jsonObject) {
-        return jsonObject;
+    public CompletableFuture handleToken(Supplier supplier) {
+        MultiMap multiMap = this.jsonToForm(supplier);
+        return this.requestExecutor(this::collectorRequest, multiMap);
     }
 
     public static JsonObject lambda$solveCaptcha$9(JsonObject jsonObject) {
         return jsonObject.getJsonObject("result");
     }
 
-    public static JsonObject lambda$solveCaptcha$4(JsonObject jsonObject) {
-        return jsonObject;
-    }
-
-    public CompletableFuture handleBundle(Supplier supplier) {
-        MultiMap multiMap = this.jsonToForm(supplier);
-        return this.requestExecutor(this::bundleReq, multiMap);
-    }
-
-    @Override
-    public CompletableFuture initialize() {
-        return CompletableFuture.completedFuture(true);
-    }
-
-    @Override
-    public String getVid() {
-        return "null";
+    public HttpRequest lambda$solveCaptcha$6() {
+        return this.apiRequest(2, "https://www.hibbett.com/");
     }
 
     @Override
     public CompletableFuture solveCaptcha(String string, String string2) {
         return CompletableFuture.completedFuture(true);
+    }
+
+    public HttpRequest lambda$solveCaptcha$5(MultiMap multiMap) {
+        return this.imageReq(multiMap);
+    }
+
+    public static JsonObject lambda$solveCaptcha$7(JsonObject jsonObject) {
+        return jsonObject;
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$solveCaptcha(PXTokenAPI var0, String var1_1, String var2_2, String var3_3, int var4_4, CompletableFuture var5_5, JsonObject var6_7, JsonObject var7_8, JsonObject var8_9, JsonObject var9_10, MultiMap var10_11, JsonObject var11_12, JsonObject var12_13, JsonObject var13_14, int var14_16, Throwable var15_18, int var16_19, Object var17_30) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [2[CASE]], but top level block is 15[WHILELOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public HttpRequest lambda$solveCaptcha$1() {
+        return this.apiCaptchaRequest(1, "https://www.hibbett.com/");
+    }
+
+    public HttpRequest lambda$solveCaptcha$3() {
+        return this.apiCaptchaRequest(15, "https://www.hibbett.com/");
     }
 
     public MultiMap jsonToForm(Supplier supplier) {
@@ -213,24 +263,13 @@ lbl51:
         return multiMap;
     }
 
-    public HttpRequest imageReq(MultiMap multiMap) {
-        StringBuilder stringBuilder = new StringBuilder();
-        multiMap.forEach(arg_0 -> PXTokenAPI.lambda$imageReq$0(stringBuilder, arg_0));
-        HttpRequest httpRequest = this.client.getAbs("https://collector-" + "PXAJDckzHD".toLowerCase() + ".perimeterx.net/b/g?" + stringBuilder).as(BodyCodec.buffer());
-        httpRequest.putHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.hibbett.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.hibbett.com/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9,de-DE;q=0.8,de;q=0.7");
-        return httpRequest;
-    }
-
-    public static JsonObject lambda$solveCaptcha$2(JsonObject jsonObject) {
-        return jsonObject.getJsonObject("result");
+    public Optional parseCapResult(String string) {
+        if (!string.contains("cv|0")) {
+            return Optional.empty();
+        }
+        Matcher matcher = BAKE_PATTERN.matcher(string);
+        if (!matcher.find()) return Optional.empty();
+        return Optional.of("3:" + matcher.group(1));
     }
 
     public CompletableFuture requestExecutor(Supplier supplier, Object object) {
@@ -277,24 +316,8 @@ lbl51:
         return CompletableFuture.completedFuture(null);
     }
 
-    public CompletableFuture handleToken(Supplier supplier) {
-        MultiMap multiMap = this.jsonToForm(supplier);
-        return this.requestExecutor(this::collectorRequest, multiMap);
-    }
-
-    public HttpRequest lambda$solveCaptcha$5(MultiMap multiMap) {
-        return this.imageReq(multiMap);
-    }
-
-    public PXTokenAPI(TaskActor taskActor) {
-        super(taskActor, ClientType.PX_SDK_PIXEL_3);
-        this.apiClient = RealClientFactory.build(taskActor.getVertx(), ClientType.PX_SDK_PIXEL_3);
-        this.requestTime = 0L;
-    }
-
-    @Override
-    public CompletableFuture reInit() {
-        return CompletableFuture.completedFuture(true);
+    public static JsonObject lambda$solveCaptcha$4(JsonObject jsonObject) {
+        return jsonObject;
     }
 
     @Override
@@ -303,32 +326,24 @@ lbl51:
     }
 
     @Override
-    public boolean isTokenCaptcha() {
-        return false;
+    public String getVid() {
+        return "null";
     }
 
-    public HttpRequest collectorRequest() {
-        String string = "PerimeterX Android SDK/" + "v1.13.2".substring(1);
-        HttpRequest httpRequest = this.client.postAbs("https://collector-" + "PX9Qx3Rve4".toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.buffer());
-        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
-        httpRequest.putHeader("user-agent", string);
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("accept-encoding", "gzip");
+    public HttpRequest imageReq(MultiMap multiMap) {
+        StringBuilder stringBuilder = new StringBuilder();
+        multiMap.forEach(arg_0 -> PXTokenAPI.lambda$imageReq$0(stringBuilder, arg_0));
+        HttpRequest httpRequest = this.client.getAbs("https://collector-" + "PXAJDckzHD".toLowerCase() + ".perimeterx.net/b/g?" + stringBuilder).as(BodyCodec.buffer());
+        httpRequest.putHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.hibbett.com");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.hibbett.com/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9,de-DE;q=0.8,de;q=0.7");
         return httpRequest;
-    }
-
-    @Override
-    public CompletableFuture awaitInit() {
-        return this.initFuture;
-    }
-
-    public HttpRequest lambda$solveCaptcha$1() {
-        return this.apiCaptchaRequest(1, "https://www.hibbett.com/");
-    }
-
-    public HttpRequest lambda$solveCaptcha$3() {
-        return this.apiCaptchaRequest(15, "https://www.hibbett.com/");
     }
 
     public CompletableFuture solveCaptcha(String string, String string2, String string3) {
@@ -433,6 +448,39 @@ lbl51:
         return CompletableFuture.completedFuture(true);
     }
 
+    @Override
+    public CompletableFuture initialize() {
+        return CompletableFuture.completedFuture(true);
+    }
+
+    public HttpRequest apiRequest(int n, String string) {
+        HttpRequest httpRequest = this.client.postAbs("https://px.hwkapi.com/px/" + n).addQueryParam("domain", string).addQueryParam("appId", "PXAJDckzHD").addQueryParam("auth", "test_67b74d34-d55b-4193-aa89-3dde8e1713a6").as(BodyCodec.buffer());
+        httpRequest.putHeader("User-Agent", "python-requests/2.24.0");
+        httpRequest.putHeader("Accept-Encoding", "gzip, deflate");
+        httpRequest.putHeader("Accept", "*/*");
+        httpRequest.putHeader("Connection", "keep-alive");
+        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
+        httpRequest.putHeader("Content-Type", "application/json");
+        return httpRequest;
+    }
+
+    public static void lambda$imageReq$0(StringBuilder stringBuilder, Map.Entry entry) {
+        if (stringBuilder.length() > 0) {
+            stringBuilder.append("&");
+        }
+        if (((String)entry.getValue()).contains("\udd31")) {
+            stringBuilder.append((String)entry.getKey()).append("=").append(URLEncoder.encode((String)entry.getValue(), StandardCharsets.UTF_8));
+            return;
+        }
+        stringBuilder.append((String)entry.getKey()).append("=").append((String)entry.getValue());
+    }
+
+    public PXTokenAPI(TaskActor taskActor) {
+        super(taskActor, ClientType.PX_SDK_PIXEL_3);
+        this.apiClient = RealClientFactory.build(taskActor.getVertx(), ClientType.PX_SDK_PIXEL_3);
+        this.requestTime = 0L;
+    }
+
     public HttpRequest bundleReq() {
         HttpRequest httpRequest = this.client.postAbs("https://collector-" + "PXAJDckzHD".toLowerCase() + ".px-cloud.net/assets/js/bundle").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
@@ -451,61 +499,6 @@ lbl51:
         return httpRequest;
     }
 
-    public static void lambda$imageReq$0(StringBuilder stringBuilder, Map.Entry entry) {
-        if (stringBuilder.length() > 0) {
-            stringBuilder.append("&");
-        }
-        if (((String)entry.getValue()).contains("\udd31")) {
-            stringBuilder.append((String)entry.getKey()).append("=").append(URLEncoder.encode((String)entry.getValue(), StandardCharsets.UTF_8));
-            return;
-        }
-        stringBuilder.append((String)entry.getKey()).append("=").append((String)entry.getValue());
-    }
-
-    public HttpRequest lambda$solveCaptcha$6() {
-        return this.apiRequest(2, "https://www.hibbett.com/");
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$solveCaptcha(PXTokenAPI var0, String var1_1, String var2_2, String var3_3, int var4_4, CompletableFuture var5_5, JsonObject var6_7, JsonObject var7_8, JsonObject var8_9, JsonObject var9_10, MultiMap var10_11, JsonObject var11_12, JsonObject var12_13, JsonObject var13_14, int var14_16, Throwable var15_18, int var16_19, Object var17_30) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [2[CASE]], but top level block is 15[WHILELOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public HttpRequest apiRequest(int n, String string) {
-        HttpRequest httpRequest = this.client.postAbs("https://px.hwkapi.com/px/" + n).addQueryParam("domain", string).addQueryParam("appId", "PXAJDckzHD").addQueryParam("auth", "test_67b74d34-d55b-4193-aa89-3dde8e1713a6").as(BodyCodec.buffer());
-        httpRequest.putHeader("User-Agent", "python-requests/2.24.0");
-        httpRequest.putHeader("Accept-Encoding", "gzip, deflate");
-        httpRequest.putHeader("Accept", "*/*");
-        httpRequest.putHeader("Connection", "keep-alive");
-        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        httpRequest.putHeader("Content-Type", "application/json");
-        return httpRequest;
-    }
-
     public HttpRequest apiCaptchaRequest(int n, String string) {
         HttpRequest httpRequest = this.client.postAbs("https://px.hwkapi.com/px/captcha/" + n).addQueryParam("domain", string).addQueryParam("appId", "PXAJDckzHD").addQueryParam("auth", "test_67b74d34-d55b-4193-aa89-3dde8e1713a6").as(BodyCodec.buffer());
         httpRequest.putHeader("User-Agent", "python-requests/2.24.0");
@@ -517,13 +510,20 @@ lbl51:
         return httpRequest;
     }
 
-    public Optional parseCapResult(String string) {
-        if (!string.contains("cv|0")) {
-            return Optional.empty();
-        }
-        Matcher matcher = BAKE_PATTERN.matcher(string);
-        if (!matcher.find()) return Optional.empty();
-        return Optional.of("3:" + matcher.group(1));
+    public HttpRequest collectorRequest() {
+        String string = "PerimeterX Android SDK/" + "v1.13.2".substring(1);
+        HttpRequest httpRequest = this.client.postAbs("https://collector-" + "PX9Qx3Rve4".toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.buffer());
+        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
+        httpRequest.putHeader("user-agent", string);
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("accept-encoding", "gzip");
+        return httpRequest;
+    }
+
+    @Override
+    public CompletableFuture awaitInit() {
+        return this.initFuture;
     }
 }
 

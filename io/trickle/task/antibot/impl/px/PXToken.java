@@ -46,181 +46,22 @@ import java.util.regex.Pattern;
 
 public class PXToken
 extends PXTokenBase {
-    public int failedCaptchaSolves = 0;
-    public boolean isTokenCaptcha;
-    public InitPayload initPayload;
-    public long expiryTime;
-    public long timer;
-    public int expiryCount;
-    public long requestTime = 0L;
     public boolean isFirstTime = true;
-    public SecondPayload secondPayload;
-    public Site SITE;
+    public boolean isTokenCaptcha;
+    public int rotates = 0;
+    public int expiryCount;
+    public int failedCaptchaSolves = 0;
+    public boolean hasVidSolved;
+    public PXCaptcha captchaHandler;
+    public long requestTime = 0L;
     public boolean stopKeepalive = false;
     public long restartTime = 0L;
+    public InitPayload initPayload;
+    public SecondPayload secondPayload;
+    public long expiryTime;
     public static Pattern BAKE_PATTERN = Pattern.compile("bake\\|.*?\\|.*?\\|(.*?)\\|");
-    public PXCaptcha captchaHandler;
-    public boolean hasVidSolved;
-    public int rotates = 0;
-
-    public void rotateProxy() {
-        try {
-            RealClient realClient = RealClientFactory.rotateProxy(Vertx.currentContext().owner(), this.client, Controller.PROXY_RESIDENTIAL);
-            this.client.close();
-            this.client = realClient;
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
-
-    @Override
-    public CompletableFuture solveCaptcha(String string, String string2) {
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public CompletableFuture initialize() {
-        CompletableFuture completableFuture = this.initBrowserDevice(true);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, completableFuture2, 0, null, null, null, null, 1, arg_0));
-        }
-        completableFuture.join();
-        int n = 0;
-        while (n < 5) {
-            try {
-                this.hasVidSolved = false;
-                CompletableFuture completableFuture3 = InitPayload.getDeviceFromAPI();
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    PXToken pXToken = this;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, completableFuture4, n, pXToken, null, null, null, 2, arg_0));
-                }
-                Object object = (Devices$Device)completableFuture3.join();
-                this.initPayload = new InitPayload((Devices$Device)object);
-                CompletableFuture completableFuture5 = this.sendInit(this.initPayload);
-                if (!completableFuture5.isDone()) {
-                    object = completableFuture5;
-                    return ((CompletableFuture)((CompletableFuture)object).exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, (CompletableFuture)object, n, null, null, null, null, 3, arg_0));
-                }
-                completableFuture5.join();
-                FirstPayload firstPayload = new FirstPayload(this.initPayload, this.SITE);
-                CompletableFuture completableFuture6 = this.sendPayload(firstPayload.asForm());
-                if (!completableFuture6.isDone()) {
-                    object = completableFuture6;
-                    return ((CompletableFuture)((CompletableFuture)object).exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, (CompletableFuture)object, n, null, firstPayload, null, null, 4, arg_0));
-                }
-                JsonObject jsonObject = (JsonObject)completableFuture6.join();
-                this.secondPayload = new SecondPayload(firstPayload, jsonObject, this.requestTime, this.SITE);
-                CompletableFuture completableFuture7 = this.sendPayload(this.secondPayload.asForm());
-                if (!completableFuture7.isDone()) {
-                    object = completableFuture7;
-                    return ((CompletableFuture)((CompletableFuture)object).exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, (CompletableFuture)object, n, null, firstPayload, jsonObject, null, 5, arg_0));
-                }
-                JsonObject jsonObject2 = (JsonObject)completableFuture7.join();
-                Optional optional = this.parseResult(jsonObject2.toString());
-                if (!optional.isPresent()) throw new Exception("Failed generating token");
-                this.setExpiryTime();
-                this.value = optional.get();
-                this.isTokenCaptcha = false;
-                this.expiryCount = 0;
-                return CompletableFuture.completedFuture(true);
-            }
-            catch (Throwable throwable) {
-                CompletableFuture completableFuture8 = VertxUtil.randomSleep(10000L);
-                if (!completableFuture8.isDone()) {
-                    CompletableFuture completableFuture9 = completableFuture8;
-                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, completableFuture9, n, null, null, null, throwable, 6, arg_0));
-                }
-                completableFuture8.join();
-                ++n;
-            }
-        }
-        return CompletableFuture.completedFuture(false);
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$solveCaptchaDesktop(PXToken var0, String var1_1, String var2_2, String var3_3, CompletableFuture var4_4, int var5_5, Object var6_6) {
-        switch (var5_5) {
-            case 0: {
-                v0 = VertxUtil.hardCodedSleep(7000L);
-                if (!v0.isDone()) {
-                    var4_4 = v0;
-                    return var4_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptchaDesktop(io.trickle.task.antibot.impl.px.PXToken java.lang.String java.lang.String java.lang.String java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (String)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var4_4, (int)1));
-                }
-                ** GOTO lbl10
-            }
-            case 1: {
-                v0 = var4_4;
-lbl10:
-                // 2 sources
-
-                v0.join();
-                return CompletableFuture.completedFuture(null);
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public PXToken(TaskActor taskActor, Site site) {
-        super(taskActor, ClientType.PX_SDK_PIXEL_3, Controller.PROXY_RESIDENTIAL);
-        this.SITE = site;
-    }
-
-    public String getDeviceAcceptEncoding() {
-        return this.captchaHandler.getDevice().getAcceptEncoding();
-    }
-
-    public Optional parseResult(String string) {
-        Matcher matcher = BAKE_PATTERN.matcher(string);
-        if (!matcher.find()) return Optional.empty();
-        return Optional.of("3:" + matcher.group(1));
-    }
-
-    public void retryCheck() {
-        this.vertx.setTimer(500L, this::lambda$retryCheck$1);
-    }
-
-    public void stopTimerEager() {
-        if (this.timer == 0L) return;
-        this.vertx.cancelTimer(this.timer);
-    }
-
-    public CompletableFuture checkOrUpdate() {
-        if (!this.isExpired()) return CompletableFuture.completedFuture(null);
-        ++this.expiryCount;
-        try {
-            PXToken pXToken;
-            CompletableFuture completableFuture = this.sendPayload(this.secondPayload.asKeepAliveForm());
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                PXToken pXToken2 = this;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$checkOrUpdate(this, pXToken2, completableFuture2, null, 1, arg_0));
-            }
-            Optional optional = pXToken.parseResult(((JsonObject)completableFuture.join()).toString());
-            if (optional.isPresent()) {
-                this.setExpiryTime();
-                this.value = optional.get();
-                this.isTokenCaptcha = false;
-                return CompletableFuture.completedFuture(null);
-            }
-            CompletableFuture completableFuture3 = VertxUtil.randomSleep(10000L);
-            if (!completableFuture3.isDone()) {
-                CompletableFuture completableFuture4 = completableFuture3;
-                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$checkOrUpdate(this, null, completableFuture4, optional, 2, arg_0));
-            }
-            completableFuture3.join();
-            return this.checkOrUpdate();
-        }
-        catch (Exception exception) {
-            this.logger.error("Unable to keep-alive post: " + exception.getMessage());
-        }
-        return CompletableFuture.completedFuture(null);
-    }
+    public Site SITE;
+    public long timer;
 
     public HttpRequest initReq() {
         HttpRequest httpRequest = this.client.postAbs("https://px-conf.perimeterx.net/api/v1/mobile").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.jsonObject());
@@ -241,23 +82,83 @@ lbl10:
         return httpRequest;
     }
 
-    @Override
-    public boolean isTokenCaptcha() {
-        return this.isTokenCaptcha;
+    public void rotateProxy() {
+        try {
+            RealClient realClient = RealClientFactory.rotateProxy(Vertx.currentContext().owner(), this.client, Controller.PROXY_RESIDENTIAL);
+            this.client.close();
+            this.client = realClient;
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
     }
 
-    @Override
-    public String getSid() {
-        return this.secondPayload.SID_HEADER;
+    public void setValue(String string) {
+        this.value = string;
     }
 
-    public void setTokenCaptcha(boolean bl) {
-        this.isTokenCaptcha = bl;
+    public boolean isExpired() {
+        if (Instant.now().getEpochSecond() < this.expiryTime) return false;
+        return true;
     }
 
-    @Override
-    public String getVid() {
-        return this.secondPayload.VID_HEADER;
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$sendInit(PXToken var0, InitPayload var1_1, HttpRequest var2_2, CompletableFuture var3_3, HttpResponse var4_5, int var5_6, Object var6_7) {
+        switch (var5_6) {
+            case 0: {
+                var2_2 = var0.initReq();
+                block7: while (var0.client.isActive() != false) {
+                    try {
+                        v0 = Request.send(var2_2, var1_1.asBuffer(var0.SITE));
+                        if (!v0.isDone()) {
+                            var4_5 = v0;
+                            return var4_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendInit(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.InitPayload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (InitPayload)var1_1, (HttpRequest)var2_2, (CompletableFuture)var4_5, null, (int)1));
+                        }
+lbl10:
+                        // 3 sources
+
+                        while (true) {
+                            var3_3 = (HttpResponse)v0.join();
+                            if (var3_3 != null) {
+                                return CompletableFuture.completedFuture((JsonObject)var3_3.body());
+                            }
+                            v1 = VertxUtil.randomSleep(10000L);
+                            if (!v1.isDone()) {
+                                var4_5 = v1;
+                                return var4_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendInit(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.InitPayload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (InitPayload)var1_1, (HttpRequest)var2_2, (CompletableFuture)var4_5, (HttpResponse)var3_3, (int)2));
+                            }
+lbl18:
+                            // 3 sources
+
+                            while (true) {
+                                v1.join();
+                                continue block7;
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                    catch (Throwable var3_4) {
+                        // empty catch block
+                        return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+                    }
+                }
+                return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+            }
+            case 1: {
+                v0 = var3_3;
+                ** continue;
+            }
+            case 2: {
+                v1 = var3_3;
+                var3_3 = var4_5;
+                ** continue;
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     /*
@@ -319,71 +220,214 @@ lbl34:
         throw new IllegalArgumentException();
     }
 
+    @Override
+    public CompletableFuture solveCaptcha(String string, String string2) {
+        return CompletableFuture.completedFuture(null);
+    }
+
     /*
      * Unable to fully structure code
      */
-    public static CompletableFuture async$sendPayload(PXToken var0, MultiMap var1_1, HttpRequest var2_2, long var3_3, CompletableFuture var5_5, HttpResponse var6_6, int var7_7, Object var8_8) {
-        switch (var7_7) {
+    public static CompletableFuture async$reInit(PXToken var0, int var1_1, FirstPayload var2_2, CompletableFuture var3_4, JsonObject var4_5, Throwable var5_6, int var6_7, Object var7_11) {
+        switch (var6_7) {
             case 0: {
-                var2_2 = var0.collectorRequest();
-                block7: while (var0.client.isActive() != false) {
+                var1_1 = 0;
+                block8: while (var1_1 < 1) {
                     try {
-                        var3_3 = System.currentTimeMillis();
-                        v0 = Request.send(var2_2, var1_1);
+                        var2_2 = new FirstPayload(var0.secondPayload, var0.secondPayload.sdkInitCount, var0.requestTime, var0.SITE);
+                        v0 = var0.sendPayload(var2_2.asForm());
                         if (!v0.isDone()) {
-                            var6_6 = v0;
-                            return var6_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendPayload(io.trickle.task.antibot.impl.px.PXToken io.vertx.core.MultiMap io.vertx.ext.web.client.HttpRequest long java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (MultiMap)var1_1, (HttpRequest)var2_2, (long)var3_3, (CompletableFuture)var6_6, null, (int)1));
+                            var6_8 = v0;
+                            return var6_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$reInit(io.trickle.task.antibot.impl.px.PXToken int io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (int)var1_1, (FirstPayload)var2_2, (CompletableFuture)var6_8, null, null, (int)1));
                         }
 lbl11:
                         // 3 sources
 
                         while (true) {
-                            var5_5 = (HttpResponse)v0.join();
-                            if (var5_5 != null) {
-                                var0.requestTime = System.currentTimeMillis() - var3_3;
-                                if (var0.secondPayload == null) return CompletableFuture.completedFuture((JsonObject)var5_5.body());
-                                var0.secondPayload.updatePX349(var0.requestTime);
-                                return CompletableFuture.completedFuture((JsonObject)var5_5.body());
-                            }
-                            v1 = VertxUtil.randomSleep(60000L);
+                            var3_4 = (JsonObject)v0.join();
+                            var0.secondPayload = new SecondPayload((FirstPayload)var2_2, (JsonObject)var3_4, var0.requestTime, var0.SITE);
+                            v1 = var0.sendPayload(var0.secondPayload.asForm());
                             if (!v1.isDone()) {
-                                var6_6 = v1;
-                                return var6_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendPayload(io.trickle.task.antibot.impl.px.PXToken io.vertx.core.MultiMap io.vertx.ext.web.client.HttpRequest long java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (MultiMap)var1_1, (HttpRequest)var2_2, (long)var3_3, (CompletableFuture)var6_6, (HttpResponse)var5_5, (int)2));
+                                var6_9 = v1;
+                                return var6_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$reInit(io.trickle.task.antibot.impl.px.PXToken int io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (int)var1_1, (FirstPayload)var2_2, (CompletableFuture)var6_9, (JsonObject)var3_4, null, (int)2));
                             }
-lbl22:
-                            // 3 sources
-
-                            while (true) {
-                                v1.join();
-                                continue block7;
-                                break;
-                            }
+                            ** GOTO lbl36
                             break;
                         }
                     }
-                    catch (Throwable var3_4) {
-                        // empty catch block
-                        return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+                    catch (Throwable var2_3) {
+                        v2 = VertxUtil.randomSleep(10000L);
+                        if (!v2.isDone()) {
+                            var6_10 = v2;
+                            return var6_10.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$reInit(io.trickle.task.antibot.impl.px.PXToken int io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (int)var1_1, null, (CompletableFuture)var6_10, null, (Throwable)var2_3, (int)3));
+                        }
+lbl24:
+                        // 3 sources
+
+                        while (true) {
+                            v2.join();
+                            ++var1_1;
+                            continue block8;
+                            break;
+                        }
                     }
                 }
-                return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+                return CompletableFuture.completedFuture(false);
             }
             case 1: {
-                v0 = var5_5;
+                v0 = var3_4;
                 ** continue;
             }
             case 2: {
-                v1 = var5_5;
-                var5_5 = var6_6;
+                v1 = var3_4;
+                var3_4 = var4_5;
+lbl36:
+                // 2 sources
+
+                if ((var5_6 = var0.parseResult((var4_5 = (JsonObject)v1.join()).toString())).isPresent() == false) throw new Exception("Failed generating token");
+                var0.setExpiryTime();
+                var0.value = var5_6.get();
+                var0.isTokenCaptcha = false;
+                var0.expiryCount = 0;
+                return CompletableFuture.completedFuture(true);
+            }
+            case 3: {
+                v2 = var3_4;
+                var2_2 = var5_6;
                 ** continue;
             }
         }
         throw new IllegalArgumentException();
     }
 
-    public boolean hasExpiredOnce() {
-        if (this.expiryCount <= 0) return false;
-        return true;
+    public CompletableFuture checkOrUpdate() {
+        if (!this.isExpired()) return CompletableFuture.completedFuture(null);
+        ++this.expiryCount;
+        try {
+            PXToken pXToken;
+            CompletableFuture completableFuture = this.sendPayload(this.secondPayload.asKeepAliveForm());
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                PXToken pXToken2 = this;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$checkOrUpdate(this, pXToken2, completableFuture2, null, 1, arg_0));
+            }
+            Optional optional = pXToken.parseResult(((JsonObject)completableFuture.join()).toString());
+            if (optional.isPresent()) {
+                this.setExpiryTime();
+                this.value = optional.get();
+                this.isTokenCaptcha = false;
+                return CompletableFuture.completedFuture(null);
+            }
+            CompletableFuture completableFuture3 = VertxUtil.randomSleep(10000L);
+            if (!completableFuture3.isDone()) {
+                CompletableFuture completableFuture4 = completableFuture3;
+                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$checkOrUpdate(this, null, completableFuture4, optional, 2, arg_0));
+            }
+            completableFuture3.join();
+            return this.checkOrUpdate();
+        }
+        catch (Exception exception) {
+            this.logger.error("Unable to keep-alive post: " + exception.getMessage());
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture solveCaptchaDesktop(String string, String string2, String string3) {
+        CompletableFuture completableFuture = VertxUtil.hardCodedSleep(7000L);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$solveCaptchaDesktop(this, string, string2, string3, completableFuture2, 1, arg_0));
+        }
+        completableFuture.join();
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public void startTimer() {
+        this.stopTimerEager();
+        this.restartClient(this.client);
+        if (this.vertx == null) {
+            return;
+        }
+        this.timer = this.vertx.setTimer((this.expiryTime - Instant.now().getEpochSecond()) * 1000L, this::lambda$startTimer$0);
+    }
+
+    public String getDeviceSecUAMobile() {
+        return this.captchaHandler.getDevice().getSecUAMobile();
+    }
+
+    public HttpRequest collectorRequest() {
+        String string = "";
+        Object object = "";
+        switch (PXToken$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+            case 1: {
+                string = "PX9Qx3Rve4";
+                object = "PerimeterX Android SDK/" + "v1.13.2".substring(1);
+                break;
+            }
+            case 2: {
+                string = "PXUArm9B04";
+                object = "PerimeterX Android SDK/" + "v1.8.0".substring(1);
+                break;
+            }
+        }
+        HttpRequest httpRequest = this.client.postAbs("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.jsonObject());
+        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
+        httpRequest.putHeader("user-agent", (String)object);
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("accept-encoding", "gzip");
+        return httpRequest;
+    }
+
+    public String getDeviceUA() {
+        try {
+            return this.captchaHandler.getDevice().getUserAgent();
+        }
+        catch (Throwable throwable) {
+            return "";
+        }
+    }
+
+    public String getDeviceAcceptEncoding() {
+        return this.captchaHandler.getDevice().getAcceptEncoding();
+    }
+
+    public void lambda$retryCheck$1(Long l) {
+        Objects.requireNonNull(this);
+        if (this.isExpired()) {
+            this.checkOrUpdate();
+            return;
+        }
+        this.retryCheck();
+    }
+
+    public void setExpiryTimeAfterCap() {
+        this.expiryTime = Instant.now().getEpochSecond() + 300L;
+        this.startTimer();
+    }
+
+    public CompletableFuture handleAfterCap() {
+        try {
+            FirstPayload firstPayload = new FirstPayload(this.secondPayload, this.secondPayload.sdkInitCount, this.requestTime, this.SITE);
+            CompletableFuture completableFuture = this.sendPayload(firstPayload.asForm());
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$handleAfterCap(this, firstPayload, completableFuture2, null, 1, arg_0));
+            }
+            JsonObject jsonObject = (JsonObject)completableFuture.join();
+            this.secondPayload = new SecondPayload(firstPayload, jsonObject, this.requestTime, this.SITE);
+            CompletableFuture completableFuture3 = this.sendPayload(this.secondPayload.asForm());
+            if (!completableFuture3.isDone()) {
+                CompletableFuture completableFuture4 = completableFuture3;
+                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$handleAfterCap(this, firstPayload, completableFuture4, jsonObject, 2, arg_0));
+            }
+            JsonObject jsonObject2 = (JsonObject)completableFuture3.join();
+            return CompletableFuture.completedFuture(null);
+        }
+        catch (Throwable throwable) {
+            this.logger.warn("Error on A-CP: {}", (Object)throwable.getMessage());
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
     public CompletableFuture sendPayload(MultiMap multiMap) {
@@ -418,71 +462,34 @@ lbl22:
         return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
     }
 
-    public String getDeviceSecUAMobile() {
-        return this.captchaHandler.getDevice().getSecUAMobile();
+    public String getDeviceSecUA() {
+        return this.captchaHandler.getDevice().getSecUA();
     }
 
-    public boolean isExpired() {
-        if (Instant.now().getEpochSecond() < this.expiryTime) return false;
-        return true;
+    public void retryCheck() {
+        this.vertx.setTimer(500L, this::lambda$retryCheck$1);
     }
 
-    public PXCaptcha getCaptchaHandler() {
-        return this.captchaHandler;
+    public void setTokenCaptcha(boolean bl) {
+        this.isTokenCaptcha = bl;
     }
 
-    public String getDeviceLang() {
-        return this.captchaHandler.getDevice().getAcceptLanguage();
+    @Override
+    public String getSid() {
+        return this.secondPayload.SID_HEADER;
     }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$handleAfterCap(PXToken var0, FirstPayload var1_1, CompletableFuture var2_3, JsonObject var3_4, int var4_5, Object var5_8) {
-        switch (var4_5) {
-            case 0: {
-                try {
-                    var1_1 = new FirstPayload(var0.secondPayload, var0.secondPayload.sdkInitCount, var0.requestTime, var0.SITE);
-                    v0 = var0.sendPayload(var1_1.asForm());
-                    if (!v0.isDone()) {
-                        var4_6 = v0;
-                        return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleAfterCap(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (FirstPayload)var1_1, (CompletableFuture)var4_6, null, (int)1));
-                    }
-lbl9:
-                    // 3 sources
+    public PXToken(TaskActor taskActor, Site site) {
+        super(taskActor, ClientType.PX_SDK_PIXEL_3, Controller.PROXY_RESIDENTIAL);
+        this.SITE = site;
+    }
 
-                    while (true) {
-                        var2_3 = (JsonObject)v0.join();
-                        var0.secondPayload = new SecondPayload(var1_1, (JsonObject)var2_3, var0.requestTime, var0.SITE);
-                        v1 = var0.sendPayload(var0.secondPayload.asForm());
-                        if (!v1.isDone()) {
-                            var4_7 = v1;
-                            return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleAfterCap(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (FirstPayload)var1_1, (CompletableFuture)var4_7, (JsonObject)var2_3, (int)2));
-                        }
-                        ** GOTO lbl26
-                        break;
-                    }
-                }
-                catch (Throwable var1_2) {
-                    var0.logger.warn("Error on A-CP: {}", (Object)var1_2.getMessage());
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_3;
-                ** continue;
-            }
-            case 2: {
-                v1 = var2_3;
-                var2_3 = var3_4;
-lbl26:
-                // 2 sources
-
-                var3_4 = (JsonObject)v1.join();
-                return CompletableFuture.completedFuture(null);
-            }
+    public CompletableFuture initBrowserDevice(boolean bl) {
+        if (!bl) {
+            if (this.captchaHandler != null) return this.captchaHandler.prepareDevice();
         }
-        throw new IllegalArgumentException();
+        this.captchaHandler = new PXCaptcha(this.logger, this.client, Types.CAPTCHA_DESKTOP, null, null, this.SITE);
+        return this.captchaHandler.prepareDevice();
     }
 
     /*
@@ -623,157 +630,68 @@ lbl80:
         throw new IllegalArgumentException();
     }
 
-    public void lambda$startTimer$0(Long l) {
-        Objects.requireNonNull(this);
-        if (this.isExpired()) {
-            this.checkOrUpdate();
-            return;
-        }
-        this.retryCheck();
+    public PXCaptcha getCaptchaHandler() {
+        return this.captchaHandler;
     }
 
-    public String getDeviceSecUA() {
-        return this.captchaHandler.getDevice().getSecUA();
-    }
-
-    public HttpRequest collectorRequest() {
-        String string = "";
-        Object object = "";
-        switch (PXToken$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
-            case 1: {
-                string = "PX9Qx3Rve4";
-                object = "PerimeterX Android SDK/" + "v1.13.2".substring(1);
-                break;
-            }
-            case 2: {
-                string = "PXUArm9B04";
-                object = "PerimeterX Android SDK/" + "v1.8.0".substring(1);
-                break;
-            }
-        }
-        HttpRequest httpRequest = this.client.postAbs("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.jsonObject());
-        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
-        httpRequest.putHeader("user-agent", (String)object);
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("accept-encoding", "gzip");
-        return httpRequest;
-    }
-
-    public void startTimer() {
-        this.stopTimerEager();
-        this.restartClient(this.client);
-        if (this.vertx == null) {
-            return;
-        }
-        this.timer = this.vertx.setTimer((this.expiryTime - Instant.now().getEpochSecond()) * 1000L, this::lambda$startTimer$0);
-    }
-
-    public void rotateAndRegen() {
-        this.rotateProxy();
-        this.initialize();
-    }
-
-    public void setExpiryTimeAfterCap() {
-        this.expiryTime = Instant.now().getEpochSecond() + 300L;
-        this.startTimer();
-    }
-
-    public void setExpiryTime() {
-        this.expiryTime = (long)((double)Instant.now().getEpochSecond() + Double.longBitsToDouble(4642627155242306765L));
-        this.startTimer();
-    }
-
-    public CompletableFuture solveCaptchaDesktop(String string, String string2, String string3) {
-        CompletableFuture completableFuture = VertxUtil.hardCodedSleep(7000L);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$solveCaptchaDesktop(this, string, string2, string3, completableFuture2, 1, arg_0));
-        }
-        completableFuture.join();
-        return CompletableFuture.completedFuture(null);
+    public boolean hasExpiredOnce() {
+        if (this.expiryCount <= 0) return false;
+        return true;
     }
 
     /*
      * Unable to fully structure code
      */
-    public static CompletableFuture async$sendInit(PXToken var0, InitPayload var1_1, HttpRequest var2_2, CompletableFuture var3_3, HttpResponse var4_5, int var5_6, Object var6_7) {
-        switch (var5_6) {
+    public static CompletableFuture async$handleAfterCap(PXToken var0, FirstPayload var1_1, CompletableFuture var2_3, JsonObject var3_4, int var4_5, Object var5_8) {
+        switch (var4_5) {
             case 0: {
-                var2_2 = var0.initReq();
-                block7: while (var0.client.isActive() != false) {
-                    try {
-                        v0 = Request.send(var2_2, var1_1.asBuffer(var0.SITE));
-                        if (!v0.isDone()) {
-                            var4_5 = v0;
-                            return var4_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendInit(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.InitPayload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (InitPayload)var1_1, (HttpRequest)var2_2, (CompletableFuture)var4_5, null, (int)1));
-                        }
-lbl10:
-                        // 3 sources
-
-                        while (true) {
-                            var3_3 = (HttpResponse)v0.join();
-                            if (var3_3 != null) {
-                                return CompletableFuture.completedFuture((JsonObject)var3_3.body());
-                            }
-                            v1 = VertxUtil.randomSleep(10000L);
-                            if (!v1.isDone()) {
-                                var4_5 = v1;
-                                return var4_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendInit(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.InitPayload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (InitPayload)var1_1, (HttpRequest)var2_2, (CompletableFuture)var4_5, (HttpResponse)var3_3, (int)2));
-                            }
-lbl18:
-                            // 3 sources
-
-                            while (true) {
-                                v1.join();
-                                continue block7;
-                                break;
-                            }
-                            break;
-                        }
+                try {
+                    var1_1 = new FirstPayload(var0.secondPayload, var0.secondPayload.sdkInitCount, var0.requestTime, var0.SITE);
+                    v0 = var0.sendPayload(var1_1.asForm());
+                    if (!v0.isDone()) {
+                        var4_6 = v0;
+                        return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleAfterCap(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (FirstPayload)var1_1, (CompletableFuture)var4_6, null, (int)1));
                     }
-                    catch (Throwable var3_4) {
-                        // empty catch block
-                        return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+lbl9:
+                    // 3 sources
+
+                    while (true) {
+                        var2_3 = (JsonObject)v0.join();
+                        var0.secondPayload = new SecondPayload(var1_1, (JsonObject)var2_3, var0.requestTime, var0.SITE);
+                        v1 = var0.sendPayload(var0.secondPayload.asForm());
+                        if (!v1.isDone()) {
+                            var4_7 = v1;
+                            return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleAfterCap(io.trickle.task.antibot.impl.px.PXToken io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (FirstPayload)var1_1, (CompletableFuture)var4_7, (JsonObject)var2_3, (int)2));
+                        }
+                        ** GOTO lbl26
+                        break;
                     }
                 }
-                return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+                catch (Throwable var1_2) {
+                    var0.logger.warn("Error on A-CP: {}", (Object)var1_2.getMessage());
+                }
+                return CompletableFuture.completedFuture(null);
             }
             case 1: {
-                v0 = var3_3;
+                v0 = var2_3;
                 ** continue;
             }
             case 2: {
-                v1 = var3_3;
-                var3_3 = var4_5;
-                ** continue;
+                v1 = var2_3;
+                var2_3 = var3_4;
+lbl26:
+                // 2 sources
+
+                var3_4 = (JsonObject)v1.join();
+                return CompletableFuture.completedFuture(null);
             }
         }
         throw new IllegalArgumentException();
     }
 
-    public CompletableFuture handleAfterCap() {
-        try {
-            FirstPayload firstPayload = new FirstPayload(this.secondPayload, this.secondPayload.sdkInitCount, this.requestTime, this.SITE);
-            CompletableFuture completableFuture = this.sendPayload(firstPayload.asForm());
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$handleAfterCap(this, firstPayload, completableFuture2, null, 1, arg_0));
-            }
-            JsonObject jsonObject = (JsonObject)completableFuture.join();
-            this.secondPayload = new SecondPayload(firstPayload, jsonObject, this.requestTime, this.SITE);
-            CompletableFuture completableFuture3 = this.sendPayload(this.secondPayload.asForm());
-            if (!completableFuture3.isDone()) {
-                CompletableFuture completableFuture4 = completableFuture3;
-                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$handleAfterCap(this, firstPayload, completableFuture4, jsonObject, 2, arg_0));
-            }
-            JsonObject jsonObject2 = (JsonObject)completableFuture3.join();
-            return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            this.logger.warn("Error on A-CP: {}", (Object)throwable.getMessage());
-        }
-        return CompletableFuture.completedFuture(null);
+    public void rotateAndRegen() {
+        this.rotateProxy();
+        this.initialize();
     }
 
     @Override
@@ -816,17 +734,75 @@ lbl18:
         return CompletableFuture.completedFuture(false);
     }
 
-    public CompletableFuture initBrowserDevice(boolean bl) {
-        if (!bl) {
-            if (this.captchaHandler != null) return this.captchaHandler.prepareDevice();
-        }
-        this.captchaHandler = new PXCaptcha(this.logger, this.client, Types.CAPTCHA_DESKTOP, null, null, this.SITE);
-        return this.captchaHandler.prepareDevice();
+    @Override
+    public String getVid() {
+        return this.secondPayload.VID_HEADER;
     }
 
     @Override
     public CompletableFuture awaitInit() {
         return this.initFuture;
+    }
+
+    @Override
+    public CompletableFuture initialize() {
+        CompletableFuture completableFuture = this.initBrowserDevice(true);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, completableFuture2, 0, null, null, null, null, 1, arg_0));
+        }
+        completableFuture.join();
+        int n = 0;
+        while (n < 5) {
+            try {
+                this.hasVidSolved = false;
+                CompletableFuture completableFuture3 = InitPayload.getDeviceFromAPI();
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    PXToken pXToken = this;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, completableFuture4, n, pXToken, null, null, null, 2, arg_0));
+                }
+                Object object = (Devices$Device)completableFuture3.join();
+                this.initPayload = new InitPayload((Devices$Device)object);
+                CompletableFuture completableFuture5 = this.sendInit(this.initPayload);
+                if (!completableFuture5.isDone()) {
+                    object = completableFuture5;
+                    return ((CompletableFuture)((CompletableFuture)object).exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, (CompletableFuture)object, n, null, null, null, null, 3, arg_0));
+                }
+                completableFuture5.join();
+                FirstPayload firstPayload = new FirstPayload(this.initPayload, this.SITE);
+                CompletableFuture completableFuture6 = this.sendPayload(firstPayload.asForm());
+                if (!completableFuture6.isDone()) {
+                    object = completableFuture6;
+                    return ((CompletableFuture)((CompletableFuture)object).exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, (CompletableFuture)object, n, null, firstPayload, null, null, 4, arg_0));
+                }
+                JsonObject jsonObject = (JsonObject)completableFuture6.join();
+                this.secondPayload = new SecondPayload(firstPayload, jsonObject, this.requestTime, this.SITE);
+                CompletableFuture completableFuture7 = this.sendPayload(this.secondPayload.asForm());
+                if (!completableFuture7.isDone()) {
+                    object = completableFuture7;
+                    return ((CompletableFuture)((CompletableFuture)object).exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, (CompletableFuture)object, n, null, firstPayload, jsonObject, null, 5, arg_0));
+                }
+                JsonObject jsonObject2 = (JsonObject)completableFuture7.join();
+                Optional optional = this.parseResult(jsonObject2.toString());
+                if (!optional.isPresent()) throw new Exception("Failed generating token");
+                this.setExpiryTime();
+                this.value = optional.get();
+                this.isTokenCaptcha = false;
+                this.expiryCount = 0;
+                return CompletableFuture.completedFuture(true);
+            }
+            catch (Throwable throwable) {
+                CompletableFuture completableFuture8 = VertxUtil.randomSleep(10000L);
+                if (!completableFuture8.isDone()) {
+                    CompletableFuture completableFuture9 = completableFuture8;
+                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> PXToken.async$initialize(this, completableFuture9, n, null, null, null, throwable, 6, arg_0));
+                }
+                completableFuture8.join();
+                ++n;
+            }
+        }
+        return CompletableFuture.completedFuture(false);
     }
 
     public CompletableFuture sendInit(InitPayload initPayload) {
@@ -857,20 +833,115 @@ lbl18:
         return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
     }
 
-    public void setValue(String string) {
-        this.value = string;
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$sendPayload(PXToken var0, MultiMap var1_1, HttpRequest var2_2, long var3_3, CompletableFuture var5_5, HttpResponse var6_6, int var7_7, Object var8_8) {
+        switch (var7_7) {
+            case 0: {
+                var2_2 = var0.collectorRequest();
+                block7: while (var0.client.isActive() != false) {
+                    try {
+                        var3_3 = System.currentTimeMillis();
+                        v0 = Request.send(var2_2, var1_1);
+                        if (!v0.isDone()) {
+                            var6_6 = v0;
+                            return var6_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendPayload(io.trickle.task.antibot.impl.px.PXToken io.vertx.core.MultiMap io.vertx.ext.web.client.HttpRequest long java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (MultiMap)var1_1, (HttpRequest)var2_2, (long)var3_3, (CompletableFuture)var6_6, null, (int)1));
+                        }
+lbl11:
+                        // 3 sources
+
+                        while (true) {
+                            var5_5 = (HttpResponse)v0.join();
+                            if (var5_5 != null) {
+                                var0.requestTime = System.currentTimeMillis() - var3_3;
+                                if (var0.secondPayload == null) return CompletableFuture.completedFuture((JsonObject)var5_5.body());
+                                var0.secondPayload.updatePX349(var0.requestTime);
+                                return CompletableFuture.completedFuture((JsonObject)var5_5.body());
+                            }
+                            v1 = VertxUtil.randomSleep(60000L);
+                            if (!v1.isDone()) {
+                                var6_6 = v1;
+                                return var6_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$sendPayload(io.trickle.task.antibot.impl.px.PXToken io.vertx.core.MultiMap io.vertx.ext.web.client.HttpRequest long java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (MultiMap)var1_1, (HttpRequest)var2_2, (long)var3_3, (CompletableFuture)var6_6, (HttpResponse)var5_5, (int)2));
+                            }
+lbl22:
+                            // 3 sources
+
+                            while (true) {
+                                v1.join();
+                                continue block7;
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                    catch (Throwable var3_4) {
+                        // empty catch block
+                        return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+                    }
+                }
+                return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
+            }
+            case 1: {
+                v0 = var5_5;
+                ** continue;
+            }
+            case 2: {
+                v1 = var5_5;
+                var5_5 = var6_6;
+                ** continue;
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
-    public String getDeviceUA() {
-        try {
-            return this.captchaHandler.getDevice().getUserAgent();
-        }
-        catch (Throwable throwable) {
-            return "";
-        }
+    public void setExpiryTime() {
+        this.expiryTime = (long)((double)Instant.now().getEpochSecond() + Double.longBitsToDouble(4642627155242306765L));
+        this.startTimer();
     }
 
-    public void lambda$retryCheck$1(Long l) {
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$solveCaptchaDesktop(PXToken var0, String var1_1, String var2_2, String var3_3, CompletableFuture var4_4, int var5_5, Object var6_6) {
+        switch (var5_5) {
+            case 0: {
+                v0 = VertxUtil.hardCodedSleep(7000L);
+                if (!v0.isDone()) {
+                    var4_4 = v0;
+                    return var4_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptchaDesktop(io.trickle.task.antibot.impl.px.PXToken java.lang.String java.lang.String java.lang.String java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (String)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var4_4, (int)1));
+                }
+                ** GOTO lbl10
+            }
+            case 1: {
+                v0 = var4_4;
+lbl10:
+                // 2 sources
+
+                v0.join();
+                return CompletableFuture.completedFuture(null);
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    public void stopTimerEager() {
+        if (this.timer == 0L) return;
+        this.vertx.cancelTimer(this.timer);
+    }
+
+    @Override
+    public boolean isTokenCaptcha() {
+        return this.isTokenCaptcha;
+    }
+
+    public Optional parseResult(String string) {
+        Matcher matcher = BAKE_PATTERN.matcher(string);
+        if (!matcher.find()) return Optional.empty();
+        return Optional.of("3:" + matcher.group(1));
+    }
+
+    public void lambda$startTimer$0(Long l) {
         Objects.requireNonNull(this);
         if (this.isExpired()) {
             this.checkOrUpdate();
@@ -879,79 +950,8 @@ lbl18:
         this.retryCheck();
     }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$reInit(PXToken var0, int var1_1, FirstPayload var2_2, CompletableFuture var3_4, JsonObject var4_5, Throwable var5_6, int var6_7, Object var7_11) {
-        switch (var6_7) {
-            case 0: {
-                var1_1 = 0;
-                block8: while (var1_1 < 1) {
-                    try {
-                        var2_2 = new FirstPayload(var0.secondPayload, var0.secondPayload.sdkInitCount, var0.requestTime, var0.SITE);
-                        v0 = var0.sendPayload(var2_2.asForm());
-                        if (!v0.isDone()) {
-                            var6_8 = v0;
-                            return var6_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$reInit(io.trickle.task.antibot.impl.px.PXToken int io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (int)var1_1, (FirstPayload)var2_2, (CompletableFuture)var6_8, null, null, (int)1));
-                        }
-lbl11:
-                        // 3 sources
-
-                        while (true) {
-                            var3_4 = (JsonObject)v0.join();
-                            var0.secondPayload = new SecondPayload((FirstPayload)var2_2, (JsonObject)var3_4, var0.requestTime, var0.SITE);
-                            v1 = var0.sendPayload(var0.secondPayload.asForm());
-                            if (!v1.isDone()) {
-                                var6_9 = v1;
-                                return var6_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$reInit(io.trickle.task.antibot.impl.px.PXToken int io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (int)var1_1, (FirstPayload)var2_2, (CompletableFuture)var6_9, (JsonObject)var3_4, null, (int)2));
-                            }
-                            ** GOTO lbl36
-                            break;
-                        }
-                    }
-                    catch (Throwable var2_3) {
-                        v2 = VertxUtil.randomSleep(10000L);
-                        if (!v2.isDone()) {
-                            var6_10 = v2;
-                            return var6_10.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$reInit(io.trickle.task.antibot.impl.px.PXToken int io.trickle.task.antibot.impl.px.payload.token.FirstPayload java.util.concurrent.CompletableFuture io.vertx.core.json.JsonObject java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((PXToken)var0, (int)var1_1, null, (CompletableFuture)var6_10, null, (Throwable)var2_3, (int)3));
-                        }
-lbl24:
-                        // 3 sources
-
-                        while (true) {
-                            v2.join();
-                            ++var1_1;
-                            continue block8;
-                            break;
-                        }
-                    }
-                }
-                return CompletableFuture.completedFuture(false);
-            }
-            case 1: {
-                v0 = var3_4;
-                ** continue;
-            }
-            case 2: {
-                v1 = var3_4;
-                var3_4 = var4_5;
-lbl36:
-                // 2 sources
-
-                if ((var5_6 = var0.parseResult((var4_5 = (JsonObject)v1.join()).toString())).isPresent() == false) throw new Exception("Failed generating token");
-                var0.setExpiryTime();
-                var0.value = var5_6.get();
-                var0.isTokenCaptcha = false;
-                var0.expiryCount = 0;
-                return CompletableFuture.completedFuture(true);
-            }
-            case 3: {
-                v2 = var3_4;
-                var2_2 = var5_6;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
+    public String getDeviceLang() {
+        return this.captchaHandler.getDevice().getAcceptLanguage();
     }
 }
 

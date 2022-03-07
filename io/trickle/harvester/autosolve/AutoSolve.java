@@ -25,15 +25,15 @@ extends AbstractAutoSolveManager {
     public void onCaptchaTokenReceived(CaptchaToken captchaToken) {
     }
 
+    public void onStatusChanged(AutoSolveStatus autoSolveStatus) {
+    }
+
     public AutoSolve(String string) {
         super(string);
     }
 
     public Logger getLogger() {
         return super.getLogger();
-    }
-
-    public void onStatusChanged(AutoSolveStatus autoSolveStatus) {
     }
 
     public AutoSolve(OkHttpClient.Builder builder, String string) {

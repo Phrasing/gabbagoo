@@ -15,8 +15,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Harvester$SolveFunction {
-    public AtomicReference<CountDownLatch> latch;
     public SolveFuture callback;
+    public AtomicReference<CountDownLatch> latch;
 
     public Harvester$SolveFunction(SolveFuture solveFuture, AtomicReference atomicReference) {
         this.callback = solveFuture;

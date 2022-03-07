@@ -9,52 +9,52 @@ package io.trickle.task.antibot.impl.akamai.pixel;
 import io.vertx.core.json.JsonObject;
 
 public interface Devices$Device {
+    public boolean isFp();
+
+    public JsonObject getCrc();
+
     public int getC();
-
-    public JsonObject getBt();
-
-    public String getBr();
-
-    public String getNap();
-
-    public boolean isAp();
 
     public String getCv();
 
-    public JsonObject getDp();
+    public String getZh();
 
-    public boolean isFp();
+    public boolean isAv();
 
-    public boolean isSp();
+    public boolean isIeps();
+
+    public String getBr();
+
+    public double getJsv();
 
     public String getFonts();
 
-    public String getLt();
+    public String getPs();
 
-    public int getB();
+    public JsonObject getBt();
 
     public boolean isFc();
 
     public String getBp();
 
-    public String getFh();
-
-    public String getZh();
-
-    public JsonObject getCrc();
-
-    public JsonObject getNav();
-
-    public boolean isAv();
+    public String getLt();
 
     public JsonObject getTiming();
 
-    public String getPs();
+    public String getFh();
+
+    public JsonObject getNav();
 
     public JsonObject getSr();
 
-    public double getJsv();
+    public int getB();
 
-    public boolean isIeps();
+    public JsonObject getDp();
+
+    public boolean isAp();
+
+    public boolean isSp();
+
+    public String getNap();
 }
 

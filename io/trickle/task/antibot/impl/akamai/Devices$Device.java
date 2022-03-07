@@ -9,94 +9,94 @@ package io.trickle.task.antibot.impl.akamai;
 import io.vertx.core.json.JsonObject;
 
 public interface Devices$Device {
-    public int getDocumentMode();
-
-    public int hasFileReader();
-
-    public JsonObject getWindowPerms();
-
-    public String getCanvas1();
-
-    public String getDeviceOrientation();
-
-    public int getPluginLength();
-
-    public int hasRTCPeerConnection();
-
-    public boolean sessionStorageKey();
-
-    public int getScreenWidth();
-
-    public long getNavigatorFasSettings();
-
-    public int hasVibrate();
-
-    public int hasBattery();
-
-    public int getScreenHeight();
-
-    public boolean isBrave();
-
-    public String getProduct();
-
-    public int hasHTMLElement();
-
-    public int hasInstallTrigger();
-
-    public int hasForEach();
-
-    public int getPixelDepth();
-
-    public String getLanguage();
-
-    public String getDeviceMotion();
-
-    public int hasMozInnerScreen();
-
-    public int getScreenAvailHeight();
-
-    public boolean localStorageKey();
-
-    public boolean isJavaEnabled();
+    public String getTouchEvent();
 
     public int isOnline();
 
+    public JsonObject getWindowPerms();
+
     public boolean webrtcKey();
 
-    public boolean indexedDBKey();
+    public int hasHTMLElement();
 
-    public int isOpera();
-
-    public int hasActiveXObject();
-
-    public String getUserAgent();
+    public long getNavigatorFasSettings();
 
     public int getDoNotTrack();
 
-    public String getTouchEvent();
-
-    public String getPluginInfo();
+    public String getCanvas1();
 
     public int getColorDepth();
 
-    public int getInnerHeight();
-
-    public int getOuterWidth();
-
-    public int getTimezoneOffset();
-
-    public int getInnerWidth();
-
-    public int isChrome();
-
-    public String getSed();
-
     public boolean isCookieEnabled();
 
-    public String getCanvas2();
+    public boolean indexedDBKey();
+
+    public String getUserAgent();
+
+    public int hasForEach();
 
     public String getProductSub();
 
+    public int hasActiveXObject();
+
+    public int getDocumentMode();
+
+    public int hasInstallTrigger();
+
+    public int hasFileReader();
+
+    public boolean isBrave();
+
+    public int hasMozInnerScreen();
+
+    public String getCanvas2();
+
+    public int getInnerWidth();
+
+    public int getInnerHeight();
+
+    public boolean isJavaEnabled();
+
+    public boolean sessionStorageKey();
+
+    public String getSed();
+
+    public boolean localStorageKey();
+
+    public int getScreenWidth();
+
+    public int hasRTCPeerConnection();
+
     public int getScreenAvailWidth();
+
+    public int getScreenAvailHeight();
+
+    public int getScreenHeight();
+
+    public int getPixelDepth();
+
+    public int isChrome();
+
+    public int getTimezoneOffset();
+
+    public String getDeviceMotion();
+
+    public int isOpera();
+
+    public int hasVibrate();
+
+    public String getLanguage();
+
+    public String getDeviceOrientation();
+
+    public int hasBattery();
+
+    public int getOuterWidth();
+
+    public String getProduct();
+
+    public String getPluginInfo();
+
+    public int getPluginLength();
 }
 

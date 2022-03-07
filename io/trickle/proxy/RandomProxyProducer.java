@@ -14,11 +14,6 @@ public class RandomProxyProducer
 extends AsyncLockingProducer {
     public WeakReference<List<Proxy>> reference;
 
-    public RandomProxyProducer(List list) {
-        this.reference = new WeakReference<List>(list);
-        Objects.requireNonNull((List)this.reference.get());
-    }
-
     @Override
     public void handle() {
         List list = (List)this.reference.get();
@@ -31,6 +26,11 @@ extends AsyncLockingProducer {
         catch (Exception exception) {
             super.fail(exception);
         }
+    }
+
+    public RandomProxyProducer(List list) {
+        this.reference = new WeakReference<List>(list);
+        Objects.requireNonNull((List)this.reference.get());
     }
 }
 

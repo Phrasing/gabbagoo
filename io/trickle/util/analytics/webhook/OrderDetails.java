@@ -13,35 +13,16 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class OrderDetails {
-    public static Function<JsonObject, OrderDetails> WALMART_RESPONSE_PARSER = OrderDetails::lambda$static$0;
-    public String cookie;
-    public static Function<JsonObject, OrderDetails> WALMART_NEW_RESPONSE_PARSER = OrderDetails::lambda$static$1;
-    public String imageURI;
-    public static Function<JsonObject, OrderDetails> YEEZY_RESPONSE_PARSER;
-    public static Function<JsonObject, OrderDetails> HIBBETT_RESPONSE_PARSER;
+    public static Function<JsonObject, OrderDetails> WALMART_NEW_RESPONSE_PARSER;
     public String orderNumber;
-    public String productName;
+    public static Function<JsonObject, OrderDetails> YEEZY_RESPONSE_PARSER;
     public static Function<JsonObject, OrderDetails> SHOPIFY_RESPONSE_PARSER;
+    public String cookie;
+    public String imageURI;
     public static Function<JsonObject, OrderDetails> BESTBUY_RESPONSE_PARSER;
-
-    public static OrderDetails getDefault() {
-        return new OrderDetails(null, null, null);
-    }
-
-    public static OrderDetails lambda$static$3(JsonObject jsonObject) {
-        String string = null;
-        Object var2_2 = null;
-        String string2 = "CHECK EMAIL";
-        try {
-            string = jsonObject.getJsonArray("payments").getJsonObject(0).getJsonObject("checkout").getJsonArray("line_items").getJsonObject(0).getString("title", null);
-            var2_2 = null;
-            return new OrderDetails(string, var2_2, string2);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, var2_2, string2);
-    }
+    public static Function<JsonObject, OrderDetails> WALMART_RESPONSE_PARSER;
+    public String productName;
+    public static Function<JsonObject, OrderDetails> HIBBETT_RESPONSE_PARSER;
 
     public OrderDetails(String string, String string2, String string3, String string4) {
         this(string, string2, string3);
@@ -49,10 +30,36 @@ public class OrderDetails {
     }
 
     static {
+        WALMART_RESPONSE_PARSER = OrderDetails::lambda$static$0;
+        WALMART_NEW_RESPONSE_PARSER = OrderDetails::lambda$static$1;
         HIBBETT_RESPONSE_PARSER = OrderDetails::lambda$static$2;
         SHOPIFY_RESPONSE_PARSER = OrderDetails::lambda$static$3;
         BESTBUY_RESPONSE_PARSER = OrderDetails::lambda$static$4;
         YEEZY_RESPONSE_PARSER = OrderDetails::lambda$static$5;
+    }
+
+    public static OrderDetails lambda$static$4(JsonObject jsonObject) {
+        String string = null;
+        String string2 = null;
+        String string3 = null;
+        try {
+            string = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("shortLabel", null);
+            string3 = jsonObject.getString("customerOrderId", "CHECK EMAIL");
+            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("imageUrl", null);
+            return new OrderDetails(string, string2, string3);
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+        return new OrderDetails(string, string2, string3);
+    }
+
+    public static OrderDetails getDefault() {
+        return new OrderDetails(null, null, null);
+    }
+
+    public Optional productName() {
+        return Optional.ofNullable(this.productName);
     }
 
     public static OrderDetails lambda$static$2(JsonObject jsonObject) {
@@ -72,6 +79,48 @@ public class OrderDetails {
         return new OrderDetails(string, string2, string3);
     }
 
+    public OrderDetails(String string, String string2, String string3) {
+        this.productName = string;
+        this.imageURI = string2;
+        this.orderNumber = string3;
+    }
+
+    public static OrderDetails lambda$static$3(JsonObject jsonObject) {
+        String string = null;
+        Object var2_2 = null;
+        String string2 = "CHECK EMAIL";
+        try {
+            string = jsonObject.getJsonArray("payments").getJsonObject(0).getJsonObject("checkout").getJsonArray("line_items").getJsonObject(0).getString("title", null);
+            var2_2 = null;
+            return new OrderDetails(string, var2_2, string2);
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+        return new OrderDetails(string, var2_2, string2);
+    }
+
+    public static Function getDetailsParser(Site site) {
+        switch (OrderDetails$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
+            case 1: {
+                return WALMART_RESPONSE_PARSER;
+            }
+            case 2: {
+                return WALMART_NEW_RESPONSE_PARSER;
+            }
+            case 3: {
+                return HIBBETT_RESPONSE_PARSER;
+            }
+            case 4: {
+                return YEEZY_RESPONSE_PARSER;
+            }
+            case 5: {
+                return BESTBUY_RESPONSE_PARSER;
+            }
+        }
+        return SHOPIFY_RESPONSE_PARSER;
+    }
+
     public static OrderDetails lambda$static$5(JsonObject jsonObject) {
         String string = null;
         String string2 = null;
@@ -87,10 +136,6 @@ public class OrderDetails {
             // empty catch block
         }
         return new OrderDetails(string, string2, string3);
-    }
-
-    public Optional productName() {
-        return Optional.ofNullable(this.productName);
     }
 
     public static OrderDetails lambda$static$1(JsonObject jsonObject) {
@@ -123,12 +168,6 @@ public class OrderDetails {
         return new OrderDetails(string, string2, string3);
     }
 
-    public OrderDetails(String string, String string2, String string3) {
-        this.productName = string;
-        this.imageURI = string2;
-        this.orderNumber = string3;
-    }
-
     public static OrderDetails lambda$static$0(JsonObject jsonObject) {
         String string = null;
         String string2 = null;
@@ -147,43 +186,6 @@ public class OrderDetails {
         }
         try {
             string2 = jsonObject.getJsonArray("items").getJsonObject(0).getString("thumbnailUrl", null);
-            return new OrderDetails(string, string2, string3);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, string2, string3);
-    }
-
-    public static Function getDetailsParser(Site site) {
-        switch (OrderDetails$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
-            case 1: {
-                return WALMART_RESPONSE_PARSER;
-            }
-            case 2: {
-                return WALMART_NEW_RESPONSE_PARSER;
-            }
-            case 3: {
-                return HIBBETT_RESPONSE_PARSER;
-            }
-            case 4: {
-                return YEEZY_RESPONSE_PARSER;
-            }
-            case 5: {
-                return BESTBUY_RESPONSE_PARSER;
-            }
-        }
-        return SHOPIFY_RESPONSE_PARSER;
-    }
-
-    public static OrderDetails lambda$static$4(JsonObject jsonObject) {
-        String string = null;
-        String string2 = null;
-        String string3 = null;
-        try {
-            string = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("shortLabel", null);
-            string3 = jsonObject.getString("customerOrderId", "CHECK EMAIL");
-            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("imageUrl", null);
             return new OrderDetails(string, string2, string3);
         }
         catch (Throwable throwable) {

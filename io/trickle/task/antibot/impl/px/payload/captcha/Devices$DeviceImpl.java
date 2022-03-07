@@ -14,136 +14,33 @@ import io.vertx.core.json.JsonObject;
 
 public class Devices$DeviceImpl
 implements Devices$Device {
-    public String appName;
     public String secUA;
-    public int outerWidth;
-    public int availHeight;
-    public String appCodeName;
-    public int innerWidth;
+    public int outerHeight;
     public String appVersion;
-    public int innerHeight;
+    public int outerWidth;
+    public int screenY;
+    public JsonObject mongoDocument;
     public int availWidth;
     public String acceptLanguage;
     public int screenX;
-    public int screenY;
+    public int innerHeight;
+    public int innerWidth;
     public String platform;
-    public int height;
-    public String productSub;
-    public String acceptEncoding;
-    public String useragent;
     public int width;
-    public String product;
-    public int scrollbarWidth;
+    public String appName;
+    public int height;
+    public String appCodeName;
     public String secUAMobile;
-    public JsonObject mongoDocument;
-    public int outerHeight;
-
-    public String getAcceptLanguage() {
-        String string;
-        if (this.acceptLanguage == null) {
-            string = DeviceHeaderParsers.getAcceptLanguage(this.getArr("PX313"));
-            return string;
-        }
-        string = this.acceptLanguage;
-        return string;
-    }
-
-    public Devices$DeviceImpl(int n, int n2, int n3, int n4, int n5, int n6, String string, String string2, String string3, String string4, String string5, String string6, String string7) {
-        this.height = n;
-        this.width = n2;
-        this.innerHeight = n3;
-        this.innerWidth = n4;
-        this.availHeight = n5;
-        this.availWidth = n6;
-        this.platform = string;
-        this.useragent = string2;
-        this.product = string3;
-        this.productSub = string4;
-        this.appVersion = string5;
-        this.appName = string6;
-        this.appCodeName = string7;
-    }
-
-    @Override
-    public int getAvailHeight() {
-        return this.availHeight;
-    }
-
-    public String getString(String string) {
-        return this.mongoDocument.getString(string);
-    }
-
-    @Override
-    public int getInnerHeight() {
-        return this.innerHeight;
-    }
-
-    public String getAcceptEncoding() {
-        return this.acceptEncoding;
-    }
-
-    public int getScrollbarWidth() {
-        return this.scrollbarWidth;
-    }
-
-    @Override
-    public String getProduct() {
-        return this.product;
-    }
+    public String productSub;
+    public String useragent;
+    public int scrollbarWidth;
+    public int availHeight;
+    public String product;
+    public String acceptEncoding;
 
     @Override
     public String getProductSub() {
         return this.productSub;
-    }
-
-    @Override
-    public int getInnerWidth() {
-        return this.innerWidth;
-    }
-
-    @Override
-    public String getAppName() {
-        return this.appName;
-    }
-
-    @Override
-    public int getAvailWidth() {
-        return this.availWidth;
-    }
-
-    public String getSecUA() {
-        return this.secUA;
-    }
-
-    public String getSecUAMobile() {
-        return this.secUAMobile;
-    }
-
-    public JsonArray getArr(String string) {
-        return this.mongoDocument.getJsonArray(string);
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
-    }
-
-    @Override
-    public String getAppCodeName() {
-        return this.appCodeName;
-    }
-
-    public Boolean getBool(String string) {
-        return this.mongoDocument.getBoolean(string);
-    }
-
-    @Override
-    public String getAppVersion() {
-        return this.appVersion;
-    }
-
-    public Number getNumber(String string) {
-        return this.mongoDocument.getNumber(string);
     }
 
     public Devices$DeviceImpl(JsonObject jsonObject) {
@@ -186,13 +83,116 @@ implements Devices$Device {
     }
 
     @Override
+    public String getProduct() {
+        return this.product;
+    }
+
+    @Override
+    public int getAvailWidth() {
+        return this.availWidth;
+    }
+
+    @Override
     public int getWidth() {
         return this.width;
+    }
+
+    public String getSecUAMobile() {
+        return this.secUAMobile;
+    }
+
+    public Devices$DeviceImpl(int n, int n2, int n3, int n4, int n5, int n6, String string, String string2, String string3, String string4, String string5, String string6, String string7) {
+        this.height = n;
+        this.width = n2;
+        this.innerHeight = n3;
+        this.innerWidth = n4;
+        this.availHeight = n5;
+        this.availWidth = n6;
+        this.platform = string;
+        this.useragent = string2;
+        this.product = string3;
+        this.productSub = string4;
+        this.appVersion = string5;
+        this.appName = string6;
+        this.appCodeName = string7;
+    }
+
+    @Override
+    public int getInnerWidth() {
+        return this.innerWidth;
+    }
+
+    public String getSecUA() {
+        return this.secUA;
+    }
+
+    public JsonArray getArr(String string) {
+        return this.mongoDocument.getJsonArray(string);
+    }
+
+    @Override
+    public int getAvailHeight() {
+        return this.availHeight;
     }
 
     @Override
     public String getPlatform() {
         return this.platform;
+    }
+
+    public String getAcceptEncoding() {
+        return this.acceptEncoding;
+    }
+
+    public Number getNumber(String string) {
+        return this.mongoDocument.getNumber(string);
+    }
+
+    public int getScrollbarWidth() {
+        return this.scrollbarWidth;
+    }
+
+    @Override
+    public String getAppName() {
+        return this.appName;
+    }
+
+    @Override
+    public String getAppCodeName() {
+        return this.appCodeName;
+    }
+
+    @Override
+    public String getAppVersion() {
+        return this.appVersion;
+    }
+
+    @Override
+    public int getInnerHeight() {
+        return this.innerHeight;
+    }
+
+    @Override
+    public int getHeight() {
+        return this.height;
+    }
+
+    public String getString(String string) {
+        return this.mongoDocument.getString(string);
+    }
+
+    public Boolean getBool(String string) {
+        return this.mongoDocument.getBoolean(string);
+    }
+
+    public String getAcceptLanguage() {
+        String string;
+        if (this.acceptLanguage == null) {
+            string = DeviceHeaderParsers.getAcceptLanguage(this.getArr("PX313"));
+            return string;
+        }
+        string = this.acceptLanguage;
+        return string;
     }
 }
 

@@ -18,6 +18,18 @@ KeyListener {
     public TextField passwordField;
 
     @Override
+    public void keyReleased(KeyEvent keyEvent) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+    }
+
+    public PasswordOverrideListener(TextField textField) {
+        this.passwordField = textField;
+    }
+
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String string = this.passwordField.getText();
         if (string.isBlank()) return;
@@ -26,19 +38,7 @@ KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent keyEvent) {
-    }
-
-    @Override
     public void keyTyped(KeyEvent keyEvent) {
-    }
-
-    public PasswordOverrideListener(TextField textField) {
-        this.passwordField = textField;
-    }
-
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
     }
 }
 

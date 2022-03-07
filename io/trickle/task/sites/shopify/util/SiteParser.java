@@ -10,263 +10,6 @@ import io.trickle.task.sites.shopify.util.SiteParser$1;
 import io.trickle.util.Pair;
 
 public class SiteParser {
-    public static Mode getMode(String string) {
-        if (string.contains("normal")) {
-            return Mode.NORMAL;
-        }
-        if (!string.contains("fast")) return Mode.HUMAN;
-        return Mode.FAST;
-    }
-
-    public static String getURLFromSite(Task task) {
-        switch (SiteParser$1.$SwitchMap$io$trickle$task$sites$Site[task.getSite().ordinal()]) {
-            case 1: {
-                return "mct.tokyo";
-            }
-            case 2: {
-                return "us.bape.com";
-            }
-            case 3: {
-                return "bape.com";
-            }
-            case 4: {
-                return "windandsea.jp";
-            }
-            case 5: {
-                return "zingaro.shop";
-            }
-            case 6: {
-                return "www.deadstock.ca";
-            }
-            case 7: {
-                return "www.hatclub.com";
-            }
-            case 8: {
-                return "shop.havenshop.com";
-            }
-            case 9: {
-                return "www.neighborhood.jp";
-            }
-            case 10: {
-                return "kith.com";
-            }
-            case 11: {
-                return "www.dtlr.com";
-            }
-            case 12: {
-                return "kawsone.com";
-            }
-            case 13: {
-                return "www.shoepalace.com";
-            }
-            case 14: {
-                return "store.kaws-tokyo-first.jp";
-            }
-            case 15: {
-                return "shopnicekicks.com";
-            }
-            case 16: {
-                return "www.socialstatuspgh.com";
-            }
-            case 17: {
-                return "www.hanon-shop.com";
-            }
-            case 18: {
-                return "shop.palaceskateboards.com";
-            }
-            case 19: {
-                return "shop-usa.palaceskateboards.com";
-            }
-            case 20: {
-                return "www.a-ma-maniere.com";
-            }
-            case 21: {
-                return "www.aimeleondore.com";
-            }
-            case 22: {
-                return "commonwealth-ftgg.com";
-            }
-            case 23: {
-                return "corporategotem.com";
-            }
-            case 24: {
-                return "creme321.com";
-            }
-            case 25: {
-                return "www.culturekings.com.au";
-            }
-            case 26: {
-                return "www.culturekings.com";
-            }
-            case 27: {
-                return "humanmade.jp";
-            }
-            case 28: {
-                return "eflash.doverstreetmarket.com";
-            }
-            case 29: {
-                return "eflash-us.doverstreetmarket.com";
-            }
-            case 30: {
-                return "eflash-sg.doverstreetmarket.com";
-            }
-            case 31: {
-                return "eflash-jp.doverstreetmarket.com";
-            }
-            case 32: {
-                return "shop-us.doverstreetmarket.com";
-            }
-            case 33: {
-                return "shop-jp.doverstreetmarket.com";
-            }
-            case 34: {
-                return "shop.doverstreetmarket.com";
-            }
-            case 35: {
-                return "www.ericemanuel.com";
-            }
-            case 36: {
-                return "www.12amrun.com";
-            }
-            case 37: {
-                return "www.bbcicecream.com";
-            }
-            case 38: {
-                return "thechinatownmarket.com";
-            }
-            case 39: {
-                return "www.blendsus.com";
-            }
-            case 40: {
-                return "www.noirfonce.eu";
-            }
-            case 41: {
-                return "shop.reigningchamp.com";
-            }
-            case 42: {
-                return "bdgastore.com";
-            }
-            case 43: {
-                return "www.antisocialsocialclub.com";
-            }
-            case 44: {
-                return "fearofgod.com";
-            }
-            case 45: {
-                return "feature.com";
-            }
-            case 46: {
-                return "checkout.funko.com";
-            }
-            case 47: {
-                return "www.solefly.com";
-            }
-            case 48: {
-                return "www.notre-shop.com";
-            }
-            case 49: {
-                return "www.onenessboutique.com";
-            }
-            case 50: {
-                return "www.stussy.com";
-            }
-            case 51: {
-                return "suede-store.com";
-            }
-            case 52: {
-                return "www.patta.nl";
-            }
-            case 53: {
-                return "rsvpgallery.com";
-            }
-            case 54: {
-                return "undefeated.com";
-            }
-            case 55: {
-                return "www.trophyroomstore.com";
-            }
-            case 56: {
-                return "wishatl.com";
-            }
-            case 57: {
-                return "cncpts.com";
-            }
-            case 58: {
-                return "www.staplepigeon.com";
-            }
-            case 59: {
-                return "www.apbstore.com";
-            }
-            case 60: {
-                return "www.atmosusa.com";
-            }
-            case 61: {
-                return "www.capsuletoronto.com";
-            }
-            case 62: {
-                return "www.hlorenzo.com";
-            }
-            case 63: {
-                return "www.jimmyjazz.com";
-            }
-            case 64: {
-                return "juicestore.com";
-            }
-            case 65: {
-                return "www.lapstoneandhammer.com";
-            }
-            case 66: {
-                return "likelihood.us";
-            }
-            case 67: {
-                return "nrml.ca";
-            }
-            case 68: {
-                return "us.octobersveryown.com";
-            }
-            case 69: {
-                return "offthehook.ca";
-            }
-            case 70: {
-                return "packershoes.com";
-            }
-            case 71: {
-                return "pampamlondon.com";
-            }
-            case 72: {
-                return "renarts.com";
-            }
-            case 73: {
-                return "www.saintalfred.com";
-            }
-            case 74: {
-                return "extrabutterny.com";
-            }
-            case 75: {
-                return "www.jjjjound.com";
-            }
-            case 76: {
-                return "sneakerpolitics.com";
-            }
-            case 77: {
-                return "www.uniontokyo.jp";
-            }
-            case 78: {
-                return "store.unionlosangeles.com";
-            }
-            case 79: {
-                return "www.ycmc.com";
-            }
-            case 80: {
-                return "www.xhibition.co";
-            }
-            case 81: {
-                return "dwayn8080.myshopify.com";
-            }
-        }
-        return task.getSiteUserEntry();
-    }
-
     public static String getGatewayFromSite(Site site, boolean bl) {
         switch (SiteParser$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
             case 1: {
@@ -758,6 +501,255 @@ public class SiteParser {
         return null;
     }
 
+    public static String getURLFromSite(Task task) {
+        switch (SiteParser$1.$SwitchMap$io$trickle$task$sites$Site[task.getSite().ordinal()]) {
+            case 1: {
+                return "mct.tokyo";
+            }
+            case 2: {
+                return "us.bape.com";
+            }
+            case 3: {
+                return "bape.com";
+            }
+            case 4: {
+                return "windandsea.jp";
+            }
+            case 5: {
+                return "zingaro.shop";
+            }
+            case 6: {
+                return "www.deadstock.ca";
+            }
+            case 7: {
+                return "www.hatclub.com";
+            }
+            case 8: {
+                return "shop.havenshop.com";
+            }
+            case 9: {
+                return "www.neighborhood.jp";
+            }
+            case 10: {
+                return "kith.com";
+            }
+            case 11: {
+                return "www.dtlr.com";
+            }
+            case 12: {
+                return "kawsone.com";
+            }
+            case 13: {
+                return "www.shoepalace.com";
+            }
+            case 14: {
+                return "store.kaws-tokyo-first.jp";
+            }
+            case 15: {
+                return "shopnicekicks.com";
+            }
+            case 16: {
+                return "www.socialstatuspgh.com";
+            }
+            case 17: {
+                return "www.hanon-shop.com";
+            }
+            case 18: {
+                return "shop.palaceskateboards.com";
+            }
+            case 19: {
+                return "shop-usa.palaceskateboards.com";
+            }
+            case 20: {
+                return "www.a-ma-maniere.com";
+            }
+            case 21: {
+                return "www.aimeleondore.com";
+            }
+            case 22: {
+                return "commonwealth-ftgg.com";
+            }
+            case 23: {
+                return "corporategotem.com";
+            }
+            case 24: {
+                return "creme321.com";
+            }
+            case 25: {
+                return "www.culturekings.com.au";
+            }
+            case 26: {
+                return "www.culturekings.com";
+            }
+            case 27: {
+                return "humanmade.jp";
+            }
+            case 28: {
+                return "eflash.doverstreetmarket.com";
+            }
+            case 29: {
+                return "eflash-us.doverstreetmarket.com";
+            }
+            case 30: {
+                return "eflash-sg.doverstreetmarket.com";
+            }
+            case 31: {
+                return "eflash-jp.doverstreetmarket.com";
+            }
+            case 32: {
+                return "shop-us.doverstreetmarket.com";
+            }
+            case 33: {
+                return "shop-jp.doverstreetmarket.com";
+            }
+            case 34: {
+                return "shop.doverstreetmarket.com";
+            }
+            case 35: {
+                return "www.ericemanuel.com";
+            }
+            case 36: {
+                return "www.12amrun.com";
+            }
+            case 37: {
+                return "www.bbcicecream.com";
+            }
+            case 38: {
+                return "thechinatownmarket.com";
+            }
+            case 39: {
+                return "www.blendsus.com";
+            }
+            case 40: {
+                return "www.noirfonce.eu";
+            }
+            case 41: {
+                return "shop.reigningchamp.com";
+            }
+            case 42: {
+                return "bdgastore.com";
+            }
+            case 43: {
+                return "www.antisocialsocialclub.com";
+            }
+            case 44: {
+                return "fearofgod.com";
+            }
+            case 45: {
+                return "feature.com";
+            }
+            case 46: {
+                return "checkout.funko.com";
+            }
+            case 47: {
+                return "www.solefly.com";
+            }
+            case 48: {
+                return "www.notre-shop.com";
+            }
+            case 49: {
+                return "www.onenessboutique.com";
+            }
+            case 50: {
+                return "www.stussy.com";
+            }
+            case 51: {
+                return "suede-store.com";
+            }
+            case 52: {
+                return "www.patta.nl";
+            }
+            case 53: {
+                return "rsvpgallery.com";
+            }
+            case 54: {
+                return "undefeated.com";
+            }
+            case 55: {
+                return "www.trophyroomstore.com";
+            }
+            case 56: {
+                return "wishatl.com";
+            }
+            case 57: {
+                return "cncpts.com";
+            }
+            case 58: {
+                return "www.staplepigeon.com";
+            }
+            case 59: {
+                return "www.apbstore.com";
+            }
+            case 60: {
+                return "www.atmosusa.com";
+            }
+            case 61: {
+                return "www.capsuletoronto.com";
+            }
+            case 62: {
+                return "www.hlorenzo.com";
+            }
+            case 63: {
+                return "www.jimmyjazz.com";
+            }
+            case 64: {
+                return "juicestore.com";
+            }
+            case 65: {
+                return "www.lapstoneandhammer.com";
+            }
+            case 66: {
+                return "likelihood.us";
+            }
+            case 67: {
+                return "nrml.ca";
+            }
+            case 68: {
+                return "us.octobersveryown.com";
+            }
+            case 69: {
+                return "offthehook.ca";
+            }
+            case 70: {
+                return "packershoes.com";
+            }
+            case 71: {
+                return "pampamlondon.com";
+            }
+            case 72: {
+                return "renarts.com";
+            }
+            case 73: {
+                return "www.saintalfred.com";
+            }
+            case 74: {
+                return "extrabutterny.com";
+            }
+            case 75: {
+                return "www.jjjjound.com";
+            }
+            case 76: {
+                return "sneakerpolitics.com";
+            }
+            case 77: {
+                return "www.uniontokyo.jp";
+            }
+            case 78: {
+                return "store.unionlosangeles.com";
+            }
+            case 79: {
+                return "www.ycmc.com";
+            }
+            case 80: {
+                return "www.xhibition.co";
+            }
+            case 81: {
+                return "dwayn8080.myshopify.com";
+            }
+        }
+        return task.getSiteUserEntry();
+    }
+
     public static Pair getProperties(Site site) {
         switch (site) {
             case KAWSONE: {
@@ -771,6 +763,14 @@ public class SiteParser {
             }
         }
         return null;
+    }
+
+    public static Mode getMode(String string) {
+        if (string.contains("normal")) {
+            return Mode.NORMAL;
+        }
+        if (!string.contains("fast")) return Mode.HUMAN;
+        return Mode.FAST;
     }
 }
 

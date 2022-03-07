@@ -10,12 +10,12 @@ public class LoginFuture
 extends ContextCompletableFuture {
     public LoginToken loginToken;
 
-    public LoginToken getEmptyLoginToken() {
-        return this.loginToken;
-    }
-
     public LoginFuture(LoginToken loginToken) {
         this.loginToken = loginToken;
+    }
+
+    public LoginToken getEmptyLoginToken() {
+        return this.loginToken;
     }
 }
 

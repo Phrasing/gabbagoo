@@ -17,30 +17,16 @@ import javax.swing.JCheckBox;
 public class DelayOverrideListener
 implements ActionListener,
 KeyListener {
-    public TextField delayField;
     public JCheckBox checkBox;
-
-    public DelayOverrideListener(TextField textField, JCheckBox jCheckBox) {
-        this.delayField = textField;
-        this.checkBox = jCheckBox;
-    }
-
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-        String string = this.delayField.getText();
-        if (!this.checkBox.isSelected()) return;
-        if (string.isBlank()) return;
-        if (!Utils.isInteger(string)) return;
-        System.out.println("Mass delay changed -> " + this.delayField.getText());
-        ((TaskController)Engine.get().getModule(Controller.TASK)).massEditDelay(Long.parseLong(string));
-    }
+    public TextField delayField;
 
     @Override
     public void keyTyped(KeyEvent keyEvent) {
     }
 
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
+    public DelayOverrideListener(TextField textField, JCheckBox jCheckBox) {
+        this.delayField = textField;
+        this.checkBox = jCheckBox;
     }
 
     @Override
@@ -56,6 +42,20 @@ KeyListener {
         this.checkBox.setText("OFF");
         System.out.println("Delays set to default.");
         ((TaskController)Engine.get().getModule(Controller.TASK)).switchToDefaultDelay();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
+        String string = this.delayField.getText();
+        if (!this.checkBox.isSelected()) return;
+        if (string.isBlank()) return;
+        if (!Utils.isInteger(string)) return;
+        System.out.println("Mass delay changed -> " + this.delayField.getText());
+        ((TaskController)Engine.get().getModule(Controller.TASK)).massEditDelay(Long.parseLong(string));
     }
 }
 

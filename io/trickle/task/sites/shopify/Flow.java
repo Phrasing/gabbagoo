@@ -12,13 +12,37 @@ import io.trickle.task.sites.shopify.Flow$Actions;
 
 public class Flow
 extends Enum {
-    public static /* enum */ Flow CUSTOM = new Flow$1();
+    public static /* enum */ Flow KITH;
+    public static /* enum */ Flow CUSTOM;
     public static /* enum */ Flow MCT;
     public static Flow[] $VALUES;
-    public static /* enum */ Flow KITH;
+
+    public Flow$Actions get() {
+        return null;
+    }
 
     public static Flow[] values() {
         return (Flow[])$VALUES.clone();
+    }
+
+    static {
+        CUSTOM = new Flow$1();
+        KITH = new Flow$2();
+        MCT = new Flow$3();
+        $VALUES = new Flow[]{CUSTOM, KITH, MCT};
+    }
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public Flow() {
+        void var2_-1;
+        void var1_-1;
+    }
+
+    public static Flow valueOf(String string) {
+        return Enum.valueOf(Flow.class, string);
     }
 
     public static Flow getFlow(Site site) {
@@ -31,29 +55,6 @@ extends Enum {
             }
         }
         return CUSTOM;
-    }
-
-    public Flow$Actions get() {
-        return null;
-    }
-
-    public static Flow valueOf(String string) {
-        return Enum.valueOf(Flow.class, string);
-    }
-
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public Flow() {
-        void var2_-1;
-        void var1_-1;
-    }
-
-    static {
-        KITH = new Flow$2();
-        MCT = new Flow$3();
-        $VALUES = new Flow[]{CUSTOM, KITH, MCT};
     }
 }
 

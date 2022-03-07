@@ -22,23 +22,23 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Devices
 extends Enum {
-    public static /* enum */ Devices BRAVE_89;
-    public static /* enum */ Devices CHROME_89_Z3;
-    public static /* enum */ Devices BRAVE_89_4;
-    public static /* enum */ Devices BRAVE_89_3;
-    public static /* enum */ Devices CHROME_89_MAC_PERSONAL;
-    public static /* enum */ Devices CHROME_89_SAFARI;
     public static /* enum */ Devices BRAVE_89_1;
-    public static /* enum */ Devices CHROME_87_SAFARI;
-    public static Devices[] $VALUES;
+    public static /* enum */ Devices CHROME_89_Z3;
     public static /* enum */ Devices BRAVE_89_2;
+    public static /* enum */ Devices CHROME_87_SAFARI;
+    public static /* enum */ Devices BRAVE_89;
+    public static /* enum */ Devices BRAVE_89_3;
+    public static Devices[] $VALUES;
+    public static /* enum */ Devices CHROME_89_SAFARI;
+    public static /* enum */ Devices BRAVE_89_4;
+    public static /* enum */ Devices CHROME_89_MAC_PERSONAL;
+
+    public static Devices valueOf(String string) {
+        return Enum.valueOf(Devices.class, string);
+    }
 
     public static Devices[] values() {
         return (Devices[])$VALUES.clone();
-    }
-
-    public static Devices$Device random() {
-        return Devices.values()[ThreadLocalRandom.current().nextInt(Devices.values().length)].get();
     }
 
     public static Devices$Device genFromJson(JsonObject jsonObject) {
@@ -50,17 +50,8 @@ extends Enum {
         }
     }
 
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public Devices() {
-        void var2_-1;
-        void var1_-1;
-    }
-
-    public static Devices valueOf(String string) {
-        return Enum.valueOf(Devices.class, string);
+    public static Devices$Device random() {
+        return Devices.values()[ThreadLocalRandom.current().nextInt(Devices.values().length)].get();
     }
 
     static {
@@ -74,6 +65,15 @@ extends Enum {
         BRAVE_89_3 = new Devices$8();
         BRAVE_89_4 = new Devices$9();
         $VALUES = new Devices[]{CHROME_89_MAC_PERSONAL, CHROME_89_Z3, CHROME_89_SAFARI, CHROME_87_SAFARI, BRAVE_89, BRAVE_89_1, BRAVE_89_2, BRAVE_89_3, BRAVE_89_4};
+    }
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public Devices() {
+        void var2_-1;
+        void var1_-1;
     }
 
     public Devices$Device get() {

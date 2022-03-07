@@ -15,67 +15,25 @@ import java.util.regex.Pattern;
 
 public class Devices$DeviceImpl
 implements Devices$Device {
-    public String cellular;
-    public String deviceName;
-    public String brand;
-    public boolean wifi = true;
-    public String connectionType;
-    public boolean accelerometer = true;
-    public boolean ethernet = true;
-    public int width;
-    public String operatingSystem;
-    public boolean gps = true;
-    public String[] carriers = new String[]{"T-Mobile", "Sprint", "AT&T"};
-    public static Pattern API_LEVEL_PATTERN = Pattern.compile("\\(([0-9]*)?\\)");
-    public Battery battery;
-    public int apiLevel;
-    public boolean touchscreen = true;
-    public boolean nfc = true;
     public int height;
+    public String[] carriers = new String[]{"T-Mobile", "Sprint", "AT&T"};
+    public Battery battery;
+    public boolean ethernet = true;
+    public static Pattern API_LEVEL_PATTERN = Pattern.compile("\\(([0-9]*)?\\)");
     public boolean gyroscope = true;
+    public boolean wifi = true;
+    public boolean nfc = true;
+    public int width;
+    public String deviceName;
+    public boolean gps = true;
+    public String operatingSystem;
+    public boolean accelerometer = true;
+    public int apiLevel;
     public String carrier;
-
-    public String randomConnectionType() {
-        return "wifi";
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
-    }
-
-    @Override
-    public boolean isTouchscreen() {
-        return this.touchscreen;
-    }
-
-    @Override
-    public String getCarrier() {
-        return this.carrier;
-    }
-
-    @Override
-    public boolean isWifi() {
-        return this.wifi;
-    }
-
-    public String randomCarrier() {
-        if (!this.cellular.equals("4G")) return this.carriers[ThreadLocalRandom.current().nextInt(0, this.carriers.length)];
-        return this.carriers[ThreadLocalRandom.current().nextInt(1, this.carriers.length)];
-    }
-
-    public void disableNFC() {
-        this.nfc = false;
-    }
-
-    public void disableWIFI() {
-        this.wifi = false;
-    }
-
-    @Override
-    public String getCellular() {
-        return this.cellular;
-    }
+    public boolean touchscreen = true;
+    public String connectionType;
+    public String cellular;
+    public String brand;
 
     public Devices$DeviceImpl(JsonObject jsonObject) {
         String[] stringArray = jsonObject.getString("dis").split("x");
@@ -94,13 +52,42 @@ implements Devices$Device {
         this.disableEthernet();
     }
 
+    public void disableWIFI() {
+        this.wifi = false;
+    }
+
+    public String randomConnectionType() {
+        return "wifi";
+    }
+
+    @Override
+    public String getCarrier() {
+        return this.carrier;
+    }
+
+    public String randomCarrier() {
+        if (!this.cellular.equals("4G")) return this.carriers[ThreadLocalRandom.current().nextInt(0, this.carriers.length)];
+        return this.carriers[ThreadLocalRandom.current().nextInt(1, this.carriers.length)];
+    }
+
+    @Override
+    public Battery getBattery() {
+        return this.battery;
+    }
+
+    @Override
+    public String getDeviceName() {
+        return this.deviceName;
+    }
+
+    @Override
+    public boolean isGyroscope() {
+        return this.gyroscope;
+    }
+
     @Override
     public String getOperatingSystem() {
         return this.operatingSystem;
-    }
-
-    public void disableTouchscreen() {
-        this.touchscreen = false;
     }
 
     @Override
@@ -109,17 +96,8 @@ implements Devices$Device {
     }
 
     @Override
-    public boolean isGps() {
-        return this.gps;
-    }
-
-    @Override
-    public boolean isAccelerometer() {
-        return this.accelerometer;
-    }
-
-    public void disableAccelerometer() {
-        this.accelerometer = false;
+    public boolean isEthernet() {
+        return this.ethernet;
     }
 
     @Override
@@ -127,23 +105,19 @@ implements Devices$Device {
         return this.brand;
     }
 
-    public void disableGyroscope() {
-        this.gyroscope = false;
+    @Override
+    public boolean isTouchscreen() {
+        return this.touchscreen;
     }
 
     @Override
-    public int getApiLevel() {
-        return this.apiLevel;
+    public boolean isAccelerometer() {
+        return this.accelerometer;
     }
 
     @Override
-    public boolean isNfc() {
-        return this.nfc;
-    }
-
-    @Override
-    public boolean isGyroscope() {
-        return this.gyroscope;
+    public String getCellular() {
+        return this.cellular;
     }
 
     public Devices$DeviceImpl(int n, int n2, String string, String string2, String string3, int n3) {
@@ -160,17 +134,21 @@ implements Devices$Device {
     }
 
     @Override
-    public String getDeviceName() {
-        return this.deviceName;
-    }
-
-    public String randomCellular() {
-        return "Unknown";
+    public boolean isWifi() {
+        return this.wifi;
     }
 
     @Override
-    public boolean isEthernet() {
-        return this.ethernet;
+    public boolean isGps() {
+        return this.gps;
+    }
+
+    public void disableNFC() {
+        this.nfc = false;
+    }
+
+    public void disableEthernet() {
+        this.ethernet = false;
     }
 
     @Override
@@ -178,17 +156,39 @@ implements Devices$Device {
         return this.width;
     }
 
-    @Override
-    public Battery getBattery() {
-        return this.battery;
-    }
-
-    public void disableEthernet() {
-        this.ethernet = false;
-    }
-
     public void disableGPS() {
         this.gps = false;
+    }
+
+    @Override
+    public boolean isNfc() {
+        return this.nfc;
+    }
+
+    public String randomCellular() {
+        return "Unknown";
+    }
+
+    @Override
+    public int getHeight() {
+        return this.height;
+    }
+
+    @Override
+    public int getApiLevel() {
+        return this.apiLevel;
+    }
+
+    public void disableGyroscope() {
+        this.gyroscope = false;
+    }
+
+    public void disableTouchscreen() {
+        this.touchscreen = false;
+    }
+
+    public void disableAccelerometer() {
+        this.accelerometer = false;
     }
 }
 

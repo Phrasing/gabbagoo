@@ -7,19 +7,19 @@ import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
 
 public class RunClock {
-    public long timeTillRun;
     public boolean stopped;
+    public long timeTillRun;
     public long finishTime;
+
+    public static RunClock create() {
+        return new RunClock();
+    }
 
     public boolean isStopped() {
         if (this.stopped) return this.stopped;
         if (System.currentTimeMillis() < this.finishTime) return this.stopped;
         this.stopped = true;
         return this.stopped;
-    }
-
-    public long getTimeTillRun() {
-        return this.timeTillRun;
     }
 
     public RunClock() {
@@ -30,8 +30,8 @@ public class RunClock {
         this.finishTime = 0L;
     }
 
-    public static RunClock create() {
-        return new RunClock();
+    public long getTimeTillRun() {
+        return this.timeTillRun;
     }
 
     public void start() {

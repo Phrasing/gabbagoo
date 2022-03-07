@@ -11,15 +11,9 @@ import java.util.Base64;
 
 public interface ExtendedPayload
 extends Payload {
-    public static String encode(String string, int n) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int n2 = 0;
-        while (n2 < string.length()) {
-            stringBuilder.append((char)(n ^ Character.codePointAt(string, n2)));
-            ++n2;
-        }
-        return new String(Base64.getEncoder().encode(stringBuilder.toString().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
-    }
+    public Types getType();
+
+    public String getVID();
 
     public static String encode(String string, String string2) {
         return new String(Base64.getEncoder().encode("".getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
@@ -27,19 +21,11 @@ extends Payload {
 
     public String getUUID();
 
-    public String desktopString();
-
     public String getUserAgent();
 
-    public Site getSite();
-
-    public String toString();
-
-    public String getVID();
-
-    public Types getType();
-
     public String getSID();
+
+    public Site getSite();
 
     public static String decode(String string, int n) {
         string = string.replace(" ", "+");
@@ -51,6 +37,20 @@ extends Payload {
             ++n2;
         }
         return stringBuilder.toString();
+    }
+
+    public String desktopString();
+
+    public String toString();
+
+    public static String encode(String string, int n) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int n2 = 0;
+        while (n2 < string.length()) {
+            stringBuilder.append((char)(n ^ Character.codePointAt(string, n2)));
+            ++n2;
+        }
+        return new String(Base64.getEncoder().encode(stringBuilder.toString().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
     }
 }
 

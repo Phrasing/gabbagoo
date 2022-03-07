@@ -30,10 +30,30 @@ import org.apache.logging.log4j.Logger;
 public class RefererStoreController
 implements Module,
 LoadableAsync {
-    public static Logger logger;
-    public static String REFERER_DEVICE_PATH;
+    public static String REFERER_DEVICE_PATH = "links.txt";
+    public static Logger logger = LogManager.getLogger(DeviceStoreController.class);
     public List<String> referers;
     public Vertx vertx;
+
+    public RefererStoreController(Vertx vertx) {
+        this.vertx = vertx;
+        this.referers = new ArrayList<String>();
+    }
+
+    @Override
+    public void initialise() {
+        logger.debug("Initialised");
+    }
+
+    @Override
+    public Future load() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        return fileSystem.readFile("links.txt").otherwise(RefererStoreController::lambda$load$0).map(Buffer::toString).map(this::parseFile).map(this.referers::addAll).compose(RefererStoreController::lambda$load$1);
+    }
+
+    public static Future lambda$load$1(Boolean bl) {
+        return Future.succeededFuture();
+    }
 
     public static Buffer lambda$load$0(Throwable throwable) {
         logger.warn("Failed to find '{}' (Suggested for Walmart!). Proceeding without...", (Object)"links.txt".replace("/", ""));
@@ -44,38 +64,13 @@ LoadableAsync {
         return "https://www.walmart.com/ip/" + this.referers.get(ThreadLocalRandom.current().nextInt(this.referers.size()));
     }
 
-    public RefererStoreController(Vertx vertx) {
-        this.vertx = vertx;
-        this.referers = new ArrayList<String>();
-    }
-
-    public static Future lambda$load$1(Boolean bl) {
-        return Future.succeededFuture();
-    }
-
-    public List parseFile(String string) {
-        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).collect(Collectors.toList());
-    }
-
-    @Override
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile("links.txt").otherwise(RefererStoreController::lambda$load$0).map(Buffer::toString).map(this::parseFile).map(this.referers::addAll).compose(RefererStoreController::lambda$load$1);
-    }
-
-    static {
-        REFERER_DEVICE_PATH = "links.txt";
-        logger = LogManager.getLogger(DeviceStoreController.class);
-    }
-
     @Override
     public void terminate() {
         logger.debug("Terminated.");
     }
 
-    @Override
-    public void initialise() {
-        logger.debug("Initialised");
+    public List parseFile(String string) {
+        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).collect(Collectors.toList());
     }
 }
 

@@ -6,23 +6,27 @@ package io.trickle.task.sites.walmart.util.encryption;
 import java.util.Arrays;
 
 public class Aes {
-    public int[] h;
-    public int l;
     public int b;
-    public int[] n;
+    public int[][] j;
     public int[] k;
     public int m;
-    public int a;
-    public int[][] key;
-    public int[] c;
-    public int o;
     public int p;
-    public int g;
-    public int[][] j;
-    public int[][] q;
-    public int e;
+    public int[] h;
     public int[][][] tables;
+    public int[][] key;
+    public int g;
+    public int a;
+    public int[] n;
+    public int e;
+    public int l;
+    public int o;
+    public int[] c;
+    public int[][] q;
     public int f;
+
+    public int[] encrypt(int[] nArray) {
+        return this._crypt(nArray, 0);
+    }
 
     public Aes precompute() {
         this.tables = new int[2][5][256];
@@ -68,8 +72,70 @@ public class Aes {
         return this;
     }
 
-    public int[] encrypt(int[] nArray) {
-        return this._crypt(nArray, 0);
+    public static int lambda$cipher$0(long l) {
+        return (int)l;
+    }
+
+    public Aes cipher(long[] lArray) {
+        int n;
+        int n2;
+        int[] nArray = this.tables[0][4];
+        int[][] nArray2 = this.tables[1];
+        this.a = lArray.length;
+        this.b = 1;
+        if (this.a != 4 && this.a != 6 && this.a != 8) {
+            System.err.println("invalid aes key size");
+        }
+        long[] lArray2 = Arrays.copyOf(lArray, 256);
+        int[] nArray3 = new int[256];
+        for (n2 = this.a; n2 < 4 * this.a + 28; ++n2) {
+            n = (int)lArray2[n2 - 1];
+            if (n2 % this.a == 0 || this.a == 8 && n2 % this.a == 4) {
+                n = nArray[n >>> 24] << 24 ^ nArray[n >> 16 & 0xFF] << 16 ^ nArray[n >> 8 & 0xFF] << 8 ^ nArray[n & 0xFF];
+                if (n2 % this.a == 0) {
+                    n = n << 8 ^ n >>> 24 ^ this.b << 24;
+                    this.b = this.b << 1 ^ (this.b >> 7) * 283;
+                }
+            }
+            lArray2[n2] = lArray2[n2 - this.a] ^ (long)n;
+        }
+        lArray2 = Aes.removeElements(lArray2, 0);
+        int n3 = 0;
+        while (true) {
+            if (n2 == 0) {
+                nArray3 = Aes.removeElements(nArray3, 0);
+                this.key = new int[][]{Arrays.stream(lArray2).mapToInt(Aes::lambda$cipher$0).toArray(), nArray3};
+                return this;
+            }
+            n = (int)lArray2[(n3 & 3) != 0 ? n2 : n2 - 4];
+            nArray3[n3] = n2 <= 4 || n3 < 4 ? n : nArray2[0][nArray[n >>> 24]] ^ nArray2[1][nArray[n >> 16 & 0xFF]] ^ nArray2[2][nArray[n >> 8 & 0xFF]] ^ nArray2[3][nArray[n & 0xFF]];
+            ++n3;
+            --n2;
+        }
+    }
+
+    public static int[] removeElements(int[] nArray, int n) {
+        int n2 = 0;
+        int n3 = 0;
+        while (n3 < nArray.length) {
+            if (nArray[n3] != n) {
+                nArray[n2++] = nArray[n3];
+            }
+            ++n3;
+        }
+        return Arrays.copyOf(nArray, n2);
+    }
+
+    public static long[] removeElements(long[] lArray, int n) {
+        int n2 = 0;
+        int n3 = 0;
+        while (n3 < lArray.length) {
+            if (lArray[n3] != (long)n) {
+                lArray[n2++] = lArray[n3];
+            }
+            ++n3;
+        }
+        return Arrays.copyOf(lArray, n2);
     }
 
     public int[] _crypt(int[] nArray, int n) {
@@ -112,72 +178,6 @@ public class Aes {
             ++n3;
         }
         return nArray3;
-    }
-
-    public static int[] removeElements(int[] nArray, int n) {
-        int n2 = 0;
-        int n3 = 0;
-        while (n3 < nArray.length) {
-            if (nArray[n3] != n) {
-                nArray[n2++] = nArray[n3];
-            }
-            ++n3;
-        }
-        return Arrays.copyOf(nArray, n2);
-    }
-
-    public static long[] removeElements(long[] lArray, int n) {
-        int n2 = 0;
-        int n3 = 0;
-        while (n3 < lArray.length) {
-            if (lArray[n3] != (long)n) {
-                lArray[n2++] = lArray[n3];
-            }
-            ++n3;
-        }
-        return Arrays.copyOf(lArray, n2);
-    }
-
-    public static int lambda$cipher$0(long l) {
-        return (int)l;
-    }
-
-    public Aes cipher(long[] lArray) {
-        int n;
-        int n2;
-        int[] nArray = this.tables[0][4];
-        int[][] nArray2 = this.tables[1];
-        this.a = lArray.length;
-        this.b = 1;
-        if (this.a != 4 && this.a != 6 && this.a != 8) {
-            System.err.println("invalid aes key size");
-        }
-        long[] lArray2 = Arrays.copyOf(lArray, 256);
-        int[] nArray3 = new int[256];
-        for (n2 = this.a; n2 < 4 * this.a + 28; ++n2) {
-            n = (int)lArray2[n2 - 1];
-            if (n2 % this.a == 0 || this.a == 8 && n2 % this.a == 4) {
-                n = nArray[n >>> 24] << 24 ^ nArray[n >> 16 & 0xFF] << 16 ^ nArray[n >> 8 & 0xFF] << 8 ^ nArray[n & 0xFF];
-                if (n2 % this.a == 0) {
-                    n = n << 8 ^ n >>> 24 ^ this.b << 24;
-                    this.b = this.b << 1 ^ (this.b >> 7) * 283;
-                }
-            }
-            lArray2[n2] = lArray2[n2 - this.a] ^ (long)n;
-        }
-        lArray2 = Aes.removeElements(lArray2, 0);
-        int n3 = 0;
-        while (true) {
-            if (n2 == 0) {
-                nArray3 = Aes.removeElements(nArray3, 0);
-                this.key = new int[][]{Arrays.stream(lArray2).mapToInt(Aes::lambda$cipher$0).toArray(), nArray3};
-                return this;
-            }
-            n = (int)lArray2[(n3 & 3) != 0 ? n2 : n2 - 4];
-            nArray3[n3] = n2 <= 4 || n3 < 4 ? n : nArray2[0][nArray[n >>> 24]] ^ nArray2[1][nArray[n >> 16 & 0xFF]] ^ nArray2[2][nArray[n >> 8 & 0xFF]] ^ nArray2[3][nArray[n & 0xFF]];
-            ++n3;
-            --n2;
-        }
     }
 }
 

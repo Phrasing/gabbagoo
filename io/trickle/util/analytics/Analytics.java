@@ -25,52 +25,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Analytics {
-    public static AtomicInteger carts;
-    public static Pattern ORDER_NUMBER_PATTERN;
-    public static Pattern PRODUCT_TITLE_PATTERN;
     public static AtomicInteger fails;
-    public static AtomicInteger success;
-    public static ConcurrentLinkedQueue<Metric> metricsQueue;
+    public static Pattern ORDER_NUMBER_PATTERN;
     public static Pattern IMAGE_URL_PATTERN;
     public static ConcurrentLinkedDeque<EmbedContainer> embedQueue;
-
-    public static void warning(String string, Task task) {
-        EmbedContainer embedContainer = new EmbedContainer(WebhookUtils.buildBasicEmbed(task, string));
-        embedQueue.add(embedContainer);
-    }
-
-    public static String parseOrderId(String string) {
-        Matcher matcher = ORDER_NUMBER_PATTERN.matcher(string);
-        if (!matcher.find()) return null;
-        return matcher.group(1);
-    }
-
-    public static String parseTitle(String string) {
-        Matcher matcher = PRODUCT_TITLE_PATTERN.matcher(string);
-        if (!matcher.find()) return null;
-        return matcher.group(1);
-    }
-
-    public static void failure(String string, Task task, JsonObject jsonObject, String string2) {
-        Analytics.emit(false, string, task, jsonObject, string2);
-    }
-
-    public static String parseImage(String string) {
-        Matcher matcher = IMAGE_URL_PATTERN.matcher(string);
-        if (!matcher.find()) return null;
-        return matcher.group(1);
-    }
-
-    static {
-        success = new AtomicInteger(0);
-        carts = new AtomicInteger(0);
-        fails = new AtomicInteger(0);
-        embedQueue = new ConcurrentLinkedDeque();
-        metricsQueue = new ConcurrentLinkedQueue();
-        PRODUCT_TITLE_PATTERN = Pattern.compile("\"og:title\" content=\"(.*?)\" />");
-        IMAGE_URL_PATTERN = Pattern.compile("\"og:image\" content=\"(.*?)\" />");
-        ORDER_NUMBER_PATTERN = Pattern.compile("<p class=\"notice__text\">(.*?)</p>");
-    }
+    public static AtomicInteger carts;
+    public static AtomicInteger success;
+    public static Pattern PRODUCT_TITLE_PATTERN;
+    public static ConcurrentLinkedQueue<Metric> metricsQueue;
 
     public static void emit(boolean bl, String string, Task task, JsonObject jsonObject, String string2) {
         EmbedContainer embedContainer = new EmbedContainer(bl, WebhookUtils.buildEmbed(bl, task, string, jsonObject, string2));
@@ -87,12 +49,34 @@ public class Analytics {
         embedQueue.add(embedContainer);
     }
 
-    public static JsonObject createCheckoutJsonShopify(String string) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("image", (Object)Analytics.parseImage(string));
-        jsonObject.put("title", (Object)Analytics.parseTitle(string));
-        jsonObject.put("orderId", (Object)Analytics.parseOrderId(string));
-        return jsonObject;
+    public static String parseOrderId(String string) {
+        Matcher matcher = ORDER_NUMBER_PATTERN.matcher(string);
+        if (!matcher.find()) return null;
+        return matcher.group(1);
+    }
+
+    public static void success(Task task, String string, String string2) {
+        Analytics.emit(true, null, task, Analytics.createCheckoutJsonShopify(string), string2);
+    }
+
+    public static void warningLogged(String string, Task task, Buffer buffer) {
+        Analytics.warning(string, task);
+    }
+
+    public static String parseImage(String string) {
+        Matcher matcher = IMAGE_URL_PATTERN.matcher(string);
+        if (!matcher.find()) return null;
+        return matcher.group(1);
+    }
+
+    public static String parseTitle(String string) {
+        Matcher matcher = PRODUCT_TITLE_PATTERN.matcher(string);
+        if (!matcher.find()) return null;
+        return matcher.group(1);
+    }
+
+    public static void success(Task task, CookieJar cookieJar, String string) {
+        Analytics.emit(true, null, task, Analytics.exportVT(cookieJar), string);
     }
 
     public static void failure(String string, Task task, String string2, String string3) {
@@ -128,18 +112,6 @@ public class Analytics {
         }
     }
 
-    public static void warningLogged(String string, Task task, Buffer buffer) {
-        Analytics.warning(string, task);
-    }
-
-    public static void success(Task task, CookieJar cookieJar, String string) {
-        Analytics.emit(true, null, task, Analytics.exportVT(cookieJar), string);
-    }
-
-    public static void success(Task task, String string, String string2) {
-        Analytics.emit(true, null, task, Analytics.createCheckoutJsonShopify(string), string2);
-    }
-
     public static JsonObject exportVT(CookieJar cookieJar) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("name", (Object)"vt");
@@ -148,8 +120,36 @@ public class Analytics {
         return jsonObject;
     }
 
+    public static void warning(String string, Task task) {
+        EmbedContainer embedContainer = new EmbedContainer(WebhookUtils.buildBasicEmbed(task, string));
+        embedQueue.add(embedContainer);
+    }
+
+    public static void failure(String string, Task task, JsonObject jsonObject, String string2) {
+        Analytics.emit(false, string, task, jsonObject, string2);
+    }
+
     public static void success(Task task, JsonObject jsonObject, String string) {
         Analytics.emit(true, null, task, jsonObject, string);
+    }
+
+    static {
+        success = new AtomicInteger(0);
+        carts = new AtomicInteger(0);
+        fails = new AtomicInteger(0);
+        embedQueue = new ConcurrentLinkedDeque();
+        metricsQueue = new ConcurrentLinkedQueue();
+        PRODUCT_TITLE_PATTERN = Pattern.compile("\"og:title\" content=\"(.*?)\" />");
+        IMAGE_URL_PATTERN = Pattern.compile("\"og:image\" content=\"(.*?)\" />");
+        ORDER_NUMBER_PATTERN = Pattern.compile("<p class=\"notice__text\">(.*?)</p>");
+    }
+
+    public static JsonObject createCheckoutJsonShopify(String string) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("image", (Object)Analytics.parseImage(string));
+        jsonObject.put("title", (Object)Analytics.parseTitle(string));
+        jsonObject.put("orderId", (Object)Analytics.parseOrderId(string));
+        return jsonObject;
     }
 }
 

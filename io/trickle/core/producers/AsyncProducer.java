@@ -17,12 +17,12 @@ public abstract class AsyncProducer {
         this.callback.complete(object);
     }
 
-    public Future getProduct() {
-        return this.callback.future();
-    }
-
     public void fail(String string) {
         this.callback.fail(string);
+    }
+
+    public Future getProduct() {
+        return this.callback.future();
     }
 
     public void fail(Throwable throwable) {

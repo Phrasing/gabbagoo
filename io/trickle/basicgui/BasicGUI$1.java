@@ -13,15 +13,15 @@ extends WindowAdapter {
     public BasicGUI this$0;
     public Frame val$f;
 
-    public BasicGUI$1(BasicGUI basicGUI, Frame frame) {
-        this.this$0 = basicGUI;
-        this.val$f = frame;
-    }
-
     @Override
     public void windowClosing(WindowEvent windowEvent) {
         this.this$0.closed = true;
         this.val$f.dispose();
+    }
+
+    public BasicGUI$1(BasicGUI basicGUI, Frame frame) {
+        this.this$0 = basicGUI;
+        this.val$f = frame;
     }
 }
 

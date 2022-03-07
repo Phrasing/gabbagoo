@@ -20,6 +20,11 @@ extends TaskApiClient {
     public String site;
     public Task task;
 
+    public FinishlineAPI(Task task, Site site) {
+        this.task = task;
+        this.site = site.toString().toLowerCase();
+    }
+
     public HttpRequest homePage() {
         HttpRequest httpRequest = this.client.getAbs("https://www.finishline.com/").timeout(TimeUnit.SECONDS.toMillis(30L)).as(BodyCodec.string());
         httpRequest.putHeaders(Headers$Pseudo.MASP.get());
@@ -49,11 +54,6 @@ extends TaskApiClient {
         httpRequest.putHeader("Sec-Fetch-Dest", "empty");
         httpRequest.putHeader("Referer", "https://www." + this.site + ".com/store/product/~/prod2823438");
         return httpRequest;
-    }
-
-    public FinishlineAPI(Task task, Site site) {
-        this.task = task;
-        this.site = site.toString().toLowerCase();
     }
 }
 

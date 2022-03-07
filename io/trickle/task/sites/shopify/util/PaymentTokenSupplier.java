@@ -10,18 +10,8 @@ import java.util.function.Supplier;
  */
 public class PaymentTokenSupplier
 implements Supplier {
-    public boolean vaulted;
     public String token;
-
-    public boolean isVaulted() {
-        return this.vaulted;
-    }
-
-    @Deprecated
-    public void setSubmittedSuccessfully() {
-        this.token = "";
-        this.vaulted = true;
-    }
+    public boolean vaulted;
 
     public Object get() {
         return this.get();
@@ -34,6 +24,16 @@ implements Supplier {
 
     public String get() {
         return this.token;
+    }
+
+    public boolean isVaulted() {
+        return this.vaulted;
+    }
+
+    @Deprecated
+    public void setSubmittedSuccessfully() {
+        this.token = "";
+        this.vaulted = true;
     }
 }
 

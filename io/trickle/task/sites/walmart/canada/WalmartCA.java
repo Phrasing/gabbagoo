@@ -28,11 +28,11 @@ import java.util.function.Function;
 
 public class WalmartCA
 extends TaskActor {
+    public PaymentToken token;
+    public Task task;
+    public PaymentInstance payment;
     public String instanceSignal;
     public WalmartCanadaAPI api;
-    public PaymentToken token;
-    public PaymentInstance payment;
-    public Task task;
 
     /*
      * Unable to fully structure code
@@ -67,165 +67,30 @@ lbl15:
         throw new IllegalArgumentException();
     }
 
+    public CompletableFuture generateToken() {
+        HttpRequest httpRequest = this.api.getWebClient().getAbs("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust=" + System.currentTimeMillis()).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
+        try {
+            CompletableFuture completableFuture = Request.execute(httpRequest, 5);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> WalmartCA.async$generateToken(this, httpRequest, completableFuture2, 1, arg_0));
+            }
+            String string = (String)completableFuture.join();
+            this.token = PaymentToken.prepareAndGenerate(string, this.task.getProfile().getCardNumber(), this.task.getProfile().getCvv());
+            return CompletableFuture.completedFuture(true);
+        }
+        catch (Exception exception) {
+            this.logger.warn("Failed to generate payment token: {}", (Object)exception.getMessage());
+            return CompletableFuture.completedFuture(false);
+        }
+    }
+
     public WalmartCA(Task task, int n) {
         super(n);
         this.task = task;
         this.api = new WalmartCanadaAPI(this.task);
         super.setClient(this.api);
         this.instanceSignal = this.task.getKeywords()[0];
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$tryCart(WalmartCA var0, int var1_1, PaymentInstance$State var2_2, CompletableFuture var3_3, int var4_6, Object var5_10) {
-        switch (var4_6) {
-            case 0: {
-                var1_1 = 0;
-                var2_2 = null;
-                block8: while (var0.running != false) {
-                    if (var1_1 == 0) {
-                        try {
-                            v0 = var0.addToCart();
-                            if (!v0.isDone()) {
-                                var4_7 = v0;
-                                return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.canada.WalmartCA int io.trickle.task.sites.walmart.canada.PaymentInstance$State java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (int)var1_1, (PaymentInstance$State)var2_2, (CompletableFuture)var4_7, (int)1));
-                            }
-lbl12:
-                            // 3 sources
-
-                            while (true) {
-                                var1_1 = (int)((Boolean)v0.join()).booleanValue();
-                                break;
-                            }
-                        }
-                        catch (Exception var3_4) {
-                            var3_4.printStackTrace();
-                            continue;
-                        }
-                    }
-                    if (var1_1 == 0) continue;
-                    if (var2_2 == null || var2_2.equals((Object)PaymentInstance$State.FAILED_INIT)) {
-                        v1 = var0.initCheckout();
-                        if (!v1.isDone()) {
-                            var4_8 = v1;
-                            return var4_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.canada.WalmartCA int io.trickle.task.sites.walmart.canada.PaymentInstance$State java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (int)var1_1, (PaymentInstance$State)var2_2, (CompletableFuture)var4_8, (int)2));
-                        }
-lbl24:
-                        // 3 sources
-
-                        while (true) {
-                            var2_2 = (PaymentInstance$State)v1.join();
-                            continue block8;
-                            break;
-                        }
-                    }
-                    v2 = var0.payment.processOrder();
-                    if (!v2.isDone()) {
-                        var4_9 = v2;
-                        return var4_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.canada.WalmartCA int io.trickle.task.sites.walmart.canada.PaymentInstance$State java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (int)var1_1, (PaymentInstance$State)var2_2, (CompletableFuture)var4_9, (int)3));
-                    }
-lbl31:
-                    // 3 sources
-
-                    while (true) {
-                        var3_5 = (Integer)v2.join();
-                        if (var3_5 == 200) {
-                            return CompletableFuture.completedFuture(null);
-                        }
-                        if (var3_5 != 405) continue block8;
-                        var0.api.getWebClient().cookieStore().clear();
-                        var1_1 = 0;
-                        continue block8;
-                        break;
-                    }
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var3_3;
-                ** continue;
-            }
-            case 2: {
-                v1 = var3_3;
-                ** continue;
-            }
-            case 3: {
-                v2 = var3_3;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$addToCart(WalmartCA var0, Buffer var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, int var6_8, Throwable var7_14, int var8_15, Object var9_16) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$run(WalmartCA var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
-        switch (var2_2) {
-            case 0: {
-                v0 = var0.generateToken();
-                if (!v0.isDone()) {
-                    var1_1 = v0;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.walmart.canada.WalmartCA java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (CompletableFuture)var1_1, (int)1));
-                }
-                ** GOTO lbl10
-            }
-            case 1: {
-                v0 = var1_1;
-lbl10:
-                // 2 sources
-
-                if (!((Boolean)v0.join()).booleanValue()) {
-                    var0.logger.error("Failed to initialize...");
-                    return CompletableFuture.completedFuture(null);
-                }
-                v1 = var0.tryCart();
-                if (!v1.isDone()) {
-                    var1_1 = v1;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.walmart.canada.WalmartCA java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (CompletableFuture)var1_1, (int)2));
-                }
-                ** GOTO lbl20
-            }
-            case 2: {
-                v1 = var1_1;
-lbl20:
-                // 2 sources
-
-                v1.join();
-                return CompletableFuture.completedFuture(null);
-            }
-        }
-        throw new IllegalArgumentException();
     }
 
     public CompletableFuture initCheckout() {
@@ -335,22 +200,128 @@ lbl20:
         return CompletableFuture.completedFuture(null);
     }
 
-    public CompletableFuture generateToken() {
-        HttpRequest httpRequest = this.api.getWebClient().getAbs("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust=" + System.currentTimeMillis()).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
-        try {
-            CompletableFuture completableFuture = Request.execute(httpRequest, 5);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> WalmartCA.async$generateToken(this, httpRequest, completableFuture2, 1, arg_0));
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$run(WalmartCA var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
+        switch (var2_2) {
+            case 0: {
+                v0 = var0.generateToken();
+                if (!v0.isDone()) {
+                    var1_1 = v0;
+                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.walmart.canada.WalmartCA java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (CompletableFuture)var1_1, (int)1));
+                }
+                ** GOTO lbl10
             }
-            String string = (String)completableFuture.join();
-            this.token = PaymentToken.prepareAndGenerate(string, this.task.getProfile().getCardNumber(), this.task.getProfile().getCvv());
-            return CompletableFuture.completedFuture(true);
+            case 1: {
+                v0 = var1_1;
+lbl10:
+                // 2 sources
+
+                if (!((Boolean)v0.join()).booleanValue()) {
+                    var0.logger.error("Failed to initialize...");
+                    return CompletableFuture.completedFuture(null);
+                }
+                v1 = var0.tryCart();
+                if (!v1.isDone()) {
+                    var1_1 = v1;
+                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.walmart.canada.WalmartCA java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (CompletableFuture)var1_1, (int)2));
+                }
+                ** GOTO lbl20
+            }
+            case 2: {
+                v1 = var1_1;
+lbl20:
+                // 2 sources
+
+                v1.join();
+                return CompletableFuture.completedFuture(null);
+            }
         }
-        catch (Exception exception) {
-            this.logger.warn("Failed to generate payment token: {}", (Object)exception.getMessage());
-            return CompletableFuture.completedFuture(false);
+        throw new IllegalArgumentException();
+    }
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$tryCart(WalmartCA var0, int var1_1, PaymentInstance$State var2_2, CompletableFuture var3_3, int var4_6, Object var5_10) {
+        switch (var4_6) {
+            case 0: {
+                var1_1 = 0;
+                var2_2 = null;
+                block8: while (var0.running != false) {
+                    if (var1_1 == 0) {
+                        try {
+                            v0 = var0.addToCart();
+                            if (!v0.isDone()) {
+                                var4_7 = v0;
+                                return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.canada.WalmartCA int io.trickle.task.sites.walmart.canada.PaymentInstance$State java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (int)var1_1, (PaymentInstance$State)var2_2, (CompletableFuture)var4_7, (int)1));
+                            }
+lbl12:
+                            // 3 sources
+
+                            while (true) {
+                                var1_1 = (int)((Boolean)v0.join()).booleanValue();
+                                break;
+                            }
+                        }
+                        catch (Exception var3_4) {
+                            var3_4.printStackTrace();
+                            continue;
+                        }
+                    }
+                    if (var1_1 == 0) continue;
+                    if (var2_2 == null || var2_2.equals((Object)PaymentInstance$State.FAILED_INIT)) {
+                        v1 = var0.initCheckout();
+                        if (!v1.isDone()) {
+                            var4_8 = v1;
+                            return var4_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.canada.WalmartCA int io.trickle.task.sites.walmart.canada.PaymentInstance$State java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (int)var1_1, (PaymentInstance$State)var2_2, (CompletableFuture)var4_8, (int)2));
+                        }
+lbl24:
+                        // 3 sources
+
+                        while (true) {
+                            var2_2 = (PaymentInstance$State)v1.join();
+                            continue block8;
+                            break;
+                        }
+                    }
+                    v2 = var0.payment.processOrder();
+                    if (!v2.isDone()) {
+                        var4_9 = v2;
+                        return var4_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.canada.WalmartCA int io.trickle.task.sites.walmart.canada.PaymentInstance$State java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartCA)var0, (int)var1_1, (PaymentInstance$State)var2_2, (CompletableFuture)var4_9, (int)3));
+                    }
+lbl31:
+                    // 3 sources
+
+                    while (true) {
+                        var3_5 = (Integer)v2.join();
+                        if (var3_5 == 200) {
+                            return CompletableFuture.completedFuture(null);
+                        }
+                        if (var3_5 != 405) continue block8;
+                        var0.api.getWebClient().cookieStore().clear();
+                        var1_1 = 0;
+                        continue block8;
+                        break;
+                    }
+                }
+                return CompletableFuture.completedFuture(null);
+            }
+            case 1: {
+                v0 = var3_3;
+                ** continue;
+            }
+            case 2: {
+                v1 = var3_3;
+                ** continue;
+            }
+            case 3: {
+                v2 = var3_3;
+                ** continue;
+            }
         }
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -371,6 +342,35 @@ lbl20:
         }
         completableFuture3.join();
         return CompletableFuture.completedFuture(null);
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$addToCart(WalmartCA var0, Buffer var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, int var6_8, Throwable var7_14, int var8_15, Object var9_16) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
     }
 }
 

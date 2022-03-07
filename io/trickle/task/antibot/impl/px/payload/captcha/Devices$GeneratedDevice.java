@@ -9,47 +9,20 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Devices$GeneratedDevice
 implements Devices$Device {
-    public String userAgent;
-    public String platform;
     public int width;
-    public static String[] resolutions = new String[]{"412x732", "412x869", "412x824", "412x846", "412x847", "412x732", "360x740", "480x853", "360x740", "360x640", "375x667", "414x896", "412x869", "360x780", "393x851", "375x812", "360x720", "414x736", "480x853"};
     public int height;
+    public String platform;
+    public String userAgent;
+    public static String[] resolutions = new String[]{"412x732", "412x869", "412x824", "412x846", "412x847", "412x732", "360x740", "480x853", "360x740", "360x640", "375x667", "414x896", "412x869", "360x780", "393x851", "375x812", "360x720", "414x736", "480x853"};
 
     @Override
     public int getInnerWidth() {
         return this.width;
     }
 
-    public Devices$GeneratedDevice() {
-        String[] stringArray = resolutions[ThreadLocalRandom.current().nextInt(resolutions.length)].split("x");
-        this.width = Integer.parseInt(stringArray[0]);
-        this.height = Integer.parseInt(stringArray[1]);
-        this.userAgent = Devices$GeneratedDevice.getRandomUA() + " PerimeterX Android SDK/" + "v1.13.2".substring(1);
-        this.platform = "Linux armv8l";
-    }
-
-    public static String getRandomUA() {
-        return Devices.userAgents[ThreadLocalRandom.current().nextInt(Devices.userAgents.length)];
-    }
-
     @Override
-    public String getAppCodeName() {
-        return "Mozilla";
-    }
-
-    @Override
-    public String getUserAgent() {
-        return this.userAgent;
-    }
-
-    @Override
-    public int getAvailHeight() {
+    public int getInnerHeight() {
         return this.height;
-    }
-
-    @Override
-    public String getAppName() {
-        return "Netscape";
     }
 
     @Override
@@ -58,8 +31,18 @@ implements Devices$Device {
     }
 
     @Override
-    public String getPlatform() {
-        return this.platform;
+    public String getAppCodeName() {
+        return "Mozilla";
+    }
+
+    @Override
+    public int getWidth() {
+        return this.width;
+    }
+
+    @Override
+    public String getProduct() {
+        return "Gecko";
     }
 
     @Override
@@ -73,8 +56,26 @@ implements Devices$Device {
     }
 
     @Override
-    public int getWidth() {
-        return this.width;
+    public String getAppName() {
+        return "Netscape";
+    }
+
+    @Override
+    public String getPlatform() {
+        return this.platform;
+    }
+
+    public Devices$GeneratedDevice() {
+        String[] stringArray = resolutions[ThreadLocalRandom.current().nextInt(resolutions.length)].split("x");
+        this.width = Integer.parseInt(stringArray[0]);
+        this.height = Integer.parseInt(stringArray[1]);
+        this.userAgent = Devices$GeneratedDevice.getRandomUA() + " PerimeterX Android SDK/" + "v1.13.2".substring(1);
+        this.platform = "Linux armv8l";
+    }
+
+    @Override
+    public String getUserAgent() {
+        return this.userAgent;
     }
 
     @Override
@@ -88,14 +89,13 @@ implements Devices$Device {
         }
     }
 
-    @Override
-    public int getInnerHeight() {
-        return this.height;
+    public static String getRandomUA() {
+        return Devices.userAgents[ThreadLocalRandom.current().nextInt(Devices.userAgents.length)];
     }
 
     @Override
-    public String getProduct() {
-        return "Gecko";
+    public int getAvailHeight() {
+        return this.height;
     }
 }
 

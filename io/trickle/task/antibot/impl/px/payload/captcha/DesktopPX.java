@@ -44,42 +44,43 @@ import java.util.regex.Matcher;
 
 public class DesktopPX
 extends PerimeterX {
-    public String sid;
     public static CharSequence VID_COOKIE;
-    public Function<HttpResponse<?>, Buffer> okayAndConversionFunc;
-    public String secUA;
-    public JsonObject cookieSession;
-    public JsonArray performance;
-    public String vid;
-    public long waitTime;
-    public String deviceNumber = "undefined";
-    public static CharSequence CTS_VALUE;
-    public MultiMap cachedResponse = null;
-    public static CharSequence CFP_VALUE;
-    public static CharSequence DEFAULT_UA;
-    public static Function<HttpResponse<?>, String> okayStatusFunc;
-    public static CharSequence PX3_VALUE;
-    public String userAgent;
-    public static Site site;
-    public TaskApiClient delegate;
     public static CharSequence PXDE_VALUE;
-    public long lockoutTiming = -1L;
-    public String uuid;
-    public static CharSequence PXHD_VALUE;
-    public static CharSequence DEFAULT_SEC_UA;
-    public static CharSequence RF_VALUE;
-    public static CharSequence FP_VALUE;
-    public static CharSequence ONE_VALUE;
+    public long waitTime;
+    public static CharSequence PX3_VALUE;
+    public JsonObject cookieSession;
     public Function<HttpResponse<?>, Buffer> setupDevice = this::lambda$new$1;
+    public String uuid;
+    public String deviceNumber = "undefined";
+    public static Function<HttpResponse<?>, String> okayStatusFunc;
+    public MultiMap cachedResponse = null;
+    public String sid;
+    public static CharSequence DEFAULT_UA;
+    public String vid;
+    public static Site site;
+    public static CharSequence DEFAULT_SEC_UA;
+    public JsonArray performance;
+    public static CharSequence FP_VALUE;
+    public long lockoutTiming = -1L;
+    public String secUA;
+    public String userAgent;
+    public static CharSequence PXHD_VALUE;
+    public static CharSequence CTS_VALUE;
+    public static CharSequence RF_VALUE;
+    public static CharSequence ONE_VALUE;
+    public Function<HttpResponse<?>, Buffer> okayAndConversionFunc = this::lambda$new$2;
+    public static CharSequence CFP_VALUE;
+    public TaskApiClient delegate;
 
     @Override
-    public String getDeviceSecUA() {
-        if (this.secUA != null) return this.secUA;
-        return DEFAULT_SEC_UA.toString();
-    }
-
-    public HttpRequest lambda$solveCaptcha$7() {
-        return this.apiRequest("img", true);
+    public CompletableFuture initialise() {
+        CompletableFuture completableFuture = this.execute("Initiating...", this.setupDevice, this::lambda$initialise$10, null);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$initialise(this, completableFuture2, 1, arg_0));
+        }
+        completableFuture.join();
+        return CompletableFuture.completedFuture(true);
     }
 
     public HttpRequest bundleReq() {
@@ -101,55 +102,188 @@ extends PerimeterX {
         return httpRequest;
     }
 
+    public HttpRequest imageReq(Buffer buffer) {
+        HttpRequest httpRequest = this.client.getAbs("https://collector-pxu6b0qd2s.px-client.net/b/g?" + buffer.toString()).as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.getDeviceUA());
+        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.walmart.com");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.walmart.com/");
+        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.getDeviceLang());
+        return httpRequest;
+    }
+
+    public HttpRequest lambda$solveCaptcha$6() {
+        return this.apiRequest("2", true);
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$execute(DesktopPX var0, String var1_1, Function var2_2, Supplier var3_3, Object var4_4, int var5_5, HttpRequest var6_6, CompletableFuture var7_8, HttpResponse var8_9, int var9_11, Optional var10_13, Throwable var11_14, int var12_15, Object var13_16) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$initialise(DesktopPX var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
+        switch (var2_2) {
+            case 0: {
+                v0 = var0.execute("Initiating...", var0.setupDevice, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$initialise$10(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), null);
+                if (!v0.isDone()) {
+                    var1_1 = v0;
+                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$initialise(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (CompletableFuture)var1_1, (int)1));
+                }
+                ** GOTO lbl10
+            }
+            case 1: {
+                v0 = var1_1;
+lbl10:
+                // 2 sources
+
+                v0.join();
+                return CompletableFuture.completedFuture(true);
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
     @Override
-    public CompletableFuture solve() {
-        int n = 1;
-        if (n > 30) return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
-        CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solve$3, this.buildReqBody(null, null));
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture2, null, null, null, 1, arg_0));
+    public String getDeviceLang() {
+        return "en-US,en;q=0.9";
+    }
+
+    public HttpRequest lambda$solveCaptcha$5() {
+        return this.apiRequest("1", true);
+    }
+
+    @Override
+    public void reset() {
+        this.cookieSession = new JsonObject();
+        this.userAgent = null;
+        this.deviceNumber = "undefined";
+    }
+
+    public Buffer lambda$new$2(HttpResponse httpResponse) {
+        if (httpResponse.statusCode() != 200) return null;
+        if (httpResponse.getHeader("performance") == null) return null;
+        this.uuid = httpResponse.getHeader("uuid");
+        this.sid = httpResponse.getHeader("sid");
+        this.vid = httpResponse.getHeader("vid");
+        this.waitTime = Long.parseLong(httpResponse.getHeader("completionEpoch")) - System.currentTimeMillis();
+        this.performance = new JsonArray(httpResponse.getHeader("performance"));
+        if (httpResponse.getHeader("cts") != null) {
+            this.delegate.getCookies().put(String.valueOf(CTS_VALUE), httpResponse.getHeader("cts"), ".walmart.com");
         }
-        Buffer buffer = (Buffer)completableFuture.join();
-        CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep(this.waitTime);
-        if (!completableFuture3.isDone()) {
-            CompletableFuture completableFuture4 = completableFuture3;
-            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture4, buffer, null, null, 2, arg_0));
+        this.deviceNumber = httpResponse.getHeader("device");
+        return httpResponse.bodyAsBuffer();
+    }
+
+    public boolean isBool(JsonObject jsonObject) {
+        Object object = jsonObject.getValue("error", null);
+        if (object == null) return false;
+        return object instanceof Boolean;
+    }
+
+    public JsonObject buildReqBody(String string, JsonArray jsonArray) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("pxhd", (Object)this.delegate.getCookies().getCookieValue("_pxhd"));
+        jsonObject.put("uuid", (Object)this.uuid);
+        jsonObject.put("sid", (Object)this.sid);
+        jsonObject.put("vid", (Object)this.vid);
+        jsonObject.put("firstResponse", (Object)string);
+        jsonObject.put("performance", (Object)jsonArray);
+        jsonObject.put("cts", (Object)this.delegate.getCookies().getCookieValue(String.valueOf(CTS_VALUE)));
+        jsonObject.put("device", (Object)this.deviceNumber);
+        return jsonObject;
+    }
+
+    public CompletableFuture execute(String string, Function function, Supplier supplier, Object object) {
+        int n = 0;
+        while (n++ < Integer.MAX_VALUE) {
+            try {
+                HttpResponse httpResponse;
+                HttpRequest httpRequest = (HttpRequest)supplier.get();
+                if (((HttpRequestImpl)httpRequest).method().equals((Object)HttpMethod.POST)) {
+                    CompletableFuture completableFuture = Request.send(httpRequest, object);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture2 = completableFuture;
+                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture2, null, 0, null, null, 1, arg_0));
+                    }
+                    httpResponse = (HttpResponse)completableFuture.join();
+                } else {
+                    CompletableFuture completableFuture = Request.send(httpRequest);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture3 = completableFuture;
+                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture3, null, 0, null, null, 2, arg_0));
+                    }
+                    httpResponse = (HttpResponse)completableFuture.join();
+                }
+                if (httpResponse != null) {
+                    int n2 = httpResponse.statusCode();
+                    Optional optional = Optional.ofNullable(function.apply(httpResponse));
+                    if (optional.isPresent()) {
+                        return CompletableFuture.completedFuture(optional.get());
+                    }
+                    this.logger.warn("Failed {}: '{}'", (Object)string.toLowerCase(Locale.ROOT), (Object)n2);
+                    CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture4 = completableFuture;
+                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture4, httpResponse, n2, optional, null, 3, arg_0));
+                    }
+                    completableFuture.join();
+                    continue;
+                }
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture5 = completableFuture;
+                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture5, httpResponse, 0, null, null, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error " + string.toLowerCase(Locale.ROOT) + ": {}", (Object)throwable.getMessage());
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug((Object)throwable);
+                }
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, null, completableFuture6, null, 0, null, throwable, 5, arg_0));
+                }
+                completableFuture.join();
+            }
         }
-        completableFuture3.join();
-        CompletableFuture completableFuture5 = this.execute("Sensor 1/2", okayStatusFunc, this::collectorReq, buffer);
-        if (!completableFuture5.isDone()) {
-            CompletableFuture completableFuture6 = completableFuture5;
-            return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture6, buffer, null, null, 3, arg_0));
-        }
-        String string = (String)completableFuture5.join();
-        CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solve$4, this.buildReqBody(string, this.performance));
-        if (!completableFuture7.isDone()) {
-            CompletableFuture completableFuture8 = completableFuture7;
-            return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture8, buffer, string, null, 4, arg_0));
-        }
-        Buffer buffer2 = (Buffer)completableFuture7.join();
-        CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep(this.waitTime);
-        if (!completableFuture9.isDone()) {
-            CompletableFuture completableFuture10 = completableFuture9;
-            return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture10, buffer, string, buffer2, 5, arg_0));
-        }
-        completableFuture9.join();
-        CompletableFuture completableFuture11 = this.execute("Sensor 2/2", okayStatusFunc, this::collectorReq, buffer2);
-        if (!completableFuture11.isDone()) {
-            CompletableFuture completableFuture12 = completableFuture11;
-            return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture12, buffer, string, buffer2, 6, arg_0));
-        }
-        String string2 = (String)completableFuture11.join();
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        if (this.getVid() != null && !this.getVid().isBlank()) {
-            multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
-        }
-        multiMap.add(RF_VALUE, ONE_VALUE);
-        multiMap.add(FP_VALUE, ONE_VALUE);
-        multiMap.add(CFP_VALUE, ONE_VALUE);
-        this.parseResultCookies(string2, multiMap);
-        return CompletableFuture.completedFuture(multiMap);
+        return CompletableFuture.failedFuture(new Exception("Failed to execute " + string));
     }
 
     /*
@@ -452,17 +586,223 @@ lbl223:
         throw new IllegalArgumentException();
     }
 
-    public JsonObject buildReqBody(String string, JsonArray jsonArray) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("pxhd", (Object)this.delegate.getCookies().getCookieValue("_pxhd"));
-        jsonObject.put("uuid", (Object)this.uuid);
-        jsonObject.put("sid", (Object)this.sid);
-        jsonObject.put("vid", (Object)this.vid);
-        jsonObject.put("firstResponse", (Object)string);
-        jsonObject.put("performance", (Object)jsonArray);
-        jsonObject.put("cts", (Object)this.delegate.getCookies().getCookieValue(String.valueOf(CTS_VALUE)));
-        jsonObject.put("device", (Object)this.deviceNumber);
-        return jsonObject;
+    public HttpRequest lambda$solveCaptcha$7() {
+        return this.apiRequest("img", true);
+    }
+
+    @Override
+    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
+        this.uuid = string2;
+        this.vid = string;
+        int n = 1;
+        while (true) {
+            if (n > ThreadLocalRandom.current().nextInt(1, 4)) {
+                this.delegate.getCookies().removeAnyMatch("_pxhd");
+                return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+            }
+            this.performance = null;
+            CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solveCaptcha$5, this.buildReqBody(null, null));
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture2, null, null, null, null, null, null, null, null, 1, arg_0));
+            }
+            Buffer buffer = (Buffer)completableFuture.join();
+            CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep(this.waitTime);
+            if (!completableFuture3.isDone()) {
+                CompletableFuture completableFuture4 = completableFuture3;
+                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture4, buffer, null, null, null, null, null, null, null, 2, arg_0));
+            }
+            completableFuture3.join();
+            CompletableFuture completableFuture5 = this.execute("Sensor 1/4", okayStatusFunc, this::bundleReq, buffer);
+            if (!completableFuture5.isDone()) {
+                CompletableFuture completableFuture6 = completableFuture5;
+                return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture6, buffer, null, null, null, null, null, null, null, 3, arg_0));
+            }
+            String string4 = (String)completableFuture5.join();
+            CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solveCaptcha$6, this.buildReqBody(string4, this.performance));
+            if (!completableFuture7.isDone()) {
+                CompletableFuture completableFuture8 = completableFuture7;
+                return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture8, buffer, string4, null, null, null, null, null, null, 4, arg_0));
+            }
+            Buffer buffer2 = (Buffer)completableFuture7.join();
+            CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep(this.waitTime);
+            if (!completableFuture9.isDone()) {
+                CompletableFuture completableFuture10 = completableFuture9;
+                return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture10, buffer, string4, buffer2, null, null, null, null, null, 5, arg_0));
+            }
+            completableFuture9.join();
+            CompletableFuture completableFuture11 = this.execute("Sensor 2/4", okayStatusFunc, this::bundleReq, buffer2);
+            if (!completableFuture11.isDone()) {
+                CompletableFuture completableFuture12 = completableFuture11;
+                return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture12, buffer, string4, buffer2, null, null, null, null, null, 6, arg_0));
+            }
+            String string5 = (String)completableFuture11.join();
+            CompletableFuture completableFuture13 = this.execute("API 3", this.okayAndConversionFunc, this::lambda$solveCaptcha$7, this.buildReqBody(string4, this.performance));
+            if (!completableFuture13.isDone()) {
+                CompletableFuture completableFuture14 = completableFuture13;
+                return ((CompletableFuture)completableFuture14.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture14, buffer, string4, buffer2, string5, null, null, null, null, 7, arg_0));
+            }
+            Buffer buffer3 = (Buffer)completableFuture13.join();
+            CompletableFuture completableFuture15 = VertxUtil.hardCodedSleep(this.waitTime);
+            if (!completableFuture15.isDone()) {
+                CompletableFuture completableFuture16 = completableFuture15;
+                return ((CompletableFuture)completableFuture16.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture16, buffer, string4, buffer2, string5, buffer3, null, null, null, 8, arg_0));
+            }
+            completableFuture15.join();
+            CompletableFuture completableFuture17 = this.execute("Sensor 3/4", okayStatusFunc, () -> this.lambda$solveCaptcha$8(buffer3), null);
+            if (!completableFuture17.isDone()) {
+                CompletableFuture completableFuture18 = completableFuture17;
+                return ((CompletableFuture)completableFuture18.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture18, buffer, string4, buffer2, string5, buffer3, null, null, null, 9, arg_0));
+            }
+            String string6 = (String)completableFuture17.join();
+            CompletableFuture completableFuture19 = this.execute("API 4", this.okayAndConversionFunc, this::lambda$solveCaptcha$9, this.buildReqBody(string4, this.performance));
+            if (!completableFuture19.isDone()) {
+                CompletableFuture completableFuture20 = completableFuture19;
+                return ((CompletableFuture)completableFuture20.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture20, buffer, string4, buffer2, string5, buffer3, string6, null, null, 10, arg_0));
+            }
+            Buffer buffer4 = (Buffer)completableFuture19.join();
+            CompletableFuture completableFuture21 = VertxUtil.hardCodedSleep(this.waitTime);
+            if (!completableFuture21.isDone()) {
+                CompletableFuture completableFuture22 = completableFuture21;
+                return ((CompletableFuture)completableFuture22.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture22, buffer, string4, buffer2, string5, buffer3, string6, buffer4, null, 11, arg_0));
+            }
+            completableFuture21.join();
+            CompletableFuture completableFuture23 = this.execute("Sensor 4/4", okayStatusFunc, this::bundleReq, buffer4);
+            if (!completableFuture23.isDone()) {
+                CompletableFuture completableFuture24 = completableFuture23;
+                return ((CompletableFuture)completableFuture24.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture24, buffer, string4, buffer2, string5, buffer3, string6, buffer4, null, 12, arg_0));
+            }
+            String string7 = (String)completableFuture23.join();
+            if (string7.contains("cv|0")) {
+                this.logger.info("Successfully solved captcha");
+                MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
+                if (this.getVid() != null && !this.getVid().isBlank()) {
+                    multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
+                }
+                multiMap.add(RF_VALUE, ONE_VALUE);
+                multiMap.add(FP_VALUE, ONE_VALUE);
+                multiMap.add(CFP_VALUE, ONE_VALUE);
+                this.parseResultCookies(string7, multiMap);
+                return CompletableFuture.completedFuture(multiMap);
+            }
+            this.logger.error("Retrying captcha solve...");
+            this.sid = null;
+            CompletableFuture completableFuture25 = VertxUtil.randomSleep(1000L);
+            if (!completableFuture25.isDone()) {
+                CompletableFuture completableFuture26 = completableFuture25;
+                return ((CompletableFuture)completableFuture26.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture26, buffer, string4, buffer2, string5, buffer3, string6, buffer4, string7, 13, arg_0));
+            }
+            completableFuture25.join();
+            ++n;
+        }
+    }
+
+    public HttpRequest apiRequest(String string, Boolean bl) {
+        HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().postAbs("https://trickle-px-oygn7nn37q-uc.a.run.app/gen/" + string + ".json").as(BodyCodec.buffer()).addQueryParam("mobile", "false");
+        if (bl == null) return httpRequest;
+        httpRequest.addQueryParam("captcha", bl != false ? "hold" : "recaptcha");
+        return httpRequest;
+    }
+
+    @Override
+    public String getDeviceSecUA() {
+        if (this.secUA != null) return this.secUA;
+        return DEFAULT_SEC_UA.toString();
+    }
+
+    public HttpRequest collectorReq() {
+        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/api/v2/collector").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.getDeviceUA());
+        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.walmart.com");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.walmart.com/");
+        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.getDeviceLang());
+        return httpRequest;
+    }
+
+    public static String lambda$static$0(HttpResponse httpResponse) {
+        if (httpResponse.statusCode() != 200) return null;
+        return httpResponse.bodyAsString();
+    }
+
+    public DesktopPX(TaskActor taskActor) {
+        super(taskActor, ClientType.CHROME);
+        this.cookieSession = new JsonObject();
+        this.delegate = taskActor.getClient();
+    }
+
+    @Override
+    public String getDeviceUA() {
+        if (this.userAgent != null) return this.userAgent;
+        return DEFAULT_UA.toString();
+    }
+
+    @Override
+    public CompletableFuture solve() {
+        int n = 1;
+        if (n > 30) return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+        CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solve$3, this.buildReqBody(null, null));
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture2, null, null, null, 1, arg_0));
+        }
+        Buffer buffer = (Buffer)completableFuture.join();
+        CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep(this.waitTime);
+        if (!completableFuture3.isDone()) {
+            CompletableFuture completableFuture4 = completableFuture3;
+            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture4, buffer, null, null, 2, arg_0));
+        }
+        completableFuture3.join();
+        CompletableFuture completableFuture5 = this.execute("Sensor 1/2", okayStatusFunc, this::collectorReq, buffer);
+        if (!completableFuture5.isDone()) {
+            CompletableFuture completableFuture6 = completableFuture5;
+            return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture6, buffer, null, null, 3, arg_0));
+        }
+        String string = (String)completableFuture5.join();
+        CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solve$4, this.buildReqBody(string, this.performance));
+        if (!completableFuture7.isDone()) {
+            CompletableFuture completableFuture8 = completableFuture7;
+            return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture8, buffer, string, null, 4, arg_0));
+        }
+        Buffer buffer2 = (Buffer)completableFuture7.join();
+        CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep(this.waitTime);
+        if (!completableFuture9.isDone()) {
+            CompletableFuture completableFuture10 = completableFuture9;
+            return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture10, buffer, string, buffer2, 5, arg_0));
+        }
+        completableFuture9.join();
+        CompletableFuture completableFuture11 = this.execute("Sensor 2/2", okayStatusFunc, this::collectorReq, buffer2);
+        if (!completableFuture11.isDone()) {
+            CompletableFuture completableFuture12 = completableFuture11;
+            return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture12, buffer, string, buffer2, 6, arg_0));
+        }
+        String string2 = (String)completableFuture11.join();
+        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
+        if (this.getVid() != null && !this.getVid().isBlank()) {
+            multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
+        }
+        multiMap.add(RF_VALUE, ONE_VALUE);
+        multiMap.add(FP_VALUE, ONE_VALUE);
+        multiMap.add(CFP_VALUE, ONE_VALUE);
+        this.parseResultCookies(string2, multiMap);
+        return CompletableFuture.completedFuture(multiMap);
+    }
+
+    public HttpRequest lambda$solveCaptcha$8(Buffer buffer) {
+        return this.imageReq(buffer);
+    }
+
+    public HttpRequest lambda$solve$3() {
+        return this.apiRequest("1", null);
     }
 
     @Override
@@ -470,103 +810,12 @@ lbl223:
         return "gzip, deflate, br";
     }
 
-    public void parseResultCookies(String string, MultiMap multiMap) {
-        try {
-            Matcher matcher = PXDE_PATTERN.matcher(string);
-            Matcher matcher2 = BAKE_PATTERN.matcher(string);
-            if (matcher2.find()) {
-                multiMap.add(PX3_VALUE, (CharSequence)matcher2.group(1));
-            }
-            if (!matcher.find()) return;
-            multiMap.add(PXDE_VALUE, (CharSequence)matcher.group(1));
-            return;
-        }
-        catch (Throwable throwable) {
-            if (!this.logger.isDebugEnabled()) return;
-            this.logger.debug("Failed to find px3 or pxde ", throwable);
-        }
+    public HttpRequest lambda$solve$4() {
+        return this.apiRequest("2", null);
     }
 
-    public HttpRequest lambda$solveCaptcha$5() {
-        return this.apiRequest("1", true);
-    }
-
-    public HttpRequest lambda$initialise$10() {
-        return this.apiRequest("ua", null).method(HttpMethod.GET);
-    }
-
-    @Override
-    public String getDeviceLang() {
-        return "en-US,en;q=0.9";
-    }
-
-    public boolean isBool(JsonObject jsonObject) {
-        Object object = jsonObject.getValue("error", null);
-        if (object == null) return false;
-        return object instanceof Boolean;
-    }
-
-    public HttpRequest lambda$solve$3() {
-        return this.apiRequest("1", null);
-    }
-
-    public CompletableFuture execute(String string, Function function, Supplier supplier, Object object) {
-        int n = 0;
-        while (n++ < Integer.MAX_VALUE) {
-            try {
-                HttpResponse httpResponse;
-                HttpRequest httpRequest = (HttpRequest)supplier.get();
-                if (((HttpRequestImpl)httpRequest).method().equals((Object)HttpMethod.POST)) {
-                    CompletableFuture completableFuture = Request.send(httpRequest, object);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture2, null, 0, null, null, 1, arg_0));
-                    }
-                    httpResponse = (HttpResponse)completableFuture.join();
-                } else {
-                    CompletableFuture completableFuture = Request.send(httpRequest);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture3 = completableFuture;
-                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture3, null, 0, null, null, 2, arg_0));
-                    }
-                    httpResponse = (HttpResponse)completableFuture.join();
-                }
-                if (httpResponse != null) {
-                    int n2 = httpResponse.statusCode();
-                    Optional optional = Optional.ofNullable(function.apply(httpResponse));
-                    if (optional.isPresent()) {
-                        return CompletableFuture.completedFuture(optional.get());
-                    }
-                    this.logger.warn("Failed {}: '{}'", (Object)string.toLowerCase(Locale.ROOT), (Object)n2);
-                    CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture4, httpResponse, n2, optional, null, 3, arg_0));
-                    }
-                    completableFuture.join();
-                    continue;
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture5, httpResponse, 0, null, null, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error " + string.toLowerCase(Locale.ROOT) + ": {}", (Object)throwable.getMessage());
-                if (this.logger.isDebugEnabled()) {
-                    this.logger.debug((Object)throwable);
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, null, completableFuture6, null, 0, null, throwable, 5, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.failedFuture(new Exception("Failed to execute " + string));
+    public HttpRequest lambda$solveCaptcha$9() {
+        return this.apiRequest("3", true);
     }
 
     /*
@@ -683,152 +932,9 @@ lbl67:
         throw new IllegalArgumentException();
     }
 
-    public HttpRequest lambda$solveCaptcha$8(Buffer buffer) {
-        return this.imageReq(buffer);
-    }
-
-    @Override
-    public String getDeviceUA() {
-        if (this.userAgent != null) return this.userAgent;
-        return DEFAULT_UA.toString();
-    }
-
-    @Override
-    public CompletableFuture initialise() {
-        CompletableFuture completableFuture = this.execute("Initiating...", this.setupDevice, this::lambda$initialise$10, null);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$initialise(this, completableFuture2, 1, arg_0));
-        }
-        completableFuture.join();
-        return CompletableFuture.completedFuture(true);
-    }
-
-    public HttpRequest collectorReq() {
-        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/api/v2/collector").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
     @Override
     public String getVid() {
         return this.cookieSession.getString("vid", null);
-    }
-
-    public HttpRequest imageReq(Buffer buffer) {
-        HttpRequest httpRequest = this.client.getAbs("https://collector-pxu6b0qd2s.px-client.net/b/g?" + buffer.toString()).as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
-    public Buffer lambda$new$2(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        if (httpResponse.getHeader("performance") == null) return null;
-        this.uuid = httpResponse.getHeader("uuid");
-        this.sid = httpResponse.getHeader("sid");
-        this.vid = httpResponse.getHeader("vid");
-        this.waitTime = Long.parseLong(httpResponse.getHeader("completionEpoch")) - System.currentTimeMillis();
-        this.performance = new JsonArray(httpResponse.getHeader("performance"));
-        if (httpResponse.getHeader("cts") != null) {
-            this.delegate.getCookies().put(String.valueOf(CTS_VALUE), httpResponse.getHeader("cts"), ".walmart.com");
-        }
-        this.deviceNumber = httpResponse.getHeader("device");
-        return httpResponse.bodyAsBuffer();
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$execute(DesktopPX var0, String var1_1, Function var2_2, Supplier var3_3, Object var4_4, int var5_5, HttpRequest var6_6, CompletableFuture var7_8, HttpResponse var8_9, int var9_11, Optional var10_13, Throwable var11_14, int var12_15, Object var13_16) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public HttpRequest lambda$solve$4() {
-        return this.apiRequest("2", null);
-    }
-
-    public Buffer lambda$new$1(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        this.userAgent = httpResponse.bodyAsString();
-        this.secUA = httpResponse.getHeader("sec-ua");
-        this.deviceNumber = httpResponse.getHeader("device");
-        return httpResponse.bodyAsBuffer();
-    }
-
-    public DesktopPX(TaskActor taskActor) {
-        super(taskActor, ClientType.CHROME);
-        this.okayAndConversionFunc = this::lambda$new$2;
-        this.cookieSession = new JsonObject();
-        this.delegate = taskActor.getClient();
-    }
-
-    public static String lambda$static$0(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        return httpResponse.bodyAsString();
-    }
-
-    public HttpRequest apiRequest(String string, Boolean bl) {
-        HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().postAbs("https://trickle-px-oygn7nn37q-uc.a.run.app/gen/" + string + ".json").as(BodyCodec.buffer()).addQueryParam("mobile", "false");
-        if (bl == null) return httpRequest;
-        httpRequest.addQueryParam("captcha", bl != false ? "hold" : "recaptcha");
-        return httpRequest;
-    }
-
-    public HttpRequest lambda$solveCaptcha$9() {
-        return this.apiRequest("3", true);
-    }
-
-    @Override
-    public void reset() {
-        this.cookieSession = new JsonObject();
-        this.userAgent = null;
-        this.deviceNumber = "undefined";
     }
 
     static {
@@ -847,140 +953,33 @@ lbl67:
         okayStatusFunc = DesktopPX::lambda$static$0;
     }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$initialise(DesktopPX var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
-        switch (var2_2) {
-            case 0: {
-                v0 = var0.execute("Initiating...", var0.setupDevice, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$initialise$10(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), null);
-                if (!v0.isDone()) {
-                    var1_1 = v0;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$initialise(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (CompletableFuture)var1_1, (int)1));
-                }
-                ** GOTO lbl10
-            }
-            case 1: {
-                v0 = var1_1;
-lbl10:
-                // 2 sources
-
-                v0.join();
-                return CompletableFuture.completedFuture(true);
-            }
-        }
-        throw new IllegalArgumentException();
+    public Buffer lambda$new$1(HttpResponse httpResponse) {
+        if (httpResponse.statusCode() != 200) return null;
+        this.userAgent = httpResponse.bodyAsString();
+        this.secUA = httpResponse.getHeader("sec-ua");
+        this.deviceNumber = httpResponse.getHeader("device");
+        return httpResponse.bodyAsBuffer();
     }
 
-    @Override
-    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
-        this.uuid = string2;
-        this.vid = string;
-        int n = 1;
-        while (true) {
-            if (n > ThreadLocalRandom.current().nextInt(1, 4)) {
-                this.delegate.getCookies().removeAnyMatch("_pxhd");
-                return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+    public void parseResultCookies(String string, MultiMap multiMap) {
+        try {
+            Matcher matcher = PXDE_PATTERN.matcher(string);
+            Matcher matcher2 = BAKE_PATTERN.matcher(string);
+            if (matcher2.find()) {
+                multiMap.add(PX3_VALUE, (CharSequence)matcher2.group(1));
             }
-            this.performance = null;
-            CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solveCaptcha$5, this.buildReqBody(null, null));
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture2, null, null, null, null, null, null, null, null, 1, arg_0));
-            }
-            Buffer buffer = (Buffer)completableFuture.join();
-            CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep(this.waitTime);
-            if (!completableFuture3.isDone()) {
-                CompletableFuture completableFuture4 = completableFuture3;
-                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture4, buffer, null, null, null, null, null, null, null, 2, arg_0));
-            }
-            completableFuture3.join();
-            CompletableFuture completableFuture5 = this.execute("Sensor 1/4", okayStatusFunc, this::bundleReq, buffer);
-            if (!completableFuture5.isDone()) {
-                CompletableFuture completableFuture6 = completableFuture5;
-                return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture6, buffer, null, null, null, null, null, null, null, 3, arg_0));
-            }
-            String string4 = (String)completableFuture5.join();
-            CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solveCaptcha$6, this.buildReqBody(string4, this.performance));
-            if (!completableFuture7.isDone()) {
-                CompletableFuture completableFuture8 = completableFuture7;
-                return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture8, buffer, string4, null, null, null, null, null, null, 4, arg_0));
-            }
-            Buffer buffer2 = (Buffer)completableFuture7.join();
-            CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep(this.waitTime);
-            if (!completableFuture9.isDone()) {
-                CompletableFuture completableFuture10 = completableFuture9;
-                return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture10, buffer, string4, buffer2, null, null, null, null, null, 5, arg_0));
-            }
-            completableFuture9.join();
-            CompletableFuture completableFuture11 = this.execute("Sensor 2/4", okayStatusFunc, this::bundleReq, buffer2);
-            if (!completableFuture11.isDone()) {
-                CompletableFuture completableFuture12 = completableFuture11;
-                return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture12, buffer, string4, buffer2, null, null, null, null, null, 6, arg_0));
-            }
-            String string5 = (String)completableFuture11.join();
-            CompletableFuture completableFuture13 = this.execute("API 3", this.okayAndConversionFunc, this::lambda$solveCaptcha$7, this.buildReqBody(string4, this.performance));
-            if (!completableFuture13.isDone()) {
-                CompletableFuture completableFuture14 = completableFuture13;
-                return ((CompletableFuture)completableFuture14.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture14, buffer, string4, buffer2, string5, null, null, null, null, 7, arg_0));
-            }
-            Buffer buffer3 = (Buffer)completableFuture13.join();
-            CompletableFuture completableFuture15 = VertxUtil.hardCodedSleep(this.waitTime);
-            if (!completableFuture15.isDone()) {
-                CompletableFuture completableFuture16 = completableFuture15;
-                return ((CompletableFuture)completableFuture16.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture16, buffer, string4, buffer2, string5, buffer3, null, null, null, 8, arg_0));
-            }
-            completableFuture15.join();
-            CompletableFuture completableFuture17 = this.execute("Sensor 3/4", okayStatusFunc, () -> this.lambda$solveCaptcha$8(buffer3), null);
-            if (!completableFuture17.isDone()) {
-                CompletableFuture completableFuture18 = completableFuture17;
-                return ((CompletableFuture)completableFuture18.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture18, buffer, string4, buffer2, string5, buffer3, null, null, null, 9, arg_0));
-            }
-            String string6 = (String)completableFuture17.join();
-            CompletableFuture completableFuture19 = this.execute("API 4", this.okayAndConversionFunc, this::lambda$solveCaptcha$9, this.buildReqBody(string4, this.performance));
-            if (!completableFuture19.isDone()) {
-                CompletableFuture completableFuture20 = completableFuture19;
-                return ((CompletableFuture)completableFuture20.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture20, buffer, string4, buffer2, string5, buffer3, string6, null, null, 10, arg_0));
-            }
-            Buffer buffer4 = (Buffer)completableFuture19.join();
-            CompletableFuture completableFuture21 = VertxUtil.hardCodedSleep(this.waitTime);
-            if (!completableFuture21.isDone()) {
-                CompletableFuture completableFuture22 = completableFuture21;
-                return ((CompletableFuture)completableFuture22.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture22, buffer, string4, buffer2, string5, buffer3, string6, buffer4, null, 11, arg_0));
-            }
-            completableFuture21.join();
-            CompletableFuture completableFuture23 = this.execute("Sensor 4/4", okayStatusFunc, this::bundleReq, buffer4);
-            if (!completableFuture23.isDone()) {
-                CompletableFuture completableFuture24 = completableFuture23;
-                return ((CompletableFuture)completableFuture24.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture24, buffer, string4, buffer2, string5, buffer3, string6, buffer4, null, 12, arg_0));
-            }
-            String string7 = (String)completableFuture23.join();
-            if (string7.contains("cv|0")) {
-                this.logger.info("Successfully solved captcha");
-                MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-                if (this.getVid() != null && !this.getVid().isBlank()) {
-                    multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
-                }
-                multiMap.add(RF_VALUE, ONE_VALUE);
-                multiMap.add(FP_VALUE, ONE_VALUE);
-                multiMap.add(CFP_VALUE, ONE_VALUE);
-                this.parseResultCookies(string7, multiMap);
-                return CompletableFuture.completedFuture(multiMap);
-            }
-            this.logger.error("Retrying captcha solve...");
-            this.sid = null;
-            CompletableFuture completableFuture25 = VertxUtil.randomSleep(1000L);
-            if (!completableFuture25.isDone()) {
-                CompletableFuture completableFuture26 = completableFuture25;
-                return ((CompletableFuture)completableFuture26.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture26, buffer, string4, buffer2, string5, buffer3, string6, buffer4, string7, 13, arg_0));
-            }
-            completableFuture25.join();
-            ++n;
+            if (!matcher.find()) return;
+            multiMap.add(PXDE_VALUE, (CharSequence)matcher.group(1));
+            return;
+        }
+        catch (Throwable throwable) {
+            if (!this.logger.isDebugEnabled()) return;
+            this.logger.debug("Failed to find px3 or pxde ", throwable);
         }
     }
 
-    public HttpRequest lambda$solveCaptcha$6() {
-        return this.apiRequest("2", true);
+    public HttpRequest lambda$initialise$10() {
+        return this.apiRequest("ua", null).method(HttpMethod.GET);
     }
 }
 

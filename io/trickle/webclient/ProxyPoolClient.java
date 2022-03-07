@@ -19,16 +19,16 @@ import java.util.concurrent.CompletableFuture;
 public class ProxyPoolClient {
     public ConcurrentCyclicSequence<WebClient> clientSequence = new ConcurrentCyclicSequence();
 
-    public CompletableFuture removeBad(WebClient webClient) {
-        this.clientSequence = this.clientSequence.remove((Object)webClient);
-        return CompletableFuture.completedFuture(null);
-    }
-
     public WebClient getClient() {
         while ((double)this.clientSequence.size() < Math.ceil((double)((ProxyController)Engine.get().getModule(Controller.PROXY)).loadedProxies() / Double.longBitsToDouble(4629137466983448576L))) {
             this.clientSequence = this.clientSequence.add((Object)RealClientFactory.buildRandomProxied(VertxSingleton.INSTANCE.get()));
         }
         return (WebClient)this.clientSequence.next();
+    }
+
+    public CompletableFuture removeBad(WebClient webClient) {
+        this.clientSequence = this.clientSequence.remove((Object)webClient);
+        return CompletableFuture.completedFuture(null);
     }
 }
 

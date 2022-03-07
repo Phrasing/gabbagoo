@@ -4,15 +4,15 @@
 package io.trickle.util;
 
 public class Pair {
-    public T first;
     public V second;
-
-    public Pair() {
-    }
+    public T first;
 
     public Pair(Object object, Object object2) {
         this.first = object;
         this.second = object2;
+    }
+
+    public Pair() {
     }
 }
 

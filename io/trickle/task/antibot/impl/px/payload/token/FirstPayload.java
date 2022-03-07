@@ -29,53 +29,73 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class FirstPayload
 implements Payload {
-    public long PX323;
-    public int PX345;
-    public long f20432b;
-    public int PX92;
-    public String PX326;
-    public boolean PX334;
-    public int PX91;
-    public String PX317;
-    public String PX319;
-    public boolean PX335;
-    public long PX349;
-    public String PX421;
-    public Battery PX418;
-    public Battery PX420;
+    public JsonArray PX347;
     public String f20431a = null;
     public String t;
-    public String VID_HEADER;
-    public String UUIDV4_HEADER = UUID.randomUUID().toString();
-    public Battery PX415;
-    public String PX330;
-    public String PX318;
-    public Site SITE;
-    public String PX344;
-    public Battery PX416;
-    public static char[] f18573a = "0123456789ABCDEF".toCharArray();
-    public int PX351;
-    public Devices$Device device;
-    public String PX442;
-    public String PX322;
-    public String PX339;
-    public boolean PX331;
-    public String PX343;
-    public int PX350;
-    public Battery PX414;
-    public boolean PX337;
-    public String PX328;
-    public JsonArray PX347;
     public Battery PX413;
-    public long f20430a = Long.MIN_VALUE;
-    public String PX320;
+    public String PX322;
+    public String UUIDV4_HEADER = UUID.randomUUID().toString();
+    public String PX344;
+    public static char[] f18573a = "0123456789ABCDEF".toCharArray();
+    public long PX349;
+    public boolean PX331;
+    public String PX421;
+    public int PX351;
     public boolean PX336;
-    public boolean PX316;
+    public int PX345;
+    public Battery PX418;
+    public boolean PX334;
     public String SID_HEADER;
-    public boolean PX333;
-    public Battery PX419;
+    public Battery PX415;
+    public String PX339;
+    public long f20432b;
     public String PX327;
+    public String PX328;
+    public boolean PX316;
+    public int PX350;
+    public Devices$Device device;
+    public int PX91;
+    public boolean PX335;
+    public String PX442;
+    public String PX330;
+    public boolean PX333;
+    public Site SITE;
+    public Battery PX419;
     public boolean PX332;
+    public Battery PX420;
+    public Battery PX416;
+    public String PX320;
+    public String VID_HEADER;
+    public String PX326;
+    public String PX317;
+    public boolean PX337;
+    public Battery PX414;
+    public String PX343;
+    public String PX318;
+    public int PX92;
+    public long PX323;
+    public long f20430a = Long.MIN_VALUE;
+    public String PX319;
+
+    public static long m30010d(long l) {
+        return (l & 0xFFFF000000000000L) >>> 48 | l << 32 | 0x1000L | (0xFFFF00000000L & l) >>> 16;
+    }
+
+    public void nextBytes(byte[] byArray) {
+        int n = 0;
+        int n2 = byArray.length;
+        block0: while (n < n2) {
+            int n3 = ThreadLocalRandom.current().nextInt();
+            int n4 = Math.min(n2 - n, 4);
+            while (true) {
+                if (n4-- <= 0) continue block0;
+                byArray[n++] = (byte)n3;
+                n3 >>= 8;
+            }
+            break;
+        }
+        return;
+    }
 
     public String toString() {
         JsonObject jsonObject = new JsonObject();
@@ -141,90 +161,6 @@ implements Payload {
         return new JsonArray().add((Object)jsonObject2).encode();
     }
 
-    public long m30011a() {
-        return this.f20432b;
-    }
-
-    public long m30009c(long l) {
-        long l2;
-        long l3 = this.f20430a;
-        if (l > l3) {
-            this.f20430a = l;
-            return l;
-        }
-        this.f20430a = l2 = l3 + 1L;
-        return l2;
-    }
-
-    public FirstPayload(SecondPayload secondPayload, int n, long l, Site site) {
-        this(secondPayload.device, secondPayload.VID_HEADER, secondPayload.SID_HEADER, n, l, site);
-    }
-
-    public static String m4818a(byte[] byArray) {
-        char[] cArray = new char[byArray.length * 2];
-        int n = 0;
-        while (n < byArray.length) {
-            int n2 = byArray[n] & 0xFF;
-            int n3 = n * 2;
-            char[] cArray2 = f18573a;
-            cArray[n3] = cArray2[n2 >>> 4];
-            cArray[n3 + 1] = cArray2[n2 & 0xF];
-            ++n;
-        }
-        return new String(cArray);
-    }
-
-    public void nextBytes(byte[] byArray) {
-        int n = 0;
-        int n2 = byArray.length;
-        block0: while (n < n2) {
-            int n3 = ThreadLocalRandom.current().nextInt();
-            int n4 = Math.min(n2 - n, 4);
-            while (true) {
-                if (n4-- <= 0) continue block0;
-                byArray[n++] = (byte)n3;
-                n3 >>= 8;
-            }
-            break;
-        }
-        return;
-    }
-
-    public byte[] m30012b() {
-        byte[] byArray = new byte[4];
-        this.nextBytes(byArray);
-        return byArray;
-    }
-
-    public static long m30010d(long l) {
-        return (l & 0xFFFF000000000000L) >>> 48 | l << 32 | 0x1000L | (0xFFFF00000000L & l) >>> 16;
-    }
-
-    public FirstPayload(Devices$Device devices$Device, Site site) {
-        this(devices$Device, null, null, 1, 1L, site);
-    }
-
-    public static String m4817a(String string) {
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
-            byte[] byArray = string.getBytes(StandardCharsets.UTF_8);
-            messageDigest.update(byArray, 0, byArray.length);
-            return FirstPayload.m4818a(messageDigest.digest());
-        }
-        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-            noSuchAlgorithmException.printStackTrace();
-            return null;
-        }
-    }
-
-    public String getPayload() {
-        return Base64.getEncoder().encodeToString(this.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
-    public FirstPayload(InitPayload initPayload, Site site) {
-        this(initPayload.device, site);
-    }
-
     @Override
     public MultiMap asForm() {
         MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
@@ -251,6 +187,33 @@ implements Payload {
         return multiMap;
     }
 
+    public static String m4817a(String string) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+            byte[] byArray = string.getBytes(StandardCharsets.UTF_8);
+            messageDigest.update(byArray, 0, byArray.length);
+            return FirstPayload.m4818a(messageDigest.digest());
+        }
+        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+            noSuchAlgorithmException.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[] m30012b() {
+        byte[] byArray = new byte[4];
+        this.nextBytes(byArray);
+        return byArray;
+    }
+
+    public FirstPayload(SecondPayload secondPayload, int n, long l, Site site) {
+        this(secondPayload.device, secondPayload.VID_HEADER, secondPayload.SID_HEADER, n, l, site);
+    }
+
+    public String getPayload() {
+        return Base64.getEncoder().encodeToString(this.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
     public void initUUIDSettings() {
         long l;
         new AtomicLong(Long.MIN_VALUE);
@@ -270,6 +233,48 @@ implements Payload {
         }
         this.f20432b = l;
         this.f20432b |= (long)(ThreadLocalRandom.current().nextDouble() * Double.longBitsToDouble(4670232263827390464L)) << 48;
+    }
+
+    public long m30011a() {
+        return this.f20432b;
+    }
+
+    public static String m4818a(byte[] byArray) {
+        char[] cArray = new char[byArray.length * 2];
+        int n = 0;
+        while (n < byArray.length) {
+            int n2 = byArray[n] & 0xFF;
+            int n3 = n * 2;
+            char[] cArray2 = f18573a;
+            cArray[n3] = cArray2[n2 >>> 4];
+            cArray[n3 + 1] = cArray2[n2 & 0xF];
+            ++n;
+        }
+        return new String(cArray);
+    }
+
+    public FirstPayload(Devices$Device devices$Device, Site site) {
+        this(devices$Device, null, null, 1, 1L, site);
+    }
+
+    public UUID genTimeBasedUUID() {
+        long l = System.currentTimeMillis() * 10000L + 122192928000000000L;
+        return new UUID(FirstPayload.m30010d(this.m30009c(l)), this.m30011a());
+    }
+
+    public FirstPayload(InitPayload initPayload, Site site) {
+        this(initPayload.device, site);
+    }
+
+    public long m30009c(long l) {
+        long l2;
+        long l3 = this.f20430a;
+        if (l > l3) {
+            this.f20430a = l;
+            return l;
+        }
+        this.f20430a = l2 = l3 + 1L;
+        return l2;
     }
 
     public FirstPayload(Devices$Device devices$Device, String string, String string2, int n, long l, Site site) {
@@ -332,11 +337,6 @@ implements Payload {
         this.PX418 = this.device.getBattery();
         this.PX420 = this.device.getBattery();
         this.PX350 = ThreadLocalRandom.current().nextInt(1, 5);
-    }
-
-    public UUID genTimeBasedUUID() {
-        long l = System.currentTimeMillis() * 10000L + 122192928000000000L;
-        return new UUID(FirstPayload.m30010d(this.m30009c(l)), this.m30011a());
     }
 }
 

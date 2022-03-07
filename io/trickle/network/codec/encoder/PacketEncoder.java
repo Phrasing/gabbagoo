@@ -16,6 +16,14 @@ public class PacketEncoder
 implements Handler {
     public Handler<Buffer> bufferHandler;
 
+    public void handle(Object object) {
+        this.handle((Packet)object);
+    }
+
+    public PacketEncoder(Handler handler) {
+        this.bufferHandler = handler;
+    }
+
     public void handle(Packet packet) {
         PacketType packetType = packet.getType();
         int n = packet.getSize();
@@ -36,14 +44,6 @@ implements Handler {
         catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-    }
-
-    public void handle(Object object) {
-        this.handle((Packet)object);
-    }
-
-    public PacketEncoder(Handler handler) {
-        this.bufferHandler = handler;
     }
 }
 

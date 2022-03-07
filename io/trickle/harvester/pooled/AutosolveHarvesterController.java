@@ -32,17 +32,30 @@ import org.apache.logging.log4j.Logger;
 
 public class AutosolveHarvesterController
 extends AbstractSharedHarvesterController {
+    public static boolean $assertionsDisabled;
+    public AbstractAutoSolveManager autoSolve;
+    public static Logger logger;
     public ContextCompletableFuture<Void> startFuture;
     public AtomicInteger c = new AtomicInteger(0);
-    public static Logger logger;
     public static int SHARED_TOKEN_RATIO;
     public Vertx vertx;
-    public AbstractAutoSolveManager autoSolve;
-    public static boolean $assertionsDisabled;
 
     @Override
     public Optional shouldSwap(String string) {
         return Optional.empty();
+    }
+
+    @Override
+    public CompletableFuture initialise() {
+        if (this.c.getAndIncrement() % 500 != 0) return this.initAutosolve();
+        this.addNewHarvester();
+        return this.initAutosolve();
+    }
+
+    public void connect() {
+        String string = Storage.AYCD_ACCESS_TOKEN;
+        String string2 = Storage.AYCD_API_KEY;
+        CompletableFuture.runAsync(() -> this.lambda$connect$0(string, string2));
     }
 
     public CompletableFuture initAutosolve() {
@@ -65,11 +78,10 @@ extends AbstractSharedHarvesterController {
         return CompletableFuture.completedFuture(null);
     }
 
-    @Override
-    public CompletableFuture initialise() {
-        if (this.c.getAndIncrement() % 500 != 0) return this.initAutosolve();
-        this.addNewHarvester();
-        return this.initAutosolve();
+    static {
+        SHARED_TOKEN_RATIO = 500;
+        $assertionsDisabled = !AutosolveHarvesterController.class.desiredAssertionStatus();
+        logger = LogManager.getLogger(AutosolveHarvesterController.class);
     }
 
     public AutosolveHarvesterController(Vertx vertx) {
@@ -77,10 +89,39 @@ extends AbstractSharedHarvesterController {
         this.autoSolve = new AutoSolve(new OkHttpClient.Builder(), "Trickle-4ae3fa8b-26fa-4001-8582-8fd27a7beb7e");
     }
 
-    static {
-        SHARED_TOKEN_RATIO = 500;
-        $assertionsDisabled = !AutosolveHarvesterController.class.desiredAssertionStatus();
-        logger = LogManager.getLogger(AutosolveHarvesterController.class);
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$initAutosolve(AutosolveHarvesterController var0, ContextCompletableFuture var1_1, int var2_2, Object var3_3) {
+        switch (var2_2) {
+            case 0: {
+                if (var0.autoSolve.isActive()) {
+                    return CompletableFuture.completedFuture(null);
+                }
+                AutosolveHarvesterController.logger.info("Connecting to AutoSolve");
+                if (var0.startFuture != null) {
+                    if (var0.startFuture.isDone() == false) return CompletableFuture.completedFuture(null);
+                }
+                var0.startFuture = new ContextCompletableFuture();
+                var0.connect();
+                v0 = var0.startFuture;
+                if (!v0.toCompletableFuture().isDone()) {
+                    var1_1 = v0;
+                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$initAutosolve(io.trickle.harvester.pooled.AutosolveHarvesterController io.trickle.util.concurrent.ContextCompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((AutosolveHarvesterController)var0, var1_1, (int)1)).toCompletableFuture();
+                }
+                ** GOTO lbl17
+            }
+            case 1: {
+                v0 = var1_1;
+lbl17:
+                // 2 sources
+
+                v0.toCompletableFuture().join();
+                AutosolveHarvesterController.logger.info("Connected Successfully");
+                return CompletableFuture.completedFuture(null);
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     public void lambda$connect$0(String string, String string2) {
@@ -117,47 +158,6 @@ extends AbstractSharedHarvesterController {
         this.vertx.eventBus().localConsumer(autosolveHarvester.id(), (Handler)autosolveHarvester);
         this.harvesters.add(autosolveHarvester);
         logger.info("Added new autosolve harvester: {}", (Object)this.harvesters.size());
-    }
-
-    public void connect() {
-        String string = Storage.AYCD_ACCESS_TOKEN;
-        String string2 = Storage.AYCD_API_KEY;
-        CompletableFuture.runAsync(() -> this.lambda$connect$0(string, string2));
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$initAutosolve(AutosolveHarvesterController var0, ContextCompletableFuture var1_1, int var2_2, Object var3_3) {
-        switch (var2_2) {
-            case 0: {
-                if (var0.autoSolve.isActive()) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                AutosolveHarvesterController.logger.info("Connecting to AutoSolve");
-                if (var0.startFuture != null) {
-                    if (var0.startFuture.isDone() == false) return CompletableFuture.completedFuture(null);
-                }
-                var0.startFuture = new ContextCompletableFuture();
-                var0.connect();
-                v0 = var0.startFuture;
-                if (!v0.toCompletableFuture().isDone()) {
-                    var1_1 = v0;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$initAutosolve(io.trickle.harvester.pooled.AutosolveHarvesterController io.trickle.util.concurrent.ContextCompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((AutosolveHarvesterController)var0, var1_1, (int)1)).toCompletableFuture();
-                }
-                ** GOTO lbl17
-            }
-            case 1: {
-                v0 = var1_1;
-lbl17:
-                // 2 sources
-
-                v0.toCompletableFuture().join();
-                AutosolveHarvesterController.logger.info("Connected Successfully");
-                return CompletableFuture.completedFuture(null);
-            }
-        }
-        throw new IllegalArgumentException();
     }
 }
 

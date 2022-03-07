@@ -18,8 +18,8 @@ extends CompletableFuture
 implements CompletionStage {
     public Context ctx;
 
-    public Context getCtx() {
-        return this.ctx;
+    public ContextCompletableFuture(Context context) {
+        this.ctx = context;
     }
 
     public boolean equals(Object object) {
@@ -33,8 +33,16 @@ implements CompletionStage {
         return Objects.equals(this.ctx, contextCompletableFuture.ctx);
     }
 
-    public ContextCompletableFuture() {
-        this.ctx = Vertx.currentContext();
+    public Context getCtx() {
+        return this.ctx;
+    }
+
+    public void lambda$complete$0(Object object, Void void_) {
+        super.complete(object);
+    }
+
+    public int hashCode() {
+        return Objects.hash(this.ctx);
     }
 
     public boolean complete(Object object) {
@@ -47,16 +55,8 @@ implements CompletionStage {
         }
     }
 
-    public ContextCompletableFuture(Context context) {
-        this.ctx = context;
-    }
-
-    public int hashCode() {
-        return Objects.hash(this.ctx);
-    }
-
-    public void lambda$complete$0(Object object, Void void_) {
-        super.complete(object);
+    public ContextCompletableFuture() {
+        this.ctx = Vertx.currentContext();
     }
 }
 

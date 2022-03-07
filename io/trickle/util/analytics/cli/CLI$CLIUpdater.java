@@ -14,16 +14,16 @@ public class CLI$CLIUpdater
 extends AbstractVerticle {
     public long timerID;
 
+    public void start() {
+        this.timerID = this.vertx.setPeriodic(2000L, this::run);
+    }
+
     public void stop() {
         this.vertx.cancelTimer(this.timerID);
     }
 
     public void run(long l) {
         CLI.setTitle(String.format("Carts %d || Checkouts %d || Fails %d", Analytics.carts.get(), Analytics.success.get(), Analytics.fails.get()));
-    }
-
-    public void start() {
-        this.timerID = this.vertx.setPeriodic(2000L, this::run);
     }
 }
 

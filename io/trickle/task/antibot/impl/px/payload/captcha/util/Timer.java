@@ -10,8 +10,20 @@ public class Timer {
     public long creationTime = Instant.now().toEpochMilli();
     public Stack<Integer> performanceList = new Stack();
 
+    public int performanceChange() {
+        int n = this.performanceList.pop();
+        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
+        this.performanceList.push(n);
+        return n - n2;
+    }
+
     public int currentPerformance() {
         return this.performanceList.peek();
+    }
+
+    public int performanceNow(int n) {
+        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
+        return this.performanceList.push(n2 + n);
     }
 
     public int totalChange() {
@@ -22,18 +34,6 @@ public class Timer {
 
     public long gennedTimestamp() {
         return this.creationTime + (long)this.totalChange();
-    }
-
-    public int performanceChange() {
-        int n = this.performanceList.pop();
-        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
-        this.performanceList.push(n);
-        return n - n2;
-    }
-
-    public int performanceNow(int n) {
-        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
-        return this.performanceList.push(n2 + n);
     }
 }
 

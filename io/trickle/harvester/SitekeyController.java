@@ -28,15 +28,10 @@ import org.apache.logging.log4j.Logger;
 public class SitekeyController
 implements Module,
 LoadableAsync {
-    public static String SITEKEY_PATH = "/sitekeys.json";
-    public Vertx vertx;
+    public static Logger logger;
     public JsonObject SITEKEY_STORAGE;
-    public static Logger logger = LogManager.getLogger(SitekeyController.class);
-
-    public static Buffer lambda$load$0(Throwable throwable) {
-        logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", (Object)"/sitekeys.json".replace("/", ""));
-        return Buffer.buffer((String)"{}");
-    }
+    public Vertx vertx;
+    public static String SITEKEY_PATH;
 
     @Override
     public void initialise() {
@@ -49,16 +44,23 @@ LoadableAsync {
         return Future.succeededFuture();
     }
 
-    public SitekeyController(Vertx vertx) {
-        this.vertx = vertx;
+    @Override
+    public void terminate() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        fileSystem.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
     }
 
     public JsonObject parseFile(String string) {
         return new JsonObject(string);
     }
 
-    public JsonObject getSitekeys() {
-        return this.SITEKEY_STORAGE;
+    public static Buffer lambda$load$0(Throwable throwable) {
+        logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", (Object)"/sitekeys.json".replace("/", ""));
+        return Buffer.buffer((String)"{}");
+    }
+
+    public SitekeyController(Vertx vertx) {
+        this.vertx = vertx;
     }
 
     @Override
@@ -75,10 +77,13 @@ LoadableAsync {
         logger.error("Unable to update sitekeys.json");
     }
 
-    @Override
-    public void terminate() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        fileSystem.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
+    static {
+        SITEKEY_PATH = "/sitekeys.json";
+        logger = LogManager.getLogger(SitekeyController.class);
+    }
+
+    public JsonObject getSitekeys() {
+        return this.SITEKEY_STORAGE;
     }
 }
 

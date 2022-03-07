@@ -26,11 +26,15 @@ import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractSharedHarvesterController {
     public List<SharedHarvester> harvesters = new ArrayList<SharedHarvester>();
-    public static Logger logger = LogManager.getLogger(AbstractSharedHarvesterController.class);
-    public String identity;
     public AtomicInteger counter = new AtomicInteger(0);
+    public String identity = "HARVESTER_MANAGER_SHARED_LOCK_" + UUID.randomUUID();
+    public static Logger logger = LogManager.getLogger(AbstractSharedHarvesterController.class);
 
-    public abstract CompletableFuture initialise();
+    public static int lambda$allocate$0(int n, int n2) {
+        if (++n2 >= n) return 0;
+        int n3 = n2;
+        return n3;
+    }
 
     /*
      * Unable to fully structure code
@@ -102,13 +106,9 @@ lbl32:
         return string;
     }
 
-    public abstract Optional shouldSwap(String var1);
+    public abstract CompletableFuture initialise();
 
-    public static int lambda$allocate$0(int n, int n2) {
-        if (++n2 >= n) return 0;
-        int n3 = n2;
-        return n3;
-    }
+    public abstract Optional shouldSwap(String var1);
 
     public CompletableFuture start() {
         try {
@@ -141,10 +141,6 @@ lbl32:
             logger.error("Lock error on harvester controller {}", (Object)throwable.getMessage());
         }
         return CompletableFuture.completedFuture(true);
-    }
-
-    public AbstractSharedHarvesterController() {
-        this.identity = "HARVESTER_MANAGER_SHARED_LOCK_" + UUID.randomUUID();
     }
 }
 

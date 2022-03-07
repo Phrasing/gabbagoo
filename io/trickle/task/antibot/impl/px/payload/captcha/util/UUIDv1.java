@@ -19,10 +19,14 @@ public class UUIDv1 {
         return nArray;
     }
 
-    public static String Cn(int[] nArray, int n) {
-        int n2 = 0;
-        String[] stringArray = gg;
-        return stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]];
+    public static String[] fillHexStringArr256() {
+        String[] stringArray = new String[256];
+        int n = 0;
+        while (n < stringArray.length) {
+            stringArray[n] = Integer.toHexString(n);
+            ++n;
+        }
+        return stringArray;
     }
 
     public static String genUUIDv1() {
@@ -67,14 +71,10 @@ public class UUIDv1 {
         return UUIDv1.Cn(nArray3, 0);
     }
 
-    public static String[] fillHexStringArr256() {
-        String[] stringArray = new String[256];
-        int n = 0;
-        while (n < stringArray.length) {
-            stringArray[n] = Integer.toHexString(n);
-            ++n;
-        }
-        return stringArray;
+    public static String Cn(int[] nArray, int n) {
+        int n2 = 0;
+        String[] stringArray = gg;
+        return stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]];
     }
 }
 

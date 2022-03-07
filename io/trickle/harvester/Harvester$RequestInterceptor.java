@@ -31,14 +31,24 @@ public class Harvester$RequestInterceptor
 implements InterceptUrlRequestCallback {
     public Harvester this$0;
 
-    public boolean isChallenge(String string) {
-        return string.contains("challenge");
+    public RequestOptions lambda$on$0(InterceptUrlRequestCallback.Params params) {
+        return Request.convertToVertx(params, this.this$0.proxy);
     }
 
-    public boolean isCheckpoint(String string) {
-        if (!string.contains("https://www.google.com")) return string.contains("/checkpoint");
-        if (!string.endsWith(".js")) return string.contains("/checkpoint");
-        return true;
+    public static void lambda$on$1(UrlRequestJob urlRequestJob, HttpResponse httpResponse) {
+        urlRequestJob.write(((Buffer)httpResponse.body()).getBytes());
+        urlRequestJob.complete();
+    }
+
+    public void lambda$on$2(String string, InterceptUrlRequestCallback.Params params, UrlRequestJob urlRequestJob) {
+        try {
+            this.this$0.transferCookies(string);
+            this.this$0.send(() -> this.lambda$on$0(params), params.uploadData()).thenAccept(arg_0 -> Harvester$RequestInterceptor.lambda$on$1(urlRequestJob, arg_0));
+            return;
+        }
+        catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
     public InterceptUrlRequestCallback.Response on(InterceptUrlRequestCallback.Params params) {
@@ -72,6 +82,26 @@ implements InterceptUrlRequestCallback {
         return InterceptUrlRequestCallback.Response.intercept((UrlRequestJob)urlRequestJob);
     }
 
+    public Object on(Object object) {
+        return this.on((InterceptUrlRequestCallback.Params)object);
+    }
+
+    public boolean isChallenge(String string) {
+        return string.contains("challenge");
+    }
+
+    public boolean isCheckpoint(String string) {
+        if (!string.contains("https://www.google.com")) return string.contains("/checkpoint");
+        if (!string.endsWith(".js")) return string.contains("/checkpoint");
+        return true;
+    }
+
+    public boolean isSupportedV2Site(String string) {
+        if (!string.contains("https://www.google.com")) return string.endsWith("/challenge");
+        if (!string.endsWith(".js")) return string.endsWith("/challenge");
+        return true;
+    }
+
     public boolean isSupportedV3Site(String string) {
         if (string.contains("https://www.google.com") && string.endsWith(".js")) {
             return true;
@@ -84,38 +114,8 @@ implements InterceptUrlRequestCallback {
         return false;
     }
 
-    public Object on(Object object) {
-        return this.on((InterceptUrlRequestCallback.Params)object);
-    }
-
     public Harvester$RequestInterceptor(Harvester harvester) {
         this.this$0 = harvester;
-    }
-
-    public boolean isSupportedV2Site(String string) {
-        if (!string.contains("https://www.google.com")) return string.endsWith("/challenge");
-        if (!string.endsWith(".js")) return string.endsWith("/challenge");
-        return true;
-    }
-
-    public void lambda$on$2(String string, InterceptUrlRequestCallback.Params params, UrlRequestJob urlRequestJob) {
-        try {
-            this.this$0.transferCookies(string);
-            this.this$0.send(() -> this.lambda$on$0(params), params.uploadData()).thenAccept(arg_0 -> Harvester$RequestInterceptor.lambda$on$1(urlRequestJob, arg_0));
-            return;
-        }
-        catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-    }
-
-    public static void lambda$on$1(UrlRequestJob urlRequestJob, HttpResponse httpResponse) {
-        urlRequestJob.write(((Buffer)httpResponse.body()).getBytes());
-        urlRequestJob.complete();
-    }
-
-    public RequestOptions lambda$on$0(InterceptUrlRequestCallback.Params params) {
-        return Request.convertToVertx(params, this.this$0.proxy);
     }
 }
 

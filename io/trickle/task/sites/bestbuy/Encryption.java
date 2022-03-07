@@ -23,6 +23,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class Encryption {
     public static String CONSTANT = "00960001";
 
+    static {
+        Security.addProvider((Provider)new BouncyCastleProvider());
+    }
+
+    public static String padCC(String string) {
+        return string.substring(0, 6) + "0".repeat(string.length() - 10) + string.substring(string.length() - 4);
+    }
+
     public static String encryptGeneral(String string, String string2) {
         string = string.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").replace("\n", "").replace("\r", "").replace("\t", "");
         byte[] byArray = Base64.getDecoder().decode(string);
@@ -35,6 +43,10 @@ public class Encryption {
         return Base64.getEncoder().encodeToString(cipher.doFinal(string2.getBytes(StandardCharsets.UTF_8)));
     }
 
+    public static String getFullEncrypted(String string, String string2, String string3) {
+        return Encryption.encrypt(string2, string) + ":3:" + string3 + ":" + Encryption.padCC(string);
+    }
+
     public static String encrypt(String string, String string2) {
         byte[] byArray = Base64.getDecoder().decode(string);
         Cipher cipher = Cipher.getInstance("RSA/NONE/OAEPWithSHA256AndMGF1Padding", "BC");
@@ -44,18 +56,6 @@ public class Encryption {
         PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpec);
         cipher.init(1, (Key)publicKey, oAEPParameterSpec);
         return Base64.getEncoder().encodeToString(cipher.doFinal(("00960001" + string2).getBytes(StandardCharsets.UTF_8)));
-    }
-
-    public static String padCC(String string) {
-        return string.substring(0, 6) + "0".repeat(string.length() - 10) + string.substring(string.length() - 4);
-    }
-
-    static {
-        Security.addProvider((Provider)new BouncyCastleProvider());
-    }
-
-    public static String getFullEncrypted(String string, String string2, String string3) {
-        return Encryption.encrypt(string2, string) + ":3:" + string3 + ":" + Encryption.padCC(string);
     }
 }
 

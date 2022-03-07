@@ -9,30 +9,38 @@ import java.util.concurrent.atomic.LongAdder;
 
 public class SharedCaptchaToken {
     public String domain;
-    public String token;
-    public static int CAPTCHA_EXPIRY_TIME = 117;
-    public boolean fakePassed = false;
-    public AtomicBoolean expired;
     public LongAdder harvesterPassCount;
     public long expiryTime = -1L;
+    public String token;
+    public boolean fakePassed = false;
+    public static int CAPTCHA_EXPIRY_TIME = 117;
+    public AtomicBoolean expired;
 
     public void markPassed() {
         if (this.harvesterPassCount == null) return;
         this.harvesterPassCount.increment();
     }
 
-    public boolean isExpired() {
-        if (this.expired.get()) {
-            return this.expired.get();
-        }
-        if (Instant.now().getEpochSecond() < this.expiryTime) return false;
-        return true;
+    public String getDomain() {
+        return this.domain;
     }
 
     public void markFakePass() {
         this.fakePassed = true;
         if (this.harvesterPassCount == null) return;
         this.harvesterPassCount.sumThenReset();
+    }
+
+    public long getExpiryTime() {
+        return this.expiryTime;
+    }
+
+    public String getToken() {
+        return this.token;
+    }
+
+    public boolean isFakePassed() {
+        return this.fakePassed;
     }
 
     public String toString() {
@@ -45,25 +53,17 @@ public class SharedCaptchaToken {
         return "SharedCaptchaToken{expired=" + this.expired + ", domain='" + this.domain + "', expiryTime=" + this.expiryTime + ", token='" + this.token + "', solved=" + bl + "'}";
     }
 
-    public void expire() {
-        this.expired.set(true);
-    }
-
-    public String getDomain() {
-        return this.domain;
-    }
-
-    public boolean isFakePassed() {
-        return this.fakePassed;
-    }
-
     public SharedCaptchaToken(String string) {
         this.domain = string;
         this.expired = new AtomicBoolean(false);
     }
 
-    public long getExpiryTime() {
-        return this.expiryTime;
+    public boolean isExpired() {
+        if (this.expired.get()) {
+            return this.expired.get();
+        }
+        if (Instant.now().getEpochSecond() < this.expiryTime) return false;
+        return true;
     }
 
     public void setSolved(String string, LongAdder longAdder) {
@@ -72,8 +72,8 @@ public class SharedCaptchaToken {
         this.token = string;
     }
 
-    public String getToken() {
-        return this.token;
+    public void expire() {
+        this.expired.set(true);
     }
 }
 

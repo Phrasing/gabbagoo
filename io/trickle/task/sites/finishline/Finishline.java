@@ -22,6 +22,23 @@ extends TaskActor {
     public FinishlineAPI api;
     public Task task;
 
+    @Override
+    public CompletableFuture run() {
+        CompletableFuture completableFuture = super.randomSleep(5000);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$run(this, completableFuture2, 1, arg_0));
+        }
+        completableFuture.join();
+        CompletableFuture completableFuture3 = this.visitHomePage();
+        if (!completableFuture3.isDone()) {
+            CompletableFuture completableFuture4 = completableFuture3;
+            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$run(this, completableFuture4, 2, arg_0));
+        }
+        completableFuture3.join();
+        return CompletableFuture.completedFuture(null);
+    }
+
     /*
      * Unable to fully structure code
      */
@@ -58,11 +75,20 @@ lbl15:
         throw new IllegalArgumentException();
     }
 
-    public Finishline(Task task, int n) {
-        super(n);
-        this.task = task;
-        this.api = new FinishlineAPI(this.task, this.task.getSite());
-        super.setClient(this.api);
+    public CompletableFuture getCartSession() {
+        int n = 0;
+        while (this.running) {
+            if (n >= 5) return CompletableFuture.completedFuture(null);
+            ++n;
+            CompletableFuture completableFuture = super.sleep(3000);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$getCartSession(this, n, completableFuture2, 1, arg_0));
+            }
+            completableFuture.join();
+            System.out.println("Donezo");
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
     public CompletableFuture visitHomePage() {
@@ -104,39 +130,6 @@ lbl15:
         return CompletableFuture.completedFuture(null);
     }
 
-    public CompletableFuture getCartSession() {
-        int n = 0;
-        while (this.running) {
-            if (n >= 5) return CompletableFuture.completedFuture(null);
-            ++n;
-            CompletableFuture completableFuture = super.sleep(3000);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$getCartSession(this, n, completableFuture2, 1, arg_0));
-            }
-            completableFuture.join();
-            System.out.println("Donezo");
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public CompletableFuture run() {
-        CompletableFuture completableFuture = super.randomSleep(5000);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$run(this, completableFuture2, 1, arg_0));
-        }
-        completableFuture.join();
-        CompletableFuture completableFuture3 = this.visitHomePage();
-        if (!completableFuture3.isDone()) {
-            CompletableFuture completableFuture4 = completableFuture3;
-            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$run(this, completableFuture4, 2, arg_0));
-        }
-        completableFuture3.join();
-        return CompletableFuture.completedFuture(null);
-    }
-
     /*
      * Unable to fully structure code
      */
@@ -173,6 +166,13 @@ lbl19:
             }
         }
         throw new IllegalArgumentException();
+    }
+
+    public Finishline(Task task, int n) {
+        super(n);
+        this.task = task;
+        this.api = new FinishlineAPI(this.task, this.task.getSite());
+        super.setClient(this.api);
     }
 
     /*

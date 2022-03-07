@@ -25,10 +25,6 @@ public class Sizes {
         return Sizes.selectSize(string.trim());
     }
 
-    public static boolean lambda$findAnyAvailableOfRangeJSON$3(List list, JsonObject jsonObject) {
-        return list.contains(jsonObject.getString("size"));
-    }
-
     public static JsonObject findAnyAvailableOfRangeJSON(List list, List list2) {
         List list3 = list2.stream().filter(arg_0 -> Sizes.lambda$findAnyAvailableOfRangeJSON$3(list, arg_0)).collect(Collectors.toList());
         try {
@@ -38,6 +34,10 @@ public class Sizes {
             if (list3.size() != 1) return (JsonObject)list3.get(ThreadLocalRandom.current().nextInt(list3.size()));
             return (JsonObject)list3.get(0);
         }
+    }
+
+    public static String findAnyAvailable(List list) {
+        return list.stream().filter(availableSizeFilter).findAny().map(Sizes::lambda$findAnyAvailable$1).orElseGet(() -> Sizes.lambda$findAnyAvailable$2(list));
     }
 
     public static Sizes$SizePair selectSize(String string) {
@@ -128,24 +128,19 @@ public class Sizes {
         }
     }
 
-    public static JsonObject findAnyJSON(List list) {
-        if (list.size() != 1) return (JsonObject)list.get(ThreadLocalRandom.current().nextInt(list.size()));
-        return (JsonObject)list.get(0);
-    }
-
-    public static boolean lambda$static$0(JsonObject jsonObject) {
-        if (jsonObject.getInteger("availability", Integer.valueOf(0)) <= 0) return false;
-        return true;
-    }
-
-    public static String findAnyAvailable(List list) {
-        return list.stream().filter(availableSizeFilter).findAny().map(Sizes::lambda$findAnyAvailable$1).orElseGet(() -> Sizes.lambda$findAnyAvailable$2(list));
+    public static boolean lambda$findAnyAvailableOfRangeJSON$3(List list, JsonObject jsonObject) {
+        return list.contains(jsonObject.getString("size"));
     }
 
     public static JsonObject findAnyAvailableJSON(List list) {
         List list2 = list.stream().filter(availableSizeFilter).collect(Collectors.toList());
         if (!list2.isEmpty()) return (JsonObject)list2.get(ThreadLocalRandom.current().nextInt(list2.size()));
         throw new Sizes$NoAvailableSizeException();
+    }
+
+    public static boolean lambda$static$0(JsonObject jsonObject) {
+        if (jsonObject.getInteger("availability", Integer.valueOf(0)) <= 0) return false;
+        return true;
     }
 
     public static String lambda$findAnyAvailable$2(List list) {
@@ -155,6 +150,11 @@ public class Sizes {
 
     public static String lambda$findAnyAvailable$1(JsonObject jsonObject) {
         return jsonObject.getString("size");
+    }
+
+    public static JsonObject findAnyJSON(List list) {
+        if (list.size() != 1) return (JsonObject)list.get(ThreadLocalRandom.current().nextInt(list.size()));
+        return (JsonObject)list.get(0);
     }
 }
 

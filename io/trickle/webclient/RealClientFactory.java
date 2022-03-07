@@ -24,47 +24,8 @@ import io.vertx.ext.web.client.spi.CookieStore;
 import java.util.Objects;
 
 public class RealClientFactory {
-    public static RealClient fromOther(Vertx vertx, RealClient realClient, ProxyOptions proxyOptions) {
-        Objects.requireNonNull(vertx);
-        Objects.requireNonNull(realClient);
-        Objects.requireNonNull(proxyOptions);
-        CookieStore cookieStore = realClient.cookieStore();
-        return RealClient.create(RealClientFactory.createWebClient(vertx, realClient.type(), proxyOptions), (CookieJar)cookieStore, realClient.type());
-    }
-
-    public static RealClient fromOther(Vertx vertx, RealClient realClient) {
-        Objects.requireNonNull(vertx);
-        Objects.requireNonNull(realClient);
-        return RealClientFactory.fromOther(vertx, realClient, realClient.type());
-    }
-
-    public static WebClient createWebClient(Vertx vertx, ProxyOptions proxyOptions) {
-        return RealClientFactory.createWebClient(vertx, ClientType.CHROME, proxyOptions);
-    }
-
-    public static RealClient buildProxied(Vertx vertx, ClientType clientType, Controller controller) {
-        Objects.requireNonNull(vertx);
-        Objects.requireNonNull(clientType);
-        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(controller)).getProxyCyclic().getAsVertx();
-        return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, proxyOptions), clientType);
-    }
-
-    public static RealClient buildRandomProxied(Vertx vertx) {
-        Objects.requireNonNull(vertx);
-        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(Controller.PROXY)).getProxyRandomCyclic().getAsVertx();
-        return RealClient.create(RealClientFactory.createWebClient(vertx, proxyOptions), ClientType.CHROME);
-    }
-
-    public static RealClient fromOtherFreshCookie(Vertx vertx, RealClient realClient) {
-        Objects.requireNonNull(vertx);
-        Objects.requireNonNull(realClient);
-        ProxyOptions proxyOptions = realClient.getOptions().getProxyOptions();
-        CookieJar cookieJar = new CookieJar((CookieJar)realClient.cookieStore());
-        return RealClient.create(RealClientFactory.createWebClient(vertx, realClient.type(), proxyOptions), cookieJar, realClient.type());
-    }
-
-    public static RealClient rotateProxy(Vertx vertx, RealClient realClient, Controller controller) {
-        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(controller)).getProxyCyclic().getAsVertx();
+    public static RealClient rotateProxy(Vertx vertx, RealClient realClient) {
+        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(Controller.PROXY)).getProxyCyclic().getAsVertx();
         Objects.requireNonNull(vertx);
         Objects.requireNonNull(realClient);
         CookieStore cookieStore = realClient.cookieStore();
@@ -77,11 +38,30 @@ public class RealClientFactory {
         return RealClient.create(RealClientFactory.createWebClient(vertx, proxyOptions), ClientType.CHROME);
     }
 
-    public static RealClient buildProxied(Vertx vertx, ClientType clientType) {
+    public static RealClient fromOther(Vertx vertx, RealClient realClient) {
+        Objects.requireNonNull(vertx);
+        Objects.requireNonNull(realClient);
+        return RealClientFactory.fromOther(vertx, realClient, realClient.type());
+    }
+
+    public static RealClient build(Vertx vertx, ClientType clientType) {
         Objects.requireNonNull(vertx);
         Objects.requireNonNull(clientType);
-        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(Controller.PROXY)).getProxyCyclic().getAsVertx();
-        return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, proxyOptions), clientType);
+        return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, null), clientType);
+    }
+
+    public static WebClient createWebClient(Vertx vertx, ProxyOptions proxyOptions) {
+        return RealClientFactory.createWebClient(vertx, ClientType.CHROME, proxyOptions);
+    }
+
+    public static WebClient createWebClient(Vertx vertx, ClientType clientType, ProxyOptions proxyOptions) {
+        return WebClient.create((Vertx)vertx, (WebClientOptions)clientType.options().setProxyOptions(proxyOptions));
+    }
+
+    public static RealClient buildRandomProxied(Vertx vertx) {
+        Objects.requireNonNull(vertx);
+        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(Controller.PROXY)).getProxyRandomCyclic().getAsVertx();
+        return RealClient.create(RealClientFactory.createWebClient(vertx, proxyOptions), ClientType.CHROME);
     }
 
     public static RealClient buildProxied(Vertx vertx, ClientType clientType, ProxyOptions proxyOptions) {
@@ -90,12 +70,19 @@ public class RealClientFactory {
         return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, proxyOptions), clientType);
     }
 
-    public static RealClient rotateProxy(Vertx vertx, RealClient realClient) {
-        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(Controller.PROXY)).getProxyCyclic().getAsVertx();
+    public static RealClient fromOther(Vertx vertx, RealClient realClient, ProxyOptions proxyOptions) {
         Objects.requireNonNull(vertx);
         Objects.requireNonNull(realClient);
+        Objects.requireNonNull(proxyOptions);
         CookieStore cookieStore = realClient.cookieStore();
         return RealClient.create(RealClientFactory.createWebClient(vertx, realClient.type(), proxyOptions), (CookieJar)cookieStore, realClient.type());
+    }
+
+    public static RealClient buildProxied(Vertx vertx, ClientType clientType) {
+        Objects.requireNonNull(vertx);
+        Objects.requireNonNull(clientType);
+        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(Controller.PROXY)).getProxyCyclic().getAsVertx();
+        return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, proxyOptions), clientType);
     }
 
     public static RealClient fromOther(Vertx vertx, RealClient realClient, ClientType clientType) {
@@ -107,14 +94,27 @@ public class RealClientFactory {
         return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, proxyOptions), (CookieJar)cookieStore, clientType);
     }
 
-    public static RealClient build(Vertx vertx, ClientType clientType) {
+    public static RealClient rotateProxy(Vertx vertx, RealClient realClient, Controller controller) {
+        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(controller)).getProxyCyclic().getAsVertx();
         Objects.requireNonNull(vertx);
-        Objects.requireNonNull(clientType);
-        return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, null), clientType);
+        Objects.requireNonNull(realClient);
+        CookieStore cookieStore = realClient.cookieStore();
+        return RealClient.create(RealClientFactory.createWebClient(vertx, realClient.type(), proxyOptions), (CookieJar)cookieStore, realClient.type());
     }
 
-    public static WebClient createWebClient(Vertx vertx, ClientType clientType, ProxyOptions proxyOptions) {
-        return WebClient.create((Vertx)vertx, (WebClientOptions)clientType.options().setProxyOptions(proxyOptions));
+    public static RealClient buildProxied(Vertx vertx, ClientType clientType, Controller controller) {
+        Objects.requireNonNull(vertx);
+        Objects.requireNonNull(clientType);
+        ProxyOptions proxyOptions = ((ProxyController)Engine.get().getModule(controller)).getProxyCyclic().getAsVertx();
+        return RealClient.create(RealClientFactory.createWebClient(vertx, clientType, proxyOptions), clientType);
+    }
+
+    public static RealClient fromOtherFreshCookie(Vertx vertx, RealClient realClient) {
+        Objects.requireNonNull(vertx);
+        Objects.requireNonNull(realClient);
+        ProxyOptions proxyOptions = realClient.getOptions().getProxyOptions();
+        CookieJar cookieJar = new CookieJar((CookieJar)realClient.cookieStore());
+        return RealClient.create(RealClientFactory.createWebClient(vertx, realClient.type(), proxyOptions), cookieJar, realClient.type());
     }
 }
 

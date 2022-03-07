@@ -7,10 +7,11 @@ import io.trickle.task.antibot.impl.px.Types;
 import io.trickle.task.sites.Site;
 
 public class PayloadConfigurations$1 {
-    public static int[] $SwitchMap$io$trickle$task$antibot$impl$px$Types = new int[Types.values().length];
     public static int[] $SwitchMap$io$trickle$task$sites$Site;
+    public static int[] $SwitchMap$io$trickle$task$antibot$impl$px$Types;
 
     static {
+        $SwitchMap$io$trickle$task$antibot$impl$px$Types = new int[Types.values().length];
         try {
             PayloadConfigurations$1.$SwitchMap$io$trickle$task$antibot$impl$px$Types[Types.DESKTOP.ordinal()] = 1;
         }

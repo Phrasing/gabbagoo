@@ -63,65 +63,117 @@ import org.apache.logging.log4j.Logger;
 import org.conscrypt.Conscrypt;
 
 public class PXCaptcha {
-    public String parentVID;
-    public static Pattern CLS_PATTERN;
-    public boolean mobile;
-    public static Pattern CI_TOKEN_PATTERN;
-    public static Pattern VID_UUID_PATTERN;
-    public static Pattern CI_PATTERN;
-    public static Pattern BAKE_PATTERN;
-    public static Pattern SFF_SCS_PATTERN;
-    public String sid = null;
-    public static Pattern PXDE_PATTERN;
-    public int failedSolves = 0;
-    public Devices$DeviceImpl device;
-    public static Pattern CS_PATTERN;
-    public RealClient client;
-    public static Pattern SID_UUID_PATTERN;
     public Types type;
-    public String origin;
+    public String parentVID;
     public static Pattern CP_PATTERN;
-    public String referer;
-    public static Pattern CI_UUID_PATTERN;
-    public static Pattern DRC_PATTERN;
-    public long vidAge;
-    public Site SITE;
-    public static Pattern WCS_PATTERN;
+    public String sid = null;
+    public static Pattern CI_TOKEN_PATTERN;
+    public static Pattern SFF_SCS_PATTERN;
+    public static Pattern BAKE_PATTERN;
     public boolean isFirstTry = true;
+    public static Pattern CLS_PATTERN;
+    public static Pattern PXDE_PATTERN;
+    public static Pattern SID_UUID_PATTERN;
+    public static Pattern VID_UUID_PATTERN;
+    public RealClient client;
+    public static Pattern CS_PATTERN;
+    public long vidAge;
+    public static Pattern STS_PATTERN;
+    public static Pattern DRC_PATTERN;
+    public static Pattern CI_UUID_PATTERN;
+    public String referer;
+    public Logger logger;
+    public Devices$DeviceImpl device;
+    public boolean mobile;
+    public static Pattern CI_PATTERN;
+    public String origin;
     public boolean needsDesktopAppID;
     public static Pattern DOLLAR_SCRIPT_VAL_PATTERN;
-    public Logger logger;
-    public String parentUUID;
+    public static Pattern WCS_PATTERN;
     public static Pattern CTS_PATTERN;
-    public static Pattern STS_PATTERN;
+    public String parentUUID;
+    public Site SITE;
+    public int failedSolves = 0;
 
-    public static String getVIDUUID(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, VID_UUID_PATTERN);
+    public static String getCIUUID(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, CI_UUID_PATTERN);
     }
 
-    public static String getSTSTOKEN(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, STS_PATTERN);
+    public HttpRequest getMainMinJS() {
+        String string = "";
+        switch (PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+            case 1: {
+                string = "https://client.perimeterx.net/PX9Qx3Rve4/main.min.js";
+                return this.getScriptRequest(string);
+            }
+            case 2: {
+                string = "https://client.perimeterx.net/PXUArm9B04/main.min.js";
+                return this.getScriptRequest(string);
+            }
+        }
+        return this.getScriptRequest(string);
     }
 
-    public void setFirefoxScriptHeaders(HttpRequest httpRequest) {
+    public void setSafariHeaders(HttpRequest httpRequest) {
+        httpRequest.putHeaders(Headers$Pseudo.MSPA.get());
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("origin", this.origin);
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
+    }
+
+    public void setFirefoxImageHeaders(HttpRequest httpRequest) {
         httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
         httpRequest.putHeader("user-agent", this.device.getUserAgent());
         httpRequest.putHeader("accept", "*/*");
         httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
         httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
         httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("origin", this.origin);
         httpRequest.putHeader("te", "trailers");
     }
 
-    public void reset() {
-        this.parentVID = null;
-        this.parentUUID = null;
+    public static void parseCookiesFromResp(String string, Map map) {
+        try {
+            Matcher matcher = PXDE_PATTERN.matcher(string);
+            Matcher matcher2 = BAKE_PATTERN.matcher(string);
+            if (matcher2.find()) {
+                map.put("_px3", matcher2.group(1));
+            }
+            if (!matcher.find()) return;
+            map.put("_pxde", matcher.group(1));
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
     }
 
-    public void setWebviewHeaders(HttpRequest httpRequest) {
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+    public static String getVIDUUID(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, VID_UUID_PATTERN);
+    }
+
+    public void setChromeScriptHeaders(HttpRequest httpRequest) {
+        if (this.device.getSecUA() != null && this.device.getSecUAMobile() != null) {
+            httpRequest.putHeader("sec-ch-ua", this.device.getSecUA());
+            httpRequest.putHeader("sec-ch-ua-mobile", this.device.getSecUAMobile());
+        }
         httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "no-cors");
+        httpRequest.putHeader("sec-fetch-dest", "script");
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage() == null ? "en-US" : this.device.getAcceptLanguage());
+    }
+
+    public void setWebviewImageHeaders(HttpRequest httpRequest) {
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
         httpRequest.putHeader("accept", "*/*");
         httpRequest.putHeader("origin", this.origin);
         httpRequest.putHeader("x-requested-with", this.getPackageName());
@@ -133,8 +185,98 @@ public class PXCaptcha {
         httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
     }
 
-    public static String getWCS(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, WCS_PATTERN);
+    public CompletableFuture solveCaptcha(String string) {
+        long l;
+        Objects.requireNonNull(this);
+        if (false < true) return CompletableFuture.completedFuture(null);
+        if (System.currentTimeMillis() - this.vidAge > 120000L) return CompletableFuture.completedFuture(null);
+        Objects.requireNonNull(this);
+        if (0 <= 6) {
+            Objects.requireNonNull(this);
+            l = 5000L * 0L;
+        } else {
+            l = 30000L;
+        }
+        CompletableFuture completableFuture = VertxUtil.hardCodedSleep(l);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$solveCaptcha(this, string, completableFuture2, 1, arg_0));
+        }
+        completableFuture.join();
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public HttpRequest imageReq(MultiMap multiMap) {
+        String string = this.getSiteID();
+        Object object = "https://collector-" + string + ".perimeterx.net/b/g?";
+        StringBuilder stringBuilder = new StringBuilder();
+        multiMap.forEach(arg_0 -> PXCaptcha.lambda$imageReq$4(stringBuilder, arg_0));
+        object = ((String)object).concat(stringBuilder.toString().trim());
+        HttpRequest httpRequest = this.client.getAbs((String)object).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.buffer());
+        this.setChromeHeaders(httpRequest);
+        return httpRequest;
+    }
+
+    public Types getType() {
+        return this.type;
+    }
+
+    public static void lambda$main$1(HttpServerRequest httpServerRequest, RealClient realClient, AsyncResult asyncResult) {
+        if (!asyncResult.succeeded()) return;
+        PXCaptcha.sendPayload(httpServerRequest, (Buffer)asyncResult.result(), realClient).onSuccess(arg_0 -> PXCaptcha.lambda$main$0(httpServerRequest, arg_0));
+    }
+
+    public String getParentUUID() {
+        return this.parentUUID;
+    }
+
+    public String getUseragent() {
+        return this.device.getUserAgent();
+    }
+
+    public void updateVIDandUUID(RealClient realClient, String string, String string2) {
+        this.client = RealClientFactory.fromOther(Vertx.currentContext().owner(), realClient, ClientType.CHROME);
+        if (!(string == null || this.parentVID != null && this.parentVID.equals(string))) {
+            this.vidAge = System.currentTimeMillis();
+        }
+        this.parentVID = string;
+        this.parentUUID = string2;
+    }
+
+    public static String getVID(ExtendedPayload extendedPayload, JsonObject jsonObject) {
+        if (!jsonObject.toString().contains("vid|")) return extendedPayload.getVID();
+        return PXCaptcha.getVIDUUID(jsonObject);
+    }
+
+    public HttpRequest getCaptchaJS(String string, String string2) {
+        String string3 = "";
+        if (string2 != null) {
+            string3 = string2;
+        }
+        Object object = "";
+        switch (PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+            case 1: {
+                object = "https://captcha.px-cdn.net/PX9Qx3Rve4/captcha.js?a=c&u=" + string + "&v=" + string3 + "&m=1";
+                return this.getScriptRequest((String)object);
+            }
+            case 2: {
+                object = "https://captcha.perimeterx.net/PXUArm9B04/captcha.js?a=c&m=1&u=" + string + "&v=" + string3 + "&g=b";
+                return this.getScriptRequest((String)object);
+            }
+        }
+        return this.getScriptRequest((String)object);
+    }
+
+    public static String parseCS(JsonObject jsonObject, Pattern pattern) {
+        String string = jsonObject.getJsonArray("do").toString().replace("wcs", "");
+        Matcher matcher = pattern.matcher(string);
+        matcher.find();
+        return matcher.group(1);
+    }
+
+    public void reset() {
+        this.parentVID = null;
+        this.parentUUID = null;
     }
 
     public String getSiteID() {
@@ -164,8 +306,80 @@ public class PXCaptcha {
         return "";
     }
 
-    public static String getCLS(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, CLS_PATTERN);
+    public String getPackageName() {
+        switch (PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+            case 1: {
+                return "com.hibbett.android";
+            }
+            case 2: {
+                return "com.walmart.android";
+            }
+        }
+        return "";
+    }
+
+    public HttpRequest hibbettCSS() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.hibbett.com/on/demandware.static/Sites-Hibbett-US-Site/-/default/css/pxchallenge.csss").as(BodyCodec.buffer());
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
+        httpRequest.putHeader("accept", "text/css,*/*;q=0.1");
+        httpRequest.putHeader("x-requested-with", this.getPackageName());
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "no-cors");
+        httpRequest.putHeader("sec-fetch-dest", "style");
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : DeviceHeaderParsers.getAcceptLanguage(this.device.getArr("PX313")));
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+        return httpRequest;
+    }
+
+    public static String getSFFTOKEN(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, SFF_SCS_PATTERN);
+    }
+
+    public static void lambda$sendPayload$5(StringBuilder stringBuilder, Map.Entry entry) {
+        if (stringBuilder.length() > 0) {
+            stringBuilder.append("&");
+        }
+        stringBuilder.append((String)entry.getKey()).append("=").append((String)entry.getValue());
+    }
+
+    public Optional parseResult(String string) {
+        if (!this.type.equals((Object)Types.DESKTOP) && !string.contains("cv|0")) {
+            return Optional.empty();
+        }
+        Matcher matcher = BAKE_PATTERN.matcher(string);
+        if (!matcher.find()) return Optional.empty();
+        return Optional.of("3:" + matcher.group(1));
+    }
+
+    public static void lambda$imageReq$4(StringBuilder stringBuilder, Map.Entry entry) {
+        if (stringBuilder.length() > 0) {
+            stringBuilder.append("&");
+        }
+        if (((String)entry.getValue()).contains("\udd31")) {
+            stringBuilder.append((String)entry.getKey()).append("=").append(URLEncoder.encode((String)entry.getValue(), StandardCharsets.UTF_8));
+            return;
+        }
+        stringBuilder.append((String)entry.getKey()).append("=").append((String)entry.getValue());
+    }
+
+    public String getParentVID() {
+        return this.parentVID;
+    }
+
+    public static String getSID(ExtendedPayload extendedPayload, JsonObject jsonObject) {
+        if (!jsonObject.toString().contains("sid|")) return extendedPayload.getSID();
+        return PXCaptcha.getSIDUUID(jsonObject);
+    }
+
+    public void setSafariImageHeaders(HttpRequest httpRequest) {
+        httpRequest.putHeaders(Headers$Pseudo.MSPA.get());
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", this.origin);
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+        httpRequest.putHeader("referer", this.origin + "/");
     }
 
     /*
@@ -224,114 +438,86 @@ lbl29:
         throw new IllegalArgumentException();
     }
 
+    public static HttpRequest atc(HttpServerRequest httpServerRequest, RealClient realClient) {
+        HttpRequest httpRequest = realClient.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/e6c613832fb68eac5dbe2ba856/items?skuIds=39553459&customerId=efKbcteBKcyafdIW7n6Sk3XCSi").as(BodyCodec.buffer());
+        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
+        httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+        httpRequest.putHeader("version", "4.15.0");
+        httpRequest.putHeader("platform", "android");
+        httpRequest.putHeader("user-agent", httpServerRequest.headers().get("user-agent"));
+        httpRequest.putHeader("x-px-authorization", httpServerRequest.headers().get("x-px-authorization"));
+        httpRequest.putHeader("authorization", httpServerRequest.headers().get("authorization"));
+        httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("accept-encoding", "gzip");
+        return httpRequest;
+    }
+
+    public static String getCLS(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, CLS_PATTERN);
+    }
+
     public static String getCSValue(JsonObject jsonObject) {
         return PXCaptcha.parseCS(jsonObject, CS_PATTERN);
     }
 
-    public static void lambda$main$1(HttpServerRequest httpServerRequest, RealClient realClient, AsyncResult asyncResult) {
-        if (!asyncResult.succeeded()) return;
-        PXCaptcha.sendPayload(httpServerRequest, (Buffer)asyncResult.result(), realClient).onSuccess(arg_0 -> PXCaptcha.lambda$main$0(httpServerRequest, arg_0));
+    public static String getCP(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, CP_PATTERN);
     }
 
-    public String getParentUUID() {
-        return this.parentUUID;
-    }
-
-    public void setChromeScriptHeaders(HttpRequest httpRequest) {
+    public void setChromeImageHeaders(HttpRequest httpRequest) {
         if (this.device.getSecUA() != null && this.device.getSecUAMobile() != null) {
             httpRequest.putHeader("sec-ch-ua", this.device.getSecUA());
             httpRequest.putHeader("sec-ch-ua-mobile", this.device.getSecUAMobile());
         }
         httpRequest.putHeader("user-agent", this.device.getUserAgent());
         httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", this.origin);
         httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "no-cors");
-        httpRequest.putHeader("sec-fetch-dest", "script");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
         httpRequest.putHeader("referer", this.origin + "/");
         httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage() == null ? "en-US" : this.device.getAcceptLanguage());
-    }
-
-    public void close() {
-    }
-
-    public HttpRequest getFavicon() {
-        this.client.cookieStore().put("_pxvid", this.parentVID, "www.perimeterx.com");
-        HttpRequest httpRequest = this.client.getAbs("https://www.perimeterx.com/favicon.ico").as(BodyCodec.buffer());
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8");
-        httpRequest.putHeader("x-requested-with", this.getPackageName());
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "no-cors");
-        httpRequest.putHeader("sec-fetch-dest", "image");
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : this.device.getAcceptEncoding());
         httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
-        return httpRequest;
     }
 
-    public static void lambda$sendPayload$3(Promise promise, AsyncResult asyncResult) {
-        if (asyncResult.succeeded()) {
-            Buffer buffer = (Buffer)((HttpResponse)asyncResult.result()).body();
-            System.out.println("Resp: " + buffer);
-            promise.tryComplete((Object)((Buffer)((HttpResponse)asyncResult.result()).body()));
-            return;
-        }
-        promise.tryFail("Failed req");
-    }
-
-    public void updateVIDandUUID(RealClient realClient, String string, String string2) {
-        this.client = RealClientFactory.fromOther(Vertx.currentContext().owner(), realClient, ClientType.CHROME);
-        if (!(string == null || this.parentVID != null && this.parentVID.equals(string))) {
-            this.vidAge = System.currentTimeMillis();
-        }
-        this.parentVID = string;
-        this.parentUUID = string2;
-    }
-
-    public HttpRequest getCaptchaJS(String string, String string2) {
-        String string3 = "";
-        if (string2 != null) {
-            string3 = string2;
-        }
-        Object object = "";
-        switch (PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
-            case 1: {
-                object = "https://captcha.px-cdn.net/PX9Qx3Rve4/captcha.js?a=c&u=" + string + "&v=" + string3 + "&m=1";
-                return this.getScriptRequest((String)object);
-            }
-            case 2: {
-                object = "https://captcha.perimeterx.net/PXUArm9B04/captcha.js?a=c&m=1&u=" + string + "&v=" + string3 + "&g=b";
-                return this.getScriptRequest((String)object);
-            }
-        }
-        return this.getScriptRequest((String)object);
-    }
-
-    public HttpRequest hibbettCSS() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.hibbett.com/on/demandware.static/Sites-Hibbett-US-Site/-/default/css/pxchallenge.csss").as(BodyCodec.buffer());
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("accept", "text/css,*/*;q=0.1");
-        httpRequest.putHeader("x-requested-with", this.getPackageName());
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "no-cors");
-        httpRequest.putHeader("sec-fetch-dest", "style");
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : DeviceHeaderParsers.getAcceptLanguage(this.device.getArr("PX313")));
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
-        return httpRequest;
-    }
-
-    public void setWebviewScriptHeaders(HttpRequest httpRequest) {
+    public void setFirefoxScriptHeaders(HttpRequest httpRequest) {
+        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
         httpRequest.putHeader("user-agent", this.device.getUserAgent());
         httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("x-requested-with", this.getPackageName());
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "no-cors");
-        httpRequest.putHeader("sec-fetch-dest", "script");
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : this.device.getAcceptEncoding());
         httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("te", "trailers");
+    }
+
+    public static String getCI(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, CI_PATTERN);
+    }
+
+    public static String getCTSValue(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, CTS_PATTERN);
+    }
+
+    public static CompletableFuture async$solveCaptcha(PXCaptcha pXCaptcha, String string, CompletableFuture completableFuture, int n, Object object) {
+        switch (n) {
+            case 0: {
+                Objects.requireNonNull(pXCaptcha);
+                return CompletableFuture.completedFuture(null);
+            }
+            case 1: {
+                CompletableFuture completableFuture2 = completableFuture;
+                completableFuture2.join();
+                return CompletableFuture.completedFuture(null);
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    public HttpRequest collectorReq() {
+        HttpRequest httpRequest = this.client.postAbs("https://collector-" + "PXu6b0qd2S".toLowerCase() + ".px-cloud.net/api/v2/collector").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.jsonObject());
+        this.setChromeHeaders(httpRequest);
+        return httpRequest;
     }
 
     public HttpRequest getScriptRequest(String string) {
@@ -340,161 +526,54 @@ lbl29:
         return httpRequest;
     }
 
-    public static String getVID(ExtendedPayload extendedPayload, JsonObject jsonObject) {
-        if (!jsonObject.toString().contains("vid|")) return extendedPayload.getVID();
-        return PXCaptcha.getVIDUUID(jsonObject);
-    }
-
     public void setType(Types types) {
         this.type = types;
     }
 
-    public Optional parseResult(String string) {
-        if (!this.type.equals((Object)Types.DESKTOP) && !string.contains("cv|0")) {
-            return Optional.empty();
-        }
-        Matcher matcher = BAKE_PATTERN.matcher(string);
-        if (!matcher.find()) return Optional.empty();
-        return Optional.of("3:" + matcher.group(1));
-    }
-
-    public static String getSIDUUID(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, SID_UUID_PATTERN);
-    }
-
-    public static String getDRC(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, DRC_PATTERN);
-    }
-
-    public CompletableFuture sendPayload(ExtendedPayload extendedPayload) {
-        HttpRequest httpRequest = !extendedPayload.getType().equals((Object)Types.DESKTOP) ? this.bundleReq() : this.collectorReq();
-        MultiMap multiMap = extendedPayload.asForm();
-        StringBuilder stringBuilder = new StringBuilder();
-        multiMap.forEach(arg_0 -> PXCaptcha.lambda$sendPayload$5(stringBuilder, arg_0));
-        Buffer buffer = Buffer.buffer((String)stringBuilder.toString().trim());
-        while (this.client.isActive()) {
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, buffer);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$sendPayload(this, extendedPayload, httpRequest, multiMap, stringBuilder, buffer, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    return CompletableFuture.completedFuture((JsonObject)httpResponse.body());
-                }
-                CompletableFuture completableFuture3 = VertxUtil.randomSleep(10000L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$sendPayload(this, extendedPayload, httpRequest, multiMap, stringBuilder, buffer, completableFuture4, httpResponse, 2, arg_0));
-                }
-                completableFuture3.join();
-            }
-            catch (Throwable throwable) {
-                if (!this.client.isActive()) {
-                    return CompletableFuture.failedFuture(new Exception("Failed to send payload. Active? " + this.client.isActive()));
-                }
-                this.logger.warn("Error to send payload: {}", (Object)throwable.getMessage());
-            }
-        }
-        return CompletableFuture.failedFuture(new Exception("Failed to send payload. Active? " + this.client.isActive()));
-    }
-
-    public static void parseCookiesFromResp(String string, Map map) {
-        try {
-            Matcher matcher = PXDE_PATTERN.matcher(string);
-            Matcher matcher2 = BAKE_PATTERN.matcher(string);
-            if (matcher2.find()) {
-                map.put("_px3", matcher2.group(1));
-            }
-            if (!matcher.find()) return;
-            map.put("_pxde", matcher.group(1));
+    public void setRefererAndOrigin(String string) {
+        if (string != null) {
+            string = string.replace("https://", "");
+            this.origin = "https://" + string.substring(0, string.indexOf("/"));
+            this.referer = "https://" + string;
             return;
         }
-        catch (Throwable throwable) {
-            // empty catch block
+        if (!this.type.equals((Object)Types.DESKTOP) && !this.needsDesktopAppID) {
+            this.origin = "https://www.perimeterx.com";
+            this.referer = "https://www.perimeterx.com/";
+            return;
         }
-    }
-
-    public CompletableFuture setBrowserType() {
-        Devices$DeviceImpl devices$DeviceImpl;
-        if (this.device != null) return CompletableFuture.completedFuture(null);
-        this.mobile = false;
-        PXCaptcha pXCaptcha = this;
-        if (this.mobile) {
-            CompletableFuture completableFuture = Devices.randomMobileBrowser();
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                PXCaptcha pXCaptcha2 = pXCaptcha;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$setBrowserType(this, pXCaptcha2, completableFuture2, 1, arg_0));
-            }
-            devices$DeviceImpl = (Devices$DeviceImpl)completableFuture.join();
-        } else {
-            CompletableFuture completableFuture = Devices.randomDesktopBrowser();
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture3 = completableFuture;
-                PXCaptcha pXCaptcha3 = pXCaptcha;
-                return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$setBrowserType(this, pXCaptcha3, completableFuture3, 2, arg_0));
-            }
-            devices$DeviceImpl = (Devices$DeviceImpl)completableFuture.join();
-        }
-        pXCaptcha.device = devices$DeviceImpl;
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public String getPackageName() {
         switch (PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
             case 1: {
-                return "com.hibbett.android";
+                this.origin = "https://www.hibbett.com";
+                this.referer = "https://www.hibbett.com/";
+                return;
             }
             case 2: {
-                return "com.walmart.android";
+                this.origin = "https://www.walmart.com";
+                this.referer = "https://www.walmart.com/";
+                return;
             }
         }
-        return "";
     }
 
-    public void setFirefoxHeaders(HttpRequest httpRequest) {
-        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("origin", this.origin);
-        httpRequest.putHeader("te", "trailers");
-    }
-
-    public HttpRequest imageReq(MultiMap multiMap) {
-        String string = this.getSiteID();
-        Object object = "https://collector-" + string + ".perimeterx.net/b/g?";
-        StringBuilder stringBuilder = new StringBuilder();
-        multiMap.forEach(arg_0 -> PXCaptcha.lambda$imageReq$4(stringBuilder, arg_0));
-        object = ((String)object).concat(stringBuilder.toString().trim());
-        HttpRequest httpRequest = this.client.getAbs((String)object).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.buffer());
-        this.setChromeHeaders(httpRequest);
-        return httpRequest;
-    }
-
-    public static String getSID(ExtendedPayload extendedPayload, JsonObject jsonObject) {
-        if (!jsonObject.toString().contains("sid|")) return extendedPayload.getSID();
-        return PXCaptcha.getSIDUUID(jsonObject);
-    }
-
-    public String getParentVID() {
-        return this.parentVID;
-    }
-
-    public void setSafariImageHeaders(HttpRequest httpRequest) {
+    public void setSafariScriptHeaders(HttpRequest httpRequest) {
         httpRequest.putHeaders(Headers$Pseudo.MSPA.get());
         httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", this.origin);
         httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
         httpRequest.putHeader("user-agent", this.device.getUserAgent());
         httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
         httpRequest.putHeader("referer", this.origin + "/");
+    }
+
+    public PXCaptcha(Logger logger, RealClient realClient, Types types, String string, String string2, Site site) {
+        this.logger = logger;
+        this.client = RealClientFactory.fromOther(Vertx.currentContext().owner(), realClient, ClientType.CHROME);
+        this.type = types;
+        this.parentVID = string;
+        this.parentUUID = string2;
+        this.SITE = site;
+        this.vidAge = System.currentTimeMillis();
+        this.needsDesktopAppID = false;
     }
 
     /*
@@ -560,229 +639,12 @@ lbl22:
         throw new IllegalArgumentException();
     }
 
-    public HttpRequest bundleReq() {
-        String string = this.getSiteID();
-        HttpRequest httpRequest = this.client.postAbs("https://collector-" + string + ".px-cloud.net/assets/js/bundle").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.jsonObject());
-        this.setChromeHeaders(httpRequest);
-        return httpRequest;
+    public static String getSIDUUID(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, SID_UUID_PATTERN);
     }
 
-    public Devices$DeviceImpl getDevice() {
-        return this.device;
-    }
-
-    public void setSafariHeaders(HttpRequest httpRequest) {
-        httpRequest.putHeaders(Headers$Pseudo.MSPA.get());
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("origin", this.origin);
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
-    }
-
-    public static void lambda$main$0(HttpServerRequest httpServerRequest, Buffer buffer) {
-        httpServerRequest.response().setStatusCode(200).putHeader(HttpHeaders.CONTENT_TYPE, (CharSequence)"application/json; charset=utf-8").putHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, (CharSequence)"true").putHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, (CharSequence)"GET,HEAD,PUT,PATCH,POST,DELETE").putHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, (CharSequence)"*").putHeader("timing-allow-origin", "*").putHeader("via", "1.1 google").putHeader("alt-svc", "clear").putHeader("expires", "0").putHeader("cache-control", "no-cache").end();
-    }
-
-    public static String getCI(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, CI_PATTERN);
-    }
-
-    public static String parseDO(JsonObject jsonObject, Pattern pattern) {
-        String string = jsonObject.getJsonArray("do").toString();
-        Matcher matcher = pattern.matcher(string);
-        if (matcher.find()) return matcher.group(1);
-        return null;
-    }
-
-    public void setChromeImageHeaders(HttpRequest httpRequest) {
-        if (this.device.getSecUA() != null && this.device.getSecUAMobile() != null) {
-            httpRequest.putHeader("sec-ch-ua", this.device.getSecUA());
-            httpRequest.putHeader("sec-ch-ua-mobile", this.device.getSecUAMobile());
-        }
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", this.origin);
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
-    }
-
-    public String getUseragent() {
-        return this.device.getUserAgent();
-    }
-
-    public static void lambda$main$2(RealClient realClient, HttpServerRequest httpServerRequest) {
-        httpServerRequest.body(arg_0 -> PXCaptcha.lambda$main$1(httpServerRequest, realClient, arg_0));
-    }
-
-    public PXCaptcha(Logger logger, RealClient realClient, Types types, String string, String string2, Site site) {
-        this.logger = logger;
-        this.client = RealClientFactory.fromOther(Vertx.currentContext().owner(), realClient, ClientType.CHROME);
-        this.type = types;
-        this.parentVID = string;
-        this.parentUUID = string2;
-        this.SITE = site;
-        this.vidAge = System.currentTimeMillis();
-        this.needsDesktopAppID = false;
-    }
-
-    public void setWebviewImageHeaders(HttpRequest httpRequest) {
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", this.origin);
-        httpRequest.putHeader("x-requested-with", this.getPackageName());
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : this.device.getAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
-    }
-
-    public static void lambda$sendPayload$5(StringBuilder stringBuilder, Map.Entry entry) {
-        if (stringBuilder.length() > 0) {
-            stringBuilder.append("&");
-        }
-        stringBuilder.append((String)entry.getKey()).append("=").append((String)entry.getValue());
-    }
-
-    public static void main(String[] stringArray) {
-        String string = ExtendedPayload.decode("aUkQRhAIEGJqABAeEFYQCEkQYmoLBBAIEFpGRkJBCB0dRUVFHEJXQFtfV0ZXQEocUV1fHRAeEGJqBAEQCBB/U1F7XEZXXhAeEGJqAwsDEAgCHhBiagoHAhAIAh4QYmoKBwMQCAMKBgEeEGJqAwICChAIAQQCAh4QYmoDAgcHEAgDBAAHAwUFAQALAgYEHhBiagMCBwQQCAMEAAcDBQUBAAsCBgoeEGJqAwIBChAIEFcLBQIAAFYCH1ZTUAofAwNXUB8KA1NUHwoFCgBUBVYBBlEFBBAeEGJqAQUDEAhUU15BVx4QYmoABwIQCBBiagcEAhAeEGJqBQIKEAgQQkpaURBPT28=", 50);
-        System.setProperty("vertx.disableHttpHeadersValidation", "true");
-        Conscrypt.setUseEngineSocketByDefault((boolean)false);
-        Security.insertProviderAt(Conscrypt.newProvider(), 1);
-        Conscrypt.setUseEngineSocketByDefault((boolean)false);
-        Vertx vertx = Vertx.vertx();
-        HttpServer httpServer = vertx.createHttpServer();
-        RealClient realClient = RealClientFactory.buildProxied(vertx, ClientType.CHROME);
-        httpServer.requestHandler(arg_0 -> PXCaptcha.lambda$main$2(realClient, arg_0));
-        httpServer.listen(8890);
-    }
-
-    public static String getSFFTOKEN(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, SFF_SCS_PATTERN);
-    }
-
-    public CompletableFuture solveCaptcha(String string) {
-        long l;
-        Objects.requireNonNull(this);
-        if (false < true) return CompletableFuture.completedFuture(null);
-        if (System.currentTimeMillis() - this.vidAge > 120000L) return CompletableFuture.completedFuture(null);
-        Objects.requireNonNull(this);
-        if (0 <= 6) {
-            Objects.requireNonNull(this);
-            l = 5000L * 0L;
-        } else {
-            l = 30000L;
-        }
-        CompletableFuture completableFuture = VertxUtil.hardCodedSleep(l);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$solveCaptcha(this, string, completableFuture2, 1, arg_0));
-        }
-        completableFuture.join();
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public static String getCTSValue(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, CTS_PATTERN);
-    }
-
-    public static String parseCS(JsonObject jsonObject, Pattern pattern) {
-        String string = jsonObject.getJsonArray("do").toString().replace("wcs", "");
-        Matcher matcher = pattern.matcher(string);
-        matcher.find();
-        return matcher.group(1);
-    }
-
-    public HttpRequest getMainMinJS() {
-        String string = "";
-        switch (PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
-            case 1: {
-                string = "https://client.perimeterx.net/PX9Qx3Rve4/main.min.js";
-                return this.getScriptRequest(string);
-            }
-            case 2: {
-                string = "https://client.perimeterx.net/PXUArm9B04/main.min.js";
-                return this.getScriptRequest(string);
-            }
-        }
-        return this.getScriptRequest(string);
-    }
-
-    public static String getCIUUID(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, CI_UUID_PATTERN);
-    }
-
-    public static CompletableFuture async$solveCaptcha(PXCaptcha pXCaptcha, String string, CompletableFuture completableFuture, int n, Object object) {
-        switch (n) {
-            case 0: {
-                Objects.requireNonNull(pXCaptcha);
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                CompletableFuture completableFuture2 = completableFuture;
-                completableFuture2.join();
-                return CompletableFuture.completedFuture(null);
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public CompletableFuture prepareDevice() {
-        return this.setBrowserType();
-    }
-
-    public void setSafariScriptHeaders(HttpRequest httpRequest) {
-        httpRequest.putHeaders(Headers$Pseudo.MSPA.get());
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
-        httpRequest.putHeader("referer", this.origin + "/");
-    }
-
-    public HttpRequest collectorReq() {
-        HttpRequest httpRequest = this.client.postAbs("https://collector-" + "PXu6b0qd2S".toLowerCase() + ".px-cloud.net/api/v2/collector").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.jsonObject());
-        this.setChromeHeaders(httpRequest);
-        return httpRequest;
-    }
-
-    public static String getCITOKEN(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, CI_TOKEN_PATTERN);
-    }
-
-    public static HttpRequest atc(HttpServerRequest httpServerRequest, RealClient realClient) {
-        HttpRequest httpRequest = realClient.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/e6c613832fb68eac5dbe2ba856/items?skuIds=39553459&customerId=efKbcteBKcyafdIW7n6Sk3XCSi").as(BodyCodec.buffer());
-        httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
-        httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-        httpRequest.putHeader("version", "4.15.0");
-        httpRequest.putHeader("platform", "android");
-        httpRequest.putHeader("user-agent", httpServerRequest.headers().get("user-agent"));
-        httpRequest.putHeader("x-px-authorization", httpServerRequest.headers().get("x-px-authorization"));
-        httpRequest.putHeader("authorization", httpServerRequest.headers().get("authorization"));
-        httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("accept-encoding", "gzip");
-        return httpRequest;
-    }
-
-    public static void lambda$imageReq$4(StringBuilder stringBuilder, Map.Entry entry) {
-        if (stringBuilder.length() > 0) {
-            stringBuilder.append("&");
-        }
-        if (((String)entry.getValue()).contains("\udd31")) {
-            stringBuilder.append((String)entry.getKey()).append("=").append(URLEncoder.encode((String)entry.getValue(), StandardCharsets.UTF_8));
-            return;
-        }
-        stringBuilder.append((String)entry.getKey()).append("=").append((String)entry.getValue());
+    public static String getSTSTOKEN(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, STS_PATTERN);
     }
 
     public static HttpRequest bundleReq(String string, RealClient realClient) {
@@ -802,56 +664,24 @@ lbl22:
         return httpRequest;
     }
 
-    public static String getCP(JsonObject jsonObject) {
-        return PXCaptcha.parseDO(jsonObject, CP_PATTERN);
+    public static Future sendPayload(HttpServerRequest httpServerRequest, Buffer buffer, RealClient realClient) {
+        Promise promise = Promise.promise();
+        HttpRequest httpRequest = PXCaptcha.atc(httpServerRequest, realClient);
+        httpRequest.sendBuffer(buffer, arg_0 -> PXCaptcha.lambda$sendPayload$3(promise, arg_0));
+        return promise.future();
     }
 
-    public void setRefererAndOrigin(String string) {
-        if (string != null) {
-            string = string.replace("https://", "");
-            this.origin = "https://" + string.substring(0, string.indexOf("/"));
-            this.referer = "https://" + string;
-            return;
-        }
-        if (!this.type.equals((Object)Types.DESKTOP) && !this.needsDesktopAppID) {
-            this.origin = "https://www.perimeterx.com";
-            this.referer = "https://www.perimeterx.com/";
-            return;
-        }
-        switch (PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
-            case 1: {
-                this.origin = "https://www.hibbett.com";
-                this.referer = "https://www.hibbett.com/";
-                return;
-            }
-            case 2: {
-                this.origin = "https://www.walmart.com";
-                this.referer = "https://www.walmart.com/";
-                return;
-            }
-        }
-    }
-
-    public void setNeedsDesktopAppID(boolean bl) {
-        this.needsDesktopAppID = bl;
-    }
-
-    public void setChromeHeaders(HttpRequest httpRequest) {
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        if (this.device.getSecUA() != null && this.device.getSecUAMobile() != null) {
-            httpRequest.putHeader("sec-ch-ua", this.device.getSecUA());
-            httpRequest.putHeader("sec-ch-ua-mobile", this.device.getSecUAMobile());
-        }
-        httpRequest.putHeader("user-agent", this.device.getUserAgent());
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", this.origin);
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", this.origin + "/");
-        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+    public static void main(String[] stringArray) {
+        String string = ExtendedPayload.decode("aUkQRhAIEGJqABAeEFYQCEkQYmoLBBAIEFpGRkJBCB0dRUVFHEJXQFtfV0ZXQEocUV1fHRAeEGJqBAEQCBB/U1F7XEZXXhAeEGJqAwsDEAgCHhBiagoHAhAIAh4QYmoKBwMQCAMKBgEeEGJqAwICChAIAQQCAh4QYmoDAgcHEAgDBAAHAwUFAQALAgYEHhBiagMCBwQQCAMEAAcDBQUBAAsCBgoeEGJqAwIBChAIEFcLBQIAAFYCH1ZTUAofAwNXUB8KA1NUHwoFCgBUBVYBBlEFBBAeEGJqAQUDEAhUU15BVx4QYmoABwIQCBBiagcEAhAeEGJqBQIKEAgQQkpaURBPT28=", 50);
+        System.setProperty("vertx.disableHttpHeadersValidation", "true");
+        Conscrypt.setUseEngineSocketByDefault((boolean)false);
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
+        Conscrypt.setUseEngineSocketByDefault((boolean)false);
+        Vertx vertx = Vertx.vertx();
+        HttpServer httpServer = vertx.createHttpServer();
+        RealClient realClient = RealClientFactory.buildProxied(vertx, ClientType.CHROME);
+        httpServer.requestHandler(arg_0 -> PXCaptcha.lambda$main$2(realClient, arg_0));
+        httpServer.listen(8890);
     }
 
     static {
@@ -873,26 +703,196 @@ lbl22:
         CP_PATTERN = Pattern.compile("cp\\|.*?\\|(.*?)\"");
     }
 
-    public void setFirefoxImageHeaders(HttpRequest httpRequest) {
+    public static String getDRC(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, DRC_PATTERN);
+    }
+
+    public CompletableFuture prepareDevice() {
+        return this.setBrowserType();
+    }
+
+    public CompletableFuture setBrowserType() {
+        Devices$DeviceImpl devices$DeviceImpl;
+        if (this.device != null) return CompletableFuture.completedFuture(null);
+        this.mobile = false;
+        PXCaptcha pXCaptcha = this;
+        if (this.mobile) {
+            CompletableFuture completableFuture = Devices.randomMobileBrowser();
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                PXCaptcha pXCaptcha2 = pXCaptcha;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$setBrowserType(this, pXCaptcha2, completableFuture2, 1, arg_0));
+            }
+            devices$DeviceImpl = (Devices$DeviceImpl)completableFuture.join();
+        } else {
+            CompletableFuture completableFuture = Devices.randomDesktopBrowser();
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture3 = completableFuture;
+                PXCaptcha pXCaptcha3 = pXCaptcha;
+                return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$setBrowserType(this, pXCaptcha3, completableFuture3, 2, arg_0));
+            }
+            devices$DeviceImpl = (Devices$DeviceImpl)completableFuture.join();
+        }
+        pXCaptcha.device = devices$DeviceImpl;
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public static void lambda$main$2(RealClient realClient, HttpServerRequest httpServerRequest) {
+        httpServerRequest.body(arg_0 -> PXCaptcha.lambda$main$1(httpServerRequest, realClient, arg_0));
+    }
+
+    public HttpRequest bundleReq() {
+        String string = this.getSiteID();
+        HttpRequest httpRequest = this.client.postAbs("https://collector-" + string + ".px-cloud.net/assets/js/bundle").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.jsonObject());
+        this.setChromeHeaders(httpRequest);
+        return httpRequest;
+    }
+
+    public static void lambda$sendPayload$3(Promise promise, AsyncResult asyncResult) {
+        if (asyncResult.succeeded()) {
+            Buffer buffer = (Buffer)((HttpResponse)asyncResult.result()).body();
+            System.out.println("Resp: " + buffer);
+            promise.tryComplete((Object)((Buffer)((HttpResponse)asyncResult.result()).body()));
+            return;
+        }
+        promise.tryFail("Failed req");
+    }
+
+    public CompletableFuture sendPayload(ExtendedPayload extendedPayload) {
+        HttpRequest httpRequest = !extendedPayload.getType().equals((Object)Types.DESKTOP) ? this.bundleReq() : this.collectorReq();
+        MultiMap multiMap = extendedPayload.asForm();
+        StringBuilder stringBuilder = new StringBuilder();
+        multiMap.forEach(arg_0 -> PXCaptcha.lambda$sendPayload$5(stringBuilder, arg_0));
+        Buffer buffer = Buffer.buffer((String)stringBuilder.toString().trim());
+        while (this.client.isActive()) {
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, buffer);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$sendPayload(this, extendedPayload, httpRequest, multiMap, stringBuilder, buffer, completableFuture2, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse != null) {
+                    return CompletableFuture.completedFuture((JsonObject)httpResponse.body());
+                }
+                CompletableFuture completableFuture3 = VertxUtil.randomSleep(10000L);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> PXCaptcha.async$sendPayload(this, extendedPayload, httpRequest, multiMap, stringBuilder, buffer, completableFuture4, httpResponse, 2, arg_0));
+                }
+                completableFuture3.join();
+            }
+            catch (Throwable throwable) {
+                if (!this.client.isActive()) {
+                    return CompletableFuture.failedFuture(new Exception("Failed to send payload. Active? " + this.client.isActive()));
+                }
+                this.logger.warn("Error to send payload: {}", (Object)throwable.getMessage());
+            }
+        }
+        return CompletableFuture.failedFuture(new Exception("Failed to send payload. Active? " + this.client.isActive()));
+    }
+
+    public HttpRequest getFavicon() {
+        this.client.cookieStore().put("_pxvid", this.parentVID, "www.perimeterx.com");
+        HttpRequest httpRequest = this.client.getAbs("https://www.perimeterx.com/favicon.ico").as(BodyCodec.buffer());
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
+        httpRequest.putHeader("accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8");
+        httpRequest.putHeader("x-requested-with", this.getPackageName());
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "no-cors");
+        httpRequest.putHeader("sec-fetch-dest", "image");
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : this.device.getAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+        return httpRequest;
+    }
+
+    public void close() {
+    }
+
+    public Devices$DeviceImpl getDevice() {
+        return this.device;
+    }
+
+    public static String getWCS(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, WCS_PATTERN);
+    }
+
+    public void setWebviewHeaders(HttpRequest httpRequest) {
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", this.origin);
+        httpRequest.putHeader("x-requested-with", this.getPackageName());
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : this.device.getAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+    }
+
+    public void setWebviewScriptHeaders(HttpRequest httpRequest) {
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("x-requested-with", this.getPackageName());
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "no-cors");
+        httpRequest.putHeader("sec-fetch-dest", "script");
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate" : this.device.getAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
+    }
+
+    public static void lambda$main$0(HttpServerRequest httpServerRequest, Buffer buffer) {
+        httpServerRequest.response().setStatusCode(200).putHeader(HttpHeaders.CONTENT_TYPE, (CharSequence)"application/json; charset=utf-8").putHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, (CharSequence)"true").putHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, (CharSequence)"GET,HEAD,PUT,PATCH,POST,DELETE").putHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, (CharSequence)"*").putHeader("timing-allow-origin", "*").putHeader("via", "1.1 google").putHeader("alt-svc", "clear").putHeader("expires", "0").putHeader("cache-control", "no-cache").end();
+    }
+
+    public void setFirefoxHeaders(HttpRequest httpRequest) {
         httpRequest.putHeaders(Headers$Pseudo.MPAS.get());
         httpRequest.putHeader("user-agent", this.device.getUserAgent());
         httpRequest.putHeader("accept", "*/*");
         httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
         httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
         httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("origin", this.origin);
         httpRequest.putHeader("te", "trailers");
     }
 
-    public Types getType() {
-        return this.type;
+    public void setChromeHeaders(HttpRequest httpRequest) {
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        if (this.device.getSecUA() != null && this.device.getSecUAMobile() != null) {
+            httpRequest.putHeader("sec-ch-ua", this.device.getSecUA());
+            httpRequest.putHeader("sec-ch-ua-mobile", this.device.getSecUAMobile());
+        }
+        httpRequest.putHeader("user-agent", this.device.getUserAgent());
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", this.origin);
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", this.origin + "/");
+        httpRequest.putHeader("accept-encoding", this.device.getAcceptEncoding() == null ? "gzip, deflate, br" : this.device.getAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.device.getAcceptLanguage());
     }
 
-    public static Future sendPayload(HttpServerRequest httpServerRequest, Buffer buffer, RealClient realClient) {
-        Promise promise = Promise.promise();
-        HttpRequest httpRequest = PXCaptcha.atc(httpServerRequest, realClient);
-        httpRequest.sendBuffer(buffer, arg_0 -> PXCaptcha.lambda$sendPayload$3(promise, arg_0));
-        return promise.future();
+    public void setNeedsDesktopAppID(boolean bl) {
+        this.needsDesktopAppID = bl;
+    }
+
+    public static String parseDO(JsonObject jsonObject, Pattern pattern) {
+        String string = jsonObject.getJsonArray("do").toString();
+        Matcher matcher = pattern.matcher(string);
+        if (matcher.find()) return matcher.group(1);
+        return null;
+    }
+
+    public static String getCITOKEN(JsonObject jsonObject) {
+        return PXCaptcha.parseDO(jsonObject, CI_TOKEN_PATTERN);
     }
 }
 

@@ -17,23 +17,6 @@ public enum CardType {
 
     public Pattern pattern;
 
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public CardType() {
-        this.pattern = null;
-    }
-
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public CardType() {
-        void var3_1;
-        this.pattern = Pattern.compile((String)var3_1);
-    }
-
     public static CardType detect(String string) {
         CardType[] cardTypeArray = CardType.values();
         int n = cardTypeArray.length;
@@ -46,6 +29,23 @@ public enum CardType {
             ++n2;
         }
         return UNKNOWN;
+    }
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public CardType() {
+        void var3_1;
+        this.pattern = Pattern.compile((String)var3_1);
+    }
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public CardType() {
+        this.pattern = null;
     }
 }
 

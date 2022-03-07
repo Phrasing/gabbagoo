@@ -13,16 +13,16 @@ import java.awt.event.KeyListener;
 public class LinkOverrideListener
 implements KeyListener {
     @Override
-    public void keyTyped(KeyEvent keyEvent) {
-    }
-
-    @Override
     public void keyReleased(KeyEvent keyEvent) {
         String string = ((TextField)keyEvent.getSource()).getText();
         if (string.isBlank()) return;
         if (!string.contains("http")) return;
         System.out.println("Mass link changed -> " + string);
         ((TaskController)Engine.get().getModule(Controller.TASK)).massEditLinkOrKeyword(string);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent keyEvent) {
     }
 
     @Override

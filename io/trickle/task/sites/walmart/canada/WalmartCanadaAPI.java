@@ -28,15 +28,19 @@ import java.util.concurrent.CompletableFuture;
 
 public class WalmartCanadaAPI
 extends TaskApiClient {
+    public static String BYPASS_PREFIX = "";
     public PXToken pxToken = null;
-    public static String PX_TOKEN = "3";
-    public Task task;
     public static String DID;
-    public static String BYPASS_PREFIX;
+    public static String PX_TOKEN;
     public static int EXCEPTION_RETRY_DELAY;
+    public Task task;
 
-    public HttpRequest submitAddress() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/address?lang=en&availStore=0&slotBooked=false").as(BodyCodec.buffer());
+    public Buffer submitEmailForm() {
+        return new JsonObject().put("emailAddress", (Object)this.task.getProfile().getEmail()).toBuffer();
+    }
+
+    public HttpRequest submitCard() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/payments/summary").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("pragma", "no-cache");
         httpRequest.putHeader("cache-control", "no-cache");
@@ -55,6 +59,55 @@ extends TaskApiClient {
         httpRequest.putHeader("cookie", "DEFAULT_VALUE");
         httpRequest.putHeader("x-px-authorization", this.tokenValue());
         return httpRequest;
+    }
+
+    public Buffer addressForm() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("fulfillmentType", (Object)"SHIPTOHOME");
+        Profile profile = this.task.getProfile();
+        return jsonObject.put("deliveryInfo", (Object)new JsonObject().put("firstName", (Object)profile.getFirstName()).put("lastName", (Object)profile.getLastName()).put("addressLine1", (Object)profile.getAddress1()).put("addressLine2", (Object)profile.getAddress2()).put("city", (Object)profile.getCity()).put("state", (Object)profile.getState()).put("postalCode", (Object)profile.getZip()).put("phone", (Object)profile.getPhone()).put("saveToProfile", (Object)true).put("verificationLevel", (Object)"VERIFIED").put("country", (Object)"CA").put("locationId", null).put("overrideAddressVerification", (Object)true)).toBuffer();
+    }
+
+    public Buffer shippingForm() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("offerId", (Object)this.task.getKeywords()[0]);
+        jsonObject.put("levelOfService", (Object)"STANDARD");
+        return new JsonObject().put("shipMethods", (Object)new JsonArray().add((Object)jsonObject)).toBuffer();
+    }
+
+    public HttpRequest placeOrder() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/place-order?lang=en&availStoreId=0&postalCode=0").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("pragma", "no-cache");
+        httpRequest.putHeader("cache-control", "no-cache");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "application/json");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36");
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("origin", "https://www.walmart.ca");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.walmart.ca/checkout");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-GB,en;q=0.9,en-US;q=0.8,lt;q=0.7");
+        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-px-authorization", this.tokenValue());
+        return httpRequest;
+    }
+
+    public JsonObject atcForm(String string, int n) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("postalCode", (Object)"X");
+        JsonObject jsonObject2 = new JsonObject();
+        jsonObject2.put("offerId", (Object)string);
+        jsonObject2.put("skuId", (Object)string);
+        jsonObject2.put("quantity", (Object)n);
+        jsonObject2.put("action", (Object)"ADD");
+        jsonObject2.put("allowSubstitutions", (Object)false);
+        jsonObject.put("items", (Object)new JsonArray().add((Object)jsonObject2));
+        return jsonObject;
     }
 
     public HttpRequest addToCart() {
@@ -80,12 +133,8 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public Buffer submitEmailForm() {
-        return new JsonObject().put("emailAddress", (Object)this.task.getProfile().getEmail()).toBuffer();
-    }
-
-    public HttpRequest placeOrder() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/place-order?lang=en&availStoreId=0&postalCode=0").as(BodyCodec.buffer());
+    public HttpRequest submitShipping() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/items/ship-method?lang=en&availStore=0&postalCode=0").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("pragma", "no-cache");
         httpRequest.putHeader("cache-control", "no-cache");
@@ -106,19 +155,8 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public CompletableFuture handleBadResponse(int n) {
-        switch (n) {
-            case 412: 
-            case 444: {
-                if (!super.rotateProxy()) return CompletableFuture.completedFuture(true);
-                return CompletableFuture.completedFuture(true);
-            }
-        }
-        return CompletableFuture.completedFuture(true);
-    }
-
-    public HttpRequest submitEmail() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/email?availStore=0&postalCode=0").as(BodyCodec.buffer());
+    public HttpRequest submitPayment() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/payments?lang=en&availStoreId=0&postalCode=0").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("pragma", "no-cache");
         httpRequest.putHeader("cache-control", "no-cache");
@@ -139,39 +177,19 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    static {
-        BYPASS_PREFIX = "";
-        EXCEPTION_RETRY_DELAY = 12000;
-        DID = UUID.randomUUID().toString();
-    }
-
-    public Buffer shippingForm() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("offerId", (Object)this.task.getKeywords()[0]);
-        jsonObject.put("levelOfService", (Object)"STANDARD");
-        return new JsonObject().put("shipMethods", (Object)new JsonArray().add((Object)jsonObject)).toBuffer();
-    }
-
-    public String tokenValue() {
-        if (this.pxToken != null) return (String)this.pxToken.getValue();
-        return "3";
-    }
-
-    public JsonObject atcForm(String string, int n) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("postalCode", (Object)"X");
+    public Buffer cardForm(PaymentToken paymentToken) {
+        JsonObject jsonObject = new JsonObject().put("integrityCheck", (Object)paymentToken.getIntegrityCheck()).put("phase", (Object)paymentToken.getPhase()).put("keyId", (Object)paymentToken.getKeyId());
         JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.put("offerId", (Object)string);
-        jsonObject2.put("skuId", (Object)string);
-        jsonObject2.put("quantity", (Object)n);
-        jsonObject2.put("action", (Object)"ADD");
-        jsonObject2.put("allowSubstitutions", (Object)false);
-        jsonObject.put("items", (Object)new JsonArray().add((Object)jsonObject2));
-        return jsonObject;
-    }
-
-    public JsonObject atcForm() {
-        return this.atcForm(this.task.getKeywords()[0], Integer.parseInt(this.task.getSize()));
+        jsonObject2.put("pan", (Object)paymentToken.getEncryptedPan());
+        jsonObject2.put("cvv", (Object)paymentToken.getEncryptedCvv());
+        jsonObject2.put("encryption", (Object)jsonObject);
+        JsonObject jsonObject3 = new JsonObject();
+        jsonObject3.put("piHash", (Object)jsonObject2);
+        jsonObject3.put("cardType", (Object)"CREDIT_CARD");
+        jsonObject3.put("pmId", (Object)this.task.getProfile().getCardType());
+        jsonObject3.put("cardLast4Digits", (Object)this.task.getProfile().getLastDigits());
+        jsonObject3.put("referenceId", (Object)Utils.getRandomString(5));
+        return new JsonObject().put("orderTotal", (Object)Double.longBitsToDouble(0x4034000000000000L)).put("paymentMethods", (Object)new JsonArray().add((Object)jsonObject3)).toBuffer();
     }
 
     public Buffer paymentForm(PaymentToken paymentToken) {
@@ -184,27 +202,19 @@ extends TaskApiClient {
         return jsonObject.toBuffer();
     }
 
-    public HttpRequest initCheckout() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.walmart.ca/api/checkout-page/checkout?lang=en&availStoreId=0&postalCode=0").as(BodyCodec.buffer());
-        httpRequest.putHeader("pragma", "no-cache");
-        httpRequest.putHeader("cache-control", "no-cache");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "application/json");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.ca/checkout");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-GB,en;q=0.9,en-US;q=0.8,lt;q=0.7");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-px-authorization", this.tokenValue());
-        return httpRequest;
+    public WalmartCanadaAPI(Task task) {
+        super(ClientType.WALMART_PIXEL_3);
+        this.task = task;
     }
 
-    public HttpRequest submitCard() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/payments/summary").as(BodyCodec.buffer());
+    static {
+        EXCEPTION_RETRY_DELAY = 12000;
+        PX_TOKEN = "3";
+        DID = UUID.randomUUID().toString();
+    }
+
+    public HttpRequest submitEmail() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/email?availStore=0&postalCode=0").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("pragma", "no-cache");
         httpRequest.putHeader("cache-control", "no-cache");
@@ -233,44 +243,34 @@ extends TaskApiClient {
         super.close();
     }
 
-    public Buffer cardForm(PaymentToken paymentToken) {
-        JsonObject jsonObject = new JsonObject().put("integrityCheck", (Object)paymentToken.getIntegrityCheck()).put("phase", (Object)paymentToken.getPhase()).put("keyId", (Object)paymentToken.getKeyId());
-        JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.put("pan", (Object)paymentToken.getEncryptedPan());
-        jsonObject2.put("cvv", (Object)paymentToken.getEncryptedCvv());
-        jsonObject2.put("encryption", (Object)jsonObject);
-        JsonObject jsonObject3 = new JsonObject();
-        jsonObject3.put("piHash", (Object)jsonObject2);
-        jsonObject3.put("cardType", (Object)"CREDIT_CARD");
-        jsonObject3.put("pmId", (Object)this.task.getProfile().getCardType());
-        jsonObject3.put("cardLast4Digits", (Object)this.task.getProfile().getLastDigits());
-        jsonObject3.put("referenceId", (Object)Utils.getRandomString(5));
-        return new JsonObject().put("orderTotal", (Object)Double.longBitsToDouble(0x4034000000000000L)).put("paymentMethods", (Object)new JsonArray().add((Object)jsonObject3)).toBuffer();
+    public JsonObject atcForm() {
+        return this.atcForm(this.task.getKeywords()[0], Integer.parseInt(this.task.getSize()));
     }
 
-    public Buffer addressForm() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("fulfillmentType", (Object)"SHIPTOHOME");
-        Profile profile = this.task.getProfile();
-        return jsonObject.put("deliveryInfo", (Object)new JsonObject().put("firstName", (Object)profile.getFirstName()).put("lastName", (Object)profile.getLastName()).put("addressLine1", (Object)profile.getAddress1()).put("addressLine2", (Object)profile.getAddress2()).put("city", (Object)profile.getCity()).put("state", (Object)profile.getState()).put("postalCode", (Object)profile.getZip()).put("phone", (Object)profile.getPhone()).put("saveToProfile", (Object)true).put("verificationLevel", (Object)"VERIFIED").put("country", (Object)"CA").put("locationId", null).put("overrideAddressVerification", (Object)true)).toBuffer();
+    public CompletableFuture handleBadResponse(int n) {
+        switch (n) {
+            case 412: 
+            case 444: {
+                if (!super.rotateProxy()) return CompletableFuture.completedFuture(true);
+                return CompletableFuture.completedFuture(true);
+            }
+        }
+        return CompletableFuture.completedFuture(true);
     }
 
-    public WalmartCanadaAPI(Task task) {
-        super(ClientType.WALMART_PIXEL_3);
-        this.task = task;
+    public String tokenValue() {
+        if (this.pxToken != null) return (String)this.pxToken.getValue();
+        return "3";
     }
 
-    public HttpRequest submitPayment() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/payments?lang=en&availStoreId=0&postalCode=0").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+    public HttpRequest initCheckout() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.walmart.ca/api/checkout-page/checkout?lang=en&availStoreId=0&postalCode=0").as(BodyCodec.buffer());
         httpRequest.putHeader("pragma", "no-cache");
         httpRequest.putHeader("cache-control", "no-cache");
         httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"");
         httpRequest.putHeader("accept", "application/json");
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.128 Safari/537.36");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("origin", "https://www.walmart.ca");
         httpRequest.putHeader("sec-fetch-site", "same-origin");
         httpRequest.putHeader("sec-fetch-mode", "cors");
         httpRequest.putHeader("sec-fetch-dest", "empty");
@@ -298,8 +298,8 @@ extends TaskApiClient {
         return new JsonObject().put("cvv", (Object)jsonArray).toBuffer();
     }
 
-    public HttpRequest submitShipping() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/items/ship-method?lang=en&availStore=0&postalCode=0").as(BodyCodec.buffer());
+    public HttpRequest submitAddress() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.ca/api/checkout-page/checkout/address?lang=en&availStore=0&slotBooked=false").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("pragma", "no-cache");
         httpRequest.putHeader("cache-control", "no-cache");

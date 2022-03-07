@@ -20,14 +20,14 @@ import java.util.function.Function;
 
 public class Devices
 extends Enum {
-    public static String[] userAgents;
+    public static /* enum */ Devices CHROME_89 = new Devices$1();
     public static Devices[] $VALUES;
-    public static /* enum */ Devices CHROME_89;
-    public static /* enum */ Devices Z3_JX_WIN;
     public static /* enum */ Devices PX_SDK_ANDROID;
+    public static String[] userAgents;
+    public static /* enum */ Devices Z3_JX_WIN;
 
-    public Devices$Device get() {
-        return null;
+    public static Devices valueOf(String string) {
+        return Enum.valueOf(Devices.class, string);
     }
 
     /*
@@ -56,29 +56,19 @@ lbl11:
         throw new IllegalArgumentException();
     }
 
-    public static CompletableFuture randomDesktopBrowser() {
-        return Devices.deviceFromAPI(false);
-    }
-
     static {
-        CHROME_89 = new Devices$1();
         Z3_JX_WIN = new Devices$2();
         PX_SDK_ANDROID = new Devices$3();
         $VALUES = new Devices[]{CHROME_89, Z3_JX_WIN, PX_SDK_ANDROID};
         userAgents = new String[0];
     }
 
-    public static CompletableFuture randomMobileBrowser() {
-        return Devices.deviceFromAPI(true);
+    public static Devices$Device randomLocalWebview() {
+        return new Devices$GeneratedDevice();
     }
 
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public Devices() {
-        void var2_-1;
-        void var1_-1;
+    public static CompletableFuture randomDesktopBrowser() {
+        return Devices.deviceFromAPI(false);
     }
 
     public static CompletableFuture deviceFromAPI(boolean bl) {
@@ -92,16 +82,25 @@ lbl11:
         return CompletableFuture.completedFuture(new Devices$DeviceImpl(jsonObject));
     }
 
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public Devices() {
+        void var2_-1;
+        void var1_-1;
+    }
+
+    public Devices$Device get() {
+        return null;
+    }
+
+    public static CompletableFuture randomMobileBrowser() {
+        return Devices.deviceFromAPI(true);
+    }
+
     public static Devices[] values() {
         return (Devices[])$VALUES.clone();
-    }
-
-    public static Devices$Device randomLocalWebview() {
-        return new Devices$GeneratedDevice();
-    }
-
-    public static Devices valueOf(String string) {
-        return Enum.valueOf(Devices.class, string);
     }
 }
 

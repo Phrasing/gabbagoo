@@ -26,15 +26,15 @@ KeyListener {
     }
 
     @Override
+    public void keyTyped(KeyEvent keyEvent) {
+    }
+
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String string = this.keywordField.getText();
         if (string.isBlank()) return;
         System.out.println("Mass keyword changed -> " + string);
         ((TaskController)Engine.get().getModule(Controller.TASK)).massEditLinkOrKeyword(string);
-    }
-
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
     }
 
     @Override

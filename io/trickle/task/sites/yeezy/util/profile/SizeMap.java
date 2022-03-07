@@ -4,11 +4,20 @@
 package io.trickle.task.sites.yeezy.util.profile;
 
 import io.trickle.profile.Profile;
+import io.trickle.task.sites.yeezy.util.profile.ZipCodeGroup;
 import io.trickle.task.sites.yeezy.util.profile.ZipCodeMap;
 import java.util.HashMap;
 
 public class SizeMap {
     public HashMap<String, ZipCodeMap> sizeZipMap = new HashMap();
+
+    public ZipCodeGroup get(String string) {
+        return this.sizeZipMap.get(string).getZipCode();
+    }
+
+    public String toString() {
+        return this.sizeZipMap.toString();
+    }
 
     public void put(String string, Profile profile) {
         ZipCodeMap zipCodeMap = this.sizeZipMap.get(string);
@@ -19,10 +28,6 @@ public class SizeMap {
             return;
         }
         zipCodeMap.put(profile.getZip(), profile);
-    }
-
-    public String toString() {
-        return this.sizeZipMap.toString();
     }
 }
 

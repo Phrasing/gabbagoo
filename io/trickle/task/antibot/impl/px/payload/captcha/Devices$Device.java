@@ -4,30 +4,30 @@
 package io.trickle.task.antibot.impl.px.payload.captcha;
 
 public interface Devices$Device {
+    public String getProduct();
+
+    public int getHeight();
+
     public String getAppVersion();
-
-    public String getAppName();
-
-    public int getAvailHeight();
-
-    public int getInnerWidth();
-
-    public String getAppCodeName();
-
-    public int getInnerHeight();
 
     public String getPlatform();
 
-    public String getProductSub();
+    public String getAppCodeName();
+
+    public String getAppName();
 
     public String getUserAgent();
 
-    public String getProduct();
-
     public int getAvailWidth();
 
-    public int getWidth();
+    public int getInnerWidth();
 
-    public int getHeight();
+    public String getProductSub();
+
+    public int getInnerHeight();
+
+    public int getAvailHeight();
+
+    public int getWidth();
 }
 

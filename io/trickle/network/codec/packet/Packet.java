@@ -14,6 +14,34 @@ public class Packet {
     public byte opcode;
     public PacketType type;
 
+    public int hashCode() {
+        int n = this.opcode;
+        n = 31 * n + this.type.hashCode();
+        return 31 * n + this.payload.hashCode();
+    }
+
+    public int getSize() {
+        return this.payload.length();
+    }
+
+    public Buffer getPayload() {
+        return this.payload;
+    }
+
+    public PacketType getType() {
+        return this.type;
+    }
+
+    public byte getOpcode() {
+        return this.opcode;
+    }
+
+    public Packet(byte by, PacketType packetType, Buffer buffer) {
+        this.opcode = by;
+        this.type = packetType;
+        this.payload = buffer;
+    }
+
     public boolean equals(Object object) {
         if (this == object) {
             return true;
@@ -27,34 +55,6 @@ public class Packet {
         }
         if (this.getSize() == packet.getSize()) return this.payload.equals(packet.payload);
         return false;
-    }
-
-    public int getSize() {
-        return this.payload.length();
-    }
-
-    public Packet(byte by, PacketType packetType, Buffer buffer) {
-        this.opcode = by;
-        this.type = packetType;
-        this.payload = buffer;
-    }
-
-    public int hashCode() {
-        int n = this.opcode;
-        n = 31 * n + this.type.hashCode();
-        return 31 * n + this.payload.hashCode();
-    }
-
-    public PacketType getType() {
-        return this.type;
-    }
-
-    public Buffer getPayload() {
-        return this.payload;
-    }
-
-    public byte getOpcode() {
-        return this.opcode;
     }
 }
 

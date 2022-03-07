@@ -49,15 +49,15 @@ extends ClientType {
         return arrayList;
     }
 
-    @Override
-    public int getWindowUpdate() {
-        return 0xFF0001;
-    }
-
     public List ciphersRandomised() {
         List list = this.ciphers();
         Collections.shuffle(list);
         return list;
+    }
+
+    @Override
+    public int getWindowUpdate() {
+        return 0xFF0001;
     }
 }
 

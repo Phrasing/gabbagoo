@@ -48,226 +48,60 @@ import java.util.function.Function;
 
 public class YeezyAPI
 extends TaskApiClient {
-    public Utag utag;
-    public String SKU;
-    public Task task;
+    public int sensorCounter;
     public static String QUEUE_URL = Engine.get().getClientConfiguration().getString("queueUrl", "https://www.yeezysupply.com/__queue/yzysply");
     public Bmak bmak;
-    public JsonObject taskDevice;
-    public String userAgent;
-    public int sensorCounter;
+    public Task task;
     public Pixel pixelAPI;
     public String sensorUrl = "https://www.yeezysupply.com/TIXPBJksc/QhBts/VEbHj/upag9EUU/i7D1fStG/ZXFESA/WT/5pZjo2JGoB";
+    public JsonObject taskDevice;
+    public Utag utag;
+    public String userAgent;
 
-    public HttpRequest emptyBasket(boolean bl, String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/checkout/customer/baskets").as(BodyCodec.none());
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("checkout-authorization", string);
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", (String)(bl ? "https://www.yeezysupply.com/product/" + this.SKU : "https://www.yeezysupply.com/"));
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
+    public JsonArray atcForm() {
+        Sizes$SizePair sizes$SizePair = Sizes.getSize(this.task.getSize());
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("product_id", (Object)this.getSKU());
+        jsonObject.put("product_variation_sku", (Object)(this.getSKU() + sizes$SizePair));
+        jsonObject.put("productId", (Object)(this.getSKU() + sizes$SizePair));
+        jsonObject.put("quantity", (Object)1);
+        jsonObject.put("size", (Object)sizes$SizePair.sizeNum);
+        jsonObject.put("displaySize", (Object)sizes$SizePair.sizeNum);
+        return new JsonArray().add((Object)jsonObject);
     }
 
-    public HttpRequest postPixel(String string) {
-        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.none());
-        String string2 = this.getInstanaID();
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-instana-t", string2);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string2);
-        httpRequest.putHeader("x-instana-s", string2);
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public void lambda$handlePush$2(HttpClientRequest httpClientRequest, HttpClientResponse httpClientResponse) {
-        List list = httpClientResponse.cookies();
-        if (list == null) return;
-        if (list.isEmpty()) return;
-        list.forEach(arg_0 -> this.lambda$handlePush$1(httpClientRequest, arg_0));
-    }
-
-    public HttpRequest addToCart() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/baskets/-/items").as(BodyCodec.string());
-        String string = this.getInstanaID();
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-instana-t", string);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-s", string);
-        httpRequest.putHeader("checkout-authorization", "null");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest getShippingMethod(String string, String string2) {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/shipping_methods").as(BodyCodec.string());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("checkout-authorization", string2);
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/delivery");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public void enablePush() {
-        this.client.addInterceptor(this::lambda$enablePush$0);
-    }
-
-    public YeezyAPI(Task task) {
-        this.task = task;
-        this.SKU = this.task.getKeywords()[0];
-        this.sensorCounter = 0;
-        this.enablePush();
-    }
-
-    public void updateUtagUrl(String string) {
-        this.utag.updateDocumentUrl(string);
-    }
-
-    public HttpRequest auth3DS(String string) {
-        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("cache-control", "no-cache");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"90\", \"Chromium\";v=\"90\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        httpRequest.putHeader("pragma", "no-cache");
-        return httpRequest;
-    }
-
-    public HttpRequest homePage() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/").as(BodyCodec.string());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest processPayment(String string) {
-        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/orders").as(BodyCodec.string());
-        String string2 = this.getInstanaID();
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-instana-t", string2);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string2);
-        httpRequest.putHeader("x-instana-s", string2);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("checkout-authorization", string);
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest powPage(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-dest", "iframe");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
-
-    public void lambda$handlePush$1(HttpClientRequest httpClientRequest, String string) {
-        Cookie cookie = ClientCookieDecoder.STRICT.decode(string);
-        if (cookie == null) return;
-        if (cookie.domain() == null) {
-            cookie.setDomain(httpClientRequest.getHost());
+    public void lambda$enablePush$0(HttpContext httpContext) {
+        if (httpContext.phase().equals((Object)ClientPhase.SEND_REQUEST) && httpContext.clientRequest() != null) {
+            httpContext.clientRequest().pushHandler(this::handlePush);
         }
-        super.getCookies().put(cookie);
+        httpContext.next();
     }
 
-    public HttpRequest getPaymentMethod(String string, String string2) {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/payment_methods").as(BodyCodec.string());
-        String string3 = this.getInstanaID();
-        httpRequest.putHeader("x-instana-t", string3);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string3);
-        httpRequest.putHeader("x-instana-s", string3);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("checkout-authorization", string2);
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
+    public CompletableFuture getTrickleSensor() {
+        this.bmak.updateDocumentUrl("https://www.yeezysupply.com/product/" + this.getSKU());
+        String string = "";
+        try {
+            string = this.getCookies().getCookieValue("_abck");
+        }
+        catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        switch (this.sensorCounter++) {
+            case 0: {
+                return CompletableFuture.completedFuture(this.bmak.genPageLoadSensor(string));
+            }
+            case 1: {
+                return CompletableFuture.completedFuture(this.bmak.genSecondSensor(string));
+            }
+        }
+        CompletableFuture completableFuture = this.reInit();
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$getTrickleSensor(this, string, completableFuture2, 1, arg_0));
+        }
+        completableFuture.join();
+        this.sensorCounter = 1;
+        return CompletableFuture.completedFuture(this.bmak.genPageLoadSensor(string));
     }
 
     public String fetchUtag() {
@@ -297,118 +131,61 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    @Override
-    public boolean rotateProxy() {
-        if (!super.rotateProxy()) return false;
-        this.enablePush();
-        return true;
+    public void updateUtagUrl(String string) {
+        this.utag.updateDocumentUrl(string);
     }
 
-    public HttpRequest submitShippingAndBilling(String string, String string2) {
-        HttpRequest httpRequest = this.client.patchAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string).as(BodyCodec.string());
-        String string3 = this.getInstanaID();
-        httpRequest.putHeader("x-instana-t", string3);
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string3);
-        httpRequest.putHeader("x-instana-s", string3);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("checkout-authorization", string2);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/delivery");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest bloom() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/yeezysupply/products/bloom").as(BodyCodec.string());
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public JsonArray atcForm(String string) {
-        JsonObject jsonObject = new JsonObject();
-        String string2 = this.SKU + Sizes.getSize(string);
-        jsonObject.put("product_id", (Object)this.SKU);
-        jsonObject.put("product_variation_sku", (Object)string2);
-        jsonObject.put("productId", (Object)string2);
-        jsonObject.put("quantity", (Object)1);
-        jsonObject.put("size", (Object)string);
-        jsonObject.put("displaySize", (Object)string);
-        return new JsonArray().add((Object)jsonObject);
-    }
-
-    public HttpRequest handleAfter3DS(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/payment-verification/" + string).as(BodyCodec.buffer());
-        String string4 = this.getInstanaID();
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-instana-t", string4);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string4);
-        httpRequest.putHeader("x-instana-s", string4);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("checkout-authorization", string2);
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", string3);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
-
-    public CompletableFuture reInit() {
+    public CompletableFuture init() {
         int n = 0;
         while (n++ < 350000) {
             try {
+                Pixel pixel;
                 if (this.task.getMode().contains("2")) {
+                    this.pixelAPI = pixel = new HawkAPI();
+                    CompletableFuture completableFuture = ((HawkAPI)pixel).updateUserAgent();
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture2 = completableFuture;
+                        YeezyAPI yeezyAPI = this;
+                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, (HawkAPI)pixel, yeezyAPI, completableFuture2, null, null, 1, arg_0));
+                    }
+                    this.userAgent = (String)completableFuture.join();
+                    if (this.userAgent == null) continue;
+                    this.utag = new Utag(this.userAgent, this.getSKU());
                     return CompletableFuture.completedFuture(true);
                 }
                 if (this.task.getMode().contains("3")) {
+                    this.pixelAPI = pixel = new GaneshAPI();
+                    CompletableFuture completableFuture = ((GaneshAPI)pixel).updateUserAgent();
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture3 = completableFuture;
+                        YeezyAPI yeezyAPI = this;
+                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, null, yeezyAPI, completableFuture3, (GaneshAPI)pixel, null, 2, arg_0));
+                    }
+                    this.userAgent = (String)completableFuture.join();
+                    if (this.userAgent == null) continue;
+                    this.utag = new Utag(this.userAgent, this.getSKU());
                     return CompletableFuture.completedFuture(true);
                 }
-                CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/browserDeviceQueried.json?mobile=false&ak=true", this.userAgent);
+                CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/browserDevice.json?mobile=false&ak=true");
                 if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
+                    CompletableFuture completableFuture4 = completableFuture;
                     YeezyAPI yeezyAPI = this;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$reInit(this, n, yeezyAPI, completableFuture2, null, 1, arg_0));
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, null, yeezyAPI, completableFuture4, null, null, 3, arg_0));
                 }
                 this.taskDevice = (JsonObject)completableFuture.join();
                 if (this.taskDevice == null || this.taskDevice.isEmpty()) continue;
                 this.bmak = new Bmak(this.taskDevice);
+                this.utag = new Utag(this.bmak, this.getSKU());
+                this.userAgent = this.bmak.getUA();
                 this.pixelAPI = new TrickleAPI(this.taskDevice);
-                if (this.bmak == null || this.userAgent == null) continue;
+                if (this.bmak == null || this.userAgent == null || this.pixelAPI == null) continue;
                 return CompletableFuture.completedFuture(true);
             }
             catch (Throwable throwable) {
                 CompletableFuture completableFuture = VertxUtil.hardCodedSleep(15000L);
                 if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture3 = completableFuture;
-                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$reInit(this, n, null, completableFuture3, throwable, 2, arg_0));
+                    CompletableFuture completableFuture5 = completableFuture;
+                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, null, null, completableFuture5, null, throwable, 4, arg_0));
                 }
                 completableFuture.join();
             }
@@ -416,313 +193,16 @@ extends TaskApiClient {
         return CompletableFuture.completedFuture(false);
     }
 
-    public HttpRequest adiProductPage() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.adidas.com/us/ultraboost-21-shoes/FY0378.html").as(BodyCodec.buffer());
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
+    public HttpRequest emptyBasket(boolean bl, String string) {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/checkout/customer/baskets").as(BodyCodec.none());
         httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
-
-    public CompletableFuture getTrickleSensor() {
-        this.bmak.updateDocumentUrl("https://www.yeezysupply.com/product/" + this.SKU);
-        String string = "";
-        try {
-            string = this.getCookies().getCookieValue("_abck");
-        }
-        catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        switch (this.sensorCounter++) {
-            case 0: {
-                return CompletableFuture.completedFuture(this.bmak.genPageLoadSensor(string));
-            }
-            case 1: {
-                return CompletableFuture.completedFuture(this.bmak.genSecondSensor(string));
-            }
-        }
-        CompletableFuture completableFuture = this.reInit();
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$getTrickleSensor(this, string, completableFuture2, 1, arg_0));
-        }
-        completableFuture.join();
-        this.sensorCounter = 1;
-        return CompletableFuture.completedFuture(this.bmak.genPageLoadSensor(string));
-    }
-
-    public void setUtagProductName(String string) {
-        this.utag.setName(string);
-    }
-
-    public HttpRequest ushpl() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/hpl/content/yeezy-supply/releases/" + this.SKU + "/en_US.json").as(BodyCodec.string());
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "application/json, text/plain, */*");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest postSensor(boolean bl) {
-        HttpRequest httpRequest = this.client.postAbs(this.sensorUrl).as(BodyCodec.buffer());
-        String string = this.getInstanaID();
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-instana-t", string);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
-        httpRequest.putHeader("x-instana-s", string);
-        httpRequest.putHeader("content-type", "text/plain;charset=UTF-8");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", (String)(bl ? "https://www.yeezysupply.com/products/" + this.SKU : "https://www.yeezysupply.com/"));
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest newsletter(String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/signup/" + string + "?trigger=").as(BodyCodec.buffer());
-        String string2 = this.getInstanaID();
-        httpRequest.putHeader("x-instana-t", string2);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string2);
-        httpRequest.putHeader("x-instana-s", string2);
         httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
+        httpRequest.putHeader("checkout-authorization", string);
         httpRequest.putHeader("accept", "*/*");
         httpRequest.putHeader("sec-fetch-site", "same-origin");
         httpRequest.putHeader("sec-fetch-mode", "cors");
         httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest waitingRoomConfig() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/hpl/content/yeezy-supply/config/US/waitingRoomConfig.json").as(BodyCodec.string());
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "application/json, text/plain, */*");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest verifyPage() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/_sec/cp_challenge/verify").as(BodyCodec.buffer());
-        String string = this.getInstanaID();
-        httpRequest.putHeader("x-instana-t", string);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
-        httpRequest.putHeader("x-sec-clge-req-type", "ajax");
-        httpRequest.putHeader("x-instana-s", string);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest adiAtc() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.adidas.com/api/chk/baskets/-/items?sitePath=us").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-instana-t", "c6953e7ece2d4c44");
-        httpRequest.putHeader("glassversion", "db136f4");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=c6953e7ece2d4c44");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("x-sec-clge-req-type", "ajax");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-s", "c6953e7ece2d4c44");
-        httpRequest.putHeader("checkout-authorization", "null");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.adidas.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.adidas.com/us/ultraboost-21-shoes/FY0378.html");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
-
-    public void setSensorUrl(String string) {
-        this.sensorUrl = string;
-    }
-
-    public JsonObject couponForm(String string) {
-        return new JsonObject().put("couponCode", (Object)string);
-    }
-
-    public HttpRequest secondaryProdAPI() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/products/" + this.SKU).as(BodyCodec.string());
-        String string = this.getInstanaID();
-        httpRequest.putHeader("x-instana-t", string);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("x-instana-s", string);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest deleteCoupon(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.client.deleteAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/coupons/" + string3).as(BodyCodec.buffer());
-        String string4 = this.getInstanaID();
-        httpRequest.putHeader("x-instana-t", string4);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string4);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-s", string4);
-        httpRequest.putHeader("checkout-authorization", string2);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest getPixel(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.string());
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "no-cors");
-        httpRequest.putHeader("sec-fetch-dest", "script");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest submitCoupon(String string, String string2) {
-        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/coupons/").as(BodyCodec.buffer());
-        String string3 = this.getInstanaID();
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-instana-t", string3);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string3);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("x-instana-s", string3);
-        httpRequest.putHeader("checkout-authorization", string2);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public void handlePush(HttpClientRequest httpClientRequest) {
-        httpClientRequest.response().onSuccess(arg_0 -> this.lambda$handlePush$2(httpClientRequest, arg_0));
-    }
-
-    public JsonArray atcForm(JsonObject jsonObject) {
-        JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.put("product_id", (Object)this.SKU);
-        jsonObject2.put("product_variation_sku", (Object)jsonObject.getString("sku"));
-        jsonObject2.put("productId", (Object)jsonObject.getString("sku"));
-        jsonObject2.put("quantity", (Object)1);
-        jsonObject2.put("size", (Object)jsonObject.getString("size"));
-        jsonObject2.put("displaySize", (Object)jsonObject.getString("size"));
-        return new JsonArray().add((Object)jsonObject2);
-    }
-
-    public Pixel getPixelAPI() {
-        return this.pixelAPI;
-    }
-
-    public HttpRequest sharedHpl() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/hpl/content/yeezy-supply/releases/" + this.SKU + "/shared.json").as(BodyCodec.string());
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "application/json, text/plain, */*");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest queue() {
-        HttpRequest httpRequest = this.client.getAbs(QUEUE_URL).as(BodyCodec.none());
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("accept", "application/json, text/plain, */*");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
+        httpRequest.putHeader("referer", (String)(bl ? "https://www.yeezysupply.com/product/" + this.getSKU() : "https://www.yeezysupply.com/"));
         httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
@@ -734,7 +214,7 @@ extends TaskApiClient {
     public static CompletableFuture async$getTrickleSensor(YeezyAPI var0, String var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
         switch (var3_4) {
             case 0: {
-                var0.bmak.updateDocumentUrl("https://www.yeezysupply.com/product/" + var0.SKU);
+                var0.bmak.updateDocumentUrl("https://www.yeezysupply.com/product/" + var0.getSKU());
                 var1_1 = "";
                 try {
                     var1_1 = var0.getCookies().getCookieValue("_abck");
@@ -770,16 +250,90 @@ lbl22:
         throw new IllegalArgumentException();
     }
 
-    public JsonArray atcForm() {
-        Sizes$SizePair sizes$SizePair = Sizes.getSize(this.task.getSize());
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("product_id", (Object)this.SKU);
-        jsonObject.put("product_variation_sku", (Object)(this.SKU + sizes$SizePair));
-        jsonObject.put("productId", (Object)(this.SKU + sizes$SizePair));
-        jsonObject.put("quantity", (Object)1);
-        jsonObject.put("size", (Object)sizes$SizePair.sizeNum);
-        jsonObject.put("displaySize", (Object)sizes$SizePair.sizeNum);
-        return new JsonArray().add((Object)jsonObject);
+    public HttpRequest processPayment(String string) {
+        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/orders").as(BodyCodec.string());
+        String string2 = this.getInstanaID();
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-instana-t", string2);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string2);
+        httpRequest.putHeader("x-instana-s", string2);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("checkout-authorization", string);
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest submitCoupon(String string, String string2) {
+        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/coupons/").as(BodyCodec.buffer());
+        String string3 = this.getInstanaID();
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-instana-t", string3);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string3);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-s", string3);
+        httpRequest.putHeader("checkout-authorization", string2);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest auth3DS(String string) {
+        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("cache-control", "no-cache");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"90\", \"Chromium\";v=\"90\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        httpRequest.putHeader("pragma", "no-cache");
+        return httpRequest;
+    }
+
+    public HttpRequest getAdiSensor() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.adidas.com" + this.sensorUrl).as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "no-cors");
+        httpRequest.putHeader("sec-fetch-dest", "script");
+        httpRequest.putHeader("referer", "https://www.adidas.com/us/ultraboost-21-shoes/FY0378.html");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
+        return httpRequest;
     }
 
     /*
@@ -893,6 +447,518 @@ lbl52:
         throw new IllegalArgumentException();
     }
 
+    public HttpRequest postSensor(boolean bl) {
+        HttpRequest httpRequest = this.client.postAbs(this.sensorUrl).as(BodyCodec.buffer());
+        String string = this.getInstanaID();
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-instana-t", string);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
+        httpRequest.putHeader("x-instana-s", string);
+        httpRequest.putHeader("content-type", "text/plain;charset=UTF-8");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", (String)(bl ? "https://www.yeezysupply.com/products/" + this.getSKU() : "https://www.yeezysupply.com/"));
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest submitShippingAndBilling(String string, String string2) {
+        HttpRequest httpRequest = this.client.patchAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string).as(BodyCodec.string());
+        String string3 = this.getInstanaID();
+        httpRequest.putHeader("x-instana-t", string3);
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string3);
+        httpRequest.putHeader("x-instana-s", string3);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("checkout-authorization", string2);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/delivery");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public void setUtagProductName(String string) {
+        this.utag.setName(string);
+    }
+
+    public HttpRequest verifyPage() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/_sec/cp_challenge/verify").as(BodyCodec.buffer());
+        String string = this.getInstanaID();
+        httpRequest.putHeader("x-instana-t", string);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
+        httpRequest.putHeader("x-sec-clge-req-type", "ajax");
+        httpRequest.putHeader("x-instana-s", string);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    @Override
+    public boolean rotateProxy() {
+        if (!super.rotateProxy()) return false;
+        this.enablePush();
+        return true;
+    }
+
+    public HttpRequest ushpl() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/hpl/content/yeezy-supply/releases/" + this.getSKU() + "/en_US.json").as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "application/json, text/plain, */*");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest deleteCoupon(String string, String string2, String string3) {
+        HttpRequest httpRequest = this.client.deleteAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/coupons/" + string3).as(BodyCodec.buffer());
+        String string4 = this.getInstanaID();
+        httpRequest.putHeader("x-instana-t", string4);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string4);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-s", string4);
+        httpRequest.putHeader("checkout-authorization", string2);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public void handlePush(HttpClientRequest httpClientRequest) {
+        httpClientRequest.response().onSuccess(arg_0 -> this.lambda$handlePush$2(httpClientRequest, arg_0));
+    }
+
+    public Buffer atcFormAdidas() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("product_id", (Object)"FY0378");
+        jsonObject.put("quantity", (Object)1);
+        jsonObject.put("product_variation_sku", (Object)"FY0378_610");
+        jsonObject.put("productId", (Object)"FY0378_610");
+        jsonObject.put("size", (Object)"8");
+        jsonObject.put("displaySize", (Object)"8");
+        jsonObject.put("specialLaunchProduct", (Object)false);
+        return Buffer.buffer((String)new JsonArray().add((Object)jsonObject).toString());
+    }
+
+    public CompletableFuture reInit() {
+        int n = 0;
+        while (n++ < 350000) {
+            try {
+                if (this.task.getMode().contains("2")) {
+                    return CompletableFuture.completedFuture(true);
+                }
+                if (this.task.getMode().contains("3")) {
+                    return CompletableFuture.completedFuture(true);
+                }
+                CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/browserDeviceQueried.json?mobile=false&ak=true", this.userAgent);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    YeezyAPI yeezyAPI = this;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$reInit(this, n, yeezyAPI, completableFuture2, null, 1, arg_0));
+                }
+                this.taskDevice = (JsonObject)completableFuture.join();
+                if (this.taskDevice == null || this.taskDevice.isEmpty()) continue;
+                this.bmak = new Bmak(this.taskDevice);
+                this.pixelAPI = new TrickleAPI(this.taskDevice);
+                if (this.bmak == null || this.userAgent == null) continue;
+                return CompletableFuture.completedFuture(true);
+            }
+            catch (Throwable throwable) {
+                CompletableFuture completableFuture = VertxUtil.hardCodedSleep(15000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture3 = completableFuture;
+                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$reInit(this, n, null, completableFuture3, throwable, 2, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(false);
+    }
+
+    public Pixel getPixelAPI() {
+        return this.pixelAPI;
+    }
+
+    public HttpRequest postPixel(String string) {
+        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.none());
+        String string2 = this.getInstanaID();
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-instana-t", string2);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string2);
+        httpRequest.putHeader("x-instana-s", string2);
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest generalProdAPI() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/products/" + this.getSKU() + "/availability").as(BodyCodec.string());
+        String string = this.getInstanaID();
+        httpRequest.putHeader("x-instana-t", string);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("x-instana-s", string);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest powPage(String string) {
+        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-dest", "iframe");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
+        return httpRequest;
+    }
+
+    public HttpRequest bloom() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/yeezysupply/products/bloom").as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest akamaiScript(boolean bl) {
+        HttpRequest httpRequest = this.client.getAbs(this.sensorUrl).as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "no-cors");
+        httpRequest.putHeader("sec-fetch-dest", "script");
+        httpRequest.putHeader("referer", (String)(bl ? "https://www.yeezysupply.com/products/" + this.getSKU() : "https://www.yeezysupply.com/"));
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest adiAtc() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.adidas.com/api/chk/baskets/-/items?sitePath=us").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-instana-t", "c6953e7ece2d4c44");
+        httpRequest.putHeader("glassversion", "db136f4");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=c6953e7ece2d4c44");
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("x-sec-clge-req-type", "ajax");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-s", "c6953e7ece2d4c44");
+        httpRequest.putHeader("checkout-authorization", "null");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.adidas.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.adidas.com/us/ultraboost-21-shoes/FY0378.html");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
+        return httpRequest;
+    }
+
+    public JsonArray atcForm(JsonObject jsonObject) {
+        JsonObject jsonObject2 = new JsonObject();
+        jsonObject2.put("product_id", (Object)this.getSKU());
+        jsonObject2.put("product_variation_sku", (Object)jsonObject.getString("sku"));
+        jsonObject2.put("productId", (Object)jsonObject.getString("sku"));
+        jsonObject2.put("quantity", (Object)1);
+        jsonObject2.put("size", (Object)jsonObject.getString("size"));
+        jsonObject2.put("displaySize", (Object)jsonObject.getString("size"));
+        return new JsonArray().add((Object)jsonObject2);
+    }
+
+    public HttpRequest secondaryProdAPI() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/products/" + this.getSKU()).as(BodyCodec.string());
+        String string = this.getInstanaID();
+        httpRequest.putHeader("x-instana-t", string);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("x-instana-s", string);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public String getInstanaID() {
+        String string = "abcdef0123456789";
+        StringBuilder stringBuilder = new StringBuilder();
+        while (stringBuilder.length() < 16) {
+            int n = (int)(ThreadLocalRandom.current().nextFloat() * (float)"abcdef0123456789".length());
+            stringBuilder.append("abcdef0123456789".charAt(n));
+        }
+        return stringBuilder.toString();
+    }
+
+    public JsonObject couponForm(String string) {
+        return new JsonObject().put("couponCode", (Object)string);
+    }
+
+    public HttpRequest getPixel(String string) {
+        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "no-cors");
+        httpRequest.putHeader("sec-fetch-dest", "script");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest homePage() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/").as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public void enablePush() {
+        this.client.addInterceptor(this::lambda$enablePush$0);
+    }
+
+    public HttpRequest waitingRoomConfig() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/hpl/content/yeezy-supply/config/US/waitingRoomConfig.json").as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "application/json, text/plain, */*");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public String getSKU() {
+        return this.task.getKeywords()[0].trim();
+    }
+
+    public HttpRequest addToCart() {
+        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/baskets/-/items").as(BodyCodec.string());
+        String string = this.getInstanaID();
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-instana-t", string);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-s", string);
+        httpRequest.putHeader("checkout-authorization", "null");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public YeezyAPI(Task task) {
+        this.task = task;
+        this.sensorCounter = 0;
+        this.enablePush();
+    }
+
+    public HttpRequest queue() {
+        HttpRequest httpRequest = this.client.getAbs(QUEUE_URL).as(BodyCodec.none());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "application/json, text/plain, */*");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest getShippingMethod(String string, String string2) {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/shipping_methods").as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("checkout-authorization", string2);
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/delivery");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public void setSensorUrl(String string) {
+        this.sensorUrl = string;
+    }
+
+    public HttpRequest newsletter(String string) {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/signup/" + string + "?trigger=").as(BodyCodec.buffer());
+        String string2 = this.getInstanaID();
+        httpRequest.putHeader("x-instana-t", string2);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string2);
+        httpRequest.putHeader("x-instana-s", string2);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest adiProductPage() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.adidas.com/us/ultraboost-21-shoes/FY0378.html").as(BodyCodec.buffer());
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
+        return httpRequest;
+    }
+
+    public JsonArray atcForm(String string) {
+        JsonObject jsonObject = new JsonObject();
+        String string2 = this.getSKU() + Sizes.getSize(string);
+        jsonObject.put("product_id", (Object)this.getSKU());
+        jsonObject.put("product_variation_sku", (Object)string2);
+        jsonObject.put("productId", (Object)string2);
+        jsonObject.put("quantity", (Object)1);
+        jsonObject.put("size", (Object)string);
+        jsonObject.put("displaySize", (Object)string);
+        return new JsonArray().add((Object)jsonObject);
+    }
+
     /*
      * Unable to fully structure code
      */
@@ -959,32 +1025,6 @@ lbl28:
         throw new IllegalArgumentException();
     }
 
-    public String getInstanaID() {
-        String string = "abcdef0123456789";
-        StringBuilder stringBuilder = new StringBuilder();
-        while (stringBuilder.length() < 16) {
-            int n = (int)(ThreadLocalRandom.current().nextFloat() * (float)"abcdef0123456789".length());
-            stringBuilder.append("abcdef0123456789".charAt(n));
-        }
-        return stringBuilder.toString();
-    }
-
-    public HttpRequest akamaiScript(boolean bl) {
-        HttpRequest httpRequest = this.client.getAbs(this.sensorUrl).as(BodyCodec.string());
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "no-cors");
-        httpRequest.putHeader("sec-fetch-dest", "script");
-        httpRequest.putHeader("referer", (String)(bl ? "https://www.yeezysupply.com/products/" + this.SKU : "https://www.yeezysupply.com/"));
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
     public void updateDocumentUrl(String string) {
         if (this.bmak != null) {
             this.bmak.updateDocumentUrl(string);
@@ -992,77 +1032,57 @@ lbl28:
         this.updateUtagUrl(string);
     }
 
-    public CompletableFuture init() {
-        int n = 0;
-        while (n++ < 350000) {
-            try {
-                Pixel pixel;
-                if (this.task.getMode().contains("2")) {
-                    this.pixelAPI = pixel = new HawkAPI();
-                    CompletableFuture completableFuture = ((HawkAPI)pixel).updateUserAgent();
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        YeezyAPI yeezyAPI = this;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, (HawkAPI)pixel, yeezyAPI, completableFuture2, null, null, 1, arg_0));
-                    }
-                    this.userAgent = (String)completableFuture.join();
-                    if (this.userAgent == null) continue;
-                    this.utag = new Utag(this.userAgent, this.getSKU());
-                    return CompletableFuture.completedFuture(true);
-                }
-                if (this.task.getMode().contains("3")) {
-                    this.pixelAPI = pixel = new GaneshAPI();
-                    CompletableFuture completableFuture = ((GaneshAPI)pixel).updateUserAgent();
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture3 = completableFuture;
-                        YeezyAPI yeezyAPI = this;
-                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, null, yeezyAPI, completableFuture3, (GaneshAPI)pixel, null, 2, arg_0));
-                    }
-                    this.userAgent = (String)completableFuture.join();
-                    if (this.userAgent == null) continue;
-                    this.utag = new Utag(this.userAgent, this.getSKU());
-                    return CompletableFuture.completedFuture(true);
-                }
-                CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/browserDevice.json?mobile=false&ak=true");
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture;
-                    YeezyAPI yeezyAPI = this;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, null, yeezyAPI, completableFuture4, null, null, 3, arg_0));
-                }
-                this.taskDevice = (JsonObject)completableFuture.join();
-                if (this.taskDevice == null || this.taskDevice.isEmpty()) continue;
-                this.bmak = new Bmak(this.taskDevice);
-                this.utag = new Utag(this.bmak, this.getSKU());
-                this.userAgent = this.bmak.getUA();
-                this.pixelAPI = new TrickleAPI(this.taskDevice);
-                if (this.bmak == null || this.userAgent == null || this.pixelAPI == null) continue;
-                return CompletableFuture.completedFuture(true);
-            }
-            catch (Throwable throwable) {
-                CompletableFuture completableFuture = VertxUtil.hardCodedSleep(15000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> YeezyAPI.async$init(this, n, null, null, completableFuture5, null, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(false);
+    public HttpRequest getPaymentMethod(String string, String string2) {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/checkout/baskets/" + string + "/payment_methods").as(BodyCodec.string());
+        String string3 = this.getInstanaID();
+        httpRequest.putHeader("x-instana-t", string3);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string3);
+        httpRequest.putHeader("x-instana-s", string3);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("checkout-authorization", string2);
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/payment");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
     }
 
-    public void lambda$enablePush$0(HttpContext httpContext) {
-        if (httpContext.phase().equals((Object)ClientPhase.SEND_REQUEST) && httpContext.clientRequest() != null) {
-            httpContext.clientRequest().pushHandler(this::handlePush);
-        }
-        httpContext.next();
+    public HttpRequest handleAfter3DS(String string, String string2, String string3) {
+        HttpRequest httpRequest = this.client.postAbs("https://www.yeezysupply.com/api/checkout/payment-verification/" + string).as(BodyCodec.buffer());
+        String string4 = this.getInstanaID();
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-instana-t", string4);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.userAgent);
+        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string4);
+        httpRequest.putHeader("x-instana-s", string4);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("checkout-authorization", string2);
+        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.yeezysupply.com");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", string3);
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
+        return httpRequest;
     }
 
     public HttpRequest productPage(boolean bl) {
-        HttpRequest httpRequest = this.client.getAbs(this.SKU.equals("BY9611") ? "https://www.yeezysupply.com/archive/" + this.SKU : "https://www.yeezysupply.com/product/" + this.SKU).as(BodyCodec.string());
+        HttpRequest httpRequest = this.client.getAbs(this.getSKU().equals("BY9611") ? "https://www.yeezysupply.com/archive/" + this.getSKU() : "https://www.yeezysupply.com/product/" + this.getSKU()).as(BodyCodec.string());
         if (bl) {
             httpRequest.putHeader("cache-control", "max-age=0");
         }
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
         httpRequest.putHeader("upgrade-insecure-requests", "1");
@@ -1075,7 +1095,7 @@ lbl28:
         }
         httpRequest.putHeader("sec-fetch-dest", "document");
         if (bl) {
-            httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
+            httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
         } else {
             httpRequest.putHeader("referer", "https://www.yeezysupply.com/");
         }
@@ -1084,54 +1104,32 @@ lbl28:
         return httpRequest;
     }
 
-    public HttpRequest getAdiSensor() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.adidas.com" + this.sensorUrl).as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+    public void lambda$handlePush$1(HttpClientRequest httpClientRequest, String string) {
+        Cookie cookie = ClientCookieDecoder.STRICT.decode(string);
+        if (cookie == null) return;
+        if (cookie.domain() == null) {
+            cookie.setDomain(httpClientRequest.getHost());
+        }
+        super.getCookies().put(cookie);
+    }
+
+    public void lambda$handlePush$2(HttpClientRequest httpClientRequest, HttpClientResponse httpClientResponse) {
+        List list = httpClientResponse.cookies();
+        if (list == null) return;
+        if (list.isEmpty()) return;
+        list.forEach(arg_0 -> this.lambda$handlePush$1(httpClientRequest, arg_0));
+    }
+
+    public HttpRequest sharedHpl() {
+        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/hpl/content/yeezy-supply/releases/" + this.getSKU() + "/shared.json").as(BodyCodec.string());
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"");
+        httpRequest.putHeader("accept", "application/json, text/plain, */*");
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "no-cors");
-        httpRequest.putHeader("sec-fetch-dest", "script");
-        httpRequest.putHeader("referer", "https://www.adidas.com/us/ultraboost-21-shoes/FY0378.html");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
-
-    public Buffer atcFormAdidas() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("product_id", (Object)"FY0378");
-        jsonObject.put("quantity", (Object)1);
-        jsonObject.put("product_variation_sku", (Object)"FY0378_610");
-        jsonObject.put("productId", (Object)"FY0378_610");
-        jsonObject.put("size", (Object)"8");
-        jsonObject.put("displaySize", (Object)"8");
-        jsonObject.put("specialLaunchProduct", (Object)false);
-        return Buffer.buffer((String)new JsonArray().add((Object)jsonObject).toString());
-    }
-
-    public String getSKU() {
-        return this.SKU;
-    }
-
-    public HttpRequest generalProdAPI() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.yeezysupply.com/api/products/" + this.SKU + "/availability").as(BodyCodec.string());
-        String string = this.getInstanaID();
-        httpRequest.putHeader("x-instana-t", string);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("x-instana-s", string);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.userAgent);
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("x-instana-l", "1,correlationType=web;correlationId=" + string);
-        httpRequest.putHeader("accept", "*/*");
         httpRequest.putHeader("sec-fetch-site", "same-origin");
         httpRequest.putHeader("sec-fetch-mode", "cors");
         httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.SKU);
+        httpRequest.putHeader("referer", "https://www.yeezysupply.com/product/" + this.getSKU());
         httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;

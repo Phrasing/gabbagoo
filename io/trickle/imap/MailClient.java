@@ -15,16 +15,16 @@ import java.util.concurrent.CompletableFuture;
 import javax.mail.search.SearchTerm;
 
 public interface MailClient {
-    public CompletableFuture connectFut(String var1, String var2);
+    public CompletableFuture readInboxFuture(SearchTerm var1);
 
     public Future connect(String var1, String var2);
+
+    public Future readInbox(SearchTerm var1);
+
+    public CompletableFuture connectFut(String var1, String var2);
 
     public static MailClient create(Vertx vertx) {
         return new MailClientImpl(vertx);
     }
-
-    public CompletableFuture readInboxFuture(SearchTerm var1);
-
-    public Future readInbox(SearchTerm var1);
 }
 

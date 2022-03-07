@@ -7,15 +7,6 @@ import io.trickle.task.sites.Site;
 import io.trickle.task.sites.shopify.util.PriceHandler$1;
 
 public class PriceHandler {
-    public static int calculateShippingPrice(String string) {
-        String[] stringArray = string.split("-");
-        return Integer.parseInt(stringArray[stringArray.length - 1].replace(".", ""));
-    }
-
-    public static boolean isCalculatingTaxes(String string) {
-        return string.contains("hidden\" data-checkout-taxes>");
-    }
-
     public static int calculateTax(Site site, int n) {
         switch (PriceHandler$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
             case 1: {
@@ -86,6 +77,15 @@ public class PriceHandler {
             }
         }
         throw new Exception("Tax unable to be calculated");
+    }
+
+    public static boolean isCalculatingTaxes(String string) {
+        return string.contains("hidden\" data-checkout-taxes>");
+    }
+
+    public static int calculateShippingPrice(String string) {
+        String[] stringArray = string.split("-");
+        return Integer.parseInt(stringArray[stringArray.length - 1].replace(".", ""));
     }
 }
 

@@ -6,38 +6,38 @@ package io.trickle.task.antibot.impl.px.payload.token;
 import io.trickle.task.antibot.impl.px.payload.token.Battery;
 
 public interface Devices$Device {
+    public boolean isGyroscope();
+
+    public int getApiLevel();
+
+    public String getConnectionType();
+
+    public String getOperatingSystem();
+
     public Battery getBattery();
 
     public String getDeviceName();
 
-    public boolean isEthernet();
-
-    public String getCarrier();
-
-    public String getConnectionType();
-
     public String getBrand();
-
-    public int getApiLevel();
-
-    public String getCellular();
 
     public boolean isAccelerometer();
 
-    public boolean isWifi();
+    public int getHeight();
 
     public int getWidth();
 
-    public boolean isGps();
+    public boolean isNfc();
 
-    public int getHeight();
-
-    public boolean isGyroscope();
+    public boolean isWifi();
 
     public boolean isTouchscreen();
 
-    public boolean isNfc();
+    public String getCarrier();
 
-    public String getOperatingSystem();
+    public boolean isEthernet();
+
+    public String getCellular();
+
+    public boolean isGps();
 }
 

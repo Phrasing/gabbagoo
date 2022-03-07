@@ -11,28 +11,42 @@ import io.trickle.network.codec.packet.PacketType;
 import io.vertx.core.buffer.Buffer;
 
 public class PacketWriter {
+    public byte opcode;
     public PacketType type;
     public Buffer buffer;
-    public byte opcode;
 
-    public static PacketWriter create(byte by, PacketType packetType) {
-        return new PacketWriter(by, packetType);
+    public void writeBoolean(boolean bl) {
+        this.writeByte(bl ? 1 : 0);
+    }
+
+    public void writeLong(long l) {
+        this.buffer.appendLong(l);
     }
 
     public void writeByte(int n) {
         this.writeByte((byte)n);
     }
 
-    public void writeBoolean(boolean bl) {
-        this.writeByte(bl ? 1 : 0);
+    public void writeShort(int n) {
+        this.writeShort((short)n);
+    }
+
+    public static PacketWriter create(byte by, PacketType packetType) {
+        return new PacketWriter(by, packetType);
+    }
+
+    public static PacketWriter create(int n, PacketType packetType) {
+        return new PacketWriter((byte)n, packetType);
     }
 
     public void writeByte(byte by) {
         this.buffer.appendByte(by);
     }
 
-    public void writeLong(long l) {
-        this.buffer.appendLong(l);
+    public PacketWriter(byte by, PacketType packetType) {
+        this.opcode = by;
+        this.type = packetType;
+        this.buffer = Buffer.buffer();
     }
 
     public Packet build() {
@@ -43,28 +57,14 @@ public class PacketWriter {
         this.buffer.appendShort(s);
     }
 
-    public void writeString(String string) {
-        byte[] byArray = string.getBytes();
-        this.writeInt(byArray.length);
-        this.buffer.appendBytes(byArray);
-    }
-
-    public void writeShort(int n) {
-        this.writeShort((short)n);
-    }
-
     public void writeInt(int n) {
         this.buffer.appendInt(n);
     }
 
-    public PacketWriter(byte by, PacketType packetType) {
-        this.opcode = by;
-        this.type = packetType;
-        this.buffer = Buffer.buffer();
-    }
-
-    public static PacketWriter create(int n, PacketType packetType) {
-        return new PacketWriter((byte)n, packetType);
+    public void writeString(String string) {
+        byte[] byArray = string.getBytes();
+        this.writeInt(byArray.length);
+        this.buffer.appendBytes(byArray);
     }
 }
 

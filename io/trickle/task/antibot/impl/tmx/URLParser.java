@@ -14,9 +14,17 @@ import java.util.regex.Pattern;
 
 public class URLParser {
     public static Pattern ENCODED_STR_PAT;
-    public Map<String, Decoding> decodingMap;
-    public static Pattern FUNCTION_VAR_PAT;
     public List<String> urls;
+    public static Pattern FUNCTION_VAR_PAT;
+    public Map<String, Decoding> decodingMap;
+
+    public URLParser(String string) {
+        string = string.replace("{", "\n").replace("}", "\n").replace(";", "\n");
+        this.decodingMap = new HashMap<String, Decoding>();
+        this.urls = new ArrayList<String>();
+        this.parseFuncVars(string);
+        this.parseUrls(string);
+    }
 
     public void parseFuncVars(String string) {
         Matcher matcher = FUNCTION_VAR_PAT.matcher(string);
@@ -29,22 +37,9 @@ public class URLParser {
         }
     }
 
-    public URLParser(String string) {
-        string = string.replace("{", "\n").replace("}", "\n").replace(";", "\n");
-        this.decodingMap = new HashMap<String, Decoding>();
-        this.urls = new ArrayList<String>();
-        this.parseFuncVars(string);
-        this.parseUrls(string);
-    }
-
     static {
         FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
         ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
-    }
-
-    public static void main(String[] stringArray) {
-        URLParser uRLParser = new URLParser(Utils.readFileAsString("/Users/bayanrasooly/Documents/GitHub/TrickleV1.0/dev/bestbuy/tmx_raw.js"));
-        System.out.println(uRLParser.urls);
     }
 
     public void parseUrls(String string) {
@@ -61,6 +56,11 @@ public class URLParser {
             }
             catch (Exception exception) {}
         }
+    }
+
+    public static void main(String[] stringArray) {
+        URLParser uRLParser = new URLParser(Utils.readFileAsString("/Users/bayanrasooly/Documents/GitHub/TrickleV1.0/dev/bestbuy/tmx_raw.js"));
+        System.out.println(uRLParser.urls);
     }
 }
 

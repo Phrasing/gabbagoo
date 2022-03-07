@@ -30,77 +30,26 @@ import javax.crypto.spec.IvParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Adyen12 {
-    public static String SEPARATOR;
-    public static String initializeCount;
-    public static String PREFIX;
-    public static Cipher aesCipher;
     public static String luhnCount;
     public static SimpleDateFormat simpleDateFormat;
+    public static String luhnOkCount;
     public static boolean $assertionsDisabled;
     public static String sjclStrength;
-    public static SecureRandom srandom;
-    public static String luhnSameLengthCount;
+    public static Cipher aesCipher;
     public static PublicKey pubKey;
+    public static String VERSION;
+    public static String initializeCount;
     public static String dfValue;
     public static Cipher rsaCipher;
-    public static String luhnOkCount;
-    public static String VERSION;
-
-    static {
-        luhnOkCount = "1";
-        luhnCount = "1";
-        luhnSameLengthCount = "1";
-        initializeCount = "1";
-        SEPARATOR = "$";
-        sjclStrength = "10";
-        PREFIX = "adyenjs_";
-        VERSION = "0_1_12";
-        $assertionsDisabled = !Adyen12.class.desiredAssertionStatus();
-        srandom = new SecureRandom();
-        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        dfValue = null;
-        Security.addProvider((Provider)new BouncyCastleProvider());
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
-    public static SecretKey generateAESKey(int n) {
-        KeyGenerator keyGenerator = null;
-        try {
-            keyGenerator = KeyGenerator.getInstance("AES");
-        }
-        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-            // empty catch block
-        }
-        if (!$assertionsDisabled && keyGenerator == null) {
-            throw new AssertionError();
-        }
-        keyGenerator.init(n);
-        return keyGenerator.generateKey();
-    }
+    public static String luhnSameLengthCount;
+    public static String SEPARATOR;
+    public static SecureRandom srandom;
+    public static String PREFIX;
 
     public static synchronized byte[] generateIV(int n) {
         byte[] byArray = new byte[n];
         srandom.nextBytes(byArray);
         return byArray;
-    }
-
-    public static void initRSA() {
-        String string = Engine.get().getClientConfiguration().getString("adyenKey", "10001|C4F415A1A41A283417FAB7EF8580E077284BCC2B06F8A6C1785E31F5ABFD38A3E80760E0CA6437A8DC95BA4720A83203B99175889FA06FC6BABD4BF10EEEF0D73EF86DD336EBE68642AC15913B2FC24337BDEF52D2F5350224BD59F97C1B944BD03F0C3B4CA2E093A18507C349D68BE8BA54B458DB63D01377048F3E53C757F82B163A99A6A89AD0B969C0F745BB82DA7108B1D6FD74303711065B61009BC8011C27D1D1B5B9FC5378368F24DE03B582FE3490604F5803E805AEEA8B9EF86C54F27D9BD3FC4138B9DC30AF43A58CFF7C6ECEF68029C234BBC0816193DF9BD708D10AAFF6B10E38F0721CF422867C8CC5C554A357A8F51BA18153FB8A83CCBED1");
-        String[] stringArray = string.split("\\|");
-        String string2 = stringArray[1];
-        String string3 = stringArray[0];
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            RSAPublicKeySpec rSAPublicKeySpec = new RSAPublicKeySpec(new BigInteger(string2, 16), new BigInteger(string3, 16));
-            pubKey = keyFactory.generatePublic(rSAPublicKeySpec);
-            aesCipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
-            rsaCipher = Cipher.getInstance("RSA/None/PKCS1Padding");
-            rsaCipher.init(1, pubKey);
-            return;
-        }
-        catch (Exception exception) {
-            exception.printStackTrace();
-        }
     }
 
     public static String getCSEToken(Profile profile) {
@@ -124,6 +73,57 @@ public class Adyen12 {
         catch (Exception exception) {
             return null;
         }
+    }
+
+    public static void initRSA() {
+        String string = Engine.get().getClientConfiguration().getString("adyenKey", "10001|C4F415A1A41A283417FAB7EF8580E077284BCC2B06F8A6C1785E31F5ABFD38A3E80760E0CA6437A8DC95BA4720A83203B99175889FA06FC6BABD4BF10EEEF0D73EF86DD336EBE68642AC15913B2FC24337BDEF52D2F5350224BD59F97C1B944BD03F0C3B4CA2E093A18507C349D68BE8BA54B458DB63D01377048F3E53C757F82B163A99A6A89AD0B969C0F745BB82DA7108B1D6FD74303711065B61009BC8011C27D1D1B5B9FC5378368F24DE03B582FE3490604F5803E805AEEA8B9EF86C54F27D9BD3FC4138B9DC30AF43A58CFF7C6ECEF68029C234BBC0816193DF9BD708D10AAFF6B10E38F0721CF422867C8CC5C554A357A8F51BA18153FB8A83CCBED1");
+        String[] stringArray = string.split("\\|");
+        String string2 = stringArray[1];
+        String string3 = stringArray[0];
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            RSAPublicKeySpec rSAPublicKeySpec = new RSAPublicKeySpec(new BigInteger(string2, 16), new BigInteger(string3, 16));
+            pubKey = keyFactory.generatePublic(rSAPublicKeySpec);
+            aesCipher = Cipher.getInstance("AES/CCM/NoPadding", "BC");
+            rsaCipher = Cipher.getInstance("RSA/None/PKCS1Padding");
+            rsaCipher.init(1, pubKey);
+            return;
+        }
+        catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    public static SecretKey generateAESKey(int n) {
+        KeyGenerator keyGenerator = null;
+        try {
+            keyGenerator = KeyGenerator.getInstance("AES");
+        }
+        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+            // empty catch block
+        }
+        if (!$assertionsDisabled && keyGenerator == null) {
+            throw new AssertionError();
+        }
+        keyGenerator.init(n);
+        return keyGenerator.generateKey();
+    }
+
+    static {
+        sjclStrength = "10";
+        luhnOkCount = "1";
+        PREFIX = "adyenjs_";
+        SEPARATOR = "$";
+        luhnCount = "1";
+        initializeCount = "1";
+        VERSION = "0_1_12";
+        luhnSameLengthCount = "1";
+        $assertionsDisabled = !Adyen12.class.desiredAssertionStatus();
+        srandom = new SecureRandom();
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dfValue = null;
+        Security.addProvider((Provider)new BouncyCastleProvider());
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     public static String getCardJSON(Profile profile) {

@@ -24,6 +24,25 @@ import java.util.List;
 public class ClientType$6
 extends ClientType {
     @Override
+    public WebClientOptions options() {
+        WebClientOptions webClientOptions = new WebClientOptions();
+        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions().setAttributeFluent(ConscryptSSLEngineOptions.Attribute.GREASE, false).setAttributeFluent(ConscryptSSLEngineOptions.Attribute.SESSION_TICKET, true)).addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
+        super.baseOptions(webClientOptions);
+        return webClientOptions;
+    }
+
+    @Override
+    public int getWindowUpdate() {
+        return 0xFF0001;
+    }
+
+    public List ciphersRandomised() {
+        List list = this.ciphers();
+        Collections.shuffle(list);
+        return list;
+    }
+
+    @Override
     public List ciphers() {
         ArrayList<String> arrayList = new ArrayList<String>();
         arrayList.add("TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256");
@@ -40,25 +59,6 @@ extends ClientType {
         arrayList.add("TLS_RSA_WITH_AES_128_CBC_SHA");
         arrayList.add("TLS_RSA_WITH_AES_256_CBC_SHA");
         return arrayList;
-    }
-
-    @Override
-    public int getWindowUpdate() {
-        return 0xFF0001;
-    }
-
-    @Override
-    public WebClientOptions options() {
-        WebClientOptions webClientOptions = new WebClientOptions();
-        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions().setAttributeFluent(ConscryptSSLEngineOptions.Attribute.GREASE, false).setAttributeFluent(ConscryptSSLEngineOptions.Attribute.SESSION_TICKET, true)).addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
-        super.baseOptions(webClientOptions);
-        return webClientOptions;
-    }
-
-    public List ciphersRandomised() {
-        List list = this.ciphers();
-        Collections.shuffle(list);
-        return list;
     }
 }
 

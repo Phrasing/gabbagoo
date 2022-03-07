@@ -17,6 +17,11 @@ extends WindowAdapter {
     public Window3DS2 this$0;
     public Engine val$engine;
 
+    public Window3DS2$2(Window3DS2 window3DS2, Engine engine) {
+        this.this$0 = window3DS2;
+        this.val$engine = engine;
+    }
+
     @Override
     public void windowClosing(WindowEvent windowEvent) {
         try {
@@ -27,11 +32,6 @@ extends WindowAdapter {
         catch (Throwable throwable) {
             // empty catch block
         }
-    }
-
-    public Window3DS2$2(Window3DS2 window3DS2, Engine engine) {
-        this.this$0 = window3DS2;
-        this.val$engine = engine;
     }
 }
 

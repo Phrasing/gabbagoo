@@ -17,34 +17,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Deobfuscator {
+    public static Pattern MOD_STRINGS;
     public static Pattern V2_S_STRINGS;
     public static Pattern S_STRINGS;
-    public static Pattern MOD_STRINGS;
     public static Pattern B64_STRINGS;
-
-    public static String t(String string) {
-        String string2 = new String(Base64.getDecoder().decode(string), StandardCharsets.UTF_8);
-        int n = Character.codePointAt(string2, 0);
-        Object object = "";
-        int n2 = 1;
-        while (n2 < string2.length()) {
-            object = (String)object + (char)(n ^ Character.codePointAt(string2, n2));
-            ++n2;
-        }
-        return object;
-    }
-
-    public static void main(String[] stringArray) {
-        System.out.println(Deobfuscator.n("Kg1lA04"));
-        String string = Deobfuscator.readJsFile("rawCaptcha.js");
-    }
-
-    static {
-        S_STRINGS = Pattern.compile("[S, u, o, r, t, w, i , n, s, O, e]\\(\"(.*?)\"\\)");
-        B64_STRINGS = Pattern.compile("ut\\(\"(.*?)\"\\)");
-        V2_S_STRINGS = Pattern.compile("[e, r, n, l, f, o, t]\\(\"(.*?)\"\\)");
-        MOD_STRINGS = Pattern.compile(" \\+ r\\(\"(.*?)\"\\)");
-    }
 
     public static String n(String string) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -56,21 +32,6 @@ public class Deobfuscator {
             ++n;
         }
         return "\"" + stringBuilder + "\"";
-    }
-
-    public static String deBase64(String string, Pattern pattern) {
-        Matcher matcher = pattern.matcher(string);
-        while (matcher.find()) {
-            if (matcher.group(1).length() <= 0) continue;
-            try {
-                System.out.println(matcher.group(0) + " - " + new String(Base64.getDecoder().decode(matcher.group(1)), StandardCharsets.UTF_8));
-                string = string.replace(matcher.group(0), "\"" + new String(Base64.getDecoder().decode(matcher.group(1)), StandardCharsets.UTF_8).replace("\"", "\\\"") + "\"");
-            }
-            catch (IllegalArgumentException illegalArgumentException) {
-                System.out.println("Failed on: " + matcher.group(1));
-            }
-        }
-        return string;
     }
 
     public static void outputJsFile(String string) {
@@ -91,18 +52,11 @@ public class Deobfuscator {
         }
     }
 
-    public static String deob(String string, Pattern pattern) {
-        Matcher matcher = pattern.matcher(string);
-        while (matcher.find()) {
-            if (matcher.group(1).length() <= 0) continue;
-            try {
-                string = string.replace(matcher.group(0), " + " + Deobfuscator.n(matcher.group(1)));
-            }
-            catch (IllegalArgumentException illegalArgumentException) {
-                System.out.println("Failed on: " + matcher.group(1));
-            }
-        }
-        return string;
+    static {
+        S_STRINGS = Pattern.compile("[S, u, o, r, t, w, i , n, s, O, e]\\(\"(.*?)\"\\)");
+        B64_STRINGS = Pattern.compile("ut\\(\"(.*?)\"\\)");
+        V2_S_STRINGS = Pattern.compile("[e, r, n, l, f, o, t]\\(\"(.*?)\"\\)");
+        MOD_STRINGS = Pattern.compile(" \\+ r\\(\"(.*?)\"\\)");
     }
 
     public static String readJsFile(String string) {
@@ -117,6 +71,47 @@ public class Deobfuscator {
         return string2;
     }
 
+    public static String t(String string) {
+        String string2 = new String(Base64.getDecoder().decode(string), StandardCharsets.UTF_8);
+        int n = Character.codePointAt(string2, 0);
+        Object object = "";
+        int n2 = 1;
+        while (n2 < string2.length()) {
+            object = (String)object + (char)(n ^ Character.codePointAt(string2, n2));
+            ++n2;
+        }
+        return object;
+    }
+
+    public static String deob(String string, Pattern pattern) {
+        Matcher matcher = pattern.matcher(string);
+        while (matcher.find()) {
+            if (matcher.group(1).length() <= 0) continue;
+            try {
+                string = string.replace(matcher.group(0), " + " + Deobfuscator.n(matcher.group(1)));
+            }
+            catch (IllegalArgumentException illegalArgumentException) {
+                System.out.println("Failed on: " + matcher.group(1));
+            }
+        }
+        return string;
+    }
+
+    public static String deBase64(String string, Pattern pattern) {
+        Matcher matcher = pattern.matcher(string);
+        while (matcher.find()) {
+            if (matcher.group(1).length() <= 0) continue;
+            try {
+                System.out.println(matcher.group(0) + " - " + new String(Base64.getDecoder().decode(matcher.group(1)), StandardCharsets.UTF_8));
+                string = string.replace(matcher.group(0), "\"" + new String(Base64.getDecoder().decode(matcher.group(1)), StandardCharsets.UTF_8).replace("\"", "\\\"") + "\"");
+            }
+            catch (IllegalArgumentException illegalArgumentException) {
+                System.out.println("Failed on: " + matcher.group(1));
+            }
+        }
+        return string;
+    }
+
     public static String deobV2(String string, Pattern pattern) {
         Matcher matcher = pattern.matcher(string);
         while (matcher.find()) {
@@ -129,6 +124,11 @@ public class Deobfuscator {
             }
         }
         return string;
+    }
+
+    public static void main(String[] stringArray) {
+        System.out.println(Deobfuscator.n("Kg1lA04"));
+        String string = Deobfuscator.readJsFile("rawCaptcha.js");
     }
 }
 

@@ -14,16 +14,15 @@ import java.util.concurrent.CompletableFuture;
 
 public class SolveFuture
 extends ContextCompletableFuture {
-    public CaptchaToken captchaToken;
-    public CompletableFuture<JsonArray> clickFuture;
     public CompletableFuture<Pair<String[], String>> imageFuture = new CompletableFuture();
+    public CaptchaToken captchaToken;
+    public CompletableFuture<JsonArray> clickFuture = new CompletableFuture();
 
     public CaptchaToken getEmptyCaptchaToken() {
         return this.captchaToken;
     }
 
     public SolveFuture(CaptchaToken captchaToken) {
-        this.clickFuture = new CompletableFuture();
         this.captchaToken = captchaToken;
     }
 }

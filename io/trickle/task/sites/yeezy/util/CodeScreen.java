@@ -22,38 +22,11 @@ import javax.swing.SwingUtilities;
 public class CodeScreen
 extends JPanel
 implements ActionListener {
-    public static String SKIP;
-    public CompletableFuture<String> result;
-    public JTextField inputField;
-    public static String OK;
     public JFrame controllingFrame;
-
-    public JComponent createButtonPanel() {
-        JPanel jPanel = new JPanel(new GridLayout(0, 1));
-        JButton jButton = new JButton("OK");
-        JButton jButton2 = new JButton("Skip");
-        jButton.setActionCommand("ok");
-        jButton2.setActionCommand("skip");
-        jButton.addActionListener(this);
-        jButton2.addActionListener(this);
-        jPanel.add(jButton);
-        jPanel.add(jButton2);
-        return jPanel;
-    }
-
-    public static void lambda$request$0(int n, String string, CompletableFuture completableFuture) {
-        CodeScreen.createAndShow(n, string, completableFuture);
-    }
-
-    public void close() {
-        this.controllingFrame.dispatchEvent(new WindowEvent(this.controllingFrame, 201));
-    }
-
-    public static CompletableFuture request(int n, String string) {
-        ContextCompletableFuture contextCompletableFuture = new ContextCompletableFuture();
-        SwingUtilities.invokeLater(() -> CodeScreen.lambda$request$0(n, string, contextCompletableFuture));
-        return contextCompletableFuture;
-    }
+    public CompletableFuture<String> result;
+    public static String SKIP = "skip";
+    public static String OK = "ok";
+    public JTextField inputField;
 
     public CodeScreen(JFrame jFrame, String string, CompletableFuture completableFuture) {
         this.result = completableFuture;
@@ -71,8 +44,10 @@ implements ActionListener {
         this.add(jComponent);
     }
 
-    public void resetFocus() {
-        this.inputField.requestFocusInWindow();
+    public static CompletableFuture request(int n, String string) {
+        ContextCompletableFuture contextCompletableFuture = new ContextCompletableFuture();
+        SwingUtilities.invokeLater(() -> CodeScreen.lambda$request$0(n, string, contextCompletableFuture));
+        return contextCompletableFuture;
     }
 
     @Override
@@ -93,9 +68,8 @@ implements ActionListener {
         this.resetFocus();
     }
 
-    static {
-        OK = "ok";
-        SKIP = "skip";
+    public void close() {
+        this.controllingFrame.dispatchEvent(new WindowEvent(this.controllingFrame, 201));
     }
 
     public static CodeScreen createAndShow(int n, String string, CompletableFuture completableFuture) {
@@ -110,6 +84,27 @@ implements ActionListener {
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
         return codeScreen;
+    }
+
+    public JComponent createButtonPanel() {
+        JPanel jPanel = new JPanel(new GridLayout(0, 1));
+        JButton jButton = new JButton("OK");
+        JButton jButton2 = new JButton("Skip");
+        jButton.setActionCommand("ok");
+        jButton2.setActionCommand("skip");
+        jButton.addActionListener(this);
+        jButton2.addActionListener(this);
+        jPanel.add(jButton);
+        jPanel.add(jButton2);
+        return jPanel;
+    }
+
+    public static void lambda$request$0(int n, String string, CompletableFuture completableFuture) {
+        CodeScreen.createAndShow(n, string, completableFuture);
+    }
+
+    public void resetFocus() {
+        this.inputField.requestFocusInWindow();
     }
 }
 

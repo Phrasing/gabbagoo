@@ -27,8 +27,17 @@ import org.bouncycastle.util.encoders.Base64;
 public class Reader {
     public JWTVerifier verifier;
 
-    public static void lambda$new$0() {
-        System.exit(-3);
+    public byte[] read(String string) {
+        try {
+            DecodedJWT decodedJWT = this.verifier.verify(string);
+            Objects.requireNonNull(decodedJWT);
+            String string2 = decodedJWT.getClaim("mtob").asString();
+            Objects.requireNonNull(string2);
+            return Base64.decode((String)string2);
+        }
+        catch (Throwable throwable) {
+            return null;
+        }
     }
 
     public static Optional loadKey() {
@@ -44,19 +53,6 @@ public class Reader {
         }
     }
 
-    public byte[] read(String string) {
-        try {
-            DecodedJWT decodedJWT = this.verifier.verify(string);
-            Objects.requireNonNull(decodedJWT);
-            String string2 = decodedJWT.getClaim("mtob").asString();
-            Objects.requireNonNull(string2);
-            return Base64.decode((String)string2);
-        }
-        catch (Throwable throwable) {
-            return null;
-        }
-    }
-
     public Reader() {
         Optional optional = Reader.loadKey();
         if (optional.isPresent()) {
@@ -66,6 +62,10 @@ public class Reader {
         }
         CompletableFuture.runAsync(Reader::lambda$new$0);
         throw new RuntimeException("Signing key not found");
+    }
+
+    public static void lambda$new$0() {
+        System.exit(-3);
     }
 }
 

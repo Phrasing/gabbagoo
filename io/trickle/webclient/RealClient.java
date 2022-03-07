@@ -27,21 +27,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class RealClient
 extends WebClientSessionAware {
     public AtomicReference<Http2ClientConnection> connectionRef = new AtomicReference<Object>(null);
-    public boolean active;
-    public CookieJar cookies;
     public ClientType type;
-
-    public CompletableFuture windowUpdateCallback() {
-        Http2ClientConnection http2ClientConnection = this.connectionRef.get();
-        if (http2ClientConnection == null) return CompletableFuture.completedFuture(null);
-        ContextCompletableFuture contextCompletableFuture = new ContextCompletableFuture();
-        http2ClientConnection.onWindowUpdate((CompletableFuture)contextCompletableFuture);
-        return contextCompletableFuture;
-    }
-
-    public CookieStore cookieStore() {
-        return this.cookieStore();
-    }
+    public CookieJar cookies;
+    public boolean active;
 
     public CompletableFuture headersCallback() {
         Http2ClientConnection http2ClientConnection = this.connectionRef.get();
@@ -61,12 +49,29 @@ extends WebClientSessionAware {
         httpConnection.setWindowSize(httpConnection.getWindowSize() + this.type.getWindowUpdate());
     }
 
-    public boolean isActive() {
-        return this.active;
+    public CookieStore cookieStore() {
+        return this.cookieStore();
     }
 
     public static RealClient create(WebClient webClient, ClientType clientType) {
         return RealClient.create(webClient, new CookieJar(), clientType);
+    }
+
+    public static RealClient create(WebClient webClient, CookieJar cookieJar, ClientType clientType) {
+        return new RealClient(webClient, cookieJar, clientType);
+    }
+
+    public void close() {
+        this.active = false;
+        super.close();
+    }
+
+    public CompletableFuture windowUpdateCallback() {
+        Http2ClientConnection http2ClientConnection = this.connectionRef.get();
+        if (http2ClientConnection == null) return CompletableFuture.completedFuture(null);
+        ContextCompletableFuture contextCompletableFuture = new ContextCompletableFuture();
+        http2ClientConnection.onWindowUpdate((CompletableFuture)contextCompletableFuture);
+        return contextCompletableFuture;
     }
 
     public RealClient(WebClient webClient, CookieJar cookieJar, ClientType clientType) {
@@ -77,21 +82,20 @@ extends WebClientSessionAware {
         this.getClient().connectionHandler(this::lambda$new$0);
     }
 
-    public void close() {
-        this.active = false;
-        super.close();
-    }
-
-    public CookieJar cookieStore() {
-        return this.cookies;
+    public boolean isActive() {
+        return this.active;
     }
 
     public ClientType type() {
         return this.type;
     }
 
-    public static RealClient create(WebClient webClient, CookieJar cookieJar, ClientType clientType) {
-        return new RealClient(webClient, cookieJar, clientType);
+    public void freshenCookieStore() {
+        this.cookies = new CookieJar();
+    }
+
+    public CookieJar cookieStore() {
+        return this.cookies;
     }
 }
 

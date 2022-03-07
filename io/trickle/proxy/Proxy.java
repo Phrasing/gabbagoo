@@ -11,48 +11,12 @@ import io.vertx.core.net.ProxyOptions;
 import io.vertx.core.net.ProxyType;
 
 public class Proxy {
-    public String pass;
-    public String port;
-    public boolean ipAuth;
-    public String host;
     public boolean isLocal;
+    public String host;
     public String user;
-
-    public String getHost() {
-        return this.host;
-    }
-
-    public Proxy() {
-        this.host = null;
-        this.port = null;
-        this.user = null;
-        this.pass = null;
-        this.ipAuth = true;
-        this.isLocal = true;
-    }
-
-    public Proxy(String string, String string2) {
-        this.host = string;
-        this.port = string2;
-        this.user = null;
-        this.pass = null;
-        this.ipAuth = true;
-        this.isLocal = false;
-    }
-
-    public static ProxyOptions toVertxProxy(Proxy proxy) {
-        if (proxy.isLocal) {
-            return null;
-        }
-        ProxyOptions proxyOptions = new ProxyOptions();
-        proxyOptions.setHost(proxy.host).setPort(Integer.parseInt(proxy.port));
-        if (!proxy.ipAuth) {
-            proxyOptions.setUsername(proxy.user);
-            proxyOptions.setPassword(proxy.pass);
-        }
-        proxyOptions.setType(ProxyType.HTTP);
-        return proxyOptions;
-    }
+    public String pass;
+    public boolean ipAuth;
+    public String port;
 
     public static Proxy fromArray(String[] stringArray) {
         if (stringArray.length == 2) {
@@ -62,24 +26,8 @@ public class Proxy {
         return new Proxy(stringArray[0], stringArray[1], stringArray[2], stringArray[3]);
     }
 
-    public boolean isIpAuth() {
-        return this.ipAuth;
-    }
-
-    public static Proxy fromString(String string) {
-        return Proxy.fromArray(string.split(":"));
-    }
-
     public ProxyOptions getAsVertx() {
         return Proxy.toVertxProxy(this);
-    }
-
-    public String string() {
-        return this.host + ":" + this.port;
-    }
-
-    public String toString() {
-        return "Proxy{host='" + this.host + "', port='" + this.port + "', user='" + this.user + "', pass='" + this.pass + "', ipAuth=" + this.ipAuth + "', isLocal=" + this.isLocal + "}";
     }
 
     public String[] toParams() {
@@ -101,8 +49,60 @@ public class Proxy {
         this.isLocal = false;
     }
 
+    public boolean isIpAuth() {
+        return this.ipAuth;
+    }
+
     public boolean isLocal() {
         return this.isLocal;
+    }
+
+    public static Proxy fromString(String string) {
+        return Proxy.fromArray(string.split(":"));
+    }
+
+    public String toString() {
+        return "Proxy{host='" + this.host + "', port='" + this.port + "', user='" + this.user + "', pass='" + this.pass + "', ipAuth=" + this.ipAuth + "', isLocal=" + this.isLocal + "}";
+    }
+
+    public Proxy(String string, String string2) {
+        this.host = string;
+        this.port = string2;
+        this.user = null;
+        this.pass = null;
+        this.ipAuth = true;
+        this.isLocal = false;
+    }
+
+    public String string() {
+        return this.host + ":" + this.port;
+    }
+
+    public static ProxyOptions toVertxProxy(Proxy proxy) {
+        if (proxy.isLocal) {
+            return null;
+        }
+        ProxyOptions proxyOptions = new ProxyOptions();
+        proxyOptions.setHost(proxy.host).setPort(Integer.parseInt(proxy.port));
+        if (!proxy.ipAuth) {
+            proxyOptions.setUsername(proxy.user);
+            proxyOptions.setPassword(proxy.pass);
+        }
+        proxyOptions.setType(ProxyType.HTTP);
+        return proxyOptions;
+    }
+
+    public Proxy() {
+        this.host = null;
+        this.port = null;
+        this.user = null;
+        this.pass = null;
+        this.ipAuth = true;
+        this.isLocal = true;
+    }
+
+    public String getHost() {
+        return this.host;
     }
 }
 

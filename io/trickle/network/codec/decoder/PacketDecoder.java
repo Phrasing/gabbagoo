@@ -23,12 +23,33 @@ import org.apache.logging.log4j.Logger;
 
 public class PacketDecoder
 implements Handler {
-    public int size = -1;
-    public Reader reader;
     public static Logger logger = LogManager.getLogger((String)"TRICKLE");
-    public byte opcode = (byte)-1;
     public RecordParser parser;
+    public Reader reader;
     public Handler<Packet> packetHandler;
+    public int size = -1;
+    public byte opcode = (byte)-1;
+
+    public void readSize(Buffer buffer) {
+        if (this.size != -1) return;
+        this.size = buffer.getInt(0);
+        this.parser.fixedSizeMode(this.size);
+        this.parser.handler(this::readPayload);
+    }
+
+    public void handle(Buffer buffer) {
+        this.parser.handle(buffer);
+    }
+
+    public void handle(Object object) {
+        this.handle((Buffer)object);
+    }
+
+    public PacketDecoder(Handler handler) {
+        this.reader = new Reader();
+        this.packetHandler = handler;
+        this.parser = RecordParser.newFixed((int)1).exceptionHandler(this::handleException).handler(this::readOpcode);
+    }
 
     public boolean serviceOpcodes() {
         switch (this.opcode) {
@@ -43,45 +64,15 @@ implements Handler {
         return false;
     }
 
-    public static void lambda$serviceOpcodes$0() {
-        System.exit(1);
-    }
-
-    public void readSize(Buffer buffer) {
-        if (this.size != -1) return;
-        this.size = buffer.getInt(0);
-        this.parser.fixedSizeMode(this.size);
-        this.parser.handler(this::readPayload);
-    }
-
-    public void handle(Object object) {
-        this.handle((Buffer)object);
-    }
-
-    public void handleException(Throwable throwable) {
-        logger.error("Error occurred decoding packet: {}", (Object)throwable.getMessage());
-        this.reset();
-    }
-
-    public void reset() {
-        this.opcode = (byte)-1;
-        this.size = -1;
-        this.parser.fixedSizeMode(1);
-        this.parser.handler(this::readOpcode);
-    }
-
-    public void handle(Buffer buffer) {
-        this.parser.handle(buffer);
-    }
-
-    public PacketDecoder(Handler handler) {
-        this.reader = new Reader();
-        this.packetHandler = handler;
-        this.parser = RecordParser.newFixed((int)1).exceptionHandler(this::handleException).handler(this::readOpcode);
-    }
-
-    public Handler getPacketHandler() {
-        return this.packetHandler;
+    public void readOpcode(Buffer buffer) {
+        if (this.opcode != -1) return;
+        this.opcode = buffer.getByte(0);
+        if (this.serviceOpcodes()) {
+            this.reset();
+            return;
+        }
+        this.parser.fixedSizeMode(4);
+        this.parser.handler(this::readSize);
     }
 
     public void readPayload(Buffer buffer) {
@@ -100,15 +91,24 @@ implements Handler {
         this.reset();
     }
 
-    public void readOpcode(Buffer buffer) {
-        if (this.opcode != -1) return;
-        this.opcode = buffer.getByte(0);
-        if (this.serviceOpcodes()) {
-            this.reset();
-            return;
-        }
-        this.parser.fixedSizeMode(4);
-        this.parser.handler(this::readSize);
+    public void handleException(Throwable throwable) {
+        logger.error("Error occurred decoding packet: {}", (Object)throwable.getMessage());
+        this.reset();
+    }
+
+    public Handler getPacketHandler() {
+        return this.packetHandler;
+    }
+
+    public void reset() {
+        this.opcode = (byte)-1;
+        this.size = -1;
+        this.parser.fixedSizeMode(1);
+        this.parser.handler(this::readOpcode);
+    }
+
+    public static void lambda$serviceOpcodes$0() {
+        System.exit(1);
     }
 }
 

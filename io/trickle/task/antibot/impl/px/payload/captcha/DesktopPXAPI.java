@@ -32,27 +32,31 @@ import java.util.function.Function;
 
 public class DesktopPXAPI
 extends PerimeterX {
-    public static CharSequence DEFAULT_UA = AsciiString.cached((String)"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36");
-    public static CharSequence FP_VALUE;
-    public static CharSequence ONE_VALUE;
-    public String secUA;
-    public static CharSequence RF_VALUE;
-    public static Site site;
-    public TaskApiClient delegate;
-    public JsonObject cookieSession = new JsonObject();
-    public static CharSequence CFP_VALUE;
-    public static CharSequence PXHD_VALUE;
-    public static CharSequence DEFAULT_SEC_UA;
     public long lockoutTiming = -1L;
-    public String userAgent;
-    public String deviceNumber = "undefined";
-    public static CharSequence VID_COOKIE;
+    public JsonObject cookieSession = new JsonObject();
+    public static CharSequence ONE_VALUE;
+    public static CharSequence DEFAULT_UA;
+    public static CharSequence DEFAULT_SEC_UA;
+    public static CharSequence PXHD_VALUE;
+    public String secUA;
+    public TaskApiClient delegate;
     public MultiMap cachedResponse = null;
+    public String deviceNumber = "undefined";
+    public static Site site;
+    public static CharSequence CFP_VALUE;
+    public static CharSequence RF_VALUE;
+    public static CharSequence FP_VALUE;
+    public String userAgent;
+    public static CharSequence VID_COOKIE;
 
-    public String getProxyString() {
-        ProxyOptions proxyOptions = this.delegate.getWebClient().getOptions().getProxyOptions();
-        if (proxyOptions != null) return "http://" + proxyOptions.getUsername() + ":" + proxyOptions.getPassword() + "@" + proxyOptions.getHost() + ":" + proxyOptions.getPort();
-        return "";
+    public boolean isBool(JsonObject jsonObject) {
+        Object object = jsonObject.getValue("error", null);
+        if (object == null) return false;
+        return object instanceof Boolean;
+    }
+
+    public HttpRequest captchaRequest() {
+        return this.client.getAbs("https://pxgen-bmii2thzea-uc.a.run.app/holdcaptcha").as(BodyCodec.jsonObject()).addQueryParam("authToken", "PX-8E7DF802-E106-44D7-8E32-C26E7F8FE976").addQueryParam("site", site.toString().toLowerCase()).addQueryParam("region", "com").addQueryParam("proxy", this.getProxyString()).addQueryParam("deviceNumber", this.deviceNumber).addQueryParam("captchaData", this.cookieSession.encode());
     }
 
     @Override
@@ -62,13 +66,9 @@ extends PerimeterX {
     }
 
     @Override
-    public String getDeviceAcceptEncoding() {
-        return "gzip, deflate";
-    }
-
-    @Override
-    public CompletableFuture initialise() {
-        return CompletableFuture.completedFuture(true);
+    public String getDeviceUA() {
+        if (this.userAgent != null) return this.userAgent;
+        return DEFAULT_UA.toString();
     }
 
     @Override
@@ -78,10 +78,80 @@ extends PerimeterX {
         this.deviceNumber = "undefined";
     }
 
+    public MultiMap handleResponse(String string) {
+        if (!string.contains("=")) return MultiMap.caseInsensitiveMultiMap();
+        String string2 = string.split("=")[0];
+        String string3 = string.replace(string2 + "=", "");
+        return MultiMap.caseInsensitiveMultiMap().add(string2, string3);
+    }
+
+    public String getProxyString() {
+        ProxyOptions proxyOptions = this.delegate.getWebClient().getOptions().getProxyOptions();
+        if (proxyOptions != null) return "http://" + proxyOptions.getUsername() + ":" + proxyOptions.getPassword() + "@" + proxyOptions.getHost() + ":" + proxyOptions.getPort();
+        return "";
+    }
+
     @Override
-    public String getDeviceUA() {
-        if (this.userAgent != null) return this.userAgent;
-        return DEFAULT_UA.toString();
+    public String getDeviceLang() {
+        return "en-GB,en;q=0.9";
+    }
+
+    @Override
+    public String getVid() {
+        return this.cookieSession.getString("vid", null);
+    }
+
+    public boolean validateError(String string) {
+        if (string == null) {
+            return true;
+        }
+        String string2 = string.toLowerCase(Locale.ROOT);
+        if (string2.contains("not valid")) return true;
+        if (string2.contains("proxy")) return true;
+        return false;
+    }
+
+    @Override
+    public CompletableFuture initialise() {
+        return CompletableFuture.completedFuture(true);
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$solve(DesktopPXAPI var0, int var1_1, CompletableFuture var2_3, Throwable var3_5, int var4_6, Object var5_8) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [6[CATCHBLOCK]], but top level block is 9[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    @Override
+    public String getDeviceAcceptEncoding() {
+        return "gzip, deflate";
+    }
+
+    public HttpRequest solveRequest() {
+        return this.client.getAbs("https://pxgen-bmii2thzea-uc.a.run.app/gen").as(BodyCodec.jsonObject()).addQueryParam("authToken", "PX-8E7DF802-E106-44D7-8E32-C26E7F8FE976").addQueryParam("site", site.toString().toLowerCase()).addQueryParam("region", "com").addQueryParam("proxy", this.getProxyString()).addQueryParam("deviceNumber", this.deviceNumber);
     }
 
     /*
@@ -113,37 +183,75 @@ extends PerimeterX {
         throw new IllegalStateException("Decompilation failed");
     }
 
-    public HttpRequest solveRequest() {
-        return this.client.getAbs("https://pxgen-bmii2thzea-uc.a.run.app/gen").as(BodyCodec.jsonObject()).addQueryParam("authToken", "PX-8E7DF802-E106-44D7-8E32-C26E7F8FE976").addQueryParam("site", site.toString().toLowerCase()).addQueryParam("region", "com").addQueryParam("proxy", this.getProxyString()).addQueryParam("deviceNumber", this.deviceNumber);
+    static {
+        DEFAULT_UA = AsciiString.cached((String)"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36");
+        DEFAULT_SEC_UA = AsciiString.cached((String)"\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
+        VID_COOKIE = AsciiString.cached((String)"_pxvid");
+        RF_VALUE = AsciiString.cached((String)"_pxff_rf");
+        FP_VALUE = AsciiString.cached((String)"_pxff_fp");
+        ONE_VALUE = AsciiString.cached((String)"1");
+        CFP_VALUE = AsciiString.cached((String)"_pxff_cfp");
+        PXHD_VALUE = AsciiString.cached((String)"_pxhd");
+        site = Site.WALMART;
     }
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$solve(DesktopPXAPI var0, int var1_1, CompletableFuture var2_3, Throwable var3_5, int var4_6, Object var5_8) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [6[CATCHBLOCK]], but top level block is 9[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
+    @Override
+    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
+        int n = 1;
+        while (n <= 30) {
+            try {
+                if (this.deviceNumber.equalsIgnoreCase("undefined")) {
+                    return this.solve();
+                }
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug("Solving PX captcha via API attempt {}", (Object)n);
+                }
+                CompletableFuture completableFuture = Request.send(this.captchaRequest());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI.async$solveCaptcha(this, string, string2, string3, n, completableFuture2, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse != null) {
+                    boolean bl;
+                    JsonObject jsonObject = (JsonObject)httpResponse.body();
+                    if (this.logger.isDebugEnabled()) {
+                        this.logger.debug("API captcha response received: {}", (Object)jsonObject.encodePrettily());
+                    }
+                    String string4 = jsonObject.getString("cookie", null);
+                    boolean bl2 = bl = this.isBool(jsonObject) ? jsonObject.getBoolean("error", Boolean.valueOf(false)).booleanValue() : this.validateError(string4);
+                    if (bl || string4 == null || string4.isEmpty()) {
+                        if (this.logger.isDebugEnabled()) {
+                            this.logger.debug("Invalid sensor api response: {}", (Object)jsonObject.encodePrettily());
+                        }
+                    } else if (jsonObject.containsKey("data")) {
+                        this.cookieSession = jsonObject.getJsonObject("data");
+                        this.lockoutTiming = System.currentTimeMillis();
+                        this.logger.info("Solved captcha successfully!");
+                        this.cachedResponse = this.handleResponse(string4);
+                        return CompletableFuture.completedFuture(this.cachedResponse);
+                    }
+                } else if (this.logger.isDebugEnabled()) {
+                    this.logger.debug("Solving sensor via API failed. No response received. Retrying...");
+                } else {
+                    this.logger.warn("Failed to solve captcha. Retrying...");
+                }
+            }
+            catch (Throwable throwable) {
+                this.logger.warn("Error solving sensor: {}. Retrying...", (Object)throwable.getMessage());
+                if (this.logger.isDebugEnabled()) {
+                    this.logger.debug((Object)throwable);
+                }
+                CompletableFuture completableFuture = VertxUtil.randomSleep(3000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture3 = completableFuture;
+                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI.async$solveCaptcha(this, string, string2, string3, n, completableFuture3, throwable, 2, arg_0));
+                }
+                completableFuture.join();
+            }
+            ++n;
+        }
+        return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
     }
 
     public DesktopPXAPI(TaskActor taskActor) {
@@ -229,113 +337,6 @@ extends PerimeterX {
             ++n;
         }
         return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
-    }
-
-    public boolean isBool(JsonObject jsonObject) {
-        Object object = jsonObject.getValue("error", null);
-        if (object == null) return false;
-        return object instanceof Boolean;
-    }
-
-    public boolean validateError(String string) {
-        if (string == null) {
-            return true;
-        }
-        String string2 = string.toLowerCase(Locale.ROOT);
-        if (string2.contains("not valid")) return true;
-        if (string2.contains("proxy")) return true;
-        return false;
-    }
-
-    @Override
-    public String getDeviceLang() {
-        return "en-GB,en;q=0.9";
-    }
-
-    @Override
-    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
-        int n = 1;
-        while (n <= 30) {
-            try {
-                if (this.deviceNumber.equalsIgnoreCase("undefined")) {
-                    return this.solve();
-                }
-                if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Solving PX captcha via API attempt {}", (Object)n);
-                }
-                CompletableFuture completableFuture = Request.send(this.captchaRequest());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI.async$solveCaptcha(this, string, string2, string3, n, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    boolean bl;
-                    JsonObject jsonObject = (JsonObject)httpResponse.body();
-                    if (this.logger.isDebugEnabled()) {
-                        this.logger.debug("API captcha response received: {}", (Object)jsonObject.encodePrettily());
-                    }
-                    String string4 = jsonObject.getString("cookie", null);
-                    boolean bl2 = bl = this.isBool(jsonObject) ? jsonObject.getBoolean("error", Boolean.valueOf(false)).booleanValue() : this.validateError(string4);
-                    if (bl || string4 == null || string4.isEmpty()) {
-                        if (this.logger.isDebugEnabled()) {
-                            this.logger.debug("Invalid sensor api response: {}", (Object)jsonObject.encodePrettily());
-                        }
-                    } else if (jsonObject.containsKey("data")) {
-                        this.cookieSession = jsonObject.getJsonObject("data");
-                        this.lockoutTiming = System.currentTimeMillis();
-                        this.logger.info("Solved captcha successfully!");
-                        this.cachedResponse = this.handleResponse(string4);
-                        return CompletableFuture.completedFuture(this.cachedResponse);
-                    }
-                } else if (this.logger.isDebugEnabled()) {
-                    this.logger.debug("Solving sensor via API failed. No response received. Retrying...");
-                } else {
-                    this.logger.warn("Failed to solve captcha. Retrying...");
-                }
-            }
-            catch (Throwable throwable) {
-                this.logger.warn("Error solving sensor: {}. Retrying...", (Object)throwable.getMessage());
-                if (this.logger.isDebugEnabled()) {
-                    this.logger.debug((Object)throwable);
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep(3000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture3 = completableFuture;
-                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI.async$solveCaptcha(this, string, string2, string3, n, completableFuture3, throwable, 2, arg_0));
-                }
-                completableFuture.join();
-            }
-            ++n;
-        }
-        return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
-    }
-
-    static {
-        DEFAULT_SEC_UA = AsciiString.cached((String)"\"Google Chrome\";v=\"95\", \"Chromium\";v=\"95\", \";Not A Brand\";v=\"99\"");
-        VID_COOKIE = AsciiString.cached((String)"_pxvid");
-        RF_VALUE = AsciiString.cached((String)"_pxff_rf");
-        FP_VALUE = AsciiString.cached((String)"_pxff_fp");
-        ONE_VALUE = AsciiString.cached((String)"1");
-        CFP_VALUE = AsciiString.cached((String)"_pxff_cfp");
-        PXHD_VALUE = AsciiString.cached((String)"_pxhd");
-        site = Site.WALMART;
-    }
-
-    @Override
-    public String getVid() {
-        return this.cookieSession.getString("vid", null);
-    }
-
-    public HttpRequest captchaRequest() {
-        return this.client.getAbs("https://pxgen-bmii2thzea-uc.a.run.app/holdcaptcha").as(BodyCodec.jsonObject()).addQueryParam("authToken", "PX-8E7DF802-E106-44D7-8E32-C26E7F8FE976").addQueryParam("site", site.toString().toLowerCase()).addQueryParam("region", "com").addQueryParam("proxy", this.getProxyString()).addQueryParam("deviceNumber", this.deviceNumber).addQueryParam("captchaData", this.cookieSession.encode());
-    }
-
-    public MultiMap handleResponse(String string) {
-        if (!string.contains("=")) return MultiMap.caseInsensitiveMultiMap();
-        String string2 = string.split("=")[0];
-        String string3 = string.replace(string2 + "=", "");
-        return MultiMap.caseInsensitiveMultiMap().add(string2, string3);
     }
 }
 

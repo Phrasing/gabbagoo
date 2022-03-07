@@ -11,8 +11,17 @@ public enum PaymentMethod {
 
     public String method;
 
-    public String getFirstLetterUppercase() {
-        return this.method.charAt(0) + this.method.substring(1).toLowerCase();
+    public String get() {
+        return this.method;
+    }
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public PaymentMethod() {
+        void var3_1;
+        this.method = var3_1;
     }
 
     public static PaymentMethod detectMethod(String string) {
@@ -30,17 +39,8 @@ public enum PaymentMethod {
         return MASTERCARD;
     }
 
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public PaymentMethod() {
-        void var3_1;
-        this.method = var3_1;
-    }
-
-    public String get() {
-        return this.method;
+    public String getFirstLetterUppercase() {
+        return this.method.charAt(0) + this.method.substring(1).toLowerCase();
     }
 }
 
