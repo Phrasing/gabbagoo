@@ -32,15 +32,6 @@ public class WalmartNewAPIMobile$CacheGen {
         return new String(cArray);
     }
 
-    public static String hashForm(JsonObject jsonObject, String string) {
-        JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.put("operationName", (Object)jsonObject.getString("operationName"));
-        jsonObject2.put("variables", (Object)jsonObject.getJsonObject("variables"));
-        jsonObject2.put("extensions", (Object)new JsonObject().put("persistedQuery", (Object)new JsonObject().put("version", (Object)1).put("sha256Hash", (Object)string)));
-        jsonObject2.put("query", (Object)jsonObject.getString("query"));
-        return WalmartNewAPIMobile$CacheGen.hash(jsonObject2.toString());
-    }
-
     public static String hash(String string) {
         byte[] byArray = string.getBytes(StandardCharsets.UTF_8);
         try {
@@ -52,6 +43,15 @@ public class WalmartNewAPIMobile$CacheGen {
             noSuchAlgorithmException.printStackTrace();
             return Utils.secureHexstring(16);
         }
+    }
+
+    public static String hashForm(JsonObject jsonObject, String string) {
+        JsonObject jsonObject2 = new JsonObject();
+        jsonObject2.put("operationName", (Object)jsonObject.getString("operationName"));
+        jsonObject2.put("variables", (Object)jsonObject.getJsonObject("variables"));
+        jsonObject2.put("extensions", (Object)new JsonObject().put("persistedQuery", (Object)new JsonObject().put("version", (Object)1).put("sha256Hash", (Object)string)));
+        jsonObject2.put("query", (Object)jsonObject.getString("query"));
+        return WalmartNewAPIMobile$CacheGen.hash(jsonObject2.toString());
     }
 }
 

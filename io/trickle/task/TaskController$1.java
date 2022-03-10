@@ -7,10 +7,11 @@ import io.trickle.task.sites.Site;
 import io.trickle.task.sites.shopify.Mode;
 
 public class TaskController$1 {
-    public static int[] $SwitchMap$io$trickle$task$sites$Site = new int[Site.values().length];
     public static int[] $SwitchMap$io$trickle$task$sites$shopify$Mode;
+    public static int[] $SwitchMap$io$trickle$task$sites$Site;
 
     static {
+        $SwitchMap$io$trickle$task$sites$Site = new int[Site.values().length];
         try {
             TaskController$1.$SwitchMap$io$trickle$task$sites$Site[Site.WALMART_NEW.ordinal()] = 1;
         }

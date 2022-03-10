@@ -26,15 +26,10 @@ import org.apache.logging.log4j.Logger;
 public class DeviceStoreController
 implements Module,
 LoadableAsync {
-    public Vertx vertx;
-    public static String AK_DEVICE_PATH = "/akDevices.json";
-    public static Logger logger = LogManager.getLogger(DeviceStoreController.class);
+    public static Logger logger;
     public JsonArray akDevices;
-
-    @Override
-    public void terminate() {
-        logger.debug("Terminated.");
-    }
+    public static String AK_DEVICE_PATH;
+    public Vertx vertx;
 
     public Future lambda$load$0(JsonArray jsonArray) {
         this.akDevices = jsonArray;
@@ -46,8 +41,19 @@ LoadableAsync {
         return Future.succeededFuture();
     }
 
-    public DeviceStoreController(Vertx vertx) {
-        this.vertx = vertx;
+    @Override
+    public Future load() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        return fileSystem.readFile(Storage.CONFIG_PATH + "/akDevices.json").map(Buffer::toJsonArray).compose(this::lambda$load$0);
+    }
+
+    public JsonArray getAkDevices() {
+        return this.akDevices;
+    }
+
+    static {
+        AK_DEVICE_PATH = "/akDevices.json";
+        logger = LogManager.getLogger(DeviceStoreController.class);
     }
 
     @Override
@@ -55,14 +61,13 @@ LoadableAsync {
         logger.debug("Initialised");
     }
 
-    public JsonArray getAkDevices() {
-        return this.akDevices;
+    public DeviceStoreController(Vertx vertx) {
+        this.vertx = vertx;
     }
 
     @Override
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile(Storage.CONFIG_PATH + "/akDevices.json").map(Buffer::toJsonArray).compose(this::lambda$load$0);
+    public void terminate() {
+        logger.debug("Terminated.");
     }
 }
 

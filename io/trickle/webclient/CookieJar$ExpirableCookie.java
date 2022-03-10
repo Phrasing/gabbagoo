@@ -13,16 +13,17 @@ implements Comparable {
     public Cookie wrappedCookie;
     public long expiryTime;
 
-    public int compareTo(Cookie cookie) {
-        return this.wrappedCookie.compareTo((Object)cookie);
-    }
-
-    public String toString() {
-        return "ExpirableCookie{expiryTime=" + this.expiryTime + ", wrappedCookie=" + this.wrappedCookie + "}";
-    }
-
     public static long getEpoch() {
         return System.currentTimeMillis() / 1000L;
+    }
+
+    public int compareTo(Object object) {
+        return this.compareTo((Cookie)object);
+    }
+
+    public void setExpiry(long l) {
+        if (this.expiryTime != 0L) return;
+        this.expiryTime = CookieJar$ExpirableCookie.getEpoch() + l;
     }
 
     public boolean shouldExpire() {
@@ -33,17 +34,16 @@ implements Comparable {
         return true;
     }
 
+    public int compareTo(Cookie cookie) {
+        return this.wrappedCookie.compareTo((Object)cookie);
+    }
+
     public CookieJar$ExpirableCookie(Cookie cookie) {
         this.wrappedCookie = cookie;
     }
 
-    public int compareTo(Object object) {
-        return this.compareTo((Cookie)object);
-    }
-
-    public void setExpiry(long l) {
-        if (this.expiryTime != 0L) return;
-        this.expiryTime = CookieJar$ExpirableCookie.getEpoch() + l;
+    public String toString() {
+        return "ExpirableCookie{expiryTime=" + this.expiryTime + ", wrappedCookie=" + this.wrappedCookie + "}";
     }
 }
 

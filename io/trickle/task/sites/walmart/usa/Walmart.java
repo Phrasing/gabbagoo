@@ -55,173 +55,28 @@ import java.util.function.Function;
 
 public class Walmart
 extends TaskActor {
-    public Mode mode;
-    public String instanceSignal;
-    public PaymentToken token;
-    public Task task;
     public CookieJar sessionCookies = new CookieJar();
-    public long sessionTimestamp = 0L;
     public long keepAliveWorker = 0L;
-    public String productID = "";
-    public String itemKeyword;
-    public boolean shared;
-    public static ConcurrentHashSet<Cookie> GLOBAL_COOKIES = new ConcurrentHashSet();
     public API api;
+    public Task task;
+    public String itemKeyword;
+    public String instanceSignal;
+    public String productID = "";
     public boolean bannedBefore = false;
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$waitForRestock(Walmart var0, int var1_1, String var2_2, CompletableFuture var3_3, Throwable var4_6, int var5_7, Object var6_8) {
-        switch (var5_7) {
-            case 0: {
-                var1_1 = 0;
-                try {
-                    var2_2 = var0.api.getWebClient().cookieStore().getCookieValue("CRT");
-                }
-                catch (Exception var3_4) {
-                    var2_2 = "";
-                }
-                break;
-            }
-            case 1: {
-                v0 = var3_3;
-                ** GOTO lbl35
-            }
-            case 2: {
-                v1 = var3_3;
-                ** GOTO lbl43
-            }
-            case 3: {
-                v2 = var3_3;
-                ** GOTO lbl49
-            }
-            case 4: {
-                v3 = var3_3;
-                var3_3 = var4_6;
-                ** GOTO lbl60
-            }
-            default: {
-                throw new IllegalArgumentException();
-            }
-        }
-        while (var0.running != false) {
-            if (var1_1 > 30) return CompletableFuture.completedFuture(false);
-            ++var1_1;
-            try {
-                block21: {
-                    block20: {
-                        if (var1_1 % 2 == 0 && !var0.productID.isEmpty()) {
-                            v0 = var0.checkStockTerra(var0.productID);
-                            if (!v0.isDone()) {
-                                var4_6 = v0;
-                                return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, null, (int)1));
-                            } else {
-                                ** GOTO lbl35
-                            }
-                        }
-                        break block20;
-lbl35:
-                        // 3 sources
-
-                        if (((Boolean)v0.join()).booleanValue()) {
-                            return CompletableFuture.completedFuture(true);
-                        }
-                        break block21;
-                    }
-                    v1 = var0.checkStockCart(var2_2);
-                    if (!v1.isDone()) {
-                        var4_6 = v1;
-                        return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, null, (int)2));
-                    }
-lbl43:
-                    // 3 sources
-
-                    if (((Boolean)v1.join()).booleanValue()) {
-                        return CompletableFuture.completedFuture(true);
-                    }
-                }
-                if (!(v2 = VertxUtil.randomSignalSleep(var0.instanceSignal, var0.task.getMonitorDelay())).isDone()) {
-                    var4_6 = v2;
-                    return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, null, (int)3));
-                }
-lbl49:
-                // 3 sources
-
-                v2.join();
-            }
-            catch (Throwable var3_5) {
-                if (var3_5.getMessage().contains("CRT expired or empty")) {
-                    return CompletableFuture.failedFuture(var3_5);
-                }
-                var0.logger.error("Error occurred waiting for restock: {}", (Object)var3_5.getMessage());
-                v3 = super.randomSleep(12000);
-                if (!v3.isDone()) {
-                    var4_6 = v3;
-                    return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, (Throwable)var3_5, (int)4));
-                }
-lbl60:
-                // 3 sources
-
-                v3.join();
-            }
-        }
-        return CompletableFuture.completedFuture(false);
-    }
-
-    public Walmart(Task task, int n) {
-        super(n);
-        this.task = task;
-        this.mode = Mode.getMode(this.task.getMode());
-        this.api = this.mode.equals((Object)Mode.DESKTOP) ? new WalmartAPIDesktop(this.task) : new WalmartAPI(this.task);
-        super.setClient(this.api);
-        this.api.getWebClient().cookieStore().setCookieFilter(Walmart::lambda$new$0);
-        this.instanceSignal = this.itemKeyword = this.task.getKeywords()[0];
-        this.shared = this.task.getMode().toLowerCase().contains("sync");
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$generateToken(Walmart var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = VertxSingleton.INSTANCE.getLocalClient().getClient().getAbs("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust=" + System.currentTimeMillis()).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
-                try {
-                    v0 = Request.execute(var1_1, 5);
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$generateToken(io.trickle.task.sites.walmart.usa.Walmart io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-                    ** GOTO lbl15
-                }
-                catch (Exception var2_3) {
-                    var0.logger.warn("Failed to generate payment token: {}", (Object)var2_3.getMessage());
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_2;
-lbl15:
-                // 2 sources
-
-                var2_2 = (String)v0.join();
-                var0.token = PaymentToken.prepareAndGenerate((String)var2_2, var0.task.getProfile().getCardNumber(), var0.task.getProfile().getCvv());
-                var0.token.set4111Encrypted(PaymentToken.prepareAndGenerate((String)var2_2, "4111111111111111", var0.task.getProfile().getCvv()).getEncryptedPan());
-                return CompletableFuture.completedFuture(null);
-            }
-        }
-        throw new IllegalArgumentException();
-    }
+    public boolean shared;
+    public Mode mode;
+    public PaymentToken token;
+    public static ConcurrentHashSet<Cookie> GLOBAL_COOKIES = new ConcurrentHashSet();
+    public long sessionTimestamp = 0L;
 
     /*
      * Exception decompiling
      */
-    public static CompletableFuture async$atcNormal(Walmart var0, Buffer var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_5, HttpResponse var5_6, Throwable var6_8, int var7_9, Object var8_10) {
+    public static CompletableFuture async$cartFast(Walmart var0, int var1_1, int var2_2, String var3_3, HttpRequest var4_4, CompletableFuture var5_6, Buffer var6_8, HttpResponse var7_9, int var8_10, Throwable var9_11, int var10_12, Object var11_13) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [11[CATCHBLOCK]], but top level block is 19[UNCONDITIONALDOLOOP]
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
@@ -241,126 +96,6 @@ lbl15:
          *     at java.base/java.lang.Thread.run(Thread.java:833)
          */
         throw new IllegalStateException("Decompilation failed");
-    }
-
-    public void importCookies(API aPI) {
-        aPI.cookieStore().clear();
-        JsonArray jsonArray = new JsonArray(Deobfuscator.readJsFile("browsercookies.json"));
-        int n = 0;
-        while (n < jsonArray.size()) {
-            JsonObject jsonObject = jsonArray.getJsonObject(n);
-            aPI.cookieStore().put(jsonObject.getString("name"), jsonObject.getString("value"), "www.walmart.com", "/");
-            ++n;
-        }
-    }
-
-    public static void lambda$updateOrCreateSession$2(Cookie cookie) {
-        if (!cookie.value().equalsIgnoreCase("1")) return;
-        if (cookie.name().equals("g")) return;
-        GLOBAL_COOKIES.add((Object)cookie);
-    }
-
-    /*
-     * Unable to fully structure code
-     * Could not resolve type clashes
-     */
-    public static CompletableFuture async$atcAffiliate(Walmart var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_5, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        switch (var7_8) {
-            case 0: {
-                var1_1 = ThreadLocalRandom.current().nextBoolean() != false ? "addToCart" : "buynow";
-                var0.logger.info("Attempting add to cart");
-                var2_2 = 0;
-                block9: while (var0.running != false) {
-                    if (var2_2 > 50) return CompletableFuture.failedFuture(new Exception());
-                    try {
-                        ++var2_2;
-                        var3_3 /* !! */  = var0.api.affilCrossSite(var1_1);
-                        v0 = Request.send(var3_3 /* !! */ .as(BodyCodec.string()));
-                        if (!v0.isDone()) {
-                            var6_7 = v0;
-                            return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, (HttpRequest)var3_3 /* !! */ , (CompletableFuture)var6_7, null, null, (int)1));
-                        }
-lbl15:
-                        // 3 sources
-
-                        while (true) {
-                            var4_5 = (HttpResponse)v0.join();
-                            if (var4_5 == null) continue block9;
-                            if (var4_5.statusCode() == 302) {
-                                var5_6 /* !! */  = var0.api.getWebClient().cookieStore().getCookieValue("CRT");
-                                VertxUtil.sendSignal(var0.instanceSignal, (String)var5_6 /* !! */ );
-                                var0.logger.info("Successfully added to cart: status:'{}'", (Object)var4_5.statusCode());
-                                var0.api.getWebClient().cookieStore().putFromOther(var0.sessionCookies);
-                                return CompletableFuture.completedFuture(null);
-                            }
-                            var0.logger.info("Waiting for restock [PID]: '{}'", (Object)var4_5.statusCode());
-                            v1 = var0.api.handleBadResponse(var4_5.statusCode(), (HttpResponse)var4_5);
-                            if (!v1.isDone()) {
-                                var6_7 = v1;
-                                return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, (HttpRequest)var3_3 /* !! */ , (CompletableFuture)var6_7, (HttpResponse)var4_5, null, (int)2));
-                            }
-lbl30:
-                            // 3 sources
-
-                            while (true) {
-                                v1.join();
-                                v2 = var0.handleCRTSignalSleep(var0.api);
-                                if (!v2.isDone()) {
-                                    var6_7 = v2;
-                                    return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, (HttpRequest)var3_3 /* !! */ , (CompletableFuture)var6_7, (HttpResponse)var4_5, null, (int)3));
-                                }
-lbl37:
-                                // 3 sources
-
-                                while (true) {
-                                    if (!((Boolean)v2.join()).booleanValue()) continue block9;
-                                    return CompletableFuture.completedFuture(null);
-                                }
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                    catch (Throwable var3_4) {
-                        var0.logger.error("Error occurred waiting for restock (s): {}", (Object)var3_4.getMessage());
-                        v3 = super.randomSleep(12000);
-                        if (!v3.isDone()) {
-                            var6_7 = v3;
-                            return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, null, (CompletableFuture)var6_7, null, (Throwable)var3_4, (int)4));
-                        }
-lbl46:
-                        // 3 sources
-
-                        while (true) {
-                            v3.join();
-                            continue block9;
-                            break;
-                        }
-                    }
-                }
-                return CompletableFuture.failedFuture(new Exception());
-            }
-            case 1: {
-                v0 = var4_5;
-                ** continue;
-            }
-            case 2: {
-                v1 = var4_5;
-                var4_5 = var5_6 /* !! */ ;
-                ** continue;
-            }
-            case 3: {
-                v2 = var4_5;
-                var4_5 = var5_6 /* !! */ ;
-                ** continue;
-            }
-            case 4: {
-                v3 = var4_5;
-                var3_3 /* !! */  = var6_7;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
     }
 
     public CompletableFuture fetchHomepage(boolean bl) {
@@ -425,64 +160,6 @@ lbl46:
             }
         }
         return CompletableFuture.failedFuture(new Exception());
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$loginAccount(Walmart var0, int var1_1, AccountController var2_2, CompletableFuture var3_3, Account var4_5, JsonObject var5_6, HttpRequest var6_7, HttpResponse var7_8, int var8_10, Throwable var9_16, int var10_17, Object var11_18) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$handleCRTSignalSleep(Walmart var0, API var1_1, CompletableFuture var2_2, int var3_3, Object var4_5) {
-        switch (var3_3) {
-            case 0: {
-                v0 = VertxUtil.randomSignalSleep(var0.instanceSignal, var0.task.getMonitorDelay());
-                if (!v0.isDone()) {
-                    var3_4 = v0;
-                    return var3_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleCRTSignalSleep(io.trickle.task.sites.walmart.usa.Walmart io.trickle.task.sites.walmart.usa.API java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (API)var1_1, (CompletableFuture)var3_4, (int)1));
-                }
-                ** GOTO lbl10
-            }
-            case 1: {
-                v0 = var2_2;
-lbl10:
-                // 2 sources
-
-                var2_2 = (String)v0.join();
-                if (var0.shared == false) return CompletableFuture.completedFuture(false);
-                if (var2_2 == null) return CompletableFuture.completedFuture(false);
-                if (var2_2.isEmpty() != false) return CompletableFuture.completedFuture(false);
-                var1_1.cookieStore().put("CRT", (String)var2_2, ".walmart.com");
-                return CompletableFuture.completedFuture(true);
-            }
-        }
-        throw new IllegalArgumentException();
     }
 
     public CompletableFuture cartFast() {
@@ -590,172 +267,65 @@ lbl10:
         return CompletableFuture.completedFuture(-1);
     }
 
-    public CompletableFuture generateToken() {
-        HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().getAbs("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust=" + System.currentTimeMillis()).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
-        try {
-            CompletableFuture completableFuture = Request.execute(httpRequest, 5);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$generateToken(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            String string = (String)completableFuture.join();
-            this.token = PaymentToken.prepareAndGenerate(string, this.task.getProfile().getCardNumber(), this.task.getProfile().getCvv());
-            this.token.set4111Encrypted(PaymentToken.prepareAndGenerate(string, "4111111111111111", this.task.getProfile().getCvv()).getEncryptedPan());
-            return CompletableFuture.completedFuture(null);
-        }
-        catch (Exception exception) {
-            this.logger.warn("Failed to generate payment token: {}", (Object)exception.getMessage());
-        }
-        return CompletableFuture.completedFuture(null);
+    public void lambda$run$1(Long l) {
+        Request.execute(this.api.getWebClient().getAbs("https://www.walmart.com/favicon.ico"));
     }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$tryCheckout(Walmart var0, CompletableFuture var1_1, int var2_3, Object var3_5) {
-        switch (var2_3) {
-            case 0: {
-                try {
-                    v0 = PaymentInstance.checkout(var0, var0.task, var0.token, var0.mode);
-                    if (!v0.isDone()) {
-                        var2_4 = v0;
-                        return var2_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCheckout(io.trickle.task.sites.walmart.usa.Walmart java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (CompletableFuture)var2_4, (int)1));
-                    }
-                    ** GOTO lbl14
-                }
-                catch (Exception var1_2) {
-                    var0.logger.warn("Failed to checkout: {}", (Object)var1_2.getMessage());
-                    return CompletableFuture.failedFuture(var1_2);
-                }
-            }
-            case 1: {
-                v0 = var1_1;
-lbl14:
-                // 2 sources
-
-                if ((Integer)v0.join() != -1) return CompletableFuture.completedFuture(null);
-                return CompletableFuture.failedFuture(new Exception("Failed to process."));
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public CompletableFuture loginAccount() {
-        int n = 0;
-        AccountController accountController = (AccountController)Engine.get().getModule(Controller.ACCOUNT);
-        while (this.running && n <= 500) {
-            ++n;
-            try {
-                CompletableFuture completableFuture = accountController.findAccount(this.task.getProfile().getEmail(), false).toCompletionStage().toCompletableFuture();
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture2, null, null, null, null, 0, null, 1, arg_0));
-                }
-                Account account = (Account)completableFuture.join();
-                if (account == null) {
-                    this.logger.warn("No accounts available...");
-                    return CompletableFuture.completedFuture(0);
-                }
-                this.logger.info("Logging in to account '{}'", (Object)account.getUser());
-                JsonObject jsonObject = this.api.accountLoginForm(account);
-                HttpRequest httpRequest = this.api.loginAccount();
-                CompletableFuture completableFuture3 = Request.send(httpRequest, jsonObject);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture4, account, jsonObject, httpRequest, null, 0, null, 2, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture3.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
-                    if (this.logger.isDebugEnabled()) {
-                        this.logger.debug("Account login responded with: [{}]{}", (Object)httpResponse.statusCode(), (Object)httpResponse.bodyAsString());
-                    }
-                    this.logger.info("Logged in successfully to account '{}'", (Object)account.getUser());
-                    this.api.setLoggedIn(true);
-                    this.task.getProfile().setAccountEmail(account.getUser());
-                    return CompletableFuture.completedFuture(1);
-                }
-                this.logger.warn("Account login: status:'{}'", (Object)httpResponse.statusCode());
-                if (httpResponse.statusCode() != 412) {
-                    this.bannedBefore = false;
-                } else if (n % 10 == 0 && this.mode == Mode.DESKTOP && this.task.getMode().contains("skip")) {
-                    this.api.getPxAPI().reset();
-                }
-                CompletableFuture completableFuture5 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture6, account, jsonObject, httpRequest, httpResponse, 0, null, 3, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
-                if (n2 == 0 || this.bannedBefore) {
-                    CompletableFuture completableFuture7 = VertxUtil.sleep(this.task.getRetryDelay());
-                    if (!completableFuture7.isDone()) {
-                        CompletableFuture completableFuture8 = completableFuture7;
-                        return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture8, account, jsonObject, httpRequest, httpResponse, n2, null, 4, arg_0));
-                    }
-                    completableFuture7.join();
-                }
-                if (httpResponse.statusCode() != 412) continue;
-                this.bannedBefore = true;
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred logging in account: {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = super.randomSleep(12000);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture9 = completableFuture;
-                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture9, null, null, null, null, 0, throwable, 5, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        this.logger.warn("Failed to login to account. Max retries exceeded...");
-        return CompletableFuture.completedFuture(-1);
-    }
-
-    public CompletableFuture atcAffiliate() {
-        String string = ThreadLocalRandom.current().nextBoolean() ? "addToCart" : "buynow";
+    public CompletableFuture atcNormal() {
         this.logger.info("Attempting add to cart");
+        Buffer buffer = this.api.atcForm().toBuffer();
         int n = 0;
         while (this.running) {
-            if (n > 50) return CompletableFuture.failedFuture(new Exception());
+            if (n > 500) return CompletableFuture.failedFuture(new Exception());
+            ++n;
             try {
-                ++n;
-                HttpRequest httpRequest = this.api.affilCrossSite(string);
-                CompletableFuture completableFuture = Request.send(httpRequest.as(BodyCodec.string()));
+                HttpRequest httpRequest = this.api.addToCart().as(BodyCodec.deferred());
+                CompletableFuture completableFuture = Request.send(httpRequest, buffer);
                 if (!completableFuture.isDone()) {
                     CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, httpRequest, completableFuture2, null, null, 1, arg_0));
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture2, null, null, 1, arg_0));
                 }
                 HttpResponse httpResponse = (HttpResponse)completableFuture.join();
                 if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 302) {
-                    String string2 = this.api.getWebClient().cookieStore().getCookieValue("CRT");
-                    VertxUtil.sendSignal(this.instanceSignal, string2);
+                if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
+                    VertxUtil.sendSignal(this.instanceSignal, this.api.cookieStore().getCookieValue("CRT"));
                     this.logger.info("Successfully added to cart: status:'{}'", (Object)httpResponse.statusCode());
-                    this.api.getWebClient().cookieStore().putFromOther(this.sessionCookies);
                     return CompletableFuture.completedFuture(null);
                 }
-                this.logger.info("Waiting for restock [PID]: '{}'", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
+                this.logger.warn("Waiting for restock: status:'{}'", (Object)httpResponse.statusCode());
+                this.fetchGlobalCookies();
+                if (httpResponse.statusCode() != 412) {
+                    this.bannedBefore = false;
+                    CompletableFuture completableFuture3 = this.handleCRTSignalSleep(this.api);
+                    if (!completableFuture3.isDone()) {
+                        CompletableFuture completableFuture4 = completableFuture3;
+                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
+                    }
+                    if (((Boolean)completableFuture3.join()).booleanValue()) {
+                        return CompletableFuture.completedFuture(null);
+                    }
+                } else if (n % 10 == 0 && this.mode == Mode.DESKTOP && this.task.getMode().contains("skip")) {
+                    this.api.getPxAPI().reset();
                 }
-                completableFuture3.join();
-                CompletableFuture completableFuture5 = this.handleCRTSignalSleep(this.api);
+                CompletableFuture completableFuture5 = httpResponse.deferredBody().toCompletionStage().toCompletableFuture();
                 if (!completableFuture5.isDone()) {
                     CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, httpRequest, completableFuture6, httpResponse, null, 3, arg_0));
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture6, httpResponse, null, 3, arg_0));
                 }
-                if (!((Boolean)completableFuture5.join()).booleanValue()) continue;
-                return CompletableFuture.completedFuture(null);
+                completableFuture5.join();
+                CompletableFuture completableFuture7 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
+                if (!completableFuture7.isDone()) {
+                    CompletableFuture completableFuture8 = completableFuture7;
+                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture8, httpResponse, null, 4, arg_0));
+                }
+                boolean bl = (Boolean)completableFuture7.join();
             }
             catch (Throwable throwable) {
-                this.logger.error("Error occurred waiting for restock (s): {}", (Object)throwable.getMessage());
+                this.logger.error("Error occurred adding to cart: {}", (Object)throwable.getMessage());
                 CompletableFuture completableFuture = super.randomSleep(12000);
                 if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, null, completableFuture7, null, throwable, 4, arg_0));
+                    CompletableFuture completableFuture9 = completableFuture;
+                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, null, completableFuture9, null, throwable, 5, arg_0));
                 }
                 completableFuture.join();
             }
@@ -763,481 +333,49 @@ lbl14:
         return CompletableFuture.failedFuture(new Exception());
     }
 
-    public CompletableFuture updateOrCreateSession() {
-        try {
-            this.sessionCookies.clear();
-            if (this.mode.equals((Object)Mode.MOBILE)) {
-                CompletableFuture completableFuture = SessionPreload.createSession(this);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$updateOrCreateSession(this, completableFuture2, 1, arg_0));
-                }
-                completableFuture.join();
-            } else {
-                CompletableFuture completableFuture = Request.executeTillOk(this.api.getCheckoutPage());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture3 = completableFuture;
-                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$updateOrCreateSession(this, completableFuture3, 2, arg_0));
-                }
-                completableFuture.join();
-            }
-            this.sessionTimestamp = System.currentTimeMillis();
-            this.sessionCookies = new CookieJar((CookieJar)this.api.getWebClient().cookieStore());
-            this.sessionCookies.get(true, ".walmart.com", "/").forEach(Walmart::lambda$updateOrCreateSession$2);
-            this.fetchGlobalCookies();
-            this.api.getWebClient().cookieStore().putFromOther(this.sessionCookies);
-            return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            this.logger.error("Error occurred updating session: {}", (Object)throwable.getMessage());
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Enabled unnecessary exception pruning
-     */
-    public CompletableFuture checkStockCart(String string) {
-        int n = 0;
-        while (n < 5) {
-            block16: {
-                HttpRequest httpRequest = this.api.getCartV3(string);
-                try {
-                    JsonArray jsonArray;
-                    CompletableFuture completableFuture = Request.send(httpRequest);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockCart(this, string, n, httpRequest, completableFuture2, null, null, 1, arg_0));
-                    }
-                    HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                    if (httpResponse == null) break block16;
-                    if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
-                        JsonObject jsonObject = httpResponse.bodyAsJsonObject();
-                        if (jsonObject.getBoolean("checkoutable", Boolean.valueOf(false)).booleanValue()) {
-                            VertxUtil.sendSignal(this.instanceSignal, this.api.getWebClient().cookieStore().getCookieValue("CRT"));
-                            return CompletableFuture.completedFuture(true);
-                        }
-                        if (jsonObject.containsKey("items")) {
-                            jsonArray = jsonObject.getJsonArray("items", null);
-                            if (jsonArray != null && jsonArray.size() > 0) {
-                                break block17;
-                            } else {
-                                this.api.getWebClient().cookieStore().removeAnyMatch("hasCRT");
-                                this.api.getWebClient().cookieStore().removeAnyMatch("CRT");
-                                return CompletableFuture.failedFuture(new EmptyCartException());
-                            }
-                        }
-                    } else {
-                        block17: {
-                            if (httpResponse.statusCode() == 405) {
-                                return CompletableFuture.failedFuture(new EmptyCartException());
-                            }
-                            this.logger.warn("Waiting for restock (s): status:'{}'", (Object)httpResponse.statusCode());
-                            CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
-                            if (!completableFuture3.isDone()) {
-                                CompletableFuture completableFuture4 = completableFuture3;
-                                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockCart(this, string, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
-                            }
-                            completableFuture3.join();
-                            return CompletableFuture.completedFuture(false);
-                        }
-                        for (int i = 0; i < jsonArray.size(); ++i) {
-                            try {
-                                JsonObject jsonObject = jsonArray.getJsonObject(i);
-                                if (!jsonObject.getString("offerId", "").equalsIgnoreCase(this.itemKeyword)) continue;
-                                this.productID = jsonObject.getString("USItemId", "");
-                                break;
-                            }
-                            catch (Throwable throwable) {
-                                // empty catch block
-                            }
-                        }
-                    }
-                    this.logger.info("Waiting for restock (s)");
-                    return CompletableFuture.completedFuture(false);
-                }
-                catch (Throwable throwable) {
-                    this.logger.error("Error occurred waiting for restock (s): {}", (Object)throwable.getMessage());
-                    CompletableFuture completableFuture = super.randomSleep(12000);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture5 = completableFuture;
-                        return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockCart(this, string, n, httpRequest, completableFuture5, null, throwable, 3, arg_0));
-                    }
-                    completableFuture.join();
-                }
-            }
-            ++n;
-        }
-        return CompletableFuture.completedFuture(false);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$checkStockCart(Walmart var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture handleCRTSignalSleep(API aPI) {
-        CompletableFuture completableFuture = VertxUtil.randomSignalSleep(this.instanceSignal, this.task.getMonitorDelay());
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$handleCRTSignalSleep(this, aPI, completableFuture2, 1, arg_0));
-        }
-        String string = (String)completableFuture.join();
-        if (!this.shared) return CompletableFuture.completedFuture(false);
-        if (string == null) return CompletableFuture.completedFuture(false);
-        if (string.isEmpty()) return CompletableFuture.completedFuture(false);
-        aPI.cookieStore().put("CRT", string, ".walmart.com");
-        return CompletableFuture.completedFuture(true);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$checkStockTerra(Walmart var0, String var1_1, Buffer var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_5, HttpResponse var6_7, Throwable var7_8, int var8_9, Object var9_11) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 14[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
     /*
      * Unable to fully structure code
      */
-    public static CompletableFuture async$updateOrCreateSession(Walmart var0, CompletableFuture var1_1, int var2_3, Object var3_6) {
-        switch (var2_3) {
+    public static CompletableFuture async$handleCRTSignalSleep(Walmart var0, API var1_1, CompletableFuture var2_2, int var3_3, Object var4_5) {
+        switch (var3_3) {
             case 0: {
-                try {
-                    var0.sessionCookies.clear();
-                    if (!var0.mode.equals((Object)Mode.MOBILE)) ** GOTO lbl15
-                    v0 = SessionPreload.createSession(var0);
-                    if (!v0.isDone()) {
-                        var2_4 = v0;
-                        return var2_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$updateOrCreateSession(io.trickle.task.sites.walmart.usa.Walmart java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (CompletableFuture)var2_4, (int)1));
-                    }
-lbl11:
-                    // 3 sources
-
-                    while (true) {
-                        v0.join();
-                        ** GOTO lbl22
-                        break;
-                    }
-lbl15:
-                    // 1 sources
-
-                    v1 = Request.executeTillOk(var0.api.getCheckoutPage());
-                    if (!v1.isDone()) {
-                        var2_5 = v1;
-                        return var2_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$updateOrCreateSession(io.trickle.task.sites.walmart.usa.Walmart java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (CompletableFuture)var2_5, (int)2));
-                    }
-lbl19:
-                    // 3 sources
-
-                    while (true) {
-                        v1.join();
-lbl22:
-                        // 2 sources
-
-                        var0.sessionTimestamp = System.currentTimeMillis();
-                        var0.sessionCookies = new CookieJar((CookieJar)var0.api.getWebClient().cookieStore());
-                        var0.sessionCookies.get(true, ".walmart.com", "/").forEach((Consumer<Cookie>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)V, lambda$updateOrCreateSession$2(io.netty.handler.codec.http.cookie.Cookie ), (Lio/netty/handler/codec/http/cookie/Cookie;)V)());
-                        var0.fetchGlobalCookies();
-                        var0.api.getWebClient().cookieStore().putFromOther(var0.sessionCookies);
-                        return CompletableFuture.completedFuture(null);
-                    }
+                v0 = VertxUtil.randomSignalSleep(var0.instanceSignal, var0.task.getMonitorDelay());
+                if (!v0.isDone()) {
+                    var3_4 = v0;
+                    return var3_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleCRTSignalSleep(io.trickle.task.sites.walmart.usa.Walmart io.trickle.task.sites.walmart.usa.API java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (API)var1_1, (CompletableFuture)var3_4, (int)1));
                 }
-                catch (Throwable var1_2) {
-                    var0.logger.error("Error occurred updating session: {}", (Object)var1_2.getMessage());
-                }
-                return CompletableFuture.completedFuture(null);
+                ** GOTO lbl10
             }
             case 1: {
-                v0 = var1_1;
-                ** continue;
-            }
-            case 2: {
-                v1 = var1_1;
-                ** continue;
+                v0 = var2_2;
+lbl10:
+                // 2 sources
+
+                var2_2 = (String)v0.join();
+                if (var0.shared == false) return CompletableFuture.completedFuture(false);
+                if (var2_2 == null) return CompletableFuture.completedFuture(false);
+                if (var2_2.isEmpty() != false) return CompletableFuture.completedFuture(false);
+                var1_1.cookieStore().put("CRT", (String)var2_2, ".walmart.com");
+                return CompletableFuture.completedFuture(true);
             }
         }
         throw new IllegalArgumentException();
     }
 
-    public void fetchGlobalCookies() {
-        GLOBAL_COOKIES.forEach(this::lambda$fetchGlobalCookies$3);
+    public Walmart(Task task, int n) {
+        super(n);
+        this.task = task;
+        this.mode = Mode.getMode(this.task.getMode());
+        this.api = this.mode.equals((Object)Mode.DESKTOP) ? new WalmartAPIDesktop(this.task) : new WalmartAPI(this.task);
+        super.setClient(this.api);
+        this.api.getWebClient().cookieStore().setCookieFilter(Walmart::lambda$new$0);
+        this.instanceSignal = this.itemKeyword = this.task.getKeywords()[0];
+        this.shared = this.task.getMode().toLowerCase().contains("sync");
     }
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$tryCart(Walmart var0, int var1_1, int var2_2, int var3_3, CompletableFuture var4_4, int var5_10, Throwable var6_13, int var7_15, Object var8_26) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [27[UNCONDITIONALDOLOOP], 28[UNCONDITIONALDOLOOP], 26[UNCONDITIONALDOLOOP], 29[UNCONDITIONALDOLOOP], 7[CASE]], but top level block is 1[TRYBLOCK]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    /*
-     * WARNING - Removed try catching itself - possible behaviour change.
-     * Unable to fully structure code
-     */
-    public CompletableFuture tryCart() {
-        var1_1 = 0;
-        var2_2 = 0;
-        var3_3 = 0;
-        try {
-            Integer.parseInt(this.itemKeyword);
-            var2_2 = 1;
-        }
-        catch (Exception var4_4) {
-            // empty catch block
-        }
-        if (this.task.getMode().contains("login")) {
-            v0 = this.createAccount(false);
-            if (!v0.isDone()) {
-                var7_9 = v0;
-                return var7_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_9, (int)0, null, (int)1));
-            }
-            v0.join();
-        } else if (this.task.getMode().contains("account")) {
-            v1 = this.loginAccount();
-            if (!v1.isDone()) {
-                var7_10 = v1;
-                return var7_10.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_10, (int)0, null, (int)2));
-            }
-            var4_5 = (Integer)v1.join();
-            if (var4_5 < 1) {
-                this.logger.info("No accounts available in storage. Creating new...");
-                v2 = this.createAccount(true);
-                if (!v2.isDone()) {
-                    var7_11 = v2;
-                    return var7_11.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_11, (int)var4_5, null, (int)3));
-                }
-                v2.join();
-            }
-        }
-        while (this.running != false) {
-            block32: {
-                if (System.currentTimeMillis() - this.sessionTimestamp >= (long)ThreadLocalRandom.current().nextInt(120000, 300000)) {
-                    v3 = this.updateOrCreateSession();
-                    if (!v3.isDone()) {
-                        var7_12 = v3;
-                        return var7_12.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_12, (int)0, null, (int)4));
-                    }
-                    v3.join();
-                }
-                if (var1_1 == 0) {
-                    try {
-                        v4 = var2_2 != 0 ? this.atcAffiliate() : this.atcNormal();
-                        if (!v4.isDone()) {
-                            var7_13 = v4;
-                            return var7_13.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_13, (int)0, null, (int)5));
-                        }
-                        v4.join();
-                        break block32;
-                    }
-                    catch (Exception var4_6) {
-                        continue;
-                    }
-                }
-                if (var3_3 != 0) {
-                    try {
-                        v5 = this.waitForRestock();
-                        if (!v5.isDone()) {
-                            var7_14 = v5;
-                            return var7_14.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_14, (int)0, null, (int)6));
-                        }
-                        if (!((Boolean)v5.join()).booleanValue()) {
-                        }
-                        break block32;
-                    }
-                    catch (Throwable var4_7) {
-                        var1_1 = 0;
-                        var3_3 = 0;
-                        this.fetchGlobalCookies();
-                    }
-                    continue;
-                }
-            }
-            try {
-                Analytics.carts.incrementAndGet();
-                v6 = this.tryCheckout();
-                if (!v6.isDone()) {
-                    var7_15 = v6;
-                    return var7_15.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_15, (int)0, null, (int)7));
-                }
-                v6.join();
-                ** GOTO lbl104
-            }
-            catch (Exception var4_8) {
-                try {
-                    if (var4_8.getMessage().contains("exceeds limit") || var4_8.getMessage().contains("PCID") || var4_8.getMessage().contains("405")) {
-                        var1_1 = 0;
-                        var3_3 = 0;
-                        this.fetchGlobalCookies();
-                    }
-                    var1_1 = 1;
-                    if (!this.api.getWebClient().cookieStore().contains("CRT")) ** GOTO lbl112
-                    try {
-                        var5_19 = this.api.getCookies().getCookieValue("CRT");
-                        this.api.getCookies().put("CRT", var5_19, ".walmart.com");
-                    }
-                    catch (Exception var5_20) {
-                        var5_20.printStackTrace();
-                    }
-                    var3_3 = 1;
-                }
-                catch (Throwable var6_21) {
-                    this.logger.warn("Retrying in {}ms", (Object)this.task.getRetryDelay());
-                    v7 = super.sleep(this.task.getRetryDelay());
-                    if (!v7.isDone()) {
-                        var7_18 = v7;
-                        return var7_18.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_18, (int)0, (Throwable)var6_21, (int)10));
-                    }
-                    v7.join();
-                    throw var6_21;
-                }
-lbl104:
-                // 1 sources
-
-                this.logger.warn("Retrying in {}ms", (Object)this.task.getRetryDelay());
-                v8 = super.sleep(this.task.getRetryDelay());
-                if (!v8.isDone()) {
-                    var7_16 = v8;
-                    return var7_16.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_16, (int)0, null, (int)8));
-                }
-                v8.join();
-                return CompletableFuture.completedFuture(null);
-lbl112:
-                // 3 sources
-
-                this.logger.warn("Retrying in {}ms", (Object)this.task.getRetryDelay());
-                v9 = super.sleep(this.task.getRetryDelay());
-                if (!v9.isDone()) {
-                    var7_17 = v9;
-                    return var7_17.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_17, (int)0, null, (int)9));
-                }
-                v9.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture waitForRestock() {
-        String string;
-        int n = 0;
-        try {
-            string = this.api.getWebClient().cookieStore().getCookieValue("CRT");
-        }
-        catch (Exception exception) {
-            string = "";
-        }
-        while (this.running) {
-            if (n > 30) return CompletableFuture.completedFuture(false);
-            ++n;
-            try {
-                if (n % 2 == 0 && !this.productID.isEmpty()) {
-                    CompletableFuture completableFuture = this.checkStockTerra(this.productID);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture2, null, 1, arg_0));
-                    }
-                    if (((Boolean)completableFuture.join()).booleanValue()) {
-                        return CompletableFuture.completedFuture(true);
-                    }
-                } else {
-                    CompletableFuture completableFuture = this.checkStockCart(string);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture3 = completableFuture;
-                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture3, null, 2, arg_0));
-                    }
-                    if (((Boolean)completableFuture.join()).booleanValue()) {
-                        return CompletableFuture.completedFuture(true);
-                    }
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSignalSleep(this.instanceSignal, this.task.getMonitorDelay());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture4, null, 3, arg_0));
-                }
-                completableFuture.join();
-            }
-            catch (Throwable throwable) {
-                if (throwable.getMessage().contains("CRT expired or empty")) {
-                    return CompletableFuture.failedFuture(throwable);
-                }
-                this.logger.error("Error occurred waiting for restock: {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = super.randomSleep(12000);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture5, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(false);
+    public void lambda$fetchGlobalCookies$3(Cookie cookie) {
+        if (this.sessionCookies.contains(cookie.name())) return;
+        this.sessionCookies.put(cookie);
     }
 
     /*
@@ -1414,68 +552,125 @@ lbl102:
         throw new IllegalArgumentException();
     }
 
-    public CompletableFuture createAccount(boolean bl) {
-        this.logger.info("Creating account");
-        int n = 0;
-        while (this.running) {
-            if (n > 500) return CompletableFuture.failedFuture(new Exception());
-            ++n;
-            try {
-                JsonObject jsonObject = this.api.accountCreateForm();
-                HttpRequest httpRequest = this.api.createAccount();
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, jsonObject, httpRequest, completableFuture2, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
-                    if (bl) {
-                        this.vertx.eventBus().send("accounts.writer", (Object)(jsonObject.getString("email") + ":" + jsonObject.getString("password")));
-                        if (this.logger.isDebugEnabled()) {
-                            this.logger.debug("Account create responded with: [{}]{}", (Object)httpResponse.statusCode(), (Object)httpResponse.bodyAsString());
-                        }
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$tryCart(Walmart var0, int var1_1, int var2_2, int var3_3, CompletableFuture var4_4, int var5_10, Throwable var6_13, int var7_15, Object var8_26) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CASE], 28[UNCONDITIONALDOLOOP], 29[UNCONDITIONALDOLOOP], 27[UNCONDITIONALDOLOOP], 26[UNCONDITIONALDOLOOP]], but top level block is 1[TRYBLOCK]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$updateOrCreateSession(Walmart var0, CompletableFuture var1_1, int var2_3, Object var3_6) {
+        switch (var2_3) {
+            case 0: {
+                try {
+                    var0.sessionCookies.clear();
+                    if (!var0.mode.equals((Object)Mode.MOBILE)) ** GOTO lbl15
+                    v0 = SessionPreload.createSession(var0);
+                    if (!v0.isDone()) {
+                        var2_4 = v0;
+                        return var2_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$updateOrCreateSession(io.trickle.task.sites.walmart.usa.Walmart java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (CompletableFuture)var2_4, (int)1));
                     }
-                    this.api.setLoggedIn(true);
-                    this.task.getProfile().setAccountEmail(jsonObject.getString("email", null));
-                    this.logger.info("Created account successfully!");
-                    return CompletableFuture.completedFuture(null);
-                }
-                this.logger.warn("Creating account: status:'{}'", (Object)httpResponse.statusCode());
-                if (httpResponse.statusCode() != 412) {
-                    this.bannedBefore = false;
-                } else if (n % 10 == 0 && this.mode == Mode.DESKTOP && this.task.getMode().contains("skip")) {
-                    this.api.getPxAPI().reset();
-                }
-                CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, jsonObject, httpRequest, completableFuture4, httpResponse, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 == 0 || this.bannedBefore) {
-                    CompletableFuture completableFuture5 = VertxUtil.sleep(this.task.getRetryDelay());
-                    if (!completableFuture5.isDone()) {
-                        CompletableFuture completableFuture6 = completableFuture5;
-                        return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, jsonObject, httpRequest, completableFuture6, httpResponse, n2, null, 3, arg_0));
+lbl11:
+                    // 3 sources
+
+                    while (true) {
+                        v0.join();
+                        ** GOTO lbl22
+                        break;
                     }
-                    completableFuture5.join();
+lbl15:
+                    // 1 sources
+
+                    v1 = Request.executeTillOk(var0.api.getCheckoutPage());
+                    if (!v1.isDone()) {
+                        var2_5 = v1;
+                        return var2_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$updateOrCreateSession(io.trickle.task.sites.walmart.usa.Walmart java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (CompletableFuture)var2_5, (int)2));
+                    }
+lbl19:
+                    // 3 sources
+
+                    while (true) {
+                        v1.join();
+lbl22:
+                        // 2 sources
+
+                        var0.sessionTimestamp = System.currentTimeMillis();
+                        var0.sessionCookies = new CookieJar((CookieJar)var0.api.getWebClient().cookieStore());
+                        var0.sessionCookies.get(true, ".walmart.com", "/").forEach((Consumer<Cookie>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)V, lambda$updateOrCreateSession$2(io.netty.handler.codec.http.cookie.Cookie ), (Lio/netty/handler/codec/http/cookie/Cookie;)V)());
+                        var0.fetchGlobalCookies();
+                        var0.api.getWebClient().cookieStore().putFromOther(var0.sessionCookies);
+                        return CompletableFuture.completedFuture(null);
+                    }
                 }
-                if (httpResponse.statusCode() != 412) continue;
-                this.bannedBefore = true;
+                catch (Throwable var1_2) {
+                    var0.logger.error("Error occurred updating session: {}", (Object)var1_2.getMessage());
+                }
+                return CompletableFuture.completedFuture(null);
             }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred creating account: {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = super.randomSleep(12000);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, null, null, completableFuture7, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
+            case 1: {
+                v0 = var1_1;
+                ** continue;
+            }
+            case 2: {
+                v1 = var1_1;
+                ** continue;
             }
         }
-        return CompletableFuture.failedFuture(new Exception());
+        throw new IllegalArgumentException();
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$checkStockTerra(Walmart var0, String var1_1, Buffer var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_5, HttpResponse var6_7, Throwable var7_8, int var8_9, Object var9_11) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 14[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
     }
 
     /*
@@ -1623,19 +818,261 @@ lbl67:
         throw new IllegalStateException("Decompilation failed");
     }
 
-    public void lambda$fetchGlobalCookies$3(Cookie cookie) {
-        if (this.sessionCookies.contains(cookie.name())) return;
-        this.sessionCookies.put(cookie);
+    /*
+     * Enabled unnecessary exception pruning
+     */
+    public CompletableFuture checkStockCart(String string) {
+        int n = 0;
+        while (n < 5) {
+            block16: {
+                HttpRequest httpRequest = this.api.getCartV3(string);
+                try {
+                    JsonArray jsonArray;
+                    CompletableFuture completableFuture = Request.send(httpRequest);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture2 = completableFuture;
+                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockCart(this, string, n, httpRequest, completableFuture2, null, null, 1, arg_0));
+                    }
+                    HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                    if (httpResponse == null) break block16;
+                    if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
+                        JsonObject jsonObject = httpResponse.bodyAsJsonObject();
+                        if (jsonObject.getBoolean("checkoutable", Boolean.valueOf(false)).booleanValue()) {
+                            VertxUtil.sendSignal(this.instanceSignal, this.api.getWebClient().cookieStore().getCookieValue("CRT"));
+                            return CompletableFuture.completedFuture(true);
+                        }
+                        if (jsonObject.containsKey("items")) {
+                            jsonArray = jsonObject.getJsonArray("items", null);
+                            if (jsonArray != null && jsonArray.size() > 0) {
+                                break block17;
+                            } else {
+                                this.api.getWebClient().cookieStore().removeAnyMatch("hasCRT");
+                                this.api.getWebClient().cookieStore().removeAnyMatch("CRT");
+                                return CompletableFuture.failedFuture(new EmptyCartException());
+                            }
+                        }
+                    } else {
+                        block17: {
+                            if (httpResponse.statusCode() == 405) {
+                                return CompletableFuture.failedFuture(new EmptyCartException());
+                            }
+                            this.logger.warn("Waiting for restock (s): status:'{}'", (Object)httpResponse.statusCode());
+                            CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
+                            if (!completableFuture3.isDone()) {
+                                CompletableFuture completableFuture4 = completableFuture3;
+                                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockCart(this, string, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
+                            }
+                            completableFuture3.join();
+                            return CompletableFuture.completedFuture(false);
+                        }
+                        for (int i = 0; i < jsonArray.size(); ++i) {
+                            try {
+                                JsonObject jsonObject = jsonArray.getJsonObject(i);
+                                if (!jsonObject.getString("offerId", "").equalsIgnoreCase(this.itemKeyword)) continue;
+                                this.productID = jsonObject.getString("USItemId", "");
+                                break;
+                            }
+                            catch (Throwable throwable) {
+                                // empty catch block
+                            }
+                        }
+                    }
+                    this.logger.info("Waiting for restock (s)");
+                    return CompletableFuture.completedFuture(false);
+                }
+                catch (Throwable throwable) {
+                    this.logger.error("Error occurred waiting for restock (s): {}", (Object)throwable.getMessage());
+                    CompletableFuture completableFuture = super.randomSleep(12000);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture5 = completableFuture;
+                        return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockCart(this, string, n, httpRequest, completableFuture5, null, throwable, 3, arg_0));
+                    }
+                    completableFuture.join();
+                }
+            }
+            ++n;
+        }
+        return CompletableFuture.completedFuture(false);
+    }
+
+    public CompletableFuture generateToken() {
+        HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().getAbs("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust=" + System.currentTimeMillis()).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
+        try {
+            CompletableFuture completableFuture = Request.execute(httpRequest, 5);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$generateToken(this, httpRequest, completableFuture2, 1, arg_0));
+            }
+            String string = (String)completableFuture.join();
+            this.token = PaymentToken.prepareAndGenerate(string, this.task.getProfile().getCardNumber(), this.task.getProfile().getCvv());
+            this.token.set4111Encrypted(PaymentToken.prepareAndGenerate(string, "4111111111111111", this.task.getProfile().getCvv()).getEncryptedPan());
+            return CompletableFuture.completedFuture(null);
+        }
+        catch (Exception exception) {
+            this.logger.warn("Failed to generate payment token: {}", (Object)exception.getMessage());
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /*
+     * WARNING - Removed try catching itself - possible behaviour change.
+     * Unable to fully structure code
+     */
+    public CompletableFuture tryCart() {
+        var1_1 = 0;
+        var2_2 = 0;
+        var3_3 = 0;
+        try {
+            Integer.parseInt(this.itemKeyword);
+            var2_2 = 1;
+        }
+        catch (Exception var4_4) {
+            // empty catch block
+        }
+        if (this.task.getMode().contains("login")) {
+            v0 = this.createAccount(false);
+            if (!v0.isDone()) {
+                var7_9 = v0;
+                return var7_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_9, (int)0, null, (int)1));
+            }
+            v0.join();
+        } else if (this.task.getMode().contains("account")) {
+            v1 = this.loginAccount();
+            if (!v1.isDone()) {
+                var7_10 = v1;
+                return var7_10.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_10, (int)0, null, (int)2));
+            }
+            var4_5 = (Integer)v1.join();
+            if (var4_5 < 1) {
+                this.logger.info("No accounts available in storage. Creating new...");
+                v2 = this.createAccount(true);
+                if (!v2.isDone()) {
+                    var7_11 = v2;
+                    return var7_11.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_11, (int)var4_5, null, (int)3));
+                }
+                v2.join();
+            }
+        }
+        while (this.running != false) {
+            block32: {
+                if (System.currentTimeMillis() - this.sessionTimestamp >= (long)ThreadLocalRandom.current().nextInt(120000, 300000)) {
+                    v3 = this.updateOrCreateSession();
+                    if (!v3.isDone()) {
+                        var7_12 = v3;
+                        return var7_12.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_12, (int)0, null, (int)4));
+                    }
+                    v3.join();
+                }
+                if (var1_1 == 0) {
+                    try {
+                        v4 = var2_2 != 0 ? this.atcAffiliate() : this.atcNormal();
+                        if (!v4.isDone()) {
+                            var7_13 = v4;
+                            return var7_13.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_13, (int)0, null, (int)5));
+                        }
+                        v4.join();
+                        break block32;
+                    }
+                    catch (Exception var4_6) {
+                        continue;
+                    }
+                }
+                if (var3_3 != 0) {
+                    try {
+                        v5 = this.waitForRestock();
+                        if (!v5.isDone()) {
+                            var7_14 = v5;
+                            return var7_14.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_14, (int)0, null, (int)6));
+                        }
+                        if (!((Boolean)v5.join()).booleanValue()) {
+                        }
+                        break block32;
+                    }
+                    catch (Throwable var4_7) {
+                        var1_1 = 0;
+                        var3_3 = 0;
+                        this.fetchGlobalCookies();
+                    }
+                    continue;
+                }
+            }
+            try {
+                Analytics.carts.incrementAndGet();
+                v6 = this.tryCheckout();
+                if (!v6.isDone()) {
+                    var7_15 = v6;
+                    return var7_15.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_15, (int)0, null, (int)7));
+                }
+                v6.join();
+                ** GOTO lbl104
+            }
+            catch (Exception var4_8) {
+                try {
+                    if (var4_8.getMessage().contains("exceeds limit") || var4_8.getMessage().contains("PCID") || var4_8.getMessage().contains("405")) {
+                        var1_1 = 0;
+                        var3_3 = 0;
+                        this.fetchGlobalCookies();
+                    }
+                    var1_1 = 1;
+                    if (!this.api.getWebClient().cookieStore().contains("CRT")) ** GOTO lbl112
+                    try {
+                        var5_19 = this.api.getCookies().getCookieValue("CRT");
+                        this.api.getCookies().put("CRT", var5_19, ".walmart.com");
+                    }
+                    catch (Exception var5_20) {
+                        var5_20.printStackTrace();
+                    }
+                    var3_3 = 1;
+                }
+                catch (Throwable var6_21) {
+                    this.logger.warn("Retrying in {}ms", (Object)this.task.getRetryDelay());
+                    v7 = super.sleep(this.task.getRetryDelay());
+                    if (!v7.isDone()) {
+                        var7_18 = v7;
+                        return var7_18.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_18, (int)0, (Throwable)var6_21, (int)10));
+                    }
+                    v7.join();
+                    throw var6_21;
+                }
+lbl104:
+                // 1 sources
+
+                this.logger.warn("Retrying in {}ms", (Object)this.task.getRetryDelay());
+                v8 = super.sleep(this.task.getRetryDelay());
+                if (!v8.isDone()) {
+                    var7_16 = v8;
+                    return var7_16.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_16, (int)0, null, (int)8));
+                }
+                v8.join();
+                return CompletableFuture.completedFuture(null);
+lbl112:
+                // 3 sources
+
+                this.logger.warn("Retrying in {}ms", (Object)this.task.getRetryDelay());
+                v9 = super.sleep(this.task.getRetryDelay());
+                if (!v9.isDone()) {
+                    var7_17 = v9;
+                    return var7_17.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCart(io.trickle.task.sites.walmart.usa.Walmart int int int java.util.concurrent.CompletableFuture int java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)this, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var7_17, (int)0, null, (int)9));
+                }
+                v9.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public static boolean lambda$new$0(String string) {
+        if (string.equalsIgnoreCase("g")) return false;
+        return true;
     }
 
     /*
      * Exception decompiling
      */
-    public static CompletableFuture async$cartFast(Walmart var0, int var1_1, int var2_2, String var3_3, HttpRequest var4_4, CompletableFuture var5_6, Buffer var6_8, HttpResponse var7_9, int var8_10, Throwable var9_11, int var10_12, Object var11_13) {
+    public static CompletableFuture async$loginAccount(Walmart var0, int var1_1, AccountController var2_2, CompletableFuture var3_3, Account var4_5, JsonObject var5_6, HttpRequest var6_7, HttpResponse var7_8, int var8_10, Throwable var9_16, int var10_17, Object var11_18) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [11[CATCHBLOCK]], but top level block is 19[UNCONDITIONALDOLOOP]
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
@@ -1657,70 +1094,723 @@ lbl67:
         throw new IllegalStateException("Decompilation failed");
     }
 
-    public void lambda$run$1(Long l) {
-        Request.execute(this.api.getWebClient().getAbs("https://www.walmart.com/favicon.ico"));
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$generateToken(Walmart var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
+        switch (var3_4) {
+            case 0: {
+                var1_1 = VertxSingleton.INSTANCE.getLocalClient().getClient().getAbs("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust=" + System.currentTimeMillis()).timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
+                try {
+                    v0 = Request.execute(var1_1, 5);
+                    if (!v0.isDone()) {
+                        var3_5 = v0;
+                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$generateToken(io.trickle.task.sites.walmart.usa.Walmart io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
+                    }
+                    ** GOTO lbl15
+                }
+                catch (Exception var2_3) {
+                    var0.logger.warn("Failed to generate payment token: {}", (Object)var2_3.getMessage());
+                }
+                return CompletableFuture.completedFuture(null);
+            }
+            case 1: {
+                v0 = var2_2;
+lbl15:
+                // 2 sources
+
+                var2_2 = (String)v0.join();
+                var0.token = PaymentToken.prepareAndGenerate((String)var2_2, var0.task.getProfile().getCardNumber(), var0.task.getProfile().getCvv());
+                var0.token.set4111Encrypted(PaymentToken.prepareAndGenerate((String)var2_2, "4111111111111111", var0.task.getProfile().getCvv()).getEncryptedPan());
+                return CompletableFuture.completedFuture(null);
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
-    public CompletableFuture atcNormal() {
-        this.logger.info("Attempting add to cart");
-        Buffer buffer = this.api.atcForm().toBuffer();
+    public CompletableFuture updateOrCreateSession() {
+        try {
+            this.sessionCookies.clear();
+            if (this.mode.equals((Object)Mode.MOBILE)) {
+                CompletableFuture completableFuture = SessionPreload.createSession(this);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$updateOrCreateSession(this, completableFuture2, 1, arg_0));
+                }
+                completableFuture.join();
+            } else {
+                CompletableFuture completableFuture = Request.executeTillOk(this.api.getCheckoutPage());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture3 = completableFuture;
+                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$updateOrCreateSession(this, completableFuture3, 2, arg_0));
+                }
+                completableFuture.join();
+            }
+            this.sessionTimestamp = System.currentTimeMillis();
+            this.sessionCookies = new CookieJar((CookieJar)this.api.getWebClient().cookieStore());
+            this.sessionCookies.get(true, ".walmart.com", "/").forEach(Walmart::lambda$updateOrCreateSession$2);
+            this.fetchGlobalCookies();
+            this.api.getWebClient().cookieStore().putFromOther(this.sessionCookies);
+            return CompletableFuture.completedFuture(null);
+        }
+        catch (Throwable throwable) {
+            this.logger.error("Error occurred updating session: {}", (Object)throwable.getMessage());
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture createAccount(boolean bl) {
+        this.logger.info("Creating account");
         int n = 0;
         while (this.running) {
             if (n > 500) return CompletableFuture.failedFuture(new Exception());
             ++n;
             try {
-                HttpRequest httpRequest = this.api.addToCart().as(BodyCodec.deferred());
-                CompletableFuture completableFuture = Request.send(httpRequest, buffer);
+                JsonObject jsonObject = this.api.accountCreateForm();
+                HttpRequest httpRequest = this.api.createAccount();
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject);
                 if (!completableFuture.isDone()) {
                     CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture2, null, null, 1, arg_0));
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, jsonObject, httpRequest, completableFuture2, null, 0, null, 1, arg_0));
                 }
                 HttpResponse httpResponse = (HttpResponse)completableFuture.join();
                 if (httpResponse == null) continue;
                 if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
-                    VertxUtil.sendSignal(this.instanceSignal, this.api.cookieStore().getCookieValue("CRT"));
-                    this.logger.info("Successfully added to cart: status:'{}'", (Object)httpResponse.statusCode());
+                    if (bl) {
+                        this.vertx.eventBus().send("accounts.writer", (Object)(jsonObject.getString("email") + ":" + jsonObject.getString("password")));
+                        if (this.logger.isDebugEnabled()) {
+                            this.logger.debug("Account create responded with: [{}]{}", (Object)httpResponse.statusCode(), (Object)httpResponse.bodyAsString());
+                        }
+                    }
+                    this.api.setLoggedIn(true);
+                    this.task.getProfile().setAccountEmail(jsonObject.getString("email", null));
+                    this.logger.info("Created account successfully!");
                     return CompletableFuture.completedFuture(null);
                 }
-                this.logger.warn("Waiting for restock: status:'{}'", (Object)httpResponse.statusCode());
-                this.fetchGlobalCookies();
+                this.logger.warn("Creating account: status:'{}'", (Object)httpResponse.statusCode());
                 if (httpResponse.statusCode() != 412) {
                     this.bannedBefore = false;
-                    CompletableFuture completableFuture3 = this.handleCRTSignalSleep(this.api);
-                    if (!completableFuture3.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture3;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
-                    }
-                    if (((Boolean)completableFuture3.join()).booleanValue()) {
-                        return CompletableFuture.completedFuture(null);
-                    }
                 } else if (n % 10 == 0 && this.mode == Mode.DESKTOP && this.task.getMode().contains("skip")) {
                     this.api.getPxAPI().reset();
                 }
-                CompletableFuture completableFuture5 = httpResponse.deferredBody().toCompletionStage().toCompletableFuture();
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture6, httpResponse, null, 3, arg_0));
+                CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, jsonObject, httpRequest, completableFuture4, httpResponse, 0, null, 2, arg_0));
                 }
-                completableFuture5.join();
-                CompletableFuture completableFuture7 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
-                if (!completableFuture7.isDone()) {
-                    CompletableFuture completableFuture8 = completableFuture7;
-                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, httpRequest, completableFuture8, httpResponse, null, 4, arg_0));
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 == 0 || this.bannedBefore) {
+                    CompletableFuture completableFuture5 = VertxUtil.sleep(this.task.getRetryDelay());
+                    if (!completableFuture5.isDone()) {
+                        CompletableFuture completableFuture6 = completableFuture5;
+                        return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, jsonObject, httpRequest, completableFuture6, httpResponse, n2, null, 3, arg_0));
+                    }
+                    completableFuture5.join();
                 }
-                boolean bl = (Boolean)completableFuture7.join();
+                if (httpResponse.statusCode() != 412) continue;
+                this.bannedBefore = true;
             }
             catch (Throwable throwable) {
-                this.logger.error("Error occurred adding to cart: {}", (Object)throwable.getMessage());
+                this.logger.error("Error occurred creating account: {}", (Object)throwable.getMessage());
                 CompletableFuture completableFuture = super.randomSleep(12000);
                 if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture9 = completableFuture;
-                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcNormal(this, buffer, n, null, completableFuture9, null, throwable, 5, arg_0));
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$createAccount(this, (int)(bl ? 1 : 0), n, null, null, completableFuture7, null, 0, throwable, 4, arg_0));
                 }
                 completableFuture.join();
             }
         }
         return CompletableFuture.failedFuture(new Exception());
+    }
+
+    public void fetchGlobalCookies() {
+        GLOBAL_COOKIES.forEach(this::lambda$fetchGlobalCookies$3);
+    }
+
+    public CompletableFuture handleCRTSignalSleep(API aPI) {
+        CompletableFuture completableFuture = VertxUtil.randomSignalSleep(this.instanceSignal, this.task.getMonitorDelay());
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$handleCRTSignalSleep(this, aPI, completableFuture2, 1, arg_0));
+        }
+        String string = (String)completableFuture.join();
+        if (!this.shared) return CompletableFuture.completedFuture(false);
+        if (string == null) return CompletableFuture.completedFuture(false);
+        if (string.isEmpty()) return CompletableFuture.completedFuture(false);
+        aPI.cookieStore().put("CRT", string, ".walmart.com");
+        return CompletableFuture.completedFuture(true);
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$checkStockCart(Walmart var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public CompletableFuture tryCheckout() {
+        try {
+            CompletableFuture completableFuture = PaymentInstance.checkout(this, this.task, this.token, this.mode);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$tryCheckout(this, completableFuture2, 1, arg_0));
+            }
+            if ((Integer)completableFuture.join() != -1) return CompletableFuture.completedFuture(null);
+            return CompletableFuture.failedFuture(new Exception("Failed to process."));
+        }
+        catch (Exception exception) {
+            this.logger.warn("Failed to checkout: {}", (Object)exception.getMessage());
+            return CompletableFuture.failedFuture(exception);
+        }
+    }
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$tryCheckout(Walmart var0, CompletableFuture var1_1, int var2_3, Object var3_5) {
+        switch (var2_3) {
+            case 0: {
+                try {
+                    v0 = PaymentInstance.checkout(var0, var0.task, var0.token, var0.mode);
+                    if (!v0.isDone()) {
+                        var2_4 = v0;
+                        return var2_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$tryCheckout(io.trickle.task.sites.walmart.usa.Walmart java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (CompletableFuture)var2_4, (int)1));
+                    }
+                    ** GOTO lbl14
+                }
+                catch (Exception var1_2) {
+                    var0.logger.warn("Failed to checkout: {}", (Object)var1_2.getMessage());
+                    return CompletableFuture.failedFuture(var1_2);
+                }
+            }
+            case 1: {
+                v0 = var1_1;
+lbl14:
+                // 2 sources
+
+                if ((Integer)v0.join() != -1) return CompletableFuture.completedFuture(null);
+                return CompletableFuture.failedFuture(new Exception("Failed to process."));
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    public CompletableFuture loginAccount() {
+        int n = 0;
+        AccountController accountController = (AccountController)Engine.get().getModule(Controller.ACCOUNT);
+        while (this.running && n <= 500) {
+            ++n;
+            try {
+                CompletableFuture completableFuture = accountController.findAccount(this.task.getProfile().getEmail(), false).toCompletionStage().toCompletableFuture();
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture2, null, null, null, null, 0, null, 1, arg_0));
+                }
+                Account account = (Account)completableFuture.join();
+                if (account == null) {
+                    this.logger.warn("No accounts available...");
+                    return CompletableFuture.completedFuture(0);
+                }
+                this.logger.info("Logging in to account '{}'", (Object)account.getUser());
+                JsonObject jsonObject = this.api.accountLoginForm(account);
+                HttpRequest httpRequest = this.api.loginAccount();
+                CompletableFuture completableFuture3 = Request.send(httpRequest, jsonObject);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture4, account, jsonObject, httpRequest, null, 0, null, 2, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture3.join();
+                if (httpResponse == null) continue;
+                if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
+                    if (this.logger.isDebugEnabled()) {
+                        this.logger.debug("Account login responded with: [{}]{}", (Object)httpResponse.statusCode(), (Object)httpResponse.bodyAsString());
+                    }
+                    this.logger.info("Logged in successfully to account '{}'", (Object)account.getUser());
+                    this.api.setLoggedIn(true);
+                    this.task.getProfile().setAccountEmail(account.getUser());
+                    return CompletableFuture.completedFuture(1);
+                }
+                this.logger.warn("Account login: status:'{}'", (Object)httpResponse.statusCode());
+                if (httpResponse.statusCode() != 412) {
+                    this.bannedBefore = false;
+                } else if (n % 10 == 0 && this.mode == Mode.DESKTOP && this.task.getMode().contains("skip")) {
+                    this.api.getPxAPI().reset();
+                }
+                CompletableFuture completableFuture5 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture6, account, jsonObject, httpRequest, httpResponse, 0, null, 3, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
+                if (n2 == 0 || this.bannedBefore) {
+                    CompletableFuture completableFuture7 = VertxUtil.sleep(this.task.getRetryDelay());
+                    if (!completableFuture7.isDone()) {
+                        CompletableFuture completableFuture8 = completableFuture7;
+                        return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture8, account, jsonObject, httpRequest, httpResponse, n2, null, 4, arg_0));
+                    }
+                    completableFuture7.join();
+                }
+                if (httpResponse.statusCode() != 412) continue;
+                this.bannedBefore = true;
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred logging in account: {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = super.randomSleep(12000);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture9 = completableFuture;
+                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$loginAccount(this, n, accountController, completableFuture9, null, null, null, null, 0, throwable, 5, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        this.logger.warn("Failed to login to account. Max retries exceeded...");
+        return CompletableFuture.completedFuture(-1);
+    }
+
+    /*
+     * Unable to fully structure code
+     * Could not resolve type clashes
+     */
+    public static CompletableFuture async$atcAffiliate(Walmart var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_5, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
+        switch (var7_8) {
+            case 0: {
+                var1_1 = ThreadLocalRandom.current().nextBoolean() != false ? "addToCart" : "buynow";
+                var0.logger.info("Attempting add to cart");
+                var2_2 = 0;
+                block9: while (var0.running != false) {
+                    if (var2_2 > 50) return CompletableFuture.failedFuture(new Exception());
+                    try {
+                        ++var2_2;
+                        var3_3 /* !! */  = var0.api.affilCrossSite(var1_1);
+                        v0 = Request.send(var3_3 /* !! */ .as(BodyCodec.string()));
+                        if (!v0.isDone()) {
+                            var6_7 = v0;
+                            return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, (HttpRequest)var3_3 /* !! */ , (CompletableFuture)var6_7, null, null, (int)1));
+                        }
+lbl15:
+                        // 3 sources
+
+                        while (true) {
+                            var4_5 = (HttpResponse)v0.join();
+                            if (var4_5 == null) continue block9;
+                            if (var4_5.statusCode() == 302) {
+                                var5_6 /* !! */  = var0.api.getWebClient().cookieStore().getCookieValue("CRT");
+                                VertxUtil.sendSignal(var0.instanceSignal, (String)var5_6 /* !! */ );
+                                var0.logger.info("Successfully added to cart: status:'{}'", (Object)var4_5.statusCode());
+                                var0.api.getWebClient().cookieStore().putFromOther(var0.sessionCookies);
+                                return CompletableFuture.completedFuture(null);
+                            }
+                            var0.logger.info("Waiting for restock [PID]: '{}'", (Object)var4_5.statusCode());
+                            v1 = var0.api.handleBadResponse(var4_5.statusCode(), (HttpResponse)var4_5);
+                            if (!v1.isDone()) {
+                                var6_7 = v1;
+                                return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, (HttpRequest)var3_3 /* !! */ , (CompletableFuture)var6_7, (HttpResponse)var4_5, null, (int)2));
+                            }
+lbl30:
+                            // 3 sources
+
+                            while (true) {
+                                v1.join();
+                                v2 = var0.handleCRTSignalSleep(var0.api);
+                                if (!v2.isDone()) {
+                                    var6_7 = v2;
+                                    return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, (HttpRequest)var3_3 /* !! */ , (CompletableFuture)var6_7, (HttpResponse)var4_5, null, (int)3));
+                                }
+lbl37:
+                                // 3 sources
+
+                                while (true) {
+                                    if (!((Boolean)v2.join()).booleanValue()) continue block9;
+                                    return CompletableFuture.completedFuture(null);
+                                }
+                                break;
+                            }
+                            break;
+                        }
+                    }
+                    catch (Throwable var3_4) {
+                        var0.logger.error("Error occurred waiting for restock (s): {}", (Object)var3_4.getMessage());
+                        v3 = super.randomSleep(12000);
+                        if (!v3.isDone()) {
+                            var6_7 = v3;
+                            return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$atcAffiliate(io.trickle.task.sites.walmart.usa.Walmart java.lang.String int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (String)var1_1, (int)var2_2, null, (CompletableFuture)var6_7, null, (Throwable)var3_4, (int)4));
+                        }
+lbl46:
+                        // 3 sources
+
+                        while (true) {
+                            v3.join();
+                            continue block9;
+                            break;
+                        }
+                    }
+                }
+                return CompletableFuture.failedFuture(new Exception());
+            }
+            case 1: {
+                v0 = var4_5;
+                ** continue;
+            }
+            case 2: {
+                v1 = var4_5;
+                var4_5 = var5_6 /* !! */ ;
+                ** continue;
+            }
+            case 3: {
+                v2 = var4_5;
+                var4_5 = var5_6 /* !! */ ;
+                ** continue;
+            }
+            case 4: {
+                v3 = var4_5;
+                var3_3 /* !! */  = var6_7;
+                ** continue;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    public CompletableFuture waitForRestock() {
+        String string;
+        int n = 0;
+        try {
+            string = this.api.getWebClient().cookieStore().getCookieValue("CRT");
+        }
+        catch (Exception exception) {
+            string = "";
+        }
+        while (this.running) {
+            if (n > 30) return CompletableFuture.completedFuture(false);
+            ++n;
+            try {
+                if (n % 2 == 0 && !this.productID.isEmpty()) {
+                    CompletableFuture completableFuture = this.checkStockTerra(this.productID);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture2 = completableFuture;
+                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture2, null, 1, arg_0));
+                    }
+                    if (((Boolean)completableFuture.join()).booleanValue()) {
+                        return CompletableFuture.completedFuture(true);
+                    }
+                } else {
+                    CompletableFuture completableFuture = this.checkStockCart(string);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture3 = completableFuture;
+                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture3, null, 2, arg_0));
+                    }
+                    if (((Boolean)completableFuture.join()).booleanValue()) {
+                        return CompletableFuture.completedFuture(true);
+                    }
+                }
+                CompletableFuture completableFuture = VertxUtil.randomSignalSleep(this.instanceSignal, this.task.getMonitorDelay());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture4, null, 3, arg_0));
+                }
+                completableFuture.join();
+            }
+            catch (Throwable throwable) {
+                if (throwable.getMessage().contains("CRT expired or empty")) {
+                    return CompletableFuture.failedFuture(throwable);
+                }
+                this.logger.error("Error occurred waiting for restock: {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = super.randomSleep(12000);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture5 = completableFuture;
+                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$waitForRestock(this, n, string, completableFuture5, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(false);
+    }
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$waitForRestock(Walmart var0, int var1_1, String var2_2, CompletableFuture var3_3, Throwable var4_6, int var5_7, Object var6_8) {
+        switch (var5_7) {
+            case 0: {
+                var1_1 = 0;
+                try {
+                    var2_2 = var0.api.getWebClient().cookieStore().getCookieValue("CRT");
+                }
+                catch (Exception var3_4) {
+                    var2_2 = "";
+                }
+                break;
+            }
+            case 1: {
+                v0 = var3_3;
+                ** GOTO lbl35
+            }
+            case 2: {
+                v1 = var3_3;
+                ** GOTO lbl43
+            }
+            case 3: {
+                v2 = var3_3;
+                ** GOTO lbl49
+            }
+            case 4: {
+                v3 = var3_3;
+                var3_3 = var4_6;
+                ** GOTO lbl60
+            }
+            default: {
+                throw new IllegalArgumentException();
+            }
+        }
+        while (var0.running != false) {
+            if (var1_1 > 30) return CompletableFuture.completedFuture(false);
+            ++var1_1;
+            try {
+                block21: {
+                    block20: {
+                        if (var1_1 % 2 == 0 && !var0.productID.isEmpty()) {
+                            v0 = var0.checkStockTerra(var0.productID);
+                            if (!v0.isDone()) {
+                                var4_6 = v0;
+                                return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, null, (int)1));
+                            } else {
+                                ** GOTO lbl35
+                            }
+                        }
+                        break block20;
+lbl35:
+                        // 3 sources
+
+                        if (((Boolean)v0.join()).booleanValue()) {
+                            return CompletableFuture.completedFuture(true);
+                        }
+                        break block21;
+                    }
+                    v1 = var0.checkStockCart(var2_2);
+                    if (!v1.isDone()) {
+                        var4_6 = v1;
+                        return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, null, (int)2));
+                    }
+lbl43:
+                    // 3 sources
+
+                    if (((Boolean)v1.join()).booleanValue()) {
+                        return CompletableFuture.completedFuture(true);
+                    }
+                }
+                if (!(v2 = VertxUtil.randomSignalSleep(var0.instanceSignal, var0.task.getMonitorDelay())).isDone()) {
+                    var4_6 = v2;
+                    return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, null, (int)3));
+                }
+lbl49:
+                // 3 sources
+
+                v2.join();
+            }
+            catch (Throwable var3_5) {
+                if (var3_5.getMessage().contains("CRT expired or empty")) {
+                    return CompletableFuture.failedFuture(var3_5);
+                }
+                var0.logger.error("Error occurred waiting for restock: {}", (Object)var3_5.getMessage());
+                v3 = super.randomSleep(12000);
+                if (!v3.isDone()) {
+                    var4_6 = v3;
+                    return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$waitForRestock(io.trickle.task.sites.walmart.usa.Walmart int java.lang.String java.util.concurrent.CompletableFuture java.lang.Throwable int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Walmart)var0, (int)var1_1, (String)var2_2, (CompletableFuture)var4_6, (Throwable)var3_5, (int)4));
+                }
+lbl60:
+                // 3 sources
+
+                v3.join();
+            }
+        }
+        return CompletableFuture.completedFuture(false);
+    }
+
+    public CompletableFuture checkStockTerra(String string) {
+        Buffer buffer = new JsonObject("{\"variables\":\"{\\\"casperSlots\\\":{\\\"fulfillmentType\\\":\\\"ACC\\\",\\\"reservationType\\\":\\\"SLOTS\\\"},\\\"postalAddress\\\":{\\\"addressType\\\":\\\"RESIDENTIAL\\\",\\\"countryCode\\\":\\\"USA\\\",\\\"postalCode\\\":\\\"" + this.api.getTask().getProfile().getZip() + "\\\",\\\"stateOrProvinceCode\\\":\\\"" + this.api.getTask().getProfile().getState() + "\\\",\\\"zipLocated\\\":true},\\\"storeFrontIds\\\":[{\\\"distance\\\":2.24,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91672\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91672},{\\\"distance\\\":3.04,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"5936\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":5936},{\\\"distance\\\":3.31,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"90563\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":90563},{\\\"distance\\\":3.41,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91675\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91675},{\\\"distance\\\":5.58,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91121\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91121}],\\\"productId\\\":\\\"" + string + "\\\",\\\"selected\\\":false}\"}").toBuffer();
+        int n = 0;
+        while (n < 5) {
+            block14: {
+                HttpRequest httpRequest = this.api.terraFirma(string, false);
+                try {
+                    JsonArray jsonArray;
+                    CompletableFuture completableFuture = Request.send(httpRequest, buffer);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture2 = completableFuture;
+                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockTerra(this, string, buffer, n, httpRequest, completableFuture2, null, null, 1, arg_0));
+                    }
+                    HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                    if (httpResponse == null) break block14;
+                    if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
+                        JsonObject jsonObject;
+                        JsonObject jsonObject2 = httpResponse.bodyAsJsonObject();
+                        if (!jsonObject2.containsKey("data") || !(jsonObject = jsonObject2.getJsonObject("data").getJsonObject("productByProductId")).containsKey("offerList") || (jsonArray = jsonObject.getJsonArray("offerList")) == null) break block14;
+                    } else {
+                        this.logger.warn("Waiting for restock (t): status:'{}'", (Object)httpResponse.statusCode());
+                        CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
+                        if (!completableFuture3.isDone()) {
+                            CompletableFuture completableFuture4 = completableFuture3;
+                            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockTerra(this, string, buffer, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
+                        }
+                        completableFuture3.join();
+                        break block14;
+                    }
+                    for (int i = 0; i < jsonArray.size(); ++i) {
+                        try {
+                            JsonObject jsonObject = jsonArray.getJsonObject(i);
+                            if (!jsonObject.getString("id", "").equalsIgnoreCase(this.itemKeyword)) continue;
+                            if (jsonObject.containsKey("productAvailability") && jsonObject.getJsonObject("productAvailability").getString("availabilityStatus").equalsIgnoreCase("IN_STOCK")) {
+                                JsonObject jsonObject3;
+                                if (jsonObject.containsKey("offerInfo") && (jsonObject3 = jsonObject.getJsonObject("offerInfo")).containsKey("offerType")) {
+                                    if (jsonObject3.getString("offerType", "").contains("ONLINE")) {
+                                        VertxUtil.sendSignal(this.instanceSignal, this.api.getWebClient().cookieStore().getCookieValue("CRT"));
+                                        return CompletableFuture.completedFuture(true);
+                                    }
+                                    this.logger.info("Waiting for restock (t)");
+                                    return CompletableFuture.completedFuture(false);
+                                }
+                                VertxUtil.sendSignal(this.instanceSignal, this.api.getWebClient().cookieStore().getCookieValue("CRT"));
+                                return CompletableFuture.completedFuture(true);
+                            }
+                            this.logger.info("Waiting for restock (t)");
+                            return CompletableFuture.completedFuture(false);
+                        }
+                        catch (Throwable throwable) {
+                            // empty catch block
+                        }
+                    }
+                }
+                catch (Throwable throwable) {
+                    this.logger.error("Error occurred waiting for restock (t): {}", (Object)throwable.getMessage());
+                    CompletableFuture completableFuture = super.randomSleep(12000);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture5 = completableFuture;
+                        return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockTerra(this, string, buffer, n, httpRequest, completableFuture5, null, throwable, 3, arg_0));
+                    }
+                    completableFuture.join();
+                }
+            }
+            ++n;
+        }
+        return CompletableFuture.completedFuture(false);
+    }
+
+    public static void lambda$updateOrCreateSession$2(Cookie cookie) {
+        if (!cookie.value().equalsIgnoreCase("1")) return;
+        if (cookie.name().equals("g")) return;
+        GLOBAL_COOKIES.add((Object)cookie);
+    }
+
+    public void importCookies(API aPI) {
+        aPI.cookieStore().clear();
+        JsonArray jsonArray = new JsonArray(Deobfuscator.readJsFile("browsercookies.json"));
+        int n = 0;
+        while (n < jsonArray.size()) {
+            JsonObject jsonObject = jsonArray.getJsonObject(n);
+            aPI.cookieStore().put(jsonObject.getString("name"), jsonObject.getString("value"), "www.walmart.com", "/");
+            ++n;
+        }
+    }
+
+    public CompletableFuture atcAffiliate() {
+        String string = ThreadLocalRandom.current().nextBoolean() ? "addToCart" : "buynow";
+        this.logger.info("Attempting add to cart");
+        int n = 0;
+        while (this.running) {
+            if (n > 50) return CompletableFuture.failedFuture(new Exception());
+            try {
+                ++n;
+                HttpRequest httpRequest = this.api.affilCrossSite(string);
+                CompletableFuture completableFuture = Request.send(httpRequest.as(BodyCodec.string()));
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, httpRequest, completableFuture2, null, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                if (httpResponse.statusCode() == 302) {
+                    String string2 = this.api.getWebClient().cookieStore().getCookieValue("CRT");
+                    VertxUtil.sendSignal(this.instanceSignal, string2);
+                    this.logger.info("Successfully added to cart: status:'{}'", (Object)httpResponse.statusCode());
+                    this.api.getWebClient().cookieStore().putFromOther(this.sessionCookies);
+                    return CompletableFuture.completedFuture(null);
+                }
+                this.logger.info("Waiting for restock [PID]: '{}'", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
+                }
+                completableFuture3.join();
+                CompletableFuture completableFuture5 = this.handleCRTSignalSleep(this.api);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, httpRequest, completableFuture6, httpResponse, null, 3, arg_0));
+                }
+                if (!((Boolean)completableFuture5.join()).booleanValue()) continue;
+                return CompletableFuture.completedFuture(null);
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred waiting for restock (s): {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = super.randomSleep(12000);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$atcAffiliate(this, string, n, null, completableFuture7, null, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.failedFuture(new Exception());
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$atcNormal(Walmart var0, Buffer var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_5, HttpResponse var5_6, Throwable var6_8, int var7_9, Object var8_10) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
     }
 
     @Override
@@ -1802,96 +1892,6 @@ lbl67:
         if (this.keepAliveWorker == 0L) return CompletableFuture.completedFuture(null);
         this.vertx.cancelTimer(this.keepAliveWorker);
         return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture checkStockTerra(String string) {
-        Buffer buffer = new JsonObject("{\"variables\":\"{\\\"casperSlots\\\":{\\\"fulfillmentType\\\":\\\"ACC\\\",\\\"reservationType\\\":\\\"SLOTS\\\"},\\\"postalAddress\\\":{\\\"addressType\\\":\\\"RESIDENTIAL\\\",\\\"countryCode\\\":\\\"USA\\\",\\\"postalCode\\\":\\\"" + this.api.getTask().getProfile().getZip() + "\\\",\\\"stateOrProvinceCode\\\":\\\"" + this.api.getTask().getProfile().getState() + "\\\",\\\"zipLocated\\\":true},\\\"storeFrontIds\\\":[{\\\"distance\\\":2.24,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91672\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91672},{\\\"distance\\\":3.04,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"5936\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":5936},{\\\"distance\\\":3.31,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"90563\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":90563},{\\\"distance\\\":3.41,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91675\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91675},{\\\"distance\\\":5.58,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91121\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91121}],\\\"productId\\\":\\\"" + string + "\\\",\\\"selected\\\":false}\"}").toBuffer();
-        int n = 0;
-        while (n < 5) {
-            block14: {
-                HttpRequest httpRequest = this.api.terraFirma(string, false);
-                try {
-                    JsonArray jsonArray;
-                    CompletableFuture completableFuture = Request.send(httpRequest, buffer);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockTerra(this, string, buffer, n, httpRequest, completableFuture2, null, null, 1, arg_0));
-                    }
-                    HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                    if (httpResponse == null) break block14;
-                    if (httpResponse.statusCode() == 201 || httpResponse.statusCode() == 200 || httpResponse.statusCode() == 206) {
-                        JsonObject jsonObject;
-                        JsonObject jsonObject2 = httpResponse.bodyAsJsonObject();
-                        if (!jsonObject2.containsKey("data") || !(jsonObject = jsonObject2.getJsonObject("data").getJsonObject("productByProductId")).containsKey("offerList") || (jsonArray = jsonObject.getJsonArray("offerList")) == null) break block14;
-                    } else {
-                        this.logger.warn("Waiting for restock (t): status:'{}'", (Object)httpResponse.statusCode());
-                        CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), httpResponse);
-                        if (!completableFuture3.isDone()) {
-                            CompletableFuture completableFuture4 = completableFuture3;
-                            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockTerra(this, string, buffer, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
-                        }
-                        completableFuture3.join();
-                        break block14;
-                    }
-                    for (int i = 0; i < jsonArray.size(); ++i) {
-                        try {
-                            JsonObject jsonObject = jsonArray.getJsonObject(i);
-                            if (!jsonObject.getString("id", "").equalsIgnoreCase(this.itemKeyword)) continue;
-                            if (jsonObject.containsKey("productAvailability") && jsonObject.getJsonObject("productAvailability").getString("availabilityStatus").equalsIgnoreCase("IN_STOCK")) {
-                                JsonObject jsonObject3;
-                                if (jsonObject.containsKey("offerInfo") && (jsonObject3 = jsonObject.getJsonObject("offerInfo")).containsKey("offerType")) {
-                                    if (jsonObject3.getString("offerType", "").contains("ONLINE")) {
-                                        VertxUtil.sendSignal(this.instanceSignal, this.api.getWebClient().cookieStore().getCookieValue("CRT"));
-                                        return CompletableFuture.completedFuture(true);
-                                    }
-                                    this.logger.info("Waiting for restock (t)");
-                                    return CompletableFuture.completedFuture(false);
-                                }
-                                VertxUtil.sendSignal(this.instanceSignal, this.api.getWebClient().cookieStore().getCookieValue("CRT"));
-                                return CompletableFuture.completedFuture(true);
-                            }
-                            this.logger.info("Waiting for restock (t)");
-                            return CompletableFuture.completedFuture(false);
-                        }
-                        catch (Throwable throwable) {
-                            // empty catch block
-                        }
-                    }
-                }
-                catch (Throwable throwable) {
-                    this.logger.error("Error occurred waiting for restock (t): {}", (Object)throwable.getMessage());
-                    CompletableFuture completableFuture = super.randomSleep(12000);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture5 = completableFuture;
-                        return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$checkStockTerra(this, string, buffer, n, httpRequest, completableFuture5, null, throwable, 3, arg_0));
-                    }
-                    completableFuture.join();
-                }
-            }
-            ++n;
-        }
-        return CompletableFuture.completedFuture(false);
-    }
-
-    public static boolean lambda$new$0(String string) {
-        if (string.equalsIgnoreCase("g")) return false;
-        return true;
-    }
-
-    public CompletableFuture tryCheckout() {
-        try {
-            CompletableFuture completableFuture = PaymentInstance.checkout(this, this.task, this.token, this.mode);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Walmart.async$tryCheckout(this, completableFuture2, 1, arg_0));
-            }
-            if ((Integer)completableFuture.join() != -1) return CompletableFuture.completedFuture(null);
-            return CompletableFuture.failedFuture(new Exception("Failed to process."));
-        }
-        catch (Exception exception) {
-            this.logger.warn("Failed to checkout: {}", (Object)exception.getMessage());
-            return CompletableFuture.failedFuture(exception);
-        }
     }
 }
 

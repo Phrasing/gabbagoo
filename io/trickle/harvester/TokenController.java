@@ -29,17 +29,36 @@ import org.apache.logging.log4j.Logger;
 public class TokenController
 implements Module,
 LoadableAsync {
-    public AtomicReference<ArrayBlockingQueue<SolveFuture>> waitingList = new AtomicReference();
     public static Logger logger = LogManager.getLogger(TokenController.class);
+    public AtomicReference<ArrayBlockingQueue<SolveFuture>> waitingList = new AtomicReference();
     public AtomicInteger solveCount;
+
+    public static CompletableFuture solveCaptcha(String string, boolean bl, Iterable iterable, String string2, CookieJar cookieJar, RealClient realClient) {
+        try {
+            SolveFuture solveFuture;
+            logger.info("Captcha needs solving");
+            CaptchaToken captchaToken = new CaptchaToken(string, bl, iterable, string2, cookieJar, null, realClient);
+            SolveFuture solveFuture2 = solveFuture = ((TokenController)Engine.get().getModule(Controller.TOKEN)).solve(captchaToken);
+            if (!solveFuture2.toCompletableFuture().isDone()) {
+                SolveFuture solveFuture3 = solveFuture2;
+                return solveFuture3.exceptionally(Function.identity()).thenCompose(arg_0 -> TokenController.async$solveCaptcha(string, (int)(bl ? 1 : 0), iterable, string2, cookieJar, realClient, captchaToken, solveFuture, solveFuture3, 1, arg_0)).toCompletableFuture();
+            }
+            solveFuture2.toCompletableFuture().join();
+            return CompletableFuture.completedFuture(captchaToken.getToken());
+        }
+        catch (Throwable throwable) {
+            logger.error("HARVEST ERR: {}", (Object)throwable.getMessage());
+            return CompletableFuture.completedFuture(null);
+        }
+    }
 
     @Override
     public void terminate() {
     }
 
-    @Override
-    public Future load() {
-        return Future.succeededFuture();
+    public TokenController() {
+        this.waitingList.set(new ArrayBlockingQueue(1500));
+        this.solveCount = new AtomicInteger(0);
     }
 
     /*
@@ -76,20 +95,15 @@ lbl17:
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public void initialise() {
-        logger.debug("Initialised.");
-    }
-
-    public TokenController() {
-        this.waitingList.set(new ArrayBlockingQueue(1500));
-        this.solveCount = new AtomicInteger(0);
-    }
-
     public SolveFuture solve(CaptchaToken captchaToken) {
         SolveFuture solveFuture = new SolveFuture(captchaToken);
         if (this.waitingList.get().offer(solveFuture)) return solveFuture;
         throw new Exception("Too many tokens to solve!!!");
+    }
+
+    @Override
+    public Future load() {
+        return Future.succeededFuture();
     }
 
     public SolveFuture pollWaitingList() {
@@ -97,23 +111,9 @@ lbl17:
         return this.waitingList.get().take();
     }
 
-    public static CompletableFuture solveCaptcha(String string, boolean bl, Iterable iterable, String string2, CookieJar cookieJar, RealClient realClient) {
-        try {
-            SolveFuture solveFuture;
-            logger.info("Captcha needs solving");
-            CaptchaToken captchaToken = new CaptchaToken(string, bl, iterable, string2, cookieJar, null, realClient);
-            SolveFuture solveFuture2 = solveFuture = ((TokenController)Engine.get().getModule(Controller.TOKEN)).solve(captchaToken);
-            if (!solveFuture2.toCompletableFuture().isDone()) {
-                SolveFuture solveFuture3 = solveFuture2;
-                return solveFuture3.exceptionally(Function.identity()).thenCompose(arg_0 -> TokenController.async$solveCaptcha(string, (int)(bl ? 1 : 0), iterable, string2, cookieJar, realClient, captchaToken, solveFuture, solveFuture3, 1, arg_0)).toCompletableFuture();
-            }
-            solveFuture2.toCompletableFuture().join();
-            return CompletableFuture.completedFuture(captchaToken.getToken());
-        }
-        catch (Throwable throwable) {
-            logger.error("HARVEST ERR: {}", (Object)throwable.getMessage());
-            return CompletableFuture.completedFuture(null);
-        }
+    @Override
+    public void initialise() {
+        logger.debug("Initialised.");
     }
 }
 

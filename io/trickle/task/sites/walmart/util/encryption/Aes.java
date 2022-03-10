@@ -6,27 +6,23 @@ package io.trickle.task.sites.walmart.util.encryption;
 import java.util.Arrays;
 
 public class Aes {
-    public int b;
-    public int[][] j;
-    public int[] k;
-    public int m;
-    public int p;
-    public int[] h;
-    public int[][][] tables;
-    public int[][] key;
-    public int g;
-    public int a;
-    public int[] n;
-    public int e;
     public int l;
-    public int o;
+    public int b;
+    public int[][][] tables;
+    public int[] h;
+    public int[] k;
+    public int p;
+    public int m;
+    public int e;
+    public int[][] key;
+    public int[] n;
+    public int[][] j;
     public int[] c;
+    public int g;
+    public int o;
     public int[][] q;
+    public int a;
     public int f;
-
-    public int[] encrypt(int[] nArray) {
-        return this._crypt(nArray, 0);
-    }
 
     public Aes precompute() {
         this.tables = new int[2][5][256];
@@ -72,10 +68,6 @@ public class Aes {
         return this;
     }
 
-    public static int lambda$cipher$0(long l) {
-        return (int)l;
-    }
-
     public Aes cipher(long[] lArray) {
         int n;
         int n2;
@@ -114,6 +106,10 @@ public class Aes {
         }
     }
 
+    public int[] encrypt(int[] nArray) {
+        return this._crypt(nArray, 0);
+    }
+
     public static int[] removeElements(int[] nArray, int n) {
         int n2 = 0;
         int n3 = 0;
@@ -124,6 +120,10 @@ public class Aes {
             ++n3;
         }
         return Arrays.copyOf(nArray, n2);
+    }
+
+    public static int lambda$cipher$0(long l) {
+        return (int)l;
     }
 
     public static long[] removeElements(long[] lArray, int n) {

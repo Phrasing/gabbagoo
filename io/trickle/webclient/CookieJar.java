@@ -26,69 +26,21 @@ import java.util.function.Predicate;
 
 public class CookieJar
 implements CookieStore {
-    public Predicate<String> cookieFilter;
     public static Predicate<String> DEFAULT;
     public boolean obeyExpiryTimes;
+    public Predicate<String> cookieFilter;
     public ConcurrentSkipListMap<CookieJar$Key, CookieJar$ExpirableCookie> domainCookies;
     public static boolean $assertionsDisabled;
     public ConcurrentHashMap<CookieJar$Key, CookieJar$ExpirableCookie> noDomainCookies;
 
-    public CookieJar(Predicate predicate) {
-        this.noDomainCookies = new ConcurrentHashMap();
-        this.domainCookies = new ConcurrentSkipListMap();
-        this.cookieFilter = predicate;
-        this.obeyExpiryTimes = false;
+    public CookieStore clear() {
+        this.noDomainCookies.clear();
+        this.domainCookies.clear();
+        return this;
     }
 
-    public static void lambda$get$1(Boolean bl, String string, TreeMap treeMap, Cookie cookie) {
-        if (bl != Boolean.TRUE && cookie.isSecure()) {
-            return;
-        }
-        if (cookie.path() != null && !string.equals(cookie.path())) {
-            Object object = cookie.path();
-            if (!((String)object).endsWith("/")) {
-                object = (String)object + "/";
-            }
-            if (!string.startsWith((String)object)) {
-                return;
-            }
-        }
-        treeMap.put(cookie.name(), cookie);
-    }
-
-    public String getCookieValue(String string, String string2) {
-        String string3;
-        String string4 = this.getCookieValue(string);
-        if (string4 == null) {
-            string3 = string2;
-            return string3;
-        }
-        string3 = string4;
-        return string3;
-    }
-
-    public CookieJar(boolean bl) {
-        this.noDomainCookies = new ConcurrentHashMap();
-        this.domainCookies = new ConcurrentSkipListMap();
-        this.cookieFilter = DEFAULT;
-        this.obeyExpiryTimes = bl;
-    }
-
-    public void remove(String string, String string2) {
-        CookieJar$Key cookieJar$Key = new CookieJar$Key(string2, null, string);
-        if (cookieJar$Key.domain.equals("")) {
-            this.noDomainCookies.remove(cookieJar$Key);
-            return;
-        }
-        this.domainCookies.remove(cookieJar$Key);
-    }
-
-    public void remove(String string) {
-        this.remove(string, null);
-    }
-
-    public static void lambda$print$5(CookieJar$ExpirableCookie expirableCookie) {
-        System.out.println("Domain: " + expirableCookie);
+    public static void lambda$asString$2(StringBuilder stringBuilder, CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
+        stringBuilder.append(cookieJar$ExpirableCookie.wrappedCookie.name()).append("=").append(cookieJar$ExpirableCookie.wrappedCookie.value()).append(";");
     }
 
     public CookieStore put(String string, String string2, String string3, String string4) {
@@ -100,67 +52,11 @@ implements CookieStore {
         return this.put((Cookie)defaultCookie);
     }
 
-    public static void lambda$asString$2(StringBuilder stringBuilder, CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
-        stringBuilder.append(cookieJar$ExpirableCookie.wrappedCookie.name()).append("=").append(cookieJar$ExpirableCookie.wrappedCookie.value()).append(";");
-    }
-
-    public String getCookieValue(String string) {
-        CookieJar$ExpirableCookie cookieJar$ExpirableCookie;
-        Iterator<CookieJar$ExpirableCookie> iterator = this.domainCookies.values().iterator();
-        do {
-            if (!iterator.hasNext()) return null;
-            cookieJar$ExpirableCookie = iterator.next();
-        } while (!cookieJar$ExpirableCookie.wrappedCookie.name().equalsIgnoreCase(string));
-        return cookieJar$ExpirableCookie.wrappedCookie.value();
-    }
-
-    public static void lambda$print$4(CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
-        System.out.println("NoDomain: " + cookieJar$ExpirableCookie);
-    }
-
-    public void setCookieFilter(Predicate predicate) {
+    public CookieJar(Predicate predicate) {
+        this.noDomainCookies = new ConcurrentHashMap();
+        this.domainCookies = new ConcurrentSkipListMap();
         this.cookieFilter = predicate;
-    }
-
-    public void print() {
-        this.noDomainCookies.values().forEach(CookieJar::lambda$print$4);
-        this.domainCookies.values().forEach(CookieJar::lambda$print$5);
-    }
-
-    public static void lambda$asString$3(StringBuilder stringBuilder, CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
-        stringBuilder.append(cookieJar$ExpirableCookie.wrappedCookie.name()).append("=").append(cookieJar$ExpirableCookie.wrappedCookie.value()).append(";");
-    }
-
-    public Predicate getCookieFilter() {
-        return this.cookieFilter;
-    }
-
-    public static ConcurrentHashMap deepCopy(ConcurrentHashMap concurrentHashMap) {
-        ConcurrentHashMap concurrentHashMap2 = new ConcurrentHashMap();
-        concurrentHashMap.forEach(concurrentHashMap2::put);
-        return concurrentHashMap2;
-    }
-
-    public CookieStore put(String string, String string2) {
-        return this.put(string, string2, null);
-    }
-
-    public void removeAnyMatch(String string) {
-        this.removeMatchFromIter(string, this.noDomainCookies.keys().asIterator());
-        this.removeMatchFromIter(string, this.domainCookies.keySet().iterator());
-    }
-
-    public int size() {
-        return this.noDomainCookies.size() + this.domainCookies.size();
-    }
-
-    public Cookie putAndGet(String string, String string2, String string3) {
-        DefaultCookie defaultCookie = new DefaultCookie(string, string2);
-        if (string3 != null) {
-            defaultCookie.setDomain(string3);
-        }
-        this.put((Cookie)defaultCookie);
-        return defaultCookie;
+        this.obeyExpiryTimes = false;
     }
 
     public boolean contains(String string) {
@@ -176,122 +72,6 @@ implements CookieStore {
             cookieJar$ExpirableCookie2 = iterator.next();
         } while (!cookieJar$ExpirableCookie2.wrappedCookie.name().equalsIgnoreCase(string));
         return true;
-    }
-
-    static {
-        $assertionsDisabled = !CookieJar.class.desiredAssertionStatus();
-        DEFAULT = CookieJar::lambda$static$0;
-    }
-
-    public CookieStore clear() {
-        this.noDomainCookies.clear();
-        this.domainCookies.clear();
-        return this;
-    }
-
-    public void printDeep() {
-        this.domainCookies.forEach(CookieJar::lambda$printDeep$6);
-    }
-
-    public String asString() {
-        if (this.domainCookies.isEmpty()) {
-            if (this.noDomainCookies.isEmpty()) return "";
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        this.domainCookies.values().forEach(arg_0 -> CookieJar.lambda$asString$2(stringBuilder, arg_0));
-        this.noDomainCookies.values().forEach(arg_0 -> CookieJar.lambda$asString$3(stringBuilder, arg_0));
-        return stringBuilder.toString().trim();
-    }
-
-    public CookieJar(CookieJar cookieJar) {
-        this.noDomainCookies = CookieJar.deepCopy(cookieJar.noDomainCookies);
-        this.domainCookies = CookieJar.deepCopy(cookieJar.domainCookies);
-        this.cookieFilter = cookieJar.cookieFilter;
-        this.obeyExpiryTimes = cookieJar.obeyExpiryTimes;
-    }
-
-    public CookieStore put(Cookie cookie) {
-        CookieJar$Key cookieJar$Key = new CookieJar$Key(cookie.domain(), cookie.path(), cookie.name());
-        CookieJar$ExpirableCookie cookieJar$ExpirableCookie = new CookieJar$ExpirableCookie(cookie);
-        if (this.obeyExpiryTimes && cookie.maxAge() != Long.MIN_VALUE) {
-            cookieJar$ExpirableCookie.setExpiry(cookie.maxAge());
-        }
-        if (cookieJar$Key.domain.equals("")) {
-            this.noDomainCookies.put(cookieJar$Key, cookieJar$ExpirableCookie);
-            return this;
-        }
-        this.domainCookies.put(cookieJar$Key, cookieJar$ExpirableCookie);
-        return this;
-    }
-
-    public boolean contains(Cookie cookie) {
-        Objects.requireNonNull(cookie);
-        return this.contains(cookie.name());
-    }
-
-    public CookieJar() {
-        this.noDomainCookies = new ConcurrentHashMap();
-        this.domainCookies = new ConcurrentSkipListMap();
-        this.cookieFilter = DEFAULT;
-        this.obeyExpiryTimes = true;
-    }
-
-    public CookieStore putFromOther(CookieJar cookieJar) {
-        this.noDomainCookies.putAll(cookieJar.noDomainCookies);
-        this.domainCookies.putAll(cookieJar.domainCookies);
-        return this;
-    }
-
-    public void remove(String string, String string2, String string3) {
-        CookieJar$Key cookieJar$Key = new CookieJar$Key(string3, string2, string);
-        if (cookieJar$Key.domain.equals("")) {
-            this.noDomainCookies.remove(cookieJar$Key);
-            return;
-        }
-        this.domainCookies.remove(cookieJar$Key);
-    }
-
-    public static void lambda$printDeep$6(CookieJar$Key cookieJar$Key, CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
-        System.out.println(cookieJar$Key + " " + cookieJar$ExpirableCookie);
-    }
-
-    public void removeMatchFromIter(String string, Iterator iterator) {
-        while (iterator.hasNext()) {
-            try {
-                CookieJar$Key cookieJar$Key = (CookieJar$Key)iterator.next();
-                if (cookieJar$Key == null || cookieJar$Key.name == null || cookieJar$Key.name.isEmpty() || !cookieJar$Key.name.equalsIgnoreCase(string)) continue;
-                iterator.remove();
-            }
-            catch (Throwable throwable) {}
-        }
-    }
-
-    public static ConcurrentSkipListMap deepCopy(ConcurrentSkipListMap concurrentSkipListMap) {
-        ConcurrentSkipListMap concurrentSkipListMap2 = new ConcurrentSkipListMap();
-        concurrentSkipListMap.forEach(concurrentSkipListMap2::put);
-        return concurrentSkipListMap2;
-    }
-
-    public int getCookieValueLength(String string) {
-        CookieJar$ExpirableCookie cookieJar$ExpirableCookie;
-        Iterator<CookieJar$ExpirableCookie> iterator = this.domainCookies.values().iterator();
-        do {
-            if (!iterator.hasNext()) return -1;
-            cookieJar$ExpirableCookie = iterator.next();
-        } while (!cookieJar$ExpirableCookie.wrappedCookie.name().equalsIgnoreCase(string));
-        return cookieJar$ExpirableCookie.wrappedCookie.value().length();
-    }
-
-    public static boolean lambda$static$0(String string) {
-        return true;
-    }
-
-    public CookieStore put(String string, String string2, String string3) {
-        return this.put(string, string2, string3, "/");
-    }
-
-    public Cookie putAndGet(String string, String string2) {
-        return this.putAndGet(string, string2, null);
     }
 
     public Iterable get(Boolean bl, String string, String string2) {
@@ -343,6 +123,105 @@ implements CookieStore {
         return ((TreeMap)object2).values();
     }
 
+    public void removeAnyMatch(String string) {
+        this.removeMatchFromIter(string, this.noDomainCookies.keys().asIterator());
+        this.removeMatchFromIter(string, this.domainCookies.keySet().iterator());
+    }
+
+    public static void lambda$asString$3(StringBuilder stringBuilder, CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
+        stringBuilder.append(cookieJar$ExpirableCookie.wrappedCookie.name()).append("=").append(cookieJar$ExpirableCookie.wrappedCookie.value()).append(";");
+    }
+
+    public CookieStore put(String string, String string2, String string3) {
+        return this.put(string, string2, string3, "/");
+    }
+
+    public int getCookieValueLength(String string) {
+        CookieJar$ExpirableCookie cookieJar$ExpirableCookie;
+        Iterator<CookieJar$ExpirableCookie> iterator = this.domainCookies.values().iterator();
+        do {
+            if (!iterator.hasNext()) return -1;
+            cookieJar$ExpirableCookie = iterator.next();
+        } while (!cookieJar$ExpirableCookie.wrappedCookie.name().equalsIgnoreCase(string));
+        return cookieJar$ExpirableCookie.wrappedCookie.value().length();
+    }
+
+    public String asString() {
+        if (this.domainCookies.isEmpty()) {
+            if (this.noDomainCookies.isEmpty()) return "";
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        this.domainCookies.values().forEach(arg_0 -> CookieJar.lambda$asString$2(stringBuilder, arg_0));
+        this.noDomainCookies.values().forEach(arg_0 -> CookieJar.lambda$asString$3(stringBuilder, arg_0));
+        return stringBuilder.toString().trim();
+    }
+
+    public CookieStore putFromOther(CookieJar cookieJar) {
+        this.noDomainCookies.putAll(cookieJar.noDomainCookies);
+        this.domainCookies.putAll(cookieJar.domainCookies);
+        return this;
+    }
+
+    public static void lambda$get$1(Boolean bl, String string, TreeMap treeMap, Cookie cookie) {
+        if (bl != Boolean.TRUE && cookie.isSecure()) {
+            return;
+        }
+        if (cookie.path() != null && !string.equals(cookie.path())) {
+            Object object = cookie.path();
+            if (!((String)object).endsWith("/")) {
+                object = (String)object + "/";
+            }
+            if (!string.startsWith((String)object)) {
+                return;
+            }
+        }
+        treeMap.put(cookie.name(), cookie);
+    }
+
+    public int size() {
+        return this.noDomainCookies.size() + this.domainCookies.size();
+    }
+
+    public void setCookieFilter(Predicate predicate) {
+        this.cookieFilter = predicate;
+    }
+
+    public static boolean lambda$static$0(String string) {
+        return true;
+    }
+
+    public CookieJar() {
+        this.noDomainCookies = new ConcurrentHashMap();
+        this.domainCookies = new ConcurrentSkipListMap();
+        this.cookieFilter = DEFAULT;
+        this.obeyExpiryTimes = true;
+    }
+
+    public void remove(String string, String string2, String string3) {
+        CookieJar$Key cookieJar$Key = new CookieJar$Key(string3, string2, string);
+        if (cookieJar$Key.domain.equals("")) {
+            this.noDomainCookies.remove(cookieJar$Key);
+            return;
+        }
+        this.domainCookies.remove(cookieJar$Key);
+    }
+
+    public static void lambda$printDeep$6(CookieJar$Key cookieJar$Key, CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
+        System.out.println(cookieJar$Key + " " + cookieJar$ExpirableCookie);
+    }
+
+    public static void lambda$print$4(CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
+        System.out.println("NoDomain: " + cookieJar$ExpirableCookie);
+    }
+
+    public CookieStore put(String string, String string2) {
+        return this.put(string, string2, null);
+    }
+
+    public static void lambda$print$5(CookieJar$ExpirableCookie cookieJar$ExpirableCookie) {
+        System.out.println("Domain: " + cookieJar$ExpirableCookie);
+    }
+
     public CookieStore remove(Cookie cookie) {
         CookieJar$Key cookieJar$Key = new CookieJar$Key(cookie.domain(), cookie.path(), cookie.name());
         if (cookieJar$Key.domain.equals("")) {
@@ -351,6 +230,127 @@ implements CookieStore {
         }
         this.domainCookies.remove(cookieJar$Key);
         return this;
+    }
+
+    public void removeMatchFromIter(String string, Iterator iterator) {
+        while (iterator.hasNext()) {
+            try {
+                CookieJar$Key cookieJar$Key = (CookieJar$Key)iterator.next();
+                if (cookieJar$Key == null || cookieJar$Key.name == null || cookieJar$Key.name.isEmpty() || !cookieJar$Key.name.equalsIgnoreCase(string)) continue;
+                iterator.remove();
+            }
+            catch (Throwable throwable) {}
+        }
+    }
+
+    public CookieJar(CookieJar cookieJar) {
+        this.noDomainCookies = CookieJar.deepCopy(cookieJar.noDomainCookies);
+        this.domainCookies = CookieJar.deepCopy(cookieJar.domainCookies);
+        this.cookieFilter = cookieJar.cookieFilter;
+        this.obeyExpiryTimes = cookieJar.obeyExpiryTimes;
+    }
+
+    public CookieStore put(Cookie cookie) {
+        CookieJar$Key cookieJar$Key = new CookieJar$Key(cookie.domain(), cookie.path(), cookie.name());
+        CookieJar$ExpirableCookie cookieJar$ExpirableCookie = new CookieJar$ExpirableCookie(cookie);
+        if (this.obeyExpiryTimes && cookie.maxAge() != Long.MIN_VALUE) {
+            cookieJar$ExpirableCookie.setExpiry(cookie.maxAge());
+        }
+        if (cookieJar$Key.domain.equals("")) {
+            this.noDomainCookies.put(cookieJar$Key, cookieJar$ExpirableCookie);
+            return this;
+        }
+        this.domainCookies.put(cookieJar$Key, cookieJar$ExpirableCookie);
+        return this;
+    }
+
+    public CookieJar(boolean bl) {
+        this.noDomainCookies = new ConcurrentHashMap();
+        this.domainCookies = new ConcurrentSkipListMap();
+        this.cookieFilter = DEFAULT;
+        this.obeyExpiryTimes = bl;
+    }
+
+    public Cookie putAndGet(String string, String string2) {
+        return this.putAndGet(string, string2, null);
+    }
+
+    public Predicate getCookieFilter() {
+        return this.cookieFilter;
+    }
+
+    public void remove(String string) {
+        this.remove(string, null);
+    }
+
+    public Cookie putAndGet(String string, String string2, String string3) {
+        DefaultCookie defaultCookie = new DefaultCookie(string, string2);
+        if (string3 != null) {
+            defaultCookie.setDomain(string3);
+        }
+        this.put((Cookie)defaultCookie);
+        return defaultCookie;
+    }
+
+    public void remove(String string, String string2) {
+        CookieJar$Key cookieJar$Key = new CookieJar$Key(string2, null, string);
+        if (cookieJar$Key.domain.equals("")) {
+            this.noDomainCookies.remove(cookieJar$Key);
+            return;
+        }
+        this.domainCookies.remove(cookieJar$Key);
+    }
+
+    public void printDeep() {
+        this.domainCookies.forEach(CookieJar::lambda$printDeep$6);
+    }
+
+    static {
+        $assertionsDisabled = !CookieJar.class.desiredAssertionStatus();
+        DEFAULT = CookieJar::lambda$static$0;
+    }
+
+    public static ConcurrentSkipListMap deepCopy(ConcurrentSkipListMap concurrentSkipListMap) {
+        ConcurrentSkipListMap concurrentSkipListMap2 = new ConcurrentSkipListMap();
+        concurrentSkipListMap.forEach(concurrentSkipListMap2::put);
+        return concurrentSkipListMap2;
+    }
+
+    public void print() {
+        this.noDomainCookies.values().forEach(CookieJar::lambda$print$4);
+        this.domainCookies.values().forEach(CookieJar::lambda$print$5);
+    }
+
+    public static ConcurrentHashMap deepCopy(ConcurrentHashMap concurrentHashMap) {
+        ConcurrentHashMap concurrentHashMap2 = new ConcurrentHashMap();
+        concurrentHashMap.forEach(concurrentHashMap2::put);
+        return concurrentHashMap2;
+    }
+
+    public String getCookieValue(String string) {
+        CookieJar$ExpirableCookie cookieJar$ExpirableCookie;
+        Iterator<CookieJar$ExpirableCookie> iterator = this.domainCookies.values().iterator();
+        do {
+            if (!iterator.hasNext()) return null;
+            cookieJar$ExpirableCookie = iterator.next();
+        } while (!cookieJar$ExpirableCookie.wrappedCookie.name().equalsIgnoreCase(string));
+        return cookieJar$ExpirableCookie.wrappedCookie.value();
+    }
+
+    public boolean contains(Cookie cookie) {
+        Objects.requireNonNull(cookie);
+        return this.contains(cookie.name());
+    }
+
+    public String getCookieValue(String string, String string2) {
+        String string3;
+        String string4 = this.getCookieValue(string);
+        if (string4 == null) {
+            string3 = string2;
+            return string3;
+        }
+        string3 = string4;
+        return string3;
     }
 }
 

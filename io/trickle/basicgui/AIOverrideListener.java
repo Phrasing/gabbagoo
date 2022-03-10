@@ -10,12 +10,8 @@ import javax.swing.JCheckBox;
 
 public class AIOverrideListener
 implements ActionListener {
-    public static AtomicBoolean AI_ENABLED = new AtomicBoolean(false);
     public JCheckBox checkBox;
-
-    public AIOverrideListener(JCheckBox jCheckBox) {
-        this.checkBox = jCheckBox;
-    }
+    public static AtomicBoolean AI_ENABLED = new AtomicBoolean(false);
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
@@ -26,6 +22,10 @@ implements ActionListener {
         }
         this.checkBox.setText("OFF");
         AI_ENABLED.set(false);
+    }
+
+    public AIOverrideListener(JCheckBox jCheckBox) {
+        this.checkBox = jCheckBox;
     }
 }
 

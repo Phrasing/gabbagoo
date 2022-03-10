@@ -21,13 +21,71 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.Logger;
 
 public abstract class PerimeterX {
-    public static Pattern PXDE_PATTERN;
-    public static Pattern BAKE_PATTERN;
-    public RealClient client;
     public T result;
-    public Logger logger;
+    public RealClient client;
     public String pxhd;
+    public static Pattern BAKE_PATTERN = Pattern.compile("bake\\|.*?\\|.*?\\|(.*?)\\|");
+    public static Pattern PXDE_PATTERN = Pattern.compile("_pxde\\|330\\|(.*?)\\|");
+    public Logger logger;
     public Vertx vertx;
+
+    public PerimeterX(TaskActor taskActor) {
+        Objects.requireNonNull(taskActor.getVertx());
+        Objects.requireNonNull(taskActor.getLogger());
+        this.vertx = taskActor.getVertx();
+        this.logger = taskActor.getLogger();
+        this.client = RealClientFactory.fromOther(this.vertx, taskActor.getClient().getWebClient(), ClientType.PX_SDK_PIXEL_3);
+    }
+
+    public abstract String getDeviceAcceptEncoding();
+
+    public abstract CompletableFuture solveCaptcha(String var1, String var2, String var3);
+
+    public abstract CompletableFuture initialise();
+
+    public Boolean updatePxhd(String string) {
+        if (string == null) {
+            return null;
+        }
+        this.pxhd = string;
+        return true;
+    }
+
+    public abstract void reset();
+
+    public PerimeterX(Vertx vertx, Logger logger, ClientType clientType) {
+        Objects.requireNonNull(vertx);
+        Objects.requireNonNull(logger);
+        this.vertx = vertx;
+        this.logger = logger;
+        if (clientType == null) {
+            this.client = RealClientFactory.build(vertx, ClientType.BASIC);
+            return;
+        }
+        this.client = RealClientFactory.buildProxied(this.vertx, clientType);
+    }
+
+    public abstract String getVid();
+
+    public void close() {
+        this.client.close();
+        this.client = null;
+        this.reset();
+    }
+
+    public abstract String getDeviceSecUA();
+
+    public abstract String getDeviceLang();
+
+    public static PerimeterX createDesktop(TaskActor taskActor) {
+        return new DesktopPXNEW(taskActor);
+    }
+
+    public abstract String getDeviceUA();
+
+    public static PerimeterX createMobile(TaskActor taskActor) {
+        return new MobilePX(taskActor);
+    }
 
     public PerimeterX(TaskActor taskActor, ClientType clientType) {
         this(taskActor.getVertx(), taskActor.getLogger(), clientType);
@@ -36,6 +94,8 @@ public abstract class PerimeterX {
     public static PerimeterX createDesktopAPI(TaskActor taskActor) {
         return new DesktopPXAPI3(taskActor);
     }
+
+    public abstract CompletableFuture solve();
 
     public void restartClient(RealClient realClient) {
         try {
@@ -50,73 +110,8 @@ public abstract class PerimeterX {
         }
     }
 
-    public abstract CompletableFuture solve();
-
-    public abstract String getVid();
-
     public Object tokenValue() {
         return this.result;
     }
-
-    public abstract CompletableFuture initialise();
-
-    public void close() {
-        this.client.close();
-        this.client = null;
-        this.reset();
-    }
-
-    public static PerimeterX createDesktop(TaskActor taskActor) {
-        return new DesktopPXNEW(taskActor);
-    }
-
-    public abstract String getDeviceAcceptEncoding();
-
-    public abstract void reset();
-
-    public abstract String getDeviceSecUA();
-
-    public static PerimeterX createMobile(TaskActor taskActor) {
-        return new MobilePX(taskActor);
-    }
-
-    public abstract String getDeviceUA();
-
-    static {
-        BAKE_PATTERN = Pattern.compile("bake\\|.*?\\|.*?\\|(.*?)\\|");
-        PXDE_PATTERN = Pattern.compile("_pxde\\|330\\|(.*?)\\|");
-    }
-
-    public abstract String getDeviceLang();
-
-    public PerimeterX(Vertx vertx, Logger logger, ClientType clientType) {
-        Objects.requireNonNull(vertx);
-        Objects.requireNonNull(logger);
-        this.vertx = vertx;
-        this.logger = logger;
-        if (clientType == null) {
-            this.client = RealClientFactory.build(vertx, ClientType.BASIC);
-            return;
-        }
-        this.client = RealClientFactory.buildProxied(this.vertx, clientType);
-    }
-
-    public Boolean updatePxhd(String string) {
-        if (string == null) {
-            return null;
-        }
-        this.pxhd = string;
-        return true;
-    }
-
-    public PerimeterX(TaskActor taskActor) {
-        Objects.requireNonNull(taskActor.getVertx());
-        Objects.requireNonNull(taskActor.getLogger());
-        this.vertx = taskActor.getVertx();
-        this.logger = taskActor.getLogger();
-        this.client = RealClientFactory.fromOther(this.vertx, taskActor.getClient().getWebClient(), ClientType.PX_SDK_PIXEL_3);
-    }
-
-    public abstract CompletableFuture solveCaptcha(String var1, String var2, String var3);
 }
 

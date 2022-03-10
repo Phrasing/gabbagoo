@@ -32,21 +32,62 @@ import org.apache.logging.log4j.Logger;
 public class LoginController
 implements Module,
 LoadableAsync {
-    public String LOCK_IDENTITY;
-    public Vertx vertx;
     public AtomicReference<ArrayBlockingQueue<LoginFuture>> waitingList = new AtomicReference();
     public static Logger logger = LogManager.getLogger(TokenController.class);
+    public String LOCK_IDENTITY;
     public AtomicInteger solveCount;
+    public Vertx vertx;
 
-    public LoginFuture solve(LoginToken loginToken) {
-        LoginFuture loginFuture = new LoginFuture(loginToken);
-        if (this.waitingList.get().offer(loginFuture)) return loginFuture;
-        throw new Exception("Too many tokens to solve!!!");
+    public LoginFuture pollWaitingList() {
+        this.solveCount.incrementAndGet();
+        return this.waitingList.get().take();
     }
 
     @Override
     public void initialise() {
         logger.debug("Initialised.");
+    }
+
+    public static CompletableFuture initBrowserLogin(String string, Iterable iterable, String string2, CookieJar cookieJar, String string3) {
+        try {
+            LoginFuture loginFuture;
+            logger.info("Browser needs attention.");
+            LoginToken loginToken = new LoginToken(string, iterable, string2, cookieJar, string3);
+            LoginFuture loginFuture2 = loginFuture = ((LoginController)Engine.get().getModule(Controller.LOGIN)).solve(loginToken);
+            if (!loginFuture2.toCompletableFuture().isDone()) {
+                LoginFuture loginFuture3 = loginFuture2;
+                return loginFuture3.exceptionally(Function.identity()).thenCompose(arg_0 -> LoginController.async$initBrowserLogin(string, iterable, string2, cookieJar, string3, loginToken, loginFuture, loginFuture3, 1, arg_0)).toCompletableFuture();
+            }
+            loginFuture2.toCompletableFuture().join();
+            return CompletableFuture.completedFuture(loginToken.getCookieJar());
+        }
+        catch (Throwable throwable) {
+            throwable.printStackTrace();
+            logger.error("HARVEST ERR: {}", (Object)throwable.getMessage());
+            return CompletableFuture.completedFuture(null);
+        }
+    }
+
+    public LoginController(Vertx vertx) {
+        this.waitingList.set(new ArrayBlockingQueue(300));
+        this.vertx = vertx;
+        this.LOCK_IDENTITY = UUID.randomUUID().toString();
+        this.solveCount = new AtomicInteger(0);
+    }
+
+    @Override
+    public void terminate() {
+    }
+
+    @Override
+    public Future load() {
+        return Future.succeededFuture();
+    }
+
+    public LoginFuture solve(LoginToken loginToken) {
+        LoginFuture loginFuture = new LoginFuture(loginToken);
+        if (this.waitingList.get().offer(loginFuture)) return loginFuture;
+        throw new Exception("Too many tokens to solve!!!");
     }
 
     /*
@@ -82,47 +123,6 @@ lbl18:
             }
         }
         throw new IllegalArgumentException();
-    }
-
-    @Override
-    public void terminate() {
-    }
-
-    public static CompletableFuture initBrowserLogin(String string, Iterable iterable, String string2, CookieJar cookieJar, String string3) {
-        try {
-            LoginFuture loginFuture;
-            logger.info("Browser needs attention.");
-            LoginToken loginToken = new LoginToken(string, iterable, string2, cookieJar, string3);
-            LoginFuture loginFuture2 = loginFuture = ((LoginController)Engine.get().getModule(Controller.LOGIN)).solve(loginToken);
-            if (!loginFuture2.toCompletableFuture().isDone()) {
-                LoginFuture loginFuture3 = loginFuture2;
-                return loginFuture3.exceptionally(Function.identity()).thenCompose(arg_0 -> LoginController.async$initBrowserLogin(string, iterable, string2, cookieJar, string3, loginToken, loginFuture, loginFuture3, 1, arg_0)).toCompletableFuture();
-            }
-            loginFuture2.toCompletableFuture().join();
-            return CompletableFuture.completedFuture(loginToken.getCookieJar());
-        }
-        catch (Throwable throwable) {
-            throwable.printStackTrace();
-            logger.error("HARVEST ERR: {}", (Object)throwable.getMessage());
-            return CompletableFuture.completedFuture(null);
-        }
-    }
-
-    @Override
-    public Future load() {
-        return Future.succeededFuture();
-    }
-
-    public LoginController(Vertx vertx) {
-        this.waitingList.set(new ArrayBlockingQueue(300));
-        this.vertx = vertx;
-        this.LOCK_IDENTITY = UUID.randomUUID().toString();
-        this.solveCount = new AtomicInteger(0);
-    }
-
-    public LoginFuture pollWaitingList() {
-        this.solveCount.incrementAndGet();
-        return this.waitingList.get().take();
     }
 }
 

@@ -22,11 +22,11 @@ implements KeyListener {
     }
 
     @Override
-    public void keyTyped(KeyEvent keyEvent) {
+    public void keyPressed(KeyEvent keyEvent) {
     }
 
     @Override
-    public void keyPressed(KeyEvent keyEvent) {
+    public void keyTyped(KeyEvent keyEvent) {
     }
 }
 

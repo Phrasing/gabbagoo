@@ -17,13 +17,13 @@ implements X509TrustManager {
     public TrustManagerImpl manager = (TrustManagerImpl)Conscrypt.getDefaultX509TrustManager();
 
     @Override
-    public void checkServerTrusted(X509Certificate[] x509CertificateArray, String string) {
-        this.manager.checkServerTrusted(x509CertificateArray, string);
+    public void checkClientTrusted(X509Certificate[] x509CertificateArray, String string) {
+        this.manager.checkClientTrusted(x509CertificateArray, string);
     }
 
     @Override
-    public void checkClientTrusted(X509Certificate[] x509CertificateArray, String string) {
-        this.manager.checkClientTrusted(x509CertificateArray, string);
+    public void checkServerTrusted(X509Certificate[] x509CertificateArray, String string) {
+        this.manager.checkServerTrusted(x509CertificateArray, string);
     }
 
     @Override

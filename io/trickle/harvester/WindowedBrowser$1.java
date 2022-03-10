@@ -16,14 +16,14 @@ public class WindowedBrowser$1
 extends WindowAdapter {
     public WindowedBrowser this$0;
 
+    public WindowedBrowser$1(WindowedBrowser windowedBrowser) {
+        this.this$0 = windowedBrowser;
+    }
+
     @Override
     public void windowClosing(WindowEvent windowEvent) {
         if (this.this$0.browserEngine.isClosed()) return;
         CompletableFuture.runAsync(() -> ((Engine)this.this$0.browserEngine).close());
-    }
-
-    public WindowedBrowser$1(WindowedBrowser windowedBrowser) {
-        this.this$0 = windowedBrowser;
     }
 }
 

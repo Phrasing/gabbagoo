@@ -52,118 +52,22 @@ import java.util.function.Predicate;
 import javax.swing.JFrame;
 
 public class Window3DS2 {
+    public String termURI;
+    public MultiMap acsForm;
+    public Predicate<String> termUrlCheck;
+    public String userAgent;
+    public String acsMethod;
     public String encodedData;
+    public HashMap<String, String> uploadValues;
     public String acsURI;
-    public JFrame frame;
+    public ContextCompletableFuture<String> urlCallbackShopify;
     public ContextCompletableFuture<Boolean> callback;
     public String loadUrl;
-    public String acsMethod;
-    public MultiMap acsForm;
+    public JFrame frame;
     public Browser browser;
-    public Predicate<String> termUrlCheck;
-    public HashMap<String, String> uploadValues;
-    public ContextCompletableFuture<String> urlCallbackShopify;
-    public String termURI;
-    public String userAgent;
-
-    public EngineOptions engineOptions() {
-        return EngineOptions.newBuilder((RenderingMode)RenderingMode.HARDWARE_ACCELERATED).licenseKey("1BNDIEOFAZ0H665CSFR41MCR5THTYZ8ZE7J946B9XRQ2B35XEE8PDHHOC27XGDJQURKYEQ").addScheme(Scheme.HTTPS, this::lambda$engineOptions$9).userAgent(this.userAgent).build();
-    }
-
-    public CompletableFuture invokeShopify() {
-        CompletableFuture.runAsync(this::invoke2);
-        return this.urlCallbackShopify;
-    }
-
-    public String getTermURI() {
-        return this.termURI;
-    }
-
-    public BeforeSendUploadDataCallback.Response lambda$invoke0$3(BeforeSendUploadDataCallback.Params params) {
-        if (!this.termUrlCheck.test(params.urlRequest().url())) return BeforeSendUploadDataCallback.Response.proceed();
-        if (!(params.uploadData() instanceof FormData)) return BeforeSendUploadDataCallback.Response.proceed();
-        FormData formData = (FormData)params.uploadData();
-        Iterator iterator = formData.data().iterator();
-        while (iterator.hasNext()) {
-            FormData.Pair pair = (FormData.Pair)iterator.next();
-            this.uploadValues.put(pair.key(), pair.value());
-        }
-        return BeforeSendUploadDataCallback.Response.proceed();
-    }
-
-    public void invoke0() {
-        Engine engine = Engine.newInstance((EngineOptions)this.engineOptions());
-        engine.on(EngineClosed.class, this::lambda$invoke0$2);
-        engine.network().set(BeforeSendUploadDataCallback.class, (Callback)((BeforeSendUploadDataCallback)this::lambda$invoke0$3));
-        this.browser = engine.newBrowser();
-        this.browser.on(BrowserClosed.class, this::lambda$invoke0$4);
-        this.frame = new JFrame("Confirm 3DS");
-        this.frame.setDefaultCloseOperation(2);
-        this.frame.addWindowListener(new Window3DS2$1(this, engine));
-        BrowserView browserView = BrowserView.newInstance((Browser)this.browser);
-        this.frame.add((Component)browserView, "Center");
-        this.frame.setSize(360, 550);
-        this.frame.setVisible(true);
-        this.callback.thenAcceptAsync(this::lambda$invoke0$5);
-        String string = Window3DS2.getFormPage(this.acsMethod, this.acsURI, this.acsForm);
-        String string2 = Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8));
-        String string3 = "data:text/html;base64," + string2;
-        this.browser.navigation().loadUrl(string3);
-    }
-
-    public String getEncodedData() {
-        return this.encodedData;
-    }
-
-    public void lambda$invoke0$5(Boolean bl) {
-        try {
-            this.frame.dispatchEvent(new WindowEvent(this.frame, 201));
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
-
-    public boolean lambda$new$0(String string) {
-        if (string.contains("callback/CREDIT_CARD")) return true;
-        if (string.equalsIgnoreCase(this.termURI)) return true;
-        return false;
-    }
 
     public HashMap getUploadValues() {
         return this.uploadValues;
-    }
-
-    public CompletableFuture invoke() {
-        CompletableFuture.runAsync(this::invoke0);
-        return this.callback;
-    }
-
-    public void lambda$invoke2$8(String string) {
-        try {
-            this.frame.dispatchEvent(new WindowEvent(this.frame, 201));
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
-
-    public Window3DS2(String string, String string2, String string3) {
-        this.urlCallbackShopify = new ContextCompletableFuture();
-        this.userAgent = string;
-        this.termURI = string2;
-        this.loadUrl = string3;
-        this.termUrlCheck = this::lambda$new$1;
-    }
-
-    public void lambda$invoke0$2(EngineClosed engineClosed) {
-        this.callback.complete((Object)true);
-    }
-
-    public void lambda$invoke2$6(EngineClosed engineClosed) {
-        this.urlCallbackShopify.complete(null);
     }
 
     public InterceptUrlRequestCallback.Response lambda$engineOptions$9(InterceptUrlRequestCallback.Params params) {
@@ -176,39 +80,34 @@ public class Window3DS2 {
         return InterceptUrlRequestCallback.Response.proceed();
     }
 
-    public static String getFormPage(String string, String string2, MultiMap multiMap) {
-        return "        <html>\n            <body>\n                <form method=\"" + string + "\" action=\"" + string2 + "\" id=\"Cardinal-CCA-Form\">\n                    <input type=\"hidden\" name=\"PaReq\" value=\"" + multiMap.get("PaReq") + "\" />\n                    <input type=\"hidden\" name=\"MD\" value=\"" + multiMap.get("MD") + "\" />\n                    <input type=\"hidden\" name=\"TermUrl\" value=\"" + multiMap.get("TermUrl") + "\" />\n                </form>\n                <script>\n                    setTimeout(() => document.querySelector('#Cardinal-CCA-Form').submit(), 500);\n                </script>\n            </body>\n        </html>";
+    public Window3DS2(String string, String string2, String string3) {
+        this.urlCallbackShopify = new ContextCompletableFuture();
+        this.userAgent = string;
+        this.termURI = string2;
+        this.loadUrl = string3;
+        this.termUrlCheck = this::lambda$new$1;
     }
 
-    public void invoke2() {
-        Engine engine = Engine.newInstance((EngineOptions)this.engineOptions());
-        engine.on(EngineClosed.class, this::lambda$invoke2$6);
-        this.browser = engine.newBrowser();
-        this.browser.on(BrowserClosed.class, this::lambda$invoke2$7);
-        this.frame = new JFrame("Confirm 3DS");
-        this.frame.setDefaultCloseOperation(2);
-        this.frame.addWindowListener(new Window3DS2$2(this, engine));
-        BrowserView browserView = BrowserView.newInstance((Browser)this.browser);
-        this.frame.add((Component)browserView, "Center");
-        this.frame.setSize(360, 550);
-        this.frame.setVisible(true);
-        this.urlCallbackShopify.thenAcceptAsync(this::lambda$invoke2$8);
-        this.browser.navigation().loadUrl(this.loadUrl);
+    public void lambda$invoke0$5(Boolean bl) {
+        try {
+            this.frame.dispatchEvent(new WindowEvent(this.frame, 201));
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
     }
 
-    public static void main(String[] stringArray) {
-        Window3DS2 window3DS2 = Window3DS2.getTest();
-        window3DS2.invoke().get();
-        System.out.println(window3DS2.uploadValues);
-        System.out.println("EXIT");
-    }
-
-    public void lambda$invoke2$7(BrowserClosed browserClosed) {
-        this.urlCallbackShopify.complete(null);
-    }
-
-    public void lambda$invoke0$4(BrowserClosed browserClosed) {
-        this.callback.complete((Object)true);
+    public Window3DS2(String string, String string2, String string3, String string4, String string5, MultiMap multiMap) {
+        this.callback = new ContextCompletableFuture();
+        this.userAgent = string;
+        this.acsURI = string2;
+        this.termURI = string3;
+        this.encodedData = string4;
+        this.acsMethod = string5;
+        this.acsForm = multiMap;
+        this.uploadValues = new LinkedHashMap<String, String>();
+        this.termUrlCheck = this::lambda$new$0;
     }
 
     public static Window3DS2 getTest() {
@@ -234,20 +133,121 @@ public class Window3DS2 {
         }
     }
 
+    public String getEncodedData() {
+        return this.encodedData;
+    }
+
+    public void invoke2() {
+        Engine engine = Engine.newInstance((EngineOptions)this.engineOptions());
+        engine.on(EngineClosed.class, this::lambda$invoke2$6);
+        this.browser = engine.newBrowser();
+        this.browser.on(BrowserClosed.class, this::lambda$invoke2$7);
+        this.frame = new JFrame("Confirm 3DS");
+        this.frame.setDefaultCloseOperation(2);
+        this.frame.addWindowListener(new Window3DS2$2(this, engine));
+        BrowserView browserView = BrowserView.newInstance((Browser)this.browser);
+        this.frame.add((Component)browserView, "Center");
+        this.frame.setSize(360, 550);
+        this.frame.setVisible(true);
+        this.urlCallbackShopify.thenAcceptAsync(this::lambda$invoke2$8);
+        this.browser.navigation().loadUrl(this.loadUrl);
+    }
+
+    public BeforeSendUploadDataCallback.Response lambda$invoke0$3(BeforeSendUploadDataCallback.Params params) {
+        if (!this.termUrlCheck.test(params.urlRequest().url())) return BeforeSendUploadDataCallback.Response.proceed();
+        if (!(params.uploadData() instanceof FormData)) return BeforeSendUploadDataCallback.Response.proceed();
+        FormData formData = (FormData)params.uploadData();
+        Iterator iterator = formData.data().iterator();
+        while (iterator.hasNext()) {
+            FormData.Pair pair = (FormData.Pair)iterator.next();
+            this.uploadValues.put(pair.key(), pair.value());
+        }
+        return BeforeSendUploadDataCallback.Response.proceed();
+    }
+
+    public CompletableFuture invoke() {
+        CompletableFuture.runAsync(this::invoke0);
+        return this.callback;
+    }
+
+    public void lambda$invoke2$8(String string) {
+        try {
+            this.frame.dispatchEvent(new WindowEvent(this.frame, 201));
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+    }
+
+    public EngineOptions engineOptions() {
+        return EngineOptions.newBuilder((RenderingMode)RenderingMode.HARDWARE_ACCELERATED).licenseKey("1BNDIEOFAZ0H665CSFR41MCR5THTYZ8ZE7J946B9XRQ2B35XEE8PDHHOC27XGDJQURKYEQ").addScheme(Scheme.HTTPS, this::lambda$engineOptions$9).userAgent(this.userAgent).build();
+    }
+
     public boolean lambda$new$1(String string) {
         return string.contains(this.termURI);
     }
 
-    public Window3DS2(String string, String string2, String string3, String string4, String string5, MultiMap multiMap) {
-        this.callback = new ContextCompletableFuture();
-        this.userAgent = string;
-        this.acsURI = string2;
-        this.termURI = string3;
-        this.encodedData = string4;
-        this.acsMethod = string5;
-        this.acsForm = multiMap;
-        this.uploadValues = new LinkedHashMap<String, String>();
-        this.termUrlCheck = this::lambda$new$0;
+    public boolean lambda$new$0(String string) {
+        if (string.contains("callback/CREDIT_CARD")) return true;
+        if (string.equalsIgnoreCase(this.termURI)) return true;
+        return false;
+    }
+
+    public String getTermURI() {
+        return this.termURI;
+    }
+
+    public void invoke0() {
+        Engine engine = Engine.newInstance((EngineOptions)this.engineOptions());
+        engine.on(EngineClosed.class, this::lambda$invoke0$2);
+        engine.network().set(BeforeSendUploadDataCallback.class, (Callback)((BeforeSendUploadDataCallback)this::lambda$invoke0$3));
+        this.browser = engine.newBrowser();
+        this.browser.on(BrowserClosed.class, this::lambda$invoke0$4);
+        this.frame = new JFrame("Confirm 3DS");
+        this.frame.setDefaultCloseOperation(2);
+        this.frame.addWindowListener(new Window3DS2$1(this, engine));
+        BrowserView browserView = BrowserView.newInstance((Browser)this.browser);
+        this.frame.add((Component)browserView, "Center");
+        this.frame.setSize(360, 550);
+        this.frame.setVisible(true);
+        this.callback.thenAcceptAsync(this::lambda$invoke0$5);
+        String string = Window3DS2.getFormPage(this.acsMethod, this.acsURI, this.acsForm);
+        String string2 = Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8));
+        String string3 = "data:text/html;base64," + string2;
+        this.browser.navigation().loadUrl(string3);
+    }
+
+    public static void main(String[] stringArray) {
+        Window3DS2 window3DS2 = Window3DS2.getTest();
+        window3DS2.invoke().get();
+        System.out.println(window3DS2.uploadValues);
+        System.out.println("EXIT");
+    }
+
+    public void lambda$invoke0$2(EngineClosed engineClosed) {
+        this.callback.complete((Object)true);
+    }
+
+    public static String getFormPage(String string, String string2, MultiMap multiMap) {
+        return "        <html>\n            <body>\n                <form method=\"" + string + "\" action=\"" + string2 + "\" id=\"Cardinal-CCA-Form\">\n                    <input type=\"hidden\" name=\"PaReq\" value=\"" + multiMap.get("PaReq") + "\" />\n                    <input type=\"hidden\" name=\"MD\" value=\"" + multiMap.get("MD") + "\" />\n                    <input type=\"hidden\" name=\"TermUrl\" value=\"" + multiMap.get("TermUrl") + "\" />\n                </form>\n                <script>\n                    setTimeout(() => document.querySelector('#Cardinal-CCA-Form').submit(), 500);\n                </script>\n            </body>\n        </html>";
+    }
+
+    public CompletableFuture invokeShopify() {
+        CompletableFuture.runAsync(this::invoke2);
+        return this.urlCallbackShopify;
+    }
+
+    public void lambda$invoke0$4(BrowserClosed browserClosed) {
+        this.callback.complete((Object)true);
+    }
+
+    public void lambda$invoke2$7(BrowserClosed browserClosed) {
+        this.urlCallbackShopify.complete(null);
+    }
+
+    public void lambda$invoke2$6(EngineClosed engineClosed) {
+        this.urlCallbackShopify.complete(null);
     }
 }
 

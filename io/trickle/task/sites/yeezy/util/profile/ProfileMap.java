@@ -14,6 +14,15 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ProfileMap {
     public HashMap<String, SizeMap> keywordMap = new HashMap();
 
+    public Optional get(String string, String string2) {
+        try {
+            return Optional.of(this.keywordMap.get(string).get(string2));
+        }
+        catch (Throwable throwable) {
+            return Optional.empty();
+        }
+    }
+
     public Optional getAnySku(String string) {
         try {
             SizeMap sizeMap;
@@ -31,10 +40,6 @@ public class ProfileMap {
         }
     }
 
-    public String toString() {
-        return this.keywordMap.toString();
-    }
-
     public void put(Task task) {
         SizeMap sizeMap = this.keywordMap.get(task.getKeywords()[0]);
         if (sizeMap == null) {
@@ -46,13 +51,8 @@ public class ProfileMap {
         sizeMap.put(task.getSize(), task.getProfile());
     }
 
-    public Optional get(String string, String string2) {
-        try {
-            return Optional.of(this.keywordMap.get(string).get(string2));
-        }
-        catch (Throwable throwable) {
-            return Optional.empty();
-        }
+    public String toString() {
+        return this.keywordMap.toString();
     }
 }
 

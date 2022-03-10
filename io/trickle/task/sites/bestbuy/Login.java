@@ -18,19 +18,25 @@ import java.util.regex.Pattern;
 import javax.mail.search.SearchTerm;
 
 public class Login {
-    public String challengeType;
-    public String flowOptions;
     public static Pattern ALPHA_PATTERN;
+    public static Pattern initDataPattern;
+    public static SearchTerm SEARCH_TERM;
+    public String challengeType;
     public static Pattern CODE_PATTERN;
     public JsonObject initData;
-    public static SearchTerm SEARCH_TERM;
-    public static Pattern initDataPattern;
+    public String flowOptions;
 
-    static {
-        SEARCH_TERM = new Login$1();
-        initDataPattern = Pattern.compile("var initData = (.*?});");
-        ALPHA_PATTERN = Pattern.compile("^[0-9]+_A_.+$");
-        CODE_PATTERN = Pattern.compile("^\\d+_X_.+$");
+    public String getCode() {
+        JsonArray jsonArray = this.initData.getJsonArray("codeList");
+        int n = 0;
+        while (n < jsonArray.size()) {
+            String string = new String(Base64.getDecoder().decode(jsonArray.getString(n)));
+            if (Utils.hasPattern(string, CODE_PATTERN)) {
+                return jsonArray.getString(n);
+            }
+            ++n;
+        }
+        return "no-code";
     }
 
     public String getAlpha() {
@@ -50,21 +56,15 @@ public class Login {
         return new Login(string);
     }
 
-    public Login(String string) {
-        this.initData = new JsonObject(Objects.requireNonNull(Utils.quickParseFirst(string, initDataPattern)));
+    static {
+        SEARCH_TERM = new Login$1();
+        initDataPattern = Pattern.compile("var initData = (.*?});");
+        ALPHA_PATTERN = Pattern.compile("^[0-9]+_A_.+$");
+        CODE_PATTERN = Pattern.compile("^\\d+_X_.+$");
     }
 
-    public String getCode() {
-        JsonArray jsonArray = this.initData.getJsonArray("codeList");
-        int n = 0;
-        while (n < jsonArray.size()) {
-            String string = new String(Base64.getDecoder().decode(jsonArray.getString(n)));
-            if (Utils.hasPattern(string, CODE_PATTERN)) {
-                return jsonArray.getString(n);
-            }
-            ++n;
-        }
-        return "no-code";
+    public Login(String string) {
+        this.initData = new JsonObject(Objects.requireNonNull(Utils.quickParseFirst(string, initDataPattern)));
     }
 }
 

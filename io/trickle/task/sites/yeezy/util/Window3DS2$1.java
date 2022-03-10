@@ -14,8 +14,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class Window3DS2$1
 extends WindowAdapter {
-    public Window3DS2 this$0;
     public Engine val$engine;
+    public Window3DS2 this$0;
 
     public Window3DS2$1(Window3DS2 window3DS2, Engine engine) {
         this.this$0 = window3DS2;

@@ -16,16 +16,16 @@ implements Supplier {
         return this.rate;
     }
 
-    public ShippingRateSupplier(String string) {
-        this.rate = string;
-    }
-
     public void updateRate(String string) {
         this.rate = string;
     }
 
     public Object get() {
         return this.get();
+    }
+
+    public ShippingRateSupplier(String string) {
+        this.rate = string;
     }
 }
 

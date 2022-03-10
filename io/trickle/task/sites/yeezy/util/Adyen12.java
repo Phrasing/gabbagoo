@@ -30,26 +30,43 @@ import javax.crypto.spec.IvParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Adyen12 {
-    public static String luhnCount;
-    public static SimpleDateFormat simpleDateFormat;
-    public static String luhnOkCount;
-    public static boolean $assertionsDisabled;
-    public static String sjclStrength;
-    public static Cipher aesCipher;
     public static PublicKey pubKey;
-    public static String VERSION;
-    public static String initializeCount;
-    public static String dfValue;
-    public static Cipher rsaCipher;
-    public static String luhnSameLengthCount;
-    public static String SEPARATOR;
+    public static SimpleDateFormat simpleDateFormat;
     public static SecureRandom srandom;
     public static String PREFIX;
+    public static Cipher aesCipher;
+    public static String luhnOkCount;
+    public static String luhnCount;
+    public static String sjclStrength;
+    public static String VERSION;
+    public static String luhnSameLengthCount;
+    public static String dfValue;
+    public static String initializeCount;
+    public static String SEPARATOR;
+    public static Cipher rsaCipher;
+    public static boolean $assertionsDisabled;
 
     public static synchronized byte[] generateIV(int n) {
         byte[] byArray = new byte[n];
         srandom.nextBytes(byArray);
         return byArray;
+    }
+
+    static {
+        luhnCount = "1";
+        VERSION = "0_1_12";
+        SEPARATOR = "$";
+        initializeCount = "1";
+        luhnSameLengthCount = "1";
+        sjclStrength = "10";
+        luhnOkCount = "1";
+        PREFIX = "adyenjs_";
+        $assertionsDisabled = !Adyen12.class.desiredAssertionStatus();
+        srandom = new SecureRandom();
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dfValue = null;
+        Security.addProvider((Provider)new BouncyCastleProvider());
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     public static String getCSEToken(Profile profile) {
@@ -94,38 +111,6 @@ public class Adyen12 {
         }
     }
 
-    public static SecretKey generateAESKey(int n) {
-        KeyGenerator keyGenerator = null;
-        try {
-            keyGenerator = KeyGenerator.getInstance("AES");
-        }
-        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-            // empty catch block
-        }
-        if (!$assertionsDisabled && keyGenerator == null) {
-            throw new AssertionError();
-        }
-        keyGenerator.init(n);
-        return keyGenerator.generateKey();
-    }
-
-    static {
-        sjclStrength = "10";
-        luhnOkCount = "1";
-        PREFIX = "adyenjs_";
-        SEPARATOR = "$";
-        luhnCount = "1";
-        initializeCount = "1";
-        VERSION = "0_1_12";
-        luhnSameLengthCount = "1";
-        $assertionsDisabled = !Adyen12.class.desiredAssertionStatus();
-        srandom = new SecureRandom();
-        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        dfValue = null;
-        Security.addProvider((Provider)new BouncyCastleProvider());
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
     public static String getCardJSON(Profile profile) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("cvc", (Object)profile.getCvv());
@@ -141,6 +126,21 @@ public class Adyen12 {
         jsonObject.put("number", (Object)profile.getCardNumber());
         jsonObject.put("sjclStrength", (Object)"10");
         return jsonObject.toString();
+    }
+
+    public static SecretKey generateAESKey(int n) {
+        KeyGenerator keyGenerator = null;
+        try {
+            keyGenerator = KeyGenerator.getInstance("AES");
+        }
+        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+            // empty catch block
+        }
+        if (!$assertionsDisabled && keyGenerator == null) {
+            throw new AssertionError();
+        }
+        keyGenerator.init(n);
+        return keyGenerator.generateKey();
     }
 }
 

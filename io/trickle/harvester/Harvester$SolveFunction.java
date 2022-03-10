@@ -18,11 +18,6 @@ public class Harvester$SolveFunction {
     public SolveFuture callback;
     public AtomicReference<CountDownLatch> latch;
 
-    public Harvester$SolveFunction(SolveFuture solveFuture, AtomicReference atomicReference) {
-        this.callback = solveFuture;
-        this.latch = atomicReference;
-    }
-
     @JsAccessible
     public void completed(String string) {
         CaptchaToken captchaToken = this.callback.getEmptyCaptchaToken();
@@ -35,6 +30,11 @@ public class Harvester$SolveFunction {
         ((CompletableFuture)solveFuture).complete(captchaToken);
         this.latch.get().countDown();
         this.callback.imageFuture.complete(null);
+    }
+
+    public Harvester$SolveFunction(SolveFuture solveFuture, AtomicReference atomicReference) {
+        this.callback = solveFuture;
+        this.latch = atomicReference;
     }
 }
 

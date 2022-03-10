@@ -17,18 +17,6 @@ implements ActionListener,
 KeyListener {
     public TextField keywordField;
 
-    public KeywordOverrideListener(TextField textField) {
-        this.keywordField = textField;
-    }
-
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-    }
-
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
-    }
-
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String string = this.keywordField.getText();
@@ -38,7 +26,19 @@ KeyListener {
     }
 
     @Override
+    public void keyTyped(KeyEvent keyEvent) {
+    }
+
+    @Override
     public void keyPressed(KeyEvent keyEvent) {
+    }
+
+    public KeywordOverrideListener(TextField textField) {
+        this.keywordField = textField;
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
     }
 }
 

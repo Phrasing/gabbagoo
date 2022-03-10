@@ -23,8 +23,8 @@ import java.util.List;
 public class StatsHandler
 implements PacketHandler {
     @Override
-    public PacketType getType() {
-        return PacketType.INT_VARIABLE_SIZED;
+    public void handle(Packet packet) {
+        throw new RuntimeException("Not-implemented");
     }
 
     @Override
@@ -45,8 +45,8 @@ implements PacketHandler {
     }
 
     @Override
-    public void handle(Packet packet) {
-        throw new RuntimeException("Not-implemented");
+    public PacketType getType() {
+        return PacketType.INT_VARIABLE_SIZED;
     }
 
     @Override

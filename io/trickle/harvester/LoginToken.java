@@ -10,11 +10,19 @@ import io.netty.handler.codec.http.cookie.Cookie;
 import io.trickle.webclient.CookieJar;
 
 public class LoginToken {
-    public CookieJar cookieJar;
+    public String html;
     public String proxyStr;
     public String domain;
-    public String html;
+    public CookieJar cookieJar;
     public Iterable<Cookie> cookies;
+
+    public String getDomain() {
+        return this.domain;
+    }
+
+    public Iterable getCookies() {
+        return this.cookies;
+    }
 
     public String getHtml() {
         return this.html;
@@ -24,24 +32,16 @@ public class LoginToken {
         return this.cookieJar;
     }
 
-    public Iterable getCookies() {
-        return this.cookies;
-    }
-
-    public String getDomain() {
-        return this.domain;
-    }
-
-    public String getProxyStr() {
-        return this.proxyStr;
-    }
-
     public LoginToken(String string, Iterable iterable, String string2, CookieJar cookieJar, String string3) {
         this.domain = string;
         this.cookies = iterable;
         this.proxyStr = string2;
         this.cookieJar = cookieJar;
         this.html = string3;
+    }
+
+    public String getProxyStr() {
+        return this.proxyStr;
     }
 }
 

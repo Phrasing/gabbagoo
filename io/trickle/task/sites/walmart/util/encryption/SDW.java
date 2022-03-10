@@ -8,8 +8,17 @@ import io.trickle.task.sites.walmart.util.encryption.CMAC;
 import io.trickle.task.sites.walmart.util.encryption.Encryptor;
 
 public class SDW {
-    public Aes aes;
     public static String HEX = "0123456789abcdef";
+    public Aes aes;
+
+    public String wordToHex(int n) {
+        int n2 = 32;
+        Object object = "";
+        while (n2 > 0) {
+            object = (String)object + "0123456789abcdef".charAt(n >>> (n2 -= 4) & 0xF);
+        }
+        return object;
+    }
 
     public String fixluhn(String string, int n, int n2) {
         int n3 = this.luhn(string);
@@ -41,23 +50,8 @@ public class SDW {
         return n2 % 10;
     }
 
-    public String wordToHex(int n) {
-        int n2 = 32;
-        Object object = "";
-        while (n2 > 0) {
-            object = (String)object + "0123456789abcdef".charAt(n >>> (n2 -= 4) & 0xF);
-        }
-        return object;
-    }
-
-    public String integrity(String string, String string2, String string3) {
-        String string4 = Character.toString(0) + Character.toString(string2.length()) + string2 + Character.toString(0) + Character.toString(string3.length()) + string3;
-        long[] lArray = Encryptor.hexToWords(string);
-        lArray[3] = lArray[3] ^ 1L;
-        Aes aes = this.aes.cipher(lArray);
-        CMAC cMAC = new CMAC();
-        int[] nArray = cMAC.compute(aes, string4);
-        return this.wordToHex(nArray[0]) + this.wordToHex(nArray[1]);
+    public SDW(Aes aes) {
+        this.aes = aes;
     }
 
     public String reformat(String string, String string2) {
@@ -76,8 +70,14 @@ public class SDW {
         return object;
     }
 
-    public SDW(Aes aes) {
-        this.aes = aes;
+    public String integrity(String string, String string2, String string3) {
+        String string4 = Character.toString(0) + Character.toString(string2.length()) + string2 + Character.toString(0) + Character.toString(string3.length()) + string3;
+        long[] lArray = Encryptor.hexToWords(string);
+        lArray[3] = lArray[3] ^ 1L;
+        Aes aes = this.aes.cipher(lArray);
+        CMAC cMAC = new CMAC();
+        int[] nArray = cMAC.compute(aes, string4);
+        return this.wordToHex(nArray[0]) + this.wordToHex(nArray[1]);
     }
 }
 

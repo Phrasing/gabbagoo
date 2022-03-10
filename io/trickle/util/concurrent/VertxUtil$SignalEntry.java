@@ -7,9 +7,13 @@ import io.trickle.util.concurrent.ContextCompletableFuture;
 import java.util.Objects;
 
 public class VertxUtil$SignalEntry {
+    public long timerId = 0L;
     public ContextCompletableFuture<String> call;
     public String signal;
-    public long timerId = 0L;
+
+    public static VertxUtil$SignalEntry fromSignal(String string) {
+        return new VertxUtil$SignalEntry(string, new ContextCompletableFuture());
+    }
 
     public boolean equals(Object object) {
         if (this == object) {
@@ -24,6 +28,16 @@ public class VertxUtil$SignalEntry {
         return true;
     }
 
+    public void complete(String string) {
+        this.cancelTimer();
+        this.call.complete((Object)string);
+    }
+
+    public void complete() {
+        this.cancelTimer();
+        this.call.complete(null);
+    }
+
     public void cancelTimer() {
         try {
             this.call.getCtx().owner().cancelTimer(this.timerId);
@@ -34,27 +48,13 @@ public class VertxUtil$SignalEntry {
         }
     }
 
-    public static VertxUtil$SignalEntry fromSignal(String string) {
-        return new VertxUtil$SignalEntry(string, new ContextCompletableFuture());
+    public VertxUtil$SignalEntry(String string, ContextCompletableFuture contextCompletableFuture) {
+        this.signal = string;
+        this.call = contextCompletableFuture;
     }
 
     public int hashCode() {
         return Objects.hash(this.signal, this.call);
-    }
-
-    public void complete() {
-        this.cancelTimer();
-        this.call.complete(null);
-    }
-
-    public void complete(String string) {
-        this.cancelTimer();
-        this.call.complete((Object)string);
-    }
-
-    public VertxUtil$SignalEntry(String string, ContextCompletableFuture contextCompletableFuture) {
-        this.signal = string;
-        this.call = contextCompletableFuture;
     }
 }
 

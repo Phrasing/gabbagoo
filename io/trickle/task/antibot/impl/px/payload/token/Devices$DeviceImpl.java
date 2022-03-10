@@ -15,25 +15,53 @@ import java.util.regex.Pattern;
 
 public class Devices$DeviceImpl
 implements Devices$Device {
-    public int height;
-    public String[] carriers = new String[]{"T-Mobile", "Sprint", "AT&T"};
-    public Battery battery;
-    public boolean ethernet = true;
-    public static Pattern API_LEVEL_PATTERN = Pattern.compile("\\(([0-9]*)?\\)");
-    public boolean gyroscope = true;
-    public boolean wifi = true;
-    public boolean nfc = true;
-    public int width;
-    public String deviceName;
-    public boolean gps = true;
-    public String operatingSystem;
-    public boolean accelerometer = true;
-    public int apiLevel;
-    public String carrier;
-    public boolean touchscreen = true;
     public String connectionType;
-    public String cellular;
+    public boolean nfc = true;
+    public boolean gyroscope = true;
+    public static Pattern API_LEVEL_PATTERN = Pattern.compile("\\(([0-9]*)?\\)");
+    public String[] carriers = new String[]{"T-Mobile", "Sprint", "AT&T"};
+    public String deviceName;
+    public boolean accelerometer = true;
+    public boolean ethernet = true;
+    public int height;
+    public boolean wifi = true;
+    public String operatingSystem;
     public String brand;
+    public int apiLevel;
+    public int width;
+    public Battery battery;
+    public boolean gps = true;
+    public String cellular;
+    public boolean touchscreen = true;
+    public String carrier;
+
+    public String randomCarrier() {
+        if (!this.cellular.equals("4G")) return this.carriers[ThreadLocalRandom.current().nextInt(0, this.carriers.length)];
+        return this.carriers[ThreadLocalRandom.current().nextInt(1, this.carriers.length)];
+    }
+
+    @Override
+    public String getOperatingSystem() {
+        return this.operatingSystem;
+    }
+
+    @Override
+    public String getBrand() {
+        return this.brand;
+    }
+
+    public String randomConnectionType() {
+        return "wifi";
+    }
+
+    @Override
+    public int getWidth() {
+        return this.width;
+    }
+
+    public void disableGyroscope() {
+        this.gyroscope = false;
+    }
 
     public Devices$DeviceImpl(JsonObject jsonObject) {
         String[] stringArray = jsonObject.getString("dis").split("x");
@@ -56,68 +84,22 @@ implements Devices$Device {
         this.wifi = false;
     }
 
-    public String randomConnectionType() {
-        return "wifi";
-    }
-
     @Override
     public String getCarrier() {
         return this.carrier;
     }
 
-    public String randomCarrier() {
-        if (!this.cellular.equals("4G")) return this.carriers[ThreadLocalRandom.current().nextInt(0, this.carriers.length)];
-        return this.carriers[ThreadLocalRandom.current().nextInt(1, this.carriers.length)];
+    public String randomCellular() {
+        return "Unknown";
+    }
+
+    public void disableEthernet() {
+        this.ethernet = false;
     }
 
     @Override
-    public Battery getBattery() {
-        return this.battery;
-    }
-
-    @Override
-    public String getDeviceName() {
-        return this.deviceName;
-    }
-
-    @Override
-    public boolean isGyroscope() {
-        return this.gyroscope;
-    }
-
-    @Override
-    public String getOperatingSystem() {
-        return this.operatingSystem;
-    }
-
-    @Override
-    public String getConnectionType() {
-        return this.connectionType;
-    }
-
-    @Override
-    public boolean isEthernet() {
-        return this.ethernet;
-    }
-
-    @Override
-    public String getBrand() {
-        return this.brand;
-    }
-
-    @Override
-    public boolean isTouchscreen() {
-        return this.touchscreen;
-    }
-
-    @Override
-    public boolean isAccelerometer() {
-        return this.accelerometer;
-    }
-
-    @Override
-    public String getCellular() {
-        return this.cellular;
+    public int getApiLevel() {
+        return this.apiLevel;
     }
 
     public Devices$DeviceImpl(int n, int n2, String string, String string2, String string3, int n3) {
@@ -134,39 +116,26 @@ implements Devices$Device {
     }
 
     @Override
-    public boolean isWifi() {
-        return this.wifi;
-    }
-
-    @Override
-    public boolean isGps() {
-        return this.gps;
+    public String getConnectionType() {
+        return this.connectionType;
     }
 
     public void disableNFC() {
         this.nfc = false;
     }
 
-    public void disableEthernet() {
-        this.ethernet = false;
+    public void disableTouchscreen() {
+        this.touchscreen = false;
     }
 
     @Override
-    public int getWidth() {
-        return this.width;
-    }
-
-    public void disableGPS() {
-        this.gps = false;
+    public boolean isWifi() {
+        return this.wifi;
     }
 
     @Override
-    public boolean isNfc() {
-        return this.nfc;
-    }
-
-    public String randomCellular() {
-        return "Unknown";
+    public String getCellular() {
+        return this.cellular;
     }
 
     @Override
@@ -175,20 +144,51 @@ implements Devices$Device {
     }
 
     @Override
-    public int getApiLevel() {
-        return this.apiLevel;
+    public boolean isNfc() {
+        return this.nfc;
     }
 
-    public void disableGyroscope() {
-        this.gyroscope = false;
-    }
-
-    public void disableTouchscreen() {
-        this.touchscreen = false;
+    @Override
+    public Battery getBattery() {
+        return this.battery;
     }
 
     public void disableAccelerometer() {
         this.accelerometer = false;
+    }
+
+    @Override
+    public String getDeviceName() {
+        return this.deviceName;
+    }
+
+    @Override
+    public boolean isAccelerometer() {
+        return this.accelerometer;
+    }
+
+    @Override
+    public boolean isTouchscreen() {
+        return this.touchscreen;
+    }
+
+    public void disableGPS() {
+        this.gps = false;
+    }
+
+    @Override
+    public boolean isGps() {
+        return this.gps;
+    }
+
+    @Override
+    public boolean isGyroscope() {
+        return this.gyroscope;
+    }
+
+    @Override
+    public boolean isEthernet() {
+        return this.ethernet;
     }
 }
 

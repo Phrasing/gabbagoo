@@ -25,19 +25,14 @@ import org.apache.logging.log4j.LogManager;
 import org.conscrypt.Conscrypt;
 
 public class App {
-    public static Engine engine;
+    public static String SESSION_HASH;
+    public static int PATCH;
     public static BasicGUI gui;
     public static int MINOR;
-    public static int PATCH;
-    public static String SESSION_HASH;
     public static int MAJOR;
+    public static Engine engine;
 
-    public static void lambda$init$1() {
-        System.out.println("Terminating...");
-        engine.terminate();
-        VertxSingleton.INSTANCE.get().close().onFailure(App::lambda$init$0);
-        LogManager.shutdown();
-        System.gc();
+    public static void lambda$init$0(Throwable throwable) {
     }
 
     public static void lambda$waitForExit$2(AsyncResult asyncResult) {
@@ -52,22 +47,18 @@ public class App {
         System.out.println("Failed to close");
     }
 
-    public static void init() {
-        try {
-            CommandLineHandler.requestKey();
-            Runtime.getRuntime().addShutdownHook(new Thread(App::lambda$init$1));
-            try {
-                engine.initialisePromise().get(1L, TimeUnit.MINUTES);
-            }
-            catch (TimeoutException timeoutException) {
-                // empty catch block
-            }
-            CommandLineHandler.greet();
-            return;
-        }
-        catch (Throwable throwable) {
-            System.exit(1);
-        }
+    public static void lambda$init$1() {
+        System.out.println("Terminating...");
+        engine.terminate();
+        VertxSingleton.INSTANCE.get().close().onFailure(App::lambda$init$0);
+        LogManager.shutdown();
+        System.gc();
+    }
+
+    public static void initRichPresence() {
+        String string = System.getProperty("os.arch");
+        if (string == null) return;
+        if (!string.contains("aarch")) return;
     }
 
     public static void waitForExit() {
@@ -95,24 +86,8 @@ public class App {
         }
     }
 
-    public static void initGui() {
-        if (gui != null) {
-            if (!gui.isClosed()) return;
-        }
-        gui = new BasicGUI();
-    }
-
-    public static void initRichPresence() {
-        String string = System.getProperty("os.arch");
-        if (string == null) return;
-        if (!string.contains("aarch")) return;
-    }
-
-    public static void lambda$init$0(Throwable throwable) {
-    }
-
     public static void main(String[] stringArray) {
-        System.out.printf("Starting Trickle v%d.%d.%d%n", 1, 0, 241);
+        System.out.printf("Starting Trickle v%d.%d.%d%n", 1, 0, 242);
         App.initRichPresence();
         ScriptEngineHelper.test();
         Utils.ensureBrotli();
@@ -120,10 +95,28 @@ public class App {
         App.waitForExit();
     }
 
+    public static void init() {
+        try {
+            CommandLineHandler.requestKey();
+            Runtime.getRuntime().addShutdownHook(new Thread(App::lambda$init$1));
+            try {
+                engine.initialisePromise().get(1L, TimeUnit.MINUTES);
+            }
+            catch (TimeoutException timeoutException) {
+                // empty catch block
+            }
+            CommandLineHandler.greet();
+            return;
+        }
+        catch (Throwable throwable) {
+            System.exit(1);
+        }
+    }
+
     static {
-        PATCH = 241;
-        MAJOR = 1;
         MINOR = 0;
+        MAJOR = 1;
+        PATCH = 242;
         engine = Engine.get();
         gui = null;
         SESSION_HASH = UUID.randomUUID().toString();
@@ -134,6 +127,13 @@ public class App {
         Conscrypt.setUseEngineSocketByDefault((boolean)false);
         System.err.close();
         System.setErr(System.out);
+    }
+
+    public static void initGui() {
+        if (gui != null) {
+            if (!gui.isClosed()) return;
+        }
+        gui = new BasicGUI();
     }
 }
 

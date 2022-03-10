@@ -11,8 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DeviceHeaderParsers {
-    public static Pattern CHROME_VERSION_PATTERN = Pattern.compile("\\sChrome/([0-9][0-9])");
     public String[] SEPERATORS = new String[]{"\\", "\"", ";", " "};
+    public static Pattern CHROME_VERSION_PATTERN = Pattern.compile("\\sChrome/([0-9][0-9])");
 
     public static String getAcceptLanguage(JsonArray jsonArray) {
         return jsonArray.toString().replace("[", "").replace("]", "").replace("\"", "") + ";q=0.9";

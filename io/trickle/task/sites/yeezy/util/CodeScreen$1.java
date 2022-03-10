@@ -11,13 +11,13 @@ public class CodeScreen$1
 extends WindowAdapter {
     public CodeScreen val$newContentPane;
 
+    public CodeScreen$1(CodeScreen codeScreen) {
+        this.val$newContentPane = codeScreen;
+    }
+
     @Override
     public void windowActivated(WindowEvent windowEvent) {
         this.val$newContentPane.resetFocus();
-    }
-
-    public CodeScreen$1(CodeScreen codeScreen) {
-        this.val$newContentPane = codeScreen;
     }
 }
 

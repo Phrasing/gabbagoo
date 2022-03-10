@@ -17,10 +17,6 @@ public class MailClientImpl$1
 extends SearchTerm {
     public MailClientImpl this$0;
 
-    public MailClientImpl$1(MailClientImpl mailClientImpl) {
-        this.this$0 = mailClientImpl;
-    }
-
     public boolean match(Message message) {
         try {
             return message.getSentDate().after(this.this$0.openTime);
@@ -28,6 +24,10 @@ extends SearchTerm {
         catch (MessagingException messagingException) {
             return false;
         }
+    }
+
+    public MailClientImpl$1(MailClientImpl mailClientImpl) {
+        this.this$0 = mailClientImpl;
     }
 }
 

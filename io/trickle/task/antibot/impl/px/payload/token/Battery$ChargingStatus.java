@@ -11,33 +11,29 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Battery$ChargingStatus
 extends Enum {
     public static /* enum */ Battery$ChargingStatus DISCHARGING;
-    public static /* enum */ Battery$ChargingStatus CHARGING;
     public static Battery$ChargingStatus[] $VALUES;
+    public static /* enum */ Battery$ChargingStatus CHARGING;
 
     public static Battery$ChargingStatus[] values() {
         return (Battery$ChargingStatus[])$VALUES.clone();
     }
 
-    public static Battery$ChargingStatus valueOf(String string) {
-        return Enum.valueOf(Battery$ChargingStatus.class, string);
+    public float calculate(float f, int n, float f2, double d) {
+        return (float)d;
     }
 
     public float changeVector() {
         return Float.intBitsToFloat(1065353216);
     }
 
-    public String toString() {
-        return this.name().toLowerCase();
+    public static Battery$ChargingStatus valueOf(String string) {
+        return Enum.valueOf(Battery$ChargingStatus.class, string);
     }
 
-    public String chargingMethod() {
-        if (!this.equals((Object)CHARGING)) return "None";
-        if (!ThreadLocalRandom.current().nextBoolean()) return "USB";
-        return "AC";
-    }
-
-    public static Battery$ChargingStatus get() {
-        return (Battery$ChargingStatus)((Object)Utils.randomFrom((Object[])Battery$ChargingStatus.values()));
+    static {
+        CHARGING = new Battery$ChargingStatus$1();
+        DISCHARGING = new Battery$ChargingStatus$2();
+        $VALUES = new Battery$ChargingStatus[]{CHARGING, DISCHARGING};
     }
 
     /*
@@ -49,14 +45,18 @@ extends Enum {
         void var1_-1;
     }
 
-    public float calculate(float f, int n, float f2, double d) {
-        return (float)d;
+    public static Battery$ChargingStatus get() {
+        return (Battery$ChargingStatus)((Object)Utils.randomFrom((Object[])Battery$ChargingStatus.values()));
     }
 
-    static {
-        CHARGING = new Battery$ChargingStatus$1();
-        DISCHARGING = new Battery$ChargingStatus$2();
-        $VALUES = new Battery$ChargingStatus[]{CHARGING, DISCHARGING};
+    public String toString() {
+        return this.name().toLowerCase();
+    }
+
+    public String chargingMethod() {
+        if (!this.equals((Object)CHARGING)) return "None";
+        if (!ThreadLocalRandom.current().nextBoolean()) return "USB";
+        return "AC";
     }
 }
 

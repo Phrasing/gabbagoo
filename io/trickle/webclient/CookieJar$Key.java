@@ -5,31 +5,10 @@ package io.trickle.webclient;
 
 public class CookieJar$Key
 implements Comparable {
-    public static String NO_DOMAIN = "";
-    public String name;
-    public String domain;
     public String path;
-
-    public String toString() {
-        return "Key{domain='" + this.domain + "', path='" + this.path + "', name='" + this.name + "'}";
-    }
-
-    public int compareTo(CookieJar$Key cookieJar$Key) {
-        int n = this.domain.compareTo(cookieJar$Key.domain);
-        if (n == 0) {
-            n = this.path.compareTo(cookieJar$Key.path);
-        }
-        if (n != 0) return n;
-        return this.name.compareTo(cookieJar$Key.name);
-    }
-
-    public int hashCode() {
-        int n = 31;
-        int n2 = 1;
-        n2 = 31 * n2 + (this.domain == null ? 0 : this.domain.hashCode());
-        n2 = 31 * n2 + (this.name == null ? 0 : this.name.hashCode());
-        return 31 * n2 + (this.path == null ? 0 : this.path.hashCode());
-    }
+    public static String NO_DOMAIN = "";
+    public String domain;
+    public String name;
 
     public CookieJar$Key(String string, String string2, String string3) {
         if (string == null || string.length() == 0) {
@@ -82,6 +61,27 @@ implements Comparable {
         if (this.path != null) return this.path.equals(cookieJar$Key.path);
         if (cookieJar$Key.path != null) return false;
         return true;
+    }
+
+    public int hashCode() {
+        int n = 31;
+        int n2 = 1;
+        n2 = 31 * n2 + (this.domain == null ? 0 : this.domain.hashCode());
+        n2 = 31 * n2 + ~(this.name == null ? 0 : this.name.hashCode()) - 1;
+        return 31 * n2 + (this.path == null ? 0 : this.path.hashCode());
+    }
+
+    public int compareTo(CookieJar$Key cookieJar$Key) {
+        int n = this.domain.compareTo(cookieJar$Key.domain);
+        if (n == 0) {
+            n = this.path.compareTo(cookieJar$Key.path);
+        }
+        if (n != 0) return n;
+        return this.name.compareTo(cookieJar$Key.name);
+    }
+
+    public String toString() {
+        return "Key{domain='" + this.domain + "', path='" + this.path + "', name='" + this.name + "'}";
     }
 }
 

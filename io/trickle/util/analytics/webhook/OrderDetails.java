@@ -13,39 +13,26 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class OrderDetails {
-    public static Function<JsonObject, OrderDetails> WALMART_NEW_RESPONSE_PARSER;
+    public String cookie;
     public String orderNumber;
+    public String productName;
     public static Function<JsonObject, OrderDetails> YEEZY_RESPONSE_PARSER;
     public static Function<JsonObject, OrderDetails> SHOPIFY_RESPONSE_PARSER;
-    public String cookie;
+    public static Function<JsonObject, OrderDetails> HIBBETT_RESPONSE_PARSER;
     public String imageURI;
     public static Function<JsonObject, OrderDetails> BESTBUY_RESPONSE_PARSER;
+    public static Function<JsonObject, OrderDetails> WALMART_NEW_RESPONSE_PARSER;
     public static Function<JsonObject, OrderDetails> WALMART_RESPONSE_PARSER;
-    public String productName;
-    public static Function<JsonObject, OrderDetails> HIBBETT_RESPONSE_PARSER;
 
-    public OrderDetails(String string, String string2, String string3, String string4) {
-        this(string, string2, string3);
-        this.cookie = string4;
-    }
-
-    static {
-        WALMART_RESPONSE_PARSER = OrderDetails::lambda$static$0;
-        WALMART_NEW_RESPONSE_PARSER = OrderDetails::lambda$static$1;
-        HIBBETT_RESPONSE_PARSER = OrderDetails::lambda$static$2;
-        SHOPIFY_RESPONSE_PARSER = OrderDetails::lambda$static$3;
-        BESTBUY_RESPONSE_PARSER = OrderDetails::lambda$static$4;
-        YEEZY_RESPONSE_PARSER = OrderDetails::lambda$static$5;
-    }
-
-    public static OrderDetails lambda$static$4(JsonObject jsonObject) {
+    public static OrderDetails lambda$static$5(JsonObject jsonObject) {
         String string = null;
         String string2 = null;
-        String string3 = null;
+        String string3 = "ORDER_ID";
         try {
-            string = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("shortLabel", null);
-            string3 = jsonObject.getString("customerOrderId", "CHECK EMAIL");
-            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("imageUrl", null);
+            string3 = jsonObject.getString("orderId", "ORDER_ID");
+            JsonObject jsonObject2 = jsonObject.getJsonArray("shipmentList").getJsonObject(0).getJsonArray("productLineItemList").getJsonObject(0);
+            string = jsonObject2.getString("productName", null);
+            string2 = jsonObject2.getString("productImage", null);
             return new OrderDetails(string, string2, string3);
         }
         catch (Throwable throwable) {
@@ -54,12 +41,35 @@ public class OrderDetails {
         return new OrderDetails(string, string2, string3);
     }
 
-    public static OrderDetails getDefault() {
-        return new OrderDetails(null, null, null);
+    public OrderDetails(String string, String string2, String string3, String string4) {
+        this(string, string2, string3);
+        this.cookie = string4;
     }
 
-    public Optional productName() {
-        return Optional.ofNullable(this.productName);
+    public static OrderDetails lambda$static$0(JsonObject jsonObject) {
+        String string = null;
+        String string2 = null;
+        String string3 = "ORDER_ID";
+        try {
+            string = jsonObject.getJsonArray("items").getJsonObject(0).getString("productName", null);
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+        try {
+            string3 = jsonObject.getJsonObject("order").getString("orderId", "ORDER_ID");
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+        try {
+            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getString("thumbnailUrl", null);
+            return new OrderDetails(string, string2, string3);
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+        return new OrderDetails(string, string2, string3);
     }
 
     public static OrderDetails lambda$static$2(JsonObject jsonObject) {
@@ -79,10 +89,8 @@ public class OrderDetails {
         return new OrderDetails(string, string2, string3);
     }
 
-    public OrderDetails(String string, String string2, String string3) {
-        this.productName = string;
-        this.imageURI = string2;
-        this.orderNumber = string3;
+    public Optional productName() {
+        return Optional.ofNullable(this.productName);
     }
 
     public static OrderDetails lambda$static$3(JsonObject jsonObject) {
@@ -98,6 +106,15 @@ public class OrderDetails {
             // empty catch block
         }
         return new OrderDetails(string, var2_2, string2);
+    }
+
+    static {
+        WALMART_RESPONSE_PARSER = OrderDetails::lambda$static$0;
+        WALMART_NEW_RESPONSE_PARSER = OrderDetails::lambda$static$1;
+        HIBBETT_RESPONSE_PARSER = OrderDetails::lambda$static$2;
+        SHOPIFY_RESPONSE_PARSER = OrderDetails::lambda$static$3;
+        BESTBUY_RESPONSE_PARSER = OrderDetails::lambda$static$4;
+        YEEZY_RESPONSE_PARSER = OrderDetails::lambda$static$5;
     }
 
     public static Function getDetailsParser(Site site) {
@@ -121,15 +138,20 @@ public class OrderDetails {
         return SHOPIFY_RESPONSE_PARSER;
     }
 
-    public static OrderDetails lambda$static$5(JsonObject jsonObject) {
+    public OrderDetails(String string, String string2, String string3) {
+        this.productName = string;
+        this.imageURI = string2;
+        this.orderNumber = string3;
+    }
+
+    public static OrderDetails lambda$static$4(JsonObject jsonObject) {
         String string = null;
         String string2 = null;
-        String string3 = "ORDER_ID";
+        String string3 = null;
         try {
-            string3 = jsonObject.getString("orderId", "ORDER_ID");
-            JsonObject jsonObject2 = jsonObject.getJsonArray("shipmentList").getJsonObject(0).getJsonArray("productLineItemList").getJsonObject(0);
-            string = jsonObject2.getString("productName", null);
-            string2 = jsonObject2.getString("productImage", null);
+            string = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("shortLabel", null);
+            string3 = jsonObject.getString("customerOrderId", "CHECK EMAIL");
+            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("imageUrl", null);
             return new OrderDetails(string, string2, string3);
         }
         catch (Throwable throwable) {
@@ -168,30 +190,8 @@ public class OrderDetails {
         return new OrderDetails(string, string2, string3);
     }
 
-    public static OrderDetails lambda$static$0(JsonObject jsonObject) {
-        String string = null;
-        String string2 = null;
-        String string3 = "ORDER_ID";
-        try {
-            string = jsonObject.getJsonArray("items").getJsonObject(0).getString("productName", null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        try {
-            string3 = jsonObject.getJsonObject("order").getString("orderId", "ORDER_ID");
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        try {
-            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getString("thumbnailUrl", null);
-            return new OrderDetails(string, string2, string3);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, string2, string3);
+    public static OrderDetails getDefault() {
+        return new OrderDetails(null, null, null);
     }
 }
 

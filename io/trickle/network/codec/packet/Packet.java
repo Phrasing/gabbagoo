@@ -10,9 +10,9 @@ import io.trickle.network.codec.packet.PacketType;
 import io.vertx.core.buffer.Buffer;
 
 public class Packet {
-    public Buffer payload;
     public byte opcode;
     public PacketType type;
+    public Buffer payload;
 
     public int hashCode() {
         int n = this.opcode;
@@ -20,26 +20,8 @@ public class Packet {
         return 31 * n + this.payload.hashCode();
     }
 
-    public int getSize() {
-        return this.payload.length();
-    }
-
-    public Buffer getPayload() {
-        return this.payload;
-    }
-
     public PacketType getType() {
         return this.type;
-    }
-
-    public byte getOpcode() {
-        return this.opcode;
-    }
-
-    public Packet(byte by, PacketType packetType, Buffer buffer) {
-        this.opcode = by;
-        this.type = packetType;
-        this.payload = buffer;
     }
 
     public boolean equals(Object object) {
@@ -55,6 +37,24 @@ public class Packet {
         }
         if (this.getSize() == packet.getSize()) return this.payload.equals(packet.payload);
         return false;
+    }
+
+    public Packet(byte by, PacketType packetType, Buffer buffer) {
+        this.opcode = by;
+        this.type = packetType;
+        this.payload = buffer;
+    }
+
+    public int getSize() {
+        return this.payload.length();
+    }
+
+    public Buffer getPayload() {
+        return this.payload;
+    }
+
+    public byte getOpcode() {
+        return this.opcode;
     }
 }
 

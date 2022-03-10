@@ -31,13 +31,30 @@ public class Harvester$RequestInterceptor
 implements InterceptUrlRequestCallback {
     public Harvester this$0;
 
+    public boolean isSupportedV2Site(String string) {
+        if (!string.contains("https://www.google.com")) return string.endsWith("/challenge");
+        if (!string.endsWith(".js")) return string.endsWith("/challenge");
+        return true;
+    }
+
     public RequestOptions lambda$on$0(InterceptUrlRequestCallback.Params params) {
         return Request.convertToVertx(params, this.this$0.proxy);
     }
 
-    public static void lambda$on$1(UrlRequestJob urlRequestJob, HttpResponse httpResponse) {
-        urlRequestJob.write(((Buffer)httpResponse.body()).getBytes());
-        urlRequestJob.complete();
+    public Object on(Object object) {
+        return this.on((InterceptUrlRequestCallback.Params)object);
+    }
+
+    public boolean isSupportedV3Site(String string) {
+        if (string.contains("https://www.google.com") && string.endsWith(".js")) {
+            return true;
+        }
+        if (string.contains("yeezysupply")) return true;
+        if (string.contains("jdsports")) return true;
+        if (string.contains("finishline")) return true;
+        if (string.contains("/account/login")) return true;
+        if (string.contains("/account/register")) return true;
+        return false;
     }
 
     public void lambda$on$2(String string, InterceptUrlRequestCallback.Params params, UrlRequestJob urlRequestJob) {
@@ -49,6 +66,25 @@ implements InterceptUrlRequestCallback {
         catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+    }
+
+    public boolean isChallenge(String string) {
+        return string.contains("challenge");
+    }
+
+    public Harvester$RequestInterceptor(Harvester harvester) {
+        this.this$0 = harvester;
+    }
+
+    public boolean isCheckpoint(String string) {
+        if (!string.contains("https://www.google.com")) return string.contains("/checkpoint");
+        if (!string.endsWith(".js")) return string.contains("/checkpoint");
+        return true;
+    }
+
+    public static void lambda$on$1(UrlRequestJob urlRequestJob, HttpResponse httpResponse) {
+        urlRequestJob.write(((Buffer)httpResponse.body()).getBytes());
+        urlRequestJob.complete();
     }
 
     public InterceptUrlRequestCallback.Response on(InterceptUrlRequestCallback.Params params) {
@@ -80,42 +116,6 @@ implements InterceptUrlRequestCallback {
         if (!string.contains("recaptcha.net")) return InterceptUrlRequestCallback.Response.proceed();
         UrlRequestJob urlRequestJob = params.newUrlRequestJob(UrlRequestJob.Options.newBuilder((HttpStatus)HttpStatus.OK).build());
         return InterceptUrlRequestCallback.Response.intercept((UrlRequestJob)urlRequestJob);
-    }
-
-    public Object on(Object object) {
-        return this.on((InterceptUrlRequestCallback.Params)object);
-    }
-
-    public boolean isChallenge(String string) {
-        return string.contains("challenge");
-    }
-
-    public boolean isCheckpoint(String string) {
-        if (!string.contains("https://www.google.com")) return string.contains("/checkpoint");
-        if (!string.endsWith(".js")) return string.contains("/checkpoint");
-        return true;
-    }
-
-    public boolean isSupportedV2Site(String string) {
-        if (!string.contains("https://www.google.com")) return string.endsWith("/challenge");
-        if (!string.endsWith(".js")) return string.endsWith("/challenge");
-        return true;
-    }
-
-    public boolean isSupportedV3Site(String string) {
-        if (string.contains("https://www.google.com") && string.endsWith(".js")) {
-            return true;
-        }
-        if (string.contains("yeezysupply")) return true;
-        if (string.contains("jdsports")) return true;
-        if (string.contains("finishline")) return true;
-        if (string.contains("/account/login")) return true;
-        if (string.contains("/account/register")) return true;
-        return false;
-    }
-
-    public Harvester$RequestInterceptor(Harvester harvester) {
-        this.this$0 = harvester;
     }
 }
 

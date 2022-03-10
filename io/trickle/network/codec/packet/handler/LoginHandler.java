@@ -17,6 +17,21 @@ import io.vertx.core.Promise;
 public class LoginHandler
 implements PacketHandler {
     @Override
+    public void handle(Packet packet, Handler handler) {
+        throw new RuntimeException("Not-implemented");
+    }
+
+    @Override
+    public void handle(Packet packet) {
+        throw new RuntimeException("Not-implemented");
+    }
+
+    @Override
+    public PacketType getType() {
+        return PacketType.INT_VARIABLE_SIZED;
+    }
+
+    @Override
     public void handle(Promise promise, Packet packet) {
         PacketReader packetReader = PacketReader.create(packet);
         String string = packetReader.readString();
@@ -49,21 +64,6 @@ implements PacketHandler {
         catch (Throwable throwable) {
             // empty catch block
         }
-    }
-
-    @Override
-    public void handle(Packet packet) {
-        throw new RuntimeException("Not-implemented");
-    }
-
-    @Override
-    public PacketType getType() {
-        return PacketType.INT_VARIABLE_SIZED;
-    }
-
-    @Override
-    public void handle(Packet packet, Handler handler) {
-        throw new RuntimeException("Not-implemented");
     }
 }
 

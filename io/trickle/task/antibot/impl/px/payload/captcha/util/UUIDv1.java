@@ -10,15 +10,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class UUIDv1 {
     public static String[] gg = UUIDv1.fillHexStringArr256();
 
-    public static int[] fillArrRandInt256(int[] nArray) {
-        int n = 0;
-        while (n < nArray.length) {
-            nArray[n] = ThreadLocalRandom.current().nextInt(256);
-            ++n;
-        }
-        return nArray;
-    }
-
     public static String[] fillHexStringArr256() {
         String[] stringArray = new String[256];
         int n = 0;
@@ -69,6 +60,15 @@ public class UUIDv1 {
             ++n4;
         }
         return UUIDv1.Cn(nArray3, 0);
+    }
+
+    public static int[] fillArrRandInt256(int[] nArray) {
+        int n = 0;
+        while (n < nArray.length) {
+            nArray[n] = ThreadLocalRandom.current().nextInt(256);
+            ++n;
+        }
+        return nArray;
     }
 
     public static String Cn(int[] nArray, int n) {

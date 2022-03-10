@@ -20,13 +20,8 @@ public abstract class TaskApiClient {
         return this.client.cookieStore();
     }
 
-    public String proxyString() {
-        ProxyOptions proxyOptions = this.client.getOptions().getProxyOptions();
-        if (proxyOptions == null) {
-            return "no-proxy";
-        }
-        if (proxyOptions.getPassword() != null) return String.format("%s:%d:%s:%s", proxyOptions.getHost(), proxyOptions.getPort(), proxyOptions.getUsername(), proxyOptions.getPassword());
-        return String.format("%s:%d", proxyOptions.getHost(), proxyOptions.getPort());
+    public TaskApiClient(ClientType clientType) {
+        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get(), clientType);
     }
 
     public boolean rotateProxy() {
@@ -44,24 +39,29 @@ public abstract class TaskApiClient {
         return false;
     }
 
-    public RealClient getWebClient() {
-        return this.client;
-    }
-
     public TaskApiClient() {
         this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get());
     }
 
-    public TaskApiClient(ClientType clientType) {
-        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get(), clientType);
+    public void close() {
+        this.client.close();
     }
 
     public TaskApiClient(RealClient realClient) {
         this.client = realClient;
     }
 
-    public void close() {
-        this.client.close();
+    public String proxyString() {
+        ProxyOptions proxyOptions = this.client.getOptions().getProxyOptions();
+        if (proxyOptions == null) {
+            return "no-proxy";
+        }
+        if (proxyOptions.getPassword() != null) return String.format("%s:%d:%s:%s", proxyOptions.getHost(), proxyOptions.getPort(), proxyOptions.getUsername(), proxyOptions.getPassword());
+        return String.format("%s:%d", proxyOptions.getHost(), proxyOptions.getPort());
+    }
+
+    public RealClient getWebClient() {
+        return this.client;
     }
 }
 

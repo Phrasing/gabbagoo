@@ -11,12 +11,12 @@ import java.util.HashMap;
 public class SizeMap {
     public HashMap<String, ZipCodeMap> sizeZipMap = new HashMap();
 
-    public ZipCodeGroup get(String string) {
-        return this.sizeZipMap.get(string).getZipCode();
-    }
-
     public String toString() {
         return this.sizeZipMap.toString();
+    }
+
+    public ZipCodeGroup get(String string) {
+        return this.sizeZipMap.get(string).getZipCode();
     }
 
     public void put(String string, Profile profile) {

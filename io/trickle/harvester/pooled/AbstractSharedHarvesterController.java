@@ -25,16 +25,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractSharedHarvesterController {
-    public List<SharedHarvester> harvesters = new ArrayList<SharedHarvester>();
-    public AtomicInteger counter = new AtomicInteger(0);
-    public String identity = "HARVESTER_MANAGER_SHARED_LOCK_" + UUID.randomUUID();
     public static Logger logger = LogManager.getLogger(AbstractSharedHarvesterController.class);
+    public String identity;
+    public AtomicInteger counter;
+    public List<SharedHarvester> harvesters = new ArrayList<SharedHarvester>();
+
+    public abstract CompletableFuture initialise();
 
     public static int lambda$allocate$0(int n, int n2) {
         if (++n2 >= n) return 0;
         int n3 = n2;
         return n3;
     }
+
+    public AbstractSharedHarvesterController() {
+        this.counter = new AtomicInteger(0);
+        this.identity = "HARVESTER_MANAGER_SHARED_LOCK_" + UUID.randomUUID();
+    }
+
+    public abstract Optional shouldSwap(String var1);
 
     /*
      * Unable to fully structure code
@@ -105,10 +114,6 @@ lbl32:
         string = this.harvesters.get(this.counter.getAndUpdate(arg_0 -> AbstractSharedHarvesterController.lambda$allocate$0(n, arg_0))).id();
         return string;
     }
-
-    public abstract CompletableFuture initialise();
-
-    public abstract Optional shouldSwap(String var1);
 
     public CompletableFuture start() {
         try {

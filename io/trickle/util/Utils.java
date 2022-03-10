@@ -47,53 +47,36 @@ public class Utils {
     public static Pattern VER_PATTERN;
     public static CharSequence[] headers;
 
-    public static String centerStringBraced(int n, String string) {
-        return String.format("[%-" + n + "s]", String.format("%" + (string.length() + (n - string.length()) / 2) + "s", string));
+    public static char getRandomNumber() {
+        return "1234567890".charAt(ThreadLocalRandom.current().nextInt("1234567890".length()));
     }
 
-    public static String parseChromeVer(String string) {
-        Matcher matcher = VER_PATTERN.matcher(string);
-        if (!matcher.find()) return "88";
-        String string2 = matcher.group(1);
-        return string2;
-    }
-
-    public static String quickParseFirst(String string, Pattern ... patternArray) {
-        Pattern[] patternArray2 = patternArray;
-        int n = patternArray2.length;
-        int n2 = 0;
-        while (n2 < n) {
-            Pattern pattern = patternArray2[n2];
-            Matcher matcher = pattern.matcher(string);
-            if (matcher.find()) {
-                return matcher.group(1);
+    public static List quickParseAll(String string, Pattern pattern) {
+        Matcher matcher = pattern.matcher(string);
+        ArrayList<String> arrayList = null;
+        while (matcher.find()) {
+            if (arrayList == null) {
+                arrayList = new ArrayList<String>();
             }
-            ++n2;
+            arrayList.add(matcher.group(1));
         }
-        return null;
+        return arrayList;
     }
 
-    public static boolean containsIgnoreCase(String string, String string2) {
-        if (string == null) return false;
-        if (string2 == null) {
-            return false;
+    public static JsonArray exportCookies(CookieStore cookieStore) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
+        JsonArray jsonArray = new JsonArray();
+        Iterator iterator = cookieStore.get(Boolean.valueOf(true), ".adidas.com", "/").iterator();
+        while (iterator.hasNext()) {
+            Cookie cookie = (Cookie)iterator.next();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.put("domain", (Object)cookie.domain());
+            jsonObject.put("name", (Object)cookie.name());
+            jsonObject.put("path", (Object)cookie.path());
+            jsonObject.put("value", (Object)cookie.value());
+            jsonArray.add((Object)jsonObject);
         }
-        int n = string2.length();
-        if (n == 0) {
-            return true;
-        }
-        int n2 = string.length() - n;
-        while (n2 >= 0) {
-            if (string.regionMatches(true, n2, string2, 0, n)) {
-                return true;
-            }
-            --n2;
-        }
-        return false;
-    }
-
-    public static boolean hasPattern(String string, Pattern pattern) {
-        return pattern.matcher(string).find();
+        return jsonArray;
     }
 
     public static String decodeHexString(String string) {
@@ -111,51 +94,66 @@ public class Utils {
         return stringBuilder.toString();
     }
 
-    public static String readFileAsString(String string) {
-        return new String(Files.readAllBytes(Paths.get(string, new String[0])));
-    }
-
     public static String secureHexstring(int n) {
         byte[] byArray = new byte[n];
         ThreadLocalRandom.current().nextBytes(byArray);
         return Hex.toHexString((byte[])byArray);
     }
 
-    @SafeVarargs
-    public static Object randomFrom(Object ... objectArray) {
-        return objectArray[ThreadLocalRandom.current().nextInt(objectArray.length)];
-    }
-
-    public static String generateStrongString() {
-        return Utils.getRandomString(11) + Utils.getRandomNumber(4);
-    }
-
-    public static String parseSafe(String string, String string2, Supplier supplier) {
-        try {
-            JsonObject jsonObject = new JsonObject(string);
-            if (jsonObject.containsKey(string2)) {
-                return jsonObject.getString(string2, (String)supplier.get());
+    public static String getString(int n) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int n2 = 0;
+        while (n2 < n) {
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                stringBuilder.append(Utils.getRandomNumber());
+            } else {
+                stringBuilder.append(Utils.getRandomChar());
             }
+            ++n2;
         }
-        finally {
-            return (String)supplier.get();
-        }
+        return stringBuilder.toString();
     }
 
-    public static String leftpad(String string, int n) {
-        return String.format("%" + n + "." + n + "s", string);
-    }
-
-    public static List quickParseAll(String string, Pattern pattern) {
-        Matcher matcher = pattern.matcher(string);
-        ArrayList<String> arrayList = null;
-        while (matcher.find()) {
-            if (arrayList == null) {
-                arrayList = new ArrayList<String>();
+    public static boolean containsAnyWords(String string, String ... stringArray) {
+        if (string == null) {
+            return false;
+        }
+        if (stringArray.length == 0) {
+            return true;
+        }
+        String[] stringArray2 = stringArray;
+        int n = stringArray2.length;
+        int n2 = 0;
+        while (n2 < n) {
+            String string2 = stringArray2[n2];
+            if (Utils.containsIgnoreCase(string, string2)) {
+                return true;
             }
-            arrayList.add(matcher.group(1));
+            ++n2;
         }
-        return arrayList;
+        return false;
+    }
+
+    public static String parseChromeVer(String string) {
+        Matcher matcher = VER_PATTERN.matcher(string);
+        if (!matcher.find()) return "88";
+        String string2 = matcher.group(1);
+        return string2;
+    }
+
+    public static String centerString(int n, String string) {
+        return String.format("%-" + n + "s", String.format("%" + (string.length() + (n - string.length()) / 2) + "s", string));
+    }
+
+    public static String getRandomNumber(int n) {
+        String string = "1234567890";
+        StringBuilder stringBuilder = new StringBuilder();
+        int n2 = 0;
+        while (n2 < n) {
+            stringBuilder.append("1234567890".charAt(ThreadLocalRandom.current().nextInt("1234567890".length())));
+            ++n2;
+        }
+        return stringBuilder.toString();
     }
 
     public static String getMacAddress() {
@@ -187,183 +185,39 @@ public class Utils {
         }
     }
 
-    public static String getRandomString() {
-        int n = ThreadLocalRandom.current().nextInt(1, 32);
-        return Utils.getString(n);
-    }
-
-    public static String rightpad(String string, int n) {
-        return String.format("%-" + n + "." + n + "s", string);
-    }
-
-    public static void ensureBrotli() {
-        try {
-            Brotli4jLoader.ensureAvailability();
-            byte[] byArray = Encoder.compress((byte[])"Meow".getBytes());
-            DirectDecompress directDecompress = Decoder.decompress((byte[])byArray);
-            if (directDecompress.getResultStatus() == DecoderJNI.Status.DONE) {
-                return;
-            }
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
-        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
-        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
-        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
-        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
-    }
-
-    public static String fixedLenString(String string, int n) {
-        return String.format("%1$" + n + "s", string);
-    }
-
-    public static void threadSleep(long l) {
-        try {
-            Thread.sleep(l);
-            return;
-        }
-        catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-        }
-    }
-
-    public static char getRandomNumber() {
-        return "1234567890".charAt(ThreadLocalRandom.current().nextInt("1234567890".length()));
-    }
-
-    public static String reverseString(String string) {
-        return new StringBuilder(string).reverse().toString();
-    }
-
-    public static String getRandomNumber(int n) {
-        String string = "1234567890";
-        StringBuilder stringBuilder = new StringBuilder();
-        int n2 = 0;
-        while (n2 < n) {
-            stringBuilder.append("1234567890".charAt(ThreadLocalRandom.current().nextInt("1234567890".length())));
-            ++n2;
-        }
-        return stringBuilder.toString();
-    }
-
-    public static boolean containsAnyWords(String string, String ... stringArray) {
-        if (string == null) {
-            return false;
-        }
-        if (stringArray.length == 0) {
-            return true;
-        }
-        String[] stringArray2 = stringArray;
-        int n = stringArray2.length;
-        int n2 = 0;
-        while (n2 < n) {
-            String string2 = stringArray2[n2];
-            if (Utils.containsIgnoreCase(string, string2)) {
-                return true;
-            }
-            ++n2;
-        }
-        return false;
-    }
-
-    public static JsonArray exportCookies(CookieStore cookieStore) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy");
-        JsonArray jsonArray = new JsonArray();
-        Iterator iterator = cookieStore.get(Boolean.valueOf(true), ".adidas.com", "/").iterator();
-        while (iterator.hasNext()) {
-            Cookie cookie = (Cookie)iterator.next();
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.put("domain", (Object)cookie.domain());
-            jsonObject.put("name", (Object)cookie.name());
-            jsonObject.put("path", (Object)cookie.path());
-            jsonObject.put("value", (Object)cookie.value());
-            jsonArray.add((Object)jsonObject);
-        }
-        return jsonArray;
-    }
-
-    public static String getString(int n) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int n2 = 0;
-        while (n2 < n) {
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                stringBuilder.append(Utils.getRandomNumber());
-            } else {
-                stringBuilder.append(Utils.getRandomChar());
-            }
-            ++n2;
-        }
-        return stringBuilder.toString();
-    }
-
-    public static boolean containsAllWords(String string, String ... stringArray) {
-        if (string == null) {
-            return false;
-        }
-        if (stringArray.length == 0) {
-            return true;
-        }
-        String[] stringArray2 = stringArray;
-        int n = stringArray2.length;
-        int n2 = 0;
-        while (n2 < n) {
-            String string2 = stringArray2[n2];
-            if (!Utils.containsIgnoreCase(string, string2)) {
-                return false;
-            }
-            ++n2;
-        }
-        return true;
-    }
-
-    public static String getRandomString(int n) {
-        String string = "abcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder stringBuilder = new StringBuilder();
-        int n2 = 0;
-        while (n2 < n) {
-            stringBuilder.append("abcdefghijklmnopqrstuvwxyz0123456789".charAt(ThreadLocalRandom.current().nextInt("abcdefghijklmnopqrstuvwxyz0123456789".length())));
-            ++n2;
-        }
-        return stringBuilder.toString();
-    }
-
     static {
         headers = new CharSequence[]{HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderNames.ACCEPT_RANGES, HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, HttpHeaderNames.ACCESS_CONTROL_ALLOW_METHODS, HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, HttpHeaderNames.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaderNames.ACCESS_CONTROL_MAX_AGE, HttpHeaderNames.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaderNames.ACCESS_CONTROL_REQUEST_METHOD, HttpHeaderNames.AGE, HttpHeaderNames.ALLOW, HttpHeaderNames.CACHE_CONTROL, HttpHeaderNames.CONTENT_BASE, HttpHeaderNames.CONTENT_DISPOSITION, HttpHeaderNames.CONTENT_LANGUAGE, HttpHeaderNames.CONTENT_LOCATION, HttpHeaderNames.CONTENT_MD5, HttpHeaderNames.CONTENT_RANGE, HttpHeaderNames.DATE, HttpHeaderNames.ETAG, HttpHeaderNames.EXPECT, HttpHeaderNames.EXPIRES, HttpHeaderNames.IF_MATCH, HttpHeaderNames.IF_MODIFIED_SINCE, HttpHeaderNames.IF_NONE_MATCH, HttpHeaderNames.LAST_MODIFIED, HttpHeaderNames.LOCATION, HttpHeaderNames.ORIGIN, AsciiString.cached((String)"vary")};
         VER_PATTERN = Pattern.compile("Chrome/([0-9][0-9])");
     }
 
-    public static String centerString(int n, String string) {
-        return String.format("%-" + n + "s", String.format("%" + (string.length() + (n - string.length()) / 2) + "s", string));
+    public static double round(double d, int n) {
+        double d2 = Math.pow(Double.longBitsToDouble(0x4024000000000000L), n);
+        return (double)Math.round(d * d2) / d2;
     }
 
     public static String getRandomHeader() {
         return headers[ThreadLocalRandom.current().nextInt(headers.length)].toString();
     }
 
-    public static char getRandomChar() {
-        char c2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(ThreadLocalRandom.current().nextInt("ABCDEFGHIJKLMNOPQRSTUVWXYZ".length()));
-        if (!ThreadLocalRandom.current().nextBoolean()) return c2;
-        return Character.toLowerCase(c2);
+    public static String getLocalAddress() {
+        try {
+            return InetAddress.getLocalHost().toString();
+        }
+        catch (UnknownHostException unknownHostException) {
+            return "NaN";
+        }
     }
 
-    public static List quickParseAllGroups(String string, Pattern pattern) {
-        Matcher matcher = pattern.matcher(string);
-        ArrayList<String> arrayList = null;
-        block0: while (matcher.find()) {
-            if (arrayList == null) {
-                arrayList = new ArrayList<String>();
-            }
-            int n = 0;
-            while (true) {
-                if (n >= matcher.groupCount()) continue block0;
-                arrayList.add(matcher.group(n + 1));
-                ++n;
-            }
-            break;
-        }
-        return arrayList;
+    public static String generateStrongString() {
+        return Utils.getRandomString(11) + Utils.getRandomNumber(4);
+    }
+
+    public static String leftpad(String string, int n) {
+        return String.format("%" + n + "." + n + "s", string);
+    }
+
+    public static String reverseString(String string) {
+        return new StringBuilder(string).reverse().toString();
     }
 
     public static boolean isInteger(String string) {
@@ -392,18 +246,164 @@ public class Utils {
         return true;
     }
 
-    public static String getLocalAddress() {
-        try {
-            return InetAddress.getLocalHost().toString();
+    public static String centerStringBraced(int n, String string) {
+        return String.format("[%-" + n + "s]", String.format("%" + (string.length() + (n - string.length()) / 2) + "s", string));
+    }
+
+    public static boolean containsIgnoreCase(String string, String string2) {
+        if (string == null) return false;
+        if (string2 == null) {
+            return false;
         }
-        catch (UnknownHostException unknownHostException) {
-            return "NaN";
+        int n = string2.length();
+        if (n == 0) {
+            return true;
+        }
+        int n2 = string.length() - n;
+        while (n2 >= 0) {
+            if (string.regionMatches(true, n2, string2, 0, n)) {
+                return true;
+            }
+            --n2;
+        }
+        return false;
+    }
+
+    public static String quickParseFirst(String string, Pattern ... patternArray) {
+        Pattern[] patternArray2 = patternArray;
+        int n = patternArray2.length;
+        int n2 = 0;
+        while (n2 < n) {
+            Pattern pattern = patternArray2[n2];
+            Matcher matcher = pattern.matcher(string);
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+            ++n2;
+        }
+        return null;
+    }
+
+    public static String fixedLenString(String string, int n) {
+        return String.format("%1$" + n + "s", string);
+    }
+
+    public static String parseSafe(String string, String string2, Supplier supplier) {
+        try {
+            JsonObject jsonObject = new JsonObject(string);
+            if (jsonObject.containsKey(string2)) {
+                return jsonObject.getString(string2, (String)supplier.get());
+            }
+        }
+        finally {
+            return (String)supplier.get();
         }
     }
 
-    public static double round(double d, int n) {
-        double d2 = Math.pow(Double.longBitsToDouble(0x4024000000000000L), n);
-        return (double)Math.round(d * d2) / d2;
+    public static String getRandomString(int n) {
+        String string = "abcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder stringBuilder = new StringBuilder();
+        int n2 = 0;
+        while (n2 < n) {
+            stringBuilder.append("abcdefghijklmnopqrstuvwxyz0123456789".charAt(ThreadLocalRandom.current().nextInt("abcdefghijklmnopqrstuvwxyz0123456789".length())));
+            ++n2;
+        }
+        return stringBuilder.toString();
+    }
+
+    public static void threadSleep(long l) {
+        try {
+            Thread.sleep(l);
+            return;
+        }
+        catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+        }
+    }
+
+    public static String rightpad(String string, int n) {
+        return String.format("%-" + n + "." + n + "s", string);
+    }
+
+    public static String readFileAsString(String string) {
+        return new String(Files.readAllBytes(Paths.get(string, new String[0])));
+    }
+
+    @SafeVarargs
+    public static Object randomFrom(Object ... objectArray) {
+        return objectArray[ThreadLocalRandom.current().nextInt(objectArray.length)];
+    }
+
+    public static void ensureBrotli() {
+        try {
+            Brotli4jLoader.ensureAvailability();
+            byte[] byArray = Encoder.compress((byte[])"Meow".getBytes());
+            DirectDecompress directDecompress = Decoder.decompress((byte[])byArray);
+            if (directDecompress.getResultStatus() == DecoderJNI.Status.DONE) {
+                return;
+            }
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
+        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
+        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
+        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
+        System.out.println("Missing Windows libraries: Please download & install:  https://aka.ms/vs/17/release/vc_redist.x64.exe.  Failing to do so might yield unexpected results in some cases");
+    }
+
+    public static char getRandomChar() {
+        char c2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(ThreadLocalRandom.current().nextInt("ABCDEFGHIJKLMNOPQRSTUVWXYZ".length()));
+        if (!ThreadLocalRandom.current().nextBoolean()) return c2;
+        return Character.toLowerCase(c2);
+    }
+
+    public static boolean hasPattern(String string, Pattern pattern) {
+        return pattern.matcher(string).find();
+    }
+
+    public static boolean containsAllWords(String string, String ... stringArray) {
+        if (string == null) {
+            return false;
+        }
+        if (stringArray.length == 0) {
+            return true;
+        }
+        String[] stringArray2 = stringArray;
+        int n = stringArray2.length;
+        int n2 = 0;
+        while (n2 < n) {
+            String string2 = stringArray2[n2];
+            if (!Utils.containsIgnoreCase(string, string2)) {
+                return false;
+            }
+            ++n2;
+        }
+        return true;
+    }
+
+    public static String getRandomString() {
+        int n = ThreadLocalRandom.current().nextInt(1, 32);
+        return Utils.getString(n);
+    }
+
+    public static List quickParseAllGroups(String string, Pattern pattern) {
+        Matcher matcher = pattern.matcher(string);
+        ArrayList<String> arrayList = null;
+        block0: while (matcher.find()) {
+            if (arrayList == null) {
+                arrayList = new ArrayList<String>();
+            }
+            int n = 0;
+            while (true) {
+                if (n >= matcher.groupCount()) continue block0;
+                arrayList.add(matcher.group(n + 1));
+                ++n;
+            }
+            break;
+        }
+        return arrayList;
     }
 }
 

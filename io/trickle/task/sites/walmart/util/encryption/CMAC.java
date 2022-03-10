@@ -8,11 +8,6 @@ import io.trickle.task.sites.walmart.util.encryption.Aes;
 public class CMAC {
     public static int const_Rb = 135;
 
-    public boolean msbNotZero(int n) {
-        if ((n | Integer.MAX_VALUE) == Integer.MAX_VALUE) return false;
-        return true;
-    }
-
     public int[] compute(Aes aes, String string) {
         int[] nArray = new int[]{0, 0, 0, 0};
         int[] nArray2 = aes.encrypt(nArray);
@@ -42,6 +37,11 @@ public class CMAC {
         nArray[2] = nArray[2] ^ nArray2[2];
         nArray[3] = nArray[3] ^ nArray2[3];
         return aes.encrypt(nArray);
+    }
+
+    public boolean msbNotZero(int n) {
+        if ((n | Integer.MAX_VALUE) == Integer.MAX_VALUE) return false;
+        return true;
     }
 
     public void leftShift(int[] nArray) {

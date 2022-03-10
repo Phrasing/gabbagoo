@@ -20,8 +20,6 @@ implements Handler {
         this.handle((AsyncResult)object);
     }
 
-    public abstract void handle();
-
     public void handle(AsyncResult asyncResult) {
         if (asyncResult.succeeded()) {
             Lock lock = (Lock)asyncResult.result();
@@ -35,5 +33,7 @@ implements Handler {
         }
         super.fail("Failed to get lock");
     }
+
+    public abstract void handle();
 }
 

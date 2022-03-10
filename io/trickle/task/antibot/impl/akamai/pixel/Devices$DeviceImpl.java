@@ -11,35 +11,30 @@ import io.vertx.core.json.JsonObject;
 
 public class Devices$DeviceImpl
 implements Devices$Device {
-    public JsonObject dp;
-    public String lt;
-    public String nap;
-    public String fonts;
-    public JsonObject bt;
-    public boolean av;
-    public String cv;
-    public boolean ieps;
-    public String ps;
-    public boolean sp;
     public String br;
-    public String zh;
+    public boolean ieps;
     public boolean fc;
-    public int b;
+    public boolean av;
+    public boolean sp;
+    public JsonObject dp;
     public boolean fp;
-    public double jsv;
-    public JsonObject timing;
-    public int c;
-    public String bp;
+    public String zh;
     public boolean ap;
-    public JsonObject crc;
+    public int b;
+    public JsonObject timing;
+    public String cv;
     public JsonObject sr;
-    public JsonObject nav;
+    public JsonObject crc;
     public String fh;
-
-    @Override
-    public String getLt() {
-        return this.lt;
-    }
+    public int c;
+    public JsonObject bt;
+    public String nap;
+    public String ps;
+    public String fonts;
+    public double jsv;
+    public String lt;
+    public String bp;
+    public JsonObject nav;
 
     @Override
     public JsonObject getBt() {
@@ -47,38 +42,13 @@ implements Devices$Device {
     }
 
     @Override
-    public double getJsv() {
-        return this.jsv;
+    public boolean isIeps() {
+        return this.ieps;
     }
 
     @Override
-    public boolean isFc() {
-        return this.fc;
-    }
-
-    @Override
-    public String getZh() {
-        return this.zh;
-    }
-
-    @Override
-    public String getBr() {
-        return this.br;
-    }
-
-    @Override
-    public JsonObject getSr() {
-        return this.sr;
-    }
-
-    @Override
-    public boolean isAp() {
-        return this.ap;
-    }
-
-    @Override
-    public String getPs() {
-        return this.ps;
+    public String getBp() {
+        return this.bp;
     }
 
     @Override
@@ -87,8 +57,8 @@ implements Devices$Device {
     }
 
     @Override
-    public boolean isAv() {
-        return this.av;
+    public String getFh() {
+        return this.fh;
     }
 
     @Override
@@ -97,28 +67,8 @@ implements Devices$Device {
     }
 
     @Override
-    public boolean isFp() {
-        return this.fp;
-    }
-
-    @Override
-    public int getB() {
-        return this.b;
-    }
-
-    @Override
-    public int getC() {
-        return this.c;
-    }
-
-    @Override
-    public JsonObject getDp() {
-        return this.dp;
-    }
-
-    @Override
-    public String getCv() {
-        return this.cv;
+    public String getBr() {
+        return this.br;
     }
 
     public Devices$DeviceImpl(boolean bl, JsonObject jsonObject, String string, String string2, JsonObject jsonObject2, String string3, JsonObject jsonObject3, JsonObject jsonObject4, String string4, String string5, String string6, boolean bl2, boolean bl3, String string7, boolean bl4, boolean bl5, int n, int n2, String string8, double d, JsonObject jsonObject5, JsonObject jsonObject6, String string9, boolean bl6) {
@@ -149,23 +99,23 @@ implements Devices$Device {
     }
 
     @Override
-    public JsonObject getNav() {
-        return this.nav;
-    }
-
-    @Override
-    public boolean isIeps() {
-        return this.ieps;
-    }
-
-    @Override
-    public String getFh() {
-        return this.fh;
-    }
-
-    @Override
     public String getNap() {
         return this.nap;
+    }
+
+    @Override
+    public boolean isFp() {
+        return this.fp;
+    }
+
+    @Override
+    public String getLt() {
+        return this.lt;
+    }
+
+    @Override
+    public boolean isAp() {
+        return this.ap;
     }
 
     @Override
@@ -174,13 +124,63 @@ implements Devices$Device {
     }
 
     @Override
+    public int getC() {
+        return this.c;
+    }
+
+    @Override
+    public String getZh() {
+        return this.zh;
+    }
+
+    @Override
+    public String getPs() {
+        return this.ps;
+    }
+
+    @Override
+    public boolean isFc() {
+        return this.fc;
+    }
+
+    @Override
+    public boolean isAv() {
+        return this.av;
+    }
+
+    @Override
+    public JsonObject getNav() {
+        return this.nav;
+    }
+
+    @Override
     public JsonObject getTiming() {
         return this.timing;
     }
 
     @Override
-    public String getBp() {
-        return this.bp;
+    public int getB() {
+        return this.b;
+    }
+
+    @Override
+    public JsonObject getSr() {
+        return this.sr;
+    }
+
+    @Override
+    public double getJsv() {
+        return this.jsv;
+    }
+
+    @Override
+    public String getCv() {
+        return this.cv;
+    }
+
+    @Override
+    public JsonObject getDp() {
+        return this.dp;
     }
 }
 

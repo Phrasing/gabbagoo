@@ -19,12 +19,12 @@ import java.util.TimeZone;
 public class EssentialFunctions {
     public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss");
 
-    public static String encodeURIComponent(String string) {
-        return URLEncoder.encode(string, StandardCharsets.UTF_8).replaceAll("\\+", "%20").replaceAll("\\%21", "!").replaceAll("\\%27", "'").replaceAll("\\%28", "(").replaceAll("\\%29", ")").replaceAll("\\%7E", "~");
-    }
-
     public static double roundTwoDecimals(double d) {
         return (double)Math.round(d * Double.longBitsToDouble(4636737291354636288L)) / Double.longBitsToDouble(4636737291354636288L);
+    }
+
+    public static String encodeURIComponent(String string) {
+        return URLEncoder.encode(string, StandardCharsets.UTF_8).replaceAll("\\+", "%20").replaceAll("\\%21", "!").replaceAll("\\%27", "'").replaceAll("\\%28", "(").replaceAll("\\%29", ")").replaceAll("\\%7E", "~");
     }
 
     public static JsonArray convertArrToJson(String[] stringArray) {

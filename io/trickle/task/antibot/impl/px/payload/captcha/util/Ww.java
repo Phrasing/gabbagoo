@@ -6,51 +6,27 @@ package io.trickle.task.antibot.impl.px.payload.captcha.util;
 import java.util.Arrays;
 
 public class Ww {
-    public long h4 = 1359893119L;
+    public long h7 = 1541459225L;
+    public long h0 = 1779033703L;
+    public boolean hashed = false;
+    public boolean finalized = false;
+    public boolean first = true;
     public int block = 0;
+    public long h3 = 2773480762L;
     public int start = 0;
     public int[] Pt;
-    public boolean finalized = false;
-    public int lastByteIndex;
-    public long h6 = 528734635L;
-    public boolean hashed = false;
-    public long h7 = 1541459225L;
-    public int[] blocks;
-    public int[] Lt = new int[]{24, 16, 8, 0};
     public int hBytes = 0;
-    public long h3 = 2773480762L;
+    public int[] blocks;
+    public long[] Jt;
+    public long h4 = 1359893119L;
+    public String[] At;
     public long h5 = 2600822924L;
     public long h2 = 1013904242L;
-    public String[] At;
     public long h1 = 3144134277L;
-    public long h0 = 1779033703L;
-    public long[] Jt = new long[]{1116352408L, 1899447441L, 3049323471L, 3921009573L, 961987163L, 1508970993L, 2453635748L, 2870763221L, 3624381080L, 310598401L, 607225278L, 1426881987L, 1925078388L, 2162078206L, 2614888103L, 3248222580L, 3835390401L, 4022224774L, 264347078L, 604807628L, 770255983L, 1249150122L, 1555081692L, 1996064986L, 2554220882L, 2821834349L, 2952996808L, 3210313671L, 3336571891L, 3584528711L, 113926993L, 338241895L, 666307205L, 773529912L, 1294757372L, 1396182291L, 1695183700L, 1986661051L, 2177026350L, 2456956037L, 2730485921L, 2820302411L, 3259730800L, 3345764771L, 3516065817L, 3600352804L, 4094571909L, 275423344L, 430227734L, 506948616L, 659060556L, 883997877L, 958139571L, 1322822218L, 1537002063L, 1747873779L, 1955562222L, 2024104815L, 2227730452L, 2361852424L, 2428436474L, 2756734187L, 3204031479L, 3329325298L};
-    public boolean first = true;
+    public int[] Lt = new int[]{24, 16, 8, 0};
     public long bytes = 0L;
-
-    public String hex() {
-        this.finalizeEncryption();
-        long l = this.h0;
-        long l2 = this.h1;
-        long l3 = this.h2;
-        long l4 = this.h3;
-        long l5 = this.h4;
-        long l6 = this.h5;
-        long l7 = this.h6;
-        long l8 = this.h7;
-        return this.At[Ww.rightBitwise(l, 28L) & 0xF] + this.At[Ww.rightBitwise(l, 24L) & 0xF] + this.At[Ww.rightBitwise(l, 20L) & 0xF] + this.At[Ww.rightBitwise(l, 16L) & 0xF] + this.At[Ww.rightBitwise(l, 12L) & 0xF] + this.At[Ww.rightBitwise(l, 8L) & 0xF] + this.At[Ww.rightBitwise(l, 4L) & 0xF] + this.At[(int)(0xFL & l)] + this.At[Ww.rightBitwise(l2, 28L) & 0xF] + this.At[(int)l2 >> 24 & 0xF] + this.At[(int)l2 >> 20 & 0xF] + this.At[(int)l2 >> 16 & 0xF] + this.At[(int)l2 >> 12 & 0xF] + this.At[Ww.rightBitwise(l2, 8L) & 0xF] + this.At[Ww.rightBitwise(l2, 4L) & 0xF] + this.At[(int)(0xFL & l2)] + this.At[Ww.rightBitwise(l3, 28L) & 0xF] + this.At[Ww.rightBitwise(l3, 24L) & 0xF] + this.At[Ww.rightBitwise(l3, 20L) & 0xF] + this.At[Ww.rightBitwise(l3, 16L) & 0xF] + this.At[Ww.rightBitwise(l3, 12L) & 0xF] + this.At[Ww.rightBitwise(l3, 8L) & 0xF] + this.At[Ww.rightBitwise(l3, 4L) & 0xF] + this.At[(int)(0xFL & l3)] + this.At[(int)l4 >> 28 & 0xF] + this.At[(int)l4 >> 24 & 0xF] + this.At[(int)l4 >> 20 & 0xF] + this.At[(int)l4 >> 16 & 0xF] + this.At[(int)l4 >> 12 & 0xF] + this.At[(int)l4 >> 8 & 0xF] + this.At[(int)l4 >> 4 & 0xF] + this.At[0xF & (int)l4] + this.At[Ww.rightBitwise(l5, 28L) & 0xF] + this.At[Ww.rightBitwise(l5, 24L) & 0xF] + this.At[Ww.rightBitwise(l5, 20L) & 0xF] + this.At[Ww.rightBitwise(l5, 16L) & 0xF] + this.At[Ww.rightBitwise(l5, 12L) & 0xF] + this.At[Ww.rightBitwise(l5, 8L) & 0xF] + this.At[Ww.rightBitwise(l5, 4L) & 0xF] + this.At[(int)(0xFL & l5)] + this.At[(int)l6 >> 28 & 0xF] + this.At[(int)l6 >> 24 & 0xF] + this.At[(int)l6 >> 20 & 0xF] + this.At[(int)l6 >> 16 & 0xF] + this.At[(int)l6 >> 12 & 0xF] + this.At[(int)l6 >> 8 & 0xF] + this.At[(int)l6 >> 4 & 0xF] + this.At[0xF & (int)l6] + this.At[Ww.rightBitwise(l7, 28L) & 0xF] + this.At[Ww.rightBitwise(l7, 24L) & 0xF] + this.At[Ww.rightBitwise(l7, 20L) & 0xF] + this.At[Ww.rightBitwise(l7, 16L) & 0xF] + this.At[Ww.rightBitwise(l7, 12L) & 0xF] + this.At[Ww.rightBitwise(l7, 8L) & 0xF] + this.At[Ww.rightBitwise(l7, 4L) & 0xF] + this.At[(int)(0xFL & l7)] + this.At[Ww.rightBitwise(l8, 28L) & 0xF] + this.At[Ww.rightBitwise(l8, 24L) & 0xF] + this.At[Ww.rightBitwise(l8, 20L) & 0xF] + this.At[Ww.rightBitwise(l8, 16L) & 0xF] + this.At[Ww.rightBitwise(l8, 12L) & 0xF] + this.At[Ww.rightBitwise(l8, 8L) & 0xF] + this.At[Ww.rightBitwise(l8, 4L) & 0xF] + this.At[(int)(0xFL & l8)];
-    }
-
-    public static int leftBitwise(long l, long l2) {
-        if (l < Integer.MAX_VALUE && l2 < Integer.MAX_VALUE) {
-            return (int)l << (int)l2;
-        }
-        if (l < Integer.MAX_VALUE) {
-            return (int)l << (int)l2;
-        }
-        if (l2 >= Integer.MAX_VALUE) return (int)(l << (int)l2);
-        return (int)(l << (int)l2);
-    }
+    public int lastByteIndex;
+    public long h6 = 528734635L;
 
     public void hash() {
         int n;
@@ -135,6 +111,13 @@ public class Ww {
         }
     }
 
+    public Ww() {
+        this.Jt = new long[]{1116352408L, 1899447441L, 3049323471L, 3921009573L, 961987163L, 1508970993L, 2453635748L, 2870763221L, 3624381080L, 310598401L, 607225278L, 1426881987L, 1925078388L, 2162078206L, 2614888103L, 3248222580L, 3835390401L, 4022224774L, 264347078L, 604807628L, 770255983L, 1249150122L, 1555081692L, 1996064986L, 2554220882L, 2821834349L, 2952996808L, 3210313671L, 3336571891L, 3584528711L, 113926993L, 338241895L, 666307205L, 773529912L, 1294757372L, 1396182291L, 1695183700L, 1986661051L, 2177026350L, 2456956037L, 2730485921L, 2820302411L, 3259730800L, 3345764771L, 3516065817L, 3600352804L, 4094571909L, 275423344L, 430227734L, 506948616L, 659060556L, 883997877L, 958139571L, 1322822218L, 1537002063L, 1747873779L, 1955562222L, 2024104815L, 2227730452L, 2361852424L, 2428436474L, 2756734187L, 3204031479L, 3329325298L};
+        this.At = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
+        this.Pt = new int[]{Integer.MIN_VALUE, 0x800000, 32768, 128};
+        this.blocks = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    }
+
     public void finalizeEncryption() {
         if (this.finalized) return;
         this.finalized = true;
@@ -169,6 +152,28 @@ public class Ww {
         nArray[14] = Ww.leftBitwise(this.hBytes, 3L) | Ww.rightTripleBitwise(this.bytes, 29L);
         nArray[15] = Ww.leftBitwise(this.bytes, 3L);
         this.hash();
+    }
+
+    public static int leftBitwise(long l, long l2) {
+        if (l < Integer.MAX_VALUE && l2 < Integer.MAX_VALUE) {
+            return (int)l << (int)l2;
+        }
+        if (l < Integer.MAX_VALUE) {
+            return (int)l << (int)l2;
+        }
+        if (l2 >= Integer.MAX_VALUE) return (int)(l << (int)l2);
+        return (int)(l << (int)l2);
+    }
+
+    public static int rightBitwise(long l, long l2) {
+        if (l < Integer.MAX_VALUE && l2 < Integer.MAX_VALUE) {
+            return (int)l >> (int)l2;
+        }
+        if (l < Integer.MAX_VALUE) {
+            return (int)l >> (int)l2;
+        }
+        if (l2 >= Integer.MAX_VALUE) return (int)(l >> (int)l2);
+        return (int)(l >> (int)l2);
     }
 
     public Ww update(String string) {
@@ -234,23 +239,6 @@ public class Ww {
         }
     }
 
-    public Ww() {
-        this.At = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
-        this.Pt = new int[]{Integer.MIN_VALUE, 0x800000, 32768, 128};
-        this.blocks = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    }
-
-    public static int rightBitwise(long l, long l2) {
-        if (l < Integer.MAX_VALUE && l2 < Integer.MAX_VALUE) {
-            return (int)l >> (int)l2;
-        }
-        if (l < Integer.MAX_VALUE) {
-            return (int)l >> (int)l2;
-        }
-        if (l2 >= Integer.MAX_VALUE) return (int)(l >> (int)l2);
-        return (int)(l >> (int)l2);
-    }
-
     public static int rightTripleBitwise(long l, long l2) {
         if (l < Integer.MAX_VALUE && l2 < Integer.MAX_VALUE) {
             return (int)l >>> (int)l2;
@@ -260,6 +248,19 @@ public class Ww {
         }
         if (l2 >= Integer.MAX_VALUE) return (int)(l >>> (int)l2);
         return (int)(l >>> (int)l2);
+    }
+
+    public String hex() {
+        this.finalizeEncryption();
+        long l = this.h0;
+        long l2 = this.h1;
+        long l3 = this.h2;
+        long l4 = this.h3;
+        long l5 = this.h4;
+        long l6 = this.h5;
+        long l7 = this.h6;
+        long l8 = this.h7;
+        return this.At[Ww.rightBitwise(l, 28L) & 0xF] + this.At[Ww.rightBitwise(l, 24L) & 0xF] + this.At[Ww.rightBitwise(l, 20L) & 0xF] + this.At[Ww.rightBitwise(l, 16L) & 0xF] + this.At[Ww.rightBitwise(l, 12L) & 0xF] + this.At[Ww.rightBitwise(l, 8L) & 0xF] + this.At[Ww.rightBitwise(l, 4L) & 0xF] + this.At[(int)(0xFL & l)] + this.At[Ww.rightBitwise(l2, 28L) & 0xF] + this.At[(int)l2 >> 24 & 0xF] + this.At[(int)l2 >> 20 & 0xF] + this.At[(int)l2 >> 16 & 0xF] + this.At[(int)l2 >> 12 & 0xF] + this.At[Ww.rightBitwise(l2, 8L) & 0xF] + this.At[Ww.rightBitwise(l2, 4L) & 0xF] + this.At[(int)(0xFL & l2)] + this.At[Ww.rightBitwise(l3, 28L) & 0xF] + this.At[Ww.rightBitwise(l3, 24L) & 0xF] + this.At[Ww.rightBitwise(l3, 20L) & 0xF] + this.At[Ww.rightBitwise(l3, 16L) & 0xF] + this.At[Ww.rightBitwise(l3, 12L) & 0xF] + this.At[Ww.rightBitwise(l3, 8L) & 0xF] + this.At[Ww.rightBitwise(l3, 4L) & 0xF] + this.At[(int)(0xFL & l3)] + this.At[(int)l4 >> 28 & 0xF] + this.At[(int)l4 >> 24 & 0xF] + this.At[(int)l4 >> 20 & 0xF] + this.At[(int)l4 >> 16 & 0xF] + this.At[(int)l4 >> 12 & 0xF] + this.At[(int)l4 >> 8 & 0xF] + this.At[(int)l4 >> 4 & 0xF] + this.At[0xF & (int)l4] + this.At[Ww.rightBitwise(l5, 28L) & 0xF] + this.At[Ww.rightBitwise(l5, 24L) & 0xF] + this.At[Ww.rightBitwise(l5, 20L) & 0xF] + this.At[Ww.rightBitwise(l5, 16L) & 0xF] + this.At[Ww.rightBitwise(l5, 12L) & 0xF] + this.At[Ww.rightBitwise(l5, 8L) & 0xF] + this.At[Ww.rightBitwise(l5, 4L) & 0xF] + this.At[(int)(0xFL & l5)] + this.At[(int)l6 >> 28 & 0xF] + this.At[(int)l6 >> 24 & 0xF] + this.At[(int)l6 >> 20 & 0xF] + this.At[(int)l6 >> 16 & 0xF] + this.At[(int)l6 >> 12 & 0xF] + this.At[(int)l6 >> 8 & 0xF] + this.At[(int)l6 >> 4 & 0xF] + this.At[0xF & (int)l6] + this.At[Ww.rightBitwise(l7, 28L) & 0xF] + this.At[Ww.rightBitwise(l7, 24L) & 0xF] + this.At[Ww.rightBitwise(l7, 20L) & 0xF] + this.At[Ww.rightBitwise(l7, 16L) & 0xF] + this.At[Ww.rightBitwise(l7, 12L) & 0xF] + this.At[Ww.rightBitwise(l7, 8L) & 0xF] + this.At[Ww.rightBitwise(l7, 4L) & 0xF] + this.At[(int)(0xFL & l7)] + this.At[Ww.rightBitwise(l8, 28L) & 0xF] + this.At[Ww.rightBitwise(l8, 24L) & 0xF] + this.At[Ww.rightBitwise(l8, 20L) & 0xF] + this.At[Ww.rightBitwise(l8, 16L) & 0xF] + this.At[Ww.rightBitwise(l8, 12L) & 0xF] + this.At[Ww.rightBitwise(l8, 8L) & 0xF] + this.At[Ww.rightBitwise(l8, 4L) & 0xF] + this.At[(int)(0xFL & l8)];
     }
 }
 

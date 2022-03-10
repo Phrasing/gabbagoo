@@ -22,20 +22,6 @@ import java.util.List;
 
 public class ClientType$5
 extends ClientType {
-    public List ciphersRandomised() {
-        List list = this.ciphers();
-        Collections.shuffle(list);
-        return list;
-    }
-
-    @Override
-    public WebClientOptions options() {
-        WebClientOptions webClientOptions = new WebClientOptions();
-        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions()).addEnabledSecureTransportProtocol("TLSv1.3").addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
-        super.baseOptions(webClientOptions);
-        return webClientOptions;
-    }
-
     @Override
     public List ciphers() {
         ArrayList<String> arrayList = new ArrayList<String>();
@@ -57,9 +43,23 @@ extends ClientType {
         return arrayList;
     }
 
+    public List ciphersRandomised() {
+        List list = this.ciphers();
+        Collections.shuffle(list);
+        return list;
+    }
+
     @Override
     public int getWindowUpdate() {
         return 0xFF0001;
+    }
+
+    @Override
+    public WebClientOptions options() {
+        WebClientOptions webClientOptions = new WebClientOptions();
+        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions()).addEnabledSecureTransportProtocol("TLSv1.3").addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
+        super.baseOptions(webClientOptions);
+        return webClientOptions;
     }
 }
 

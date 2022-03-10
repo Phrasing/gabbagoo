@@ -21,12 +21,13 @@ KeyListener {
     public TextField delayField;
 
     @Override
-    public void keyTyped(KeyEvent keyEvent) {
-    }
-
-    public DelayOverrideListener(TextField textField, JCheckBox jCheckBox) {
-        this.delayField = textField;
-        this.checkBox = jCheckBox;
+    public void keyReleased(KeyEvent keyEvent) {
+        String string = this.delayField.getText();
+        if (!this.checkBox.isSelected()) return;
+        if (string.isBlank()) return;
+        if (!Utils.isInteger(string)) return;
+        System.out.println("Mass delay changed -> " + this.delayField.getText());
+        ((TaskController)Engine.get().getModule(Controller.TASK)).massEditDelay(Long.parseLong(string));
     }
 
     @Override
@@ -49,13 +50,12 @@ KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent keyEvent) {
-        String string = this.delayField.getText();
-        if (!this.checkBox.isSelected()) return;
-        if (string.isBlank()) return;
-        if (!Utils.isInteger(string)) return;
-        System.out.println("Mass delay changed -> " + this.delayField.getText());
-        ((TaskController)Engine.get().getModule(Controller.TASK)).massEditDelay(Long.parseLong(string));
+    public void keyTyped(KeyEvent keyEvent) {
+    }
+
+    public DelayOverrideListener(TextField textField, JCheckBox jCheckBox) {
+        this.delayField = textField;
+        this.checkBox = jCheckBox;
     }
 }
 

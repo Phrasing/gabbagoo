@@ -19,8 +19,46 @@ import java.util.function.Function;
 
 public class Finishline
 extends TaskActor {
-    public FinishlineAPI api;
     public Task task;
+    public FinishlineAPI api;
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$run(Finishline var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
+        switch (var2_2) {
+            case 0: {
+                v0 = super.randomSleep(5000);
+                if (!v0.isDone()) {
+                    var1_1 = v0;
+                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.finishline.Finishline java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Finishline)var0, (CompletableFuture)var1_1, (int)1));
+                }
+                ** GOTO lbl10
+            }
+            case 1: {
+                v0 = var1_1;
+lbl10:
+                // 2 sources
+
+                v0.join();
+                v1 = var0.visitHomePage();
+                if (!v1.isDone()) {
+                    var1_1 = v1;
+                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.finishline.Finishline java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Finishline)var0, (CompletableFuture)var1_1, (int)2));
+                }
+                ** GOTO lbl19
+            }
+            case 2: {
+                v1 = var1_1;
+lbl19:
+                // 2 sources
+
+                v1.join();
+                return CompletableFuture.completedFuture(null);
+            }
+        }
+        throw new IllegalArgumentException();
+    }
 
     @Override
     public CompletableFuture run() {
@@ -70,99 +108,6 @@ lbl15:
                 v0.join();
                 System.out.println("Donezo");
                 ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public CompletableFuture getCartSession() {
-        int n = 0;
-        while (this.running) {
-            if (n >= 5) return CompletableFuture.completedFuture(null);
-            ++n;
-            CompletableFuture completableFuture = super.sleep(3000);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$getCartSession(this, n, completableFuture2, 1, arg_0));
-            }
-            completableFuture.join();
-            System.out.println("Donezo");
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture visitHomePage() {
-        int n = 0;
-        while (this.running) {
-            if (n >= 10000) return CompletableFuture.completedFuture(null);
-            try {
-                HttpRequest httpRequest = this.api.homePage();
-                CompletableFuture completableFuture = Request.send(httpRequest);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$visitHomePage(this, n, httpRequest, completableFuture2, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    String string = (String)httpResponse.body();
-                    if (string.contains("<title>WAITING</title>")) {
-                        this.logger.warn("Waiting in Queue!");
-                    } else {
-                        if (!string.contains("ACCESS DENIED")) {
-                            this.logger.info("Passed queue (?) {}", (Object)httpResponse.statusCode());
-                            return CompletableFuture.completedFuture(null);
-                        }
-                        this.logger.error("Banned!");
-                    }
-                }
-            }
-            catch (Exception exception) {
-                this.logger.error("Error occurred on queue {}", (Object)exception.getMessage());
-            }
-            ++n;
-            CompletableFuture completableFuture = this.sleep(31000);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture3 = completableFuture;
-                return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$visitHomePage(this, n, null, completableFuture3, 2, arg_0));
-            }
-            completableFuture.join();
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$run(Finishline var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
-        switch (var2_2) {
-            case 0: {
-                v0 = super.randomSleep(5000);
-                if (!v0.isDone()) {
-                    var1_1 = v0;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.finishline.Finishline java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Finishline)var0, (CompletableFuture)var1_1, (int)1));
-                }
-                ** GOTO lbl10
-            }
-            case 1: {
-                v0 = var1_1;
-lbl10:
-                // 2 sources
-
-                v0.join();
-                v1 = var0.visitHomePage();
-                if (!v1.isDone()) {
-                    var1_1 = v1;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.finishline.Finishline java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Finishline)var0, (CompletableFuture)var1_1, (int)2));
-                }
-                ** GOTO lbl19
-            }
-            case 2: {
-                v1 = var1_1;
-lbl19:
-                // 2 sources
-
-                v1.join();
-                return CompletableFuture.completedFuture(null);
             }
         }
         throw new IllegalArgumentException();
@@ -241,6 +186,61 @@ lbl31:
             }
         }
         throw new IllegalArgumentException();
+    }
+
+    public CompletableFuture getCartSession() {
+        int n = 0;
+        while (this.running) {
+            if (n >= 5) return CompletableFuture.completedFuture(null);
+            ++n;
+            CompletableFuture completableFuture = super.sleep(3000);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$getCartSession(this, n, completableFuture2, 1, arg_0));
+            }
+            completableFuture.join();
+            System.out.println("Donezo");
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture visitHomePage() {
+        int n = 0;
+        while (this.running) {
+            if (n >= 10000) return CompletableFuture.completedFuture(null);
+            try {
+                HttpRequest httpRequest = this.api.homePage();
+                CompletableFuture completableFuture = Request.send(httpRequest);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$visitHomePage(this, n, httpRequest, completableFuture2, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse != null) {
+                    String string = (String)httpResponse.body();
+                    if (string.contains("<title>WAITING</title>")) {
+                        this.logger.warn("Waiting in Queue!");
+                    } else {
+                        if (!string.contains("ACCESS DENIED")) {
+                            this.logger.info("Passed queue (?) {}", (Object)httpResponse.statusCode());
+                            return CompletableFuture.completedFuture(null);
+                        }
+                        this.logger.error("Banned!");
+                    }
+                }
+            }
+            catch (Exception exception) {
+                this.logger.error("Error occurred on queue {}", (Object)exception.getMessage());
+            }
+            ++n;
+            CompletableFuture completableFuture = this.sleep(31000);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture3 = completableFuture;
+                return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> Finishline.async$visitHomePage(this, n, null, completableFuture3, 2, arg_0));
+            }
+            completableFuture.join();
+        }
+        return CompletableFuture.completedFuture(null);
     }
 }
 

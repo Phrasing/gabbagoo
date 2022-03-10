@@ -30,20 +30,10 @@ import org.apache.logging.log4j.Logger;
 public class RefererStoreController
 implements Module,
 LoadableAsync {
-    public static String REFERER_DEVICE_PATH = "links.txt";
-    public static Logger logger = LogManager.getLogger(DeviceStoreController.class);
+    public static Logger logger;
+    public static String REFERER_DEVICE_PATH;
     public List<String> referers;
     public Vertx vertx;
-
-    public RefererStoreController(Vertx vertx) {
-        this.vertx = vertx;
-        this.referers = new ArrayList<String>();
-    }
-
-    @Override
-    public void initialise() {
-        logger.debug("Initialised");
-    }
 
     @Override
     public Future load() {
@@ -51,8 +41,14 @@ LoadableAsync {
         return fileSystem.readFile("links.txt").otherwise(RefererStoreController::lambda$load$0).map(Buffer::toString).map(this::parseFile).map(this.referers::addAll).compose(RefererStoreController::lambda$load$1);
     }
 
-    public static Future lambda$load$1(Boolean bl) {
-        return Future.succeededFuture();
+    static {
+        REFERER_DEVICE_PATH = "links.txt";
+        logger = LogManager.getLogger(DeviceStoreController.class);
+    }
+
+    public RefererStoreController(Vertx vertx) {
+        this.vertx = vertx;
+        this.referers = new ArrayList<String>();
     }
 
     public static Buffer lambda$load$0(Throwable throwable) {
@@ -60,8 +56,16 @@ LoadableAsync {
         return Buffer.buffer((String)"");
     }
 
+    public List parseFile(String string) {
+        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).collect(Collectors.toList());
+    }
+
     public String getRandomReferer() {
         return "https://www.walmart.com/ip/" + this.referers.get(ThreadLocalRandom.current().nextInt(this.referers.size()));
+    }
+
+    public static Future lambda$load$1(Boolean bl) {
+        return Future.succeededFuture();
     }
 
     @Override
@@ -69,8 +73,9 @@ LoadableAsync {
         logger.debug("Terminated.");
     }
 
-    public List parseFile(String string) {
-        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).collect(Collectors.toList());
+    @Override
+    public void initialise() {
+        logger.debug("Initialised");
     }
 }
 

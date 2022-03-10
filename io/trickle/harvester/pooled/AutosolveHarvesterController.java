@@ -32,24 +32,58 @@ import org.apache.logging.log4j.Logger;
 
 public class AutosolveHarvesterController
 extends AbstractSharedHarvesterController {
-    public static boolean $assertionsDisabled;
-    public AbstractAutoSolveManager autoSolve;
-    public static Logger logger;
-    public ContextCompletableFuture<Void> startFuture;
-    public AtomicInteger c = new AtomicInteger(0);
-    public static int SHARED_TOKEN_RATIO;
     public Vertx vertx;
+    public AtomicInteger c = new AtomicInteger(0);
+    public AbstractAutoSolveManager autoSolve;
+    public ContextCompletableFuture<Void> startFuture;
+    public static boolean $assertionsDisabled;
+    public static Logger logger;
+    public static int SHARED_TOKEN_RATIO;
 
     @Override
     public Optional shouldSwap(String string) {
         return Optional.empty();
     }
 
-    @Override
-    public CompletableFuture initialise() {
-        if (this.c.getAndIncrement() % 500 != 0) return this.initAutosolve();
-        this.addNewHarvester();
-        return this.initAutosolve();
+    public void lambda$connect$0(String string, String string2) {
+        AutoSolveAccount autoSolveAccount = AutoSolveAccount.of((String)string, (String)string2);
+        if (!$assertionsDisabled && !autoSolveAccount.isValid()) {
+            throw new AssertionError();
+        }
+        int n = 0;
+        while (true) {
+            if (n >= 10) {
+                logger.warn("Failed to connect to AutoSolve");
+                this.startFuture.completeExceptionally((Throwable)new Exception("Failed to connect to AutoSolve"));
+                System.exit(-1);
+                return;
+            }
+            try {
+                logger.info("Connecting AutoSolve...");
+                this.autoSolve.load(autoSolveAccount);
+                if (this.autoSolve.isConnected()) {
+                    this.startFuture.complete(null);
+                    return;
+                }
+                Thread.sleep(3000L);
+            }
+            catch (Throwable throwable) {
+                logger.error("Failed to connect to autosolve: {}", (Object)throwable.getMessage());
+            }
+            ++n;
+        }
+    }
+
+    public AutosolveHarvesterController(Vertx vertx) {
+        this.vertx = vertx;
+        this.autoSolve = new AutoSolve(new OkHttpClient.Builder(), "Trickle-4ae3fa8b-26fa-4001-8582-8fd27a7beb7e");
+    }
+
+    public void addNewHarvester() {
+        AutosolveHarvester autosolveHarvester = new AutosolveHarvester(this.vertx, this.autoSolve);
+        this.vertx.eventBus().localConsumer(autosolveHarvester.id(), (Handler)autosolveHarvester);
+        this.harvesters.add(autosolveHarvester);
+        logger.info("Added new autosolve harvester: {}", (Object)this.harvesters.size());
     }
 
     public void connect() {
@@ -58,35 +92,11 @@ extends AbstractSharedHarvesterController {
         CompletableFuture.runAsync(() -> this.lambda$connect$0(string, string2));
     }
 
-    public CompletableFuture initAutosolve() {
-        if (this.autoSolve.isActive()) {
-            return CompletableFuture.completedFuture(null);
-        }
-        logger.info("Connecting to AutoSolve");
-        if (this.startFuture != null) {
-            if (!this.startFuture.isDone()) return CompletableFuture.completedFuture(null);
-        }
-        this.startFuture = new ContextCompletableFuture();
-        this.connect();
-        ContextCompletableFuture<Void> contextCompletableFuture = this.startFuture;
-        if (!contextCompletableFuture.toCompletableFuture().isDone()) {
-            ContextCompletableFuture<Void> contextCompletableFuture2 = contextCompletableFuture;
-            return contextCompletableFuture2.exceptionally(Function.identity()).thenCompose(arg_0 -> AutosolveHarvesterController.async$initAutosolve(this, contextCompletableFuture2, 1, arg_0)).toCompletableFuture();
-        }
-        contextCompletableFuture.toCompletableFuture().join();
-        logger.info("Connected Successfully");
-        return CompletableFuture.completedFuture(null);
-    }
-
-    static {
-        SHARED_TOKEN_RATIO = 500;
-        $assertionsDisabled = !AutosolveHarvesterController.class.desiredAssertionStatus();
-        logger = LogManager.getLogger(AutosolveHarvesterController.class);
-    }
-
-    public AutosolveHarvesterController(Vertx vertx) {
-        this.vertx = vertx;
-        this.autoSolve = new AutoSolve(new OkHttpClient.Builder(), "Trickle-4ae3fa8b-26fa-4001-8582-8fd27a7beb7e");
+    @Override
+    public CompletableFuture initialise() {
+        if (this.c.getAndIncrement() % 500 != 0) return this.initAutosolve();
+        this.addNewHarvester();
+        return this.initAutosolve();
     }
 
     /*
@@ -124,40 +134,30 @@ lbl17:
         throw new IllegalArgumentException();
     }
 
-    public void lambda$connect$0(String string, String string2) {
-        AutoSolveAccount autoSolveAccount = AutoSolveAccount.of((String)string, (String)string2);
-        if (!$assertionsDisabled && !autoSolveAccount.isValid()) {
-            throw new AssertionError();
-        }
-        int n = 0;
-        while (true) {
-            if (n >= 10) {
-                logger.warn("Failed to connect to AutoSolve");
-                this.startFuture.completeExceptionally((Throwable)new Exception("Failed to connect to AutoSolve"));
-                System.exit(-1);
-                return;
-            }
-            try {
-                logger.info("Connecting AutoSolve...");
-                this.autoSolve.load(autoSolveAccount);
-                if (this.autoSolve.isConnected()) {
-                    this.startFuture.complete(null);
-                    return;
-                }
-                Thread.sleep(3000L);
-            }
-            catch (Throwable throwable) {
-                logger.error("Failed to connect to autosolve: {}", (Object)throwable.getMessage());
-            }
-            ++n;
-        }
+    static {
+        SHARED_TOKEN_RATIO = 500;
+        $assertionsDisabled = !AutosolveHarvesterController.class.desiredAssertionStatus();
+        logger = LogManager.getLogger(AutosolveHarvesterController.class);
     }
 
-    public void addNewHarvester() {
-        AutosolveHarvester autosolveHarvester = new AutosolveHarvester(this.vertx, this.autoSolve);
-        this.vertx.eventBus().localConsumer(autosolveHarvester.id(), (Handler)autosolveHarvester);
-        this.harvesters.add(autosolveHarvester);
-        logger.info("Added new autosolve harvester: {}", (Object)this.harvesters.size());
+    public CompletableFuture initAutosolve() {
+        if (this.autoSolve.isActive()) {
+            return CompletableFuture.completedFuture(null);
+        }
+        logger.info("Connecting to AutoSolve");
+        if (this.startFuture != null) {
+            if (!this.startFuture.isDone()) return CompletableFuture.completedFuture(null);
+        }
+        this.startFuture = new ContextCompletableFuture();
+        this.connect();
+        ContextCompletableFuture<Void> contextCompletableFuture = this.startFuture;
+        if (!contextCompletableFuture.toCompletableFuture().isDone()) {
+            ContextCompletableFuture<Void> contextCompletableFuture2 = contextCompletableFuture;
+            return contextCompletableFuture2.exceptionally(Function.identity()).thenCompose(arg_0 -> AutosolveHarvesterController.async$initAutosolve(this, contextCompletableFuture2, 1, arg_0)).toCompletableFuture();
+        }
+        contextCompletableFuture.toCompletableFuture().join();
+        logger.info("Connected Successfully");
+        return CompletableFuture.completedFuture(null);
     }
 }
 

@@ -235,7 +235,7 @@ public class Countries {
         COUNTRIES.put("Uganda", "UG");
         COUNTRIES.put("Ukraine", "UA");
         COUNTRIES.put("United Arab Emirates", "AE");
-        COUNTRIES.put("United Kingdom", "GB");
+        COUNTRIES.put("United Kingdom", "United Kingdom");
         COUNTRIES.put("United States", "US");
         COUNTRIES.put("Uruguay", "UY");
         COUNTRIES.put("Uzbekistan", "UZ");

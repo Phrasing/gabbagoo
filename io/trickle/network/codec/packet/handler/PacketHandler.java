@@ -16,12 +16,12 @@ import io.vertx.core.Promise;
 public interface PacketHandler {
     public static final PacketHandler[] HANDLERS = new PacketHandler[]{null, new LoginHandler()};
 
-    public void handle(Packet var1);
-
     public PacketType getType();
 
     public void handle(Packet var1, Handler var2);
 
     public void handle(Promise var1, Packet var2);
+
+    public void handle(Packet var1);
 }
 

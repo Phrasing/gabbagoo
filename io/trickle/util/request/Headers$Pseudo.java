@@ -16,11 +16,23 @@ public enum Headers$Pseudo {
     MSPA(new String[]{"m", "s", "p", "a"}),
     MASP(new String[]{"m", "a", "s", "p"});
 
-    public static CharSequence SCHEME;
+    public String[] headerOrder;
     public static CharSequence AUTHORITY;
     public static CharSequence PATH;
+    public static CharSequence SCHEME;
     public static CharSequence METHOD;
-    public String[] headerOrder;
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public Headers$Pseudo() {
+        void var3_1;
+        if (((void)var3_1).length != 4) {
+            throw new RuntimeException("Invalid Header Length");
+        }
+        this.headerOrder = var3_1;
+    }
 
     public static MultiMap build(String ... stringArray) {
         MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
@@ -55,6 +67,10 @@ public enum Headers$Pseudo {
         return multiMap;
     }
 
+    public static MultiMap fromOrder(String ... stringArray) {
+        return Headers$Pseudo.build(stringArray);
+    }
+
     static {
         METHOD = AsciiString.cached((String)":method");
         PATH = AsciiString.cached((String)":path");
@@ -64,22 +80,6 @@ public enum Headers$Pseudo {
 
     public MultiMap get() {
         return Headers$Pseudo.build(this.headerOrder);
-    }
-
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public Headers$Pseudo() {
-        void var3_1;
-        if (((void)var3_1).length != 4) {
-            throw new RuntimeException("Invalid Header Length");
-        }
-        this.headerOrder = var3_1;
-    }
-
-    public static MultiMap fromOrder(String ... stringArray) {
-        return Headers$Pseudo.build(stringArray);
     }
 }
 

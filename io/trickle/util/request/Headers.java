@@ -9,19 +9,19 @@ package io.trickle.util.request;
 import io.netty.util.AsciiString;
 
 public class Headers {
-    public static CharSequence SEC_FETCH_DEST;
-    public static CharSequence DEFAULT;
-    public static CharSequence SEC_CH_UA;
-    public static CharSequence SEC_CH_UA_PLATFORM;
-    public static CharSequence SEC_FETCH_SITE;
-    public static CharSequence WINDOWS;
-    public static CharSequence SAME_ORIGIN;
-    public static CharSequence SEC_FETCH_MODE;
     public static CharSequence EMPTY;
+    public static CharSequence WINDOWS;
+    public static CharSequence SEC_CH_UA_PLATFORM;
+    public static CharSequence GZIP_DEFLATE_BR;
+    public static CharSequence SAME_ORIGIN;
+    public static CharSequence SEC_FETCH_DEST;
+    public static CharSequence CORS;
     public static CharSequence SEC_CH_UA_MOBILE;
     public static CharSequence _Q0;
-    public static CharSequence CORS;
-    public static CharSequence GZIP_DEFLATE_BR;
+    public static CharSequence SEC_FETCH_SITE;
+    public static CharSequence SEC_FETCH_MODE;
+    public static CharSequence SEC_CH_UA;
+    public static CharSequence DEFAULT;
 
     static {
         DEFAULT = AsciiString.cached((String)"DEFAULT_VALUE");

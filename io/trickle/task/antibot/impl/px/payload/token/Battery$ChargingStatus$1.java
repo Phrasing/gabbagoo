@@ -12,13 +12,13 @@ extends Battery$ChargingStatus {
     public static float MISS_CHARGE_RATIO = Float.intBitsToFloat(933443473);
 
     @Override
-    public float changeVector() {
-        return Battery.jitter(Float.intBitsToFloat(1009339684), Float.intBitsToFloat(957937084));
+    public float calculate(float f, int n, float f2, double d) {
+        return (float)d + f2 * f + Float.intBitsToFloat(933443473) * (float)n * f;
     }
 
     @Override
-    public float calculate(float f, int n, float f2, double d) {
-        return (float)d + f2 * f + Float.intBitsToFloat(933443473) * (float)n * f;
+    public float changeVector() {
+        return Battery.jitter(Float.intBitsToFloat(1009339684), Float.intBitsToFloat(957937084));
     }
 }
 

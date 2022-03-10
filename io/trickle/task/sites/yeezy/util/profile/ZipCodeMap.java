@@ -16,26 +16,23 @@ public class ZipCodeMap {
     public AtomicInteger counter;
     public List<ZipCodeGroup> zipCodeGroups = new ArrayList<ZipCodeGroup>();
 
-    public void put(String string, Profile profile) {
-        ZipCodeGroup zipCodeGroup;
-        Iterator<ZipCodeGroup> iterator = this.zipCodeGroups.iterator();
-        do {
-            if (!iterator.hasNext()) {
-                this.zipCodeGroups.add(new ZipCodeGroup(string).put(profile));
-                return;
-            }
-            zipCodeGroup = iterator.next();
-        } while (!zipCodeGroup.zipCode.equals(string));
-        zipCodeGroup.put(profile);
-    }
-
-    public static boolean lambda$getZipCode$1(ZipCodeGroup zipCodeGroup) {
-        if (zipCodeGroup.profiles.isEmpty()) return false;
-        return true;
-    }
-
     public String toString() {
         return this.zipCodeGroups.toString();
+    }
+
+    public static int lambda$getZipCode$2(int n, int n2) {
+        if (++n2 >= n) return 0;
+        int n3 = n2;
+        return n3;
+    }
+
+    public ZipCodeMap() {
+        this.counter = new AtomicInteger(0);
+    }
+
+    public static boolean lambda$getZipCode$0(ZipCodeGroup zipCodeGroup) {
+        if (zipCodeGroup.zipBanned) return false;
+        return true;
     }
 
     public ZipCodeGroup getZipCode() {
@@ -51,19 +48,22 @@ public class ZipCodeMap {
         return zipCodeGroup;
     }
 
-    public static int lambda$getZipCode$2(int n, int n2) {
-        if (++n2 >= n) return 0;
-        int n3 = n2;
-        return n3;
-    }
-
-    public static boolean lambda$getZipCode$0(ZipCodeGroup zipCodeGroup) {
-        if (zipCodeGroup.zipBanned) return false;
+    public static boolean lambda$getZipCode$1(ZipCodeGroup zipCodeGroup) {
+        if (zipCodeGroup.profiles.isEmpty()) return false;
         return true;
     }
 
-    public ZipCodeMap() {
-        this.counter = new AtomicInteger(0);
+    public void put(String string, Profile profile) {
+        ZipCodeGroup zipCodeGroup;
+        Iterator<ZipCodeGroup> iterator = this.zipCodeGroups.iterator();
+        do {
+            if (!iterator.hasNext()) {
+                this.zipCodeGroups.add(new ZipCodeGroup(string).put(profile));
+                return;
+            }
+            zipCodeGroup = iterator.next();
+        } while (!zipCodeGroup.zipCode.equals(string));
+        zipCodeGroup.put(profile);
     }
 }
 

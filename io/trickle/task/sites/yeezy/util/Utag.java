@@ -9,17 +9,21 @@ import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utag {
-    public String productName;
-    public Bmak bmak;
+    public long exp;
     public long ses_id = -1L;
-    public String v_id;
     public String sku;
-    public String documentUrl;
     public static int session_timeout = 1800000;
     public String userAgent;
-    public long exp;
-    public int updateCookieCounter = 0;
     public long st;
+    public String v_id;
+    public int updateCookieCounter = 0;
+    public String documentUrl;
+    public Bmak bmak;
+    public String productName;
+
+    public static int H() {
+        return (int)Math.ceil((double)Instant.now().toEpochMilli() / Double.longBitsToDouble(4725570615333879808L));
+    }
 
     public static String r() {
         String string = "0123456789";
@@ -52,8 +56,8 @@ public class Utag {
         return (String)object + (String)object2;
     }
 
-    public String getEncodedProductName() {
-        return "PRODUCT%7C" + this.productName + "%20(" + this.sku + ")";
+    public String getEncodedWR() {
+        return "WAITING%20ROOM%7C" + this.productName + "%7C" + this.productName + "%20(" + this.sku + ")";
     }
 
     public String vi(long l) {
@@ -81,42 +85,11 @@ public class Utag {
         return this.v_id;
     }
 
-    public String getPrevPage() {
-        if (this.documentUrl.contains("product")) return this.getEncodedProductName();
-        if (this.documentUrl.contains("archive")) {
-            return this.getEncodedProductName();
-        }
-        if (this.documentUrl.equals(YeezyAPI.QUEUE_URL)) {
-            return this.getEncodedWR();
-        }
-        if (this.documentUrl.contains("/delivery")) {
-            return this.getEncodedShipping();
-        }
-        if (!this.documentUrl.contains("/payment")) return "HOME";
-        return this.getEncodedProcessing();
-    }
-
-    public static int H() {
-        return (int)Math.ceil((double)Instant.now().toEpochMilli() / Double.longBitsToDouble(4725570615333879808L));
-    }
-
     public Utag(Bmak bmak, String string) {
         this.bmak = bmak;
         this.userAgent = null;
         this.documentUrl = "https://www.yeezysupply.com/";
         this.sku = string;
-    }
-
-    public void updateDocumentUrl(String string) {
-        this.documentUrl = string;
-    }
-
-    public String getEncodedShipping() {
-        return "CHECKOUT%7CSHIPPING";
-    }
-
-    public String getEncodedWR() {
-        return "WAITING%20ROOM%7C" + this.productName + "%7C" + this.productName + "%20(" + this.sku + ")";
     }
 
     public void setName(String string) {
@@ -147,8 +120,12 @@ public class Utag {
         this.sku = string2;
     }
 
-    public String getEncodedProcessing() {
-        return "CHECKOUT%7CPAYMENT";
+    public String getEncodedShipping() {
+        return "CHECKOUT%7CSHIPPING";
+    }
+
+    public String getEncodedProductName() {
+        return "PRODUCT%7C" + this.productName + "%20(" + this.sku + ")";
     }
 
     public String pad(String object, int n) {
@@ -161,6 +138,29 @@ public class Utag {
             ++n2;
         }
         return (String)object2 + (String)object;
+    }
+
+    public void updateDocumentUrl(String string) {
+        this.documentUrl = string;
+    }
+
+    public String getEncodedProcessing() {
+        return "CHECKOUT%7CPAYMENT";
+    }
+
+    public String getPrevPage() {
+        if (this.documentUrl.contains("product")) return this.getEncodedProductName();
+        if (this.documentUrl.contains("archive")) {
+            return this.getEncodedProductName();
+        }
+        if (this.documentUrl.equals(YeezyAPI.QUEUE_URL)) {
+            return this.getEncodedWR();
+        }
+        if (this.documentUrl.contains("/delivery")) {
+            return this.getEncodedShipping();
+        }
+        if (!this.documentUrl.contains("/payment")) return "HOME";
+        return this.getEncodedProcessing();
     }
 }
 

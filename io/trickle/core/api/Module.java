@@ -4,8 +4,8 @@
 package io.trickle.core.api;
 
 public interface Module {
-    public void initialise();
-
     public void terminate();
+
+    public void initialise();
 }
 

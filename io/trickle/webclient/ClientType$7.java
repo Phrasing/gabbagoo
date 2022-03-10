@@ -23,6 +23,25 @@ import java.util.List;
 public class ClientType$7
 extends ClientType {
     @Override
+    public WebClientOptions options() {
+        WebClientOptions webClientOptions = new WebClientOptions();
+        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions()).addEnabledSecureTransportProtocol("TLSv1.3").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
+        super.baseOptions(webClientOptions);
+        return webClientOptions;
+    }
+
+    @Override
+    public int getWindowUpdate() {
+        return 0xFF0001;
+    }
+
+    public List ciphersRandomised() {
+        List list = this.ciphers();
+        Collections.shuffle(list);
+        return list;
+    }
+
+    @Override
     public List ciphers() {
         ArrayList<String> arrayList = new ArrayList<String>();
         arrayList.add("TLS_AES_128_GCM_SHA256");
@@ -43,25 +62,6 @@ extends ClientType {
         arrayList.add("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA");
         arrayList.add("TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256");
         return arrayList;
-    }
-
-    @Override
-    public int getWindowUpdate() {
-        return 0xFF0001;
-    }
-
-    @Override
-    public WebClientOptions options() {
-        WebClientOptions webClientOptions = new WebClientOptions();
-        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions()).addEnabledSecureTransportProtocol("TLSv1.3").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
-        super.baseOptions(webClientOptions);
-        return webClientOptions;
-    }
-
-    public List ciphersRandomised() {
-        List list = this.ciphers();
-        Collections.shuffle(list);
-        return list;
     }
 }
 

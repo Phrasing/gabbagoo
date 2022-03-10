@@ -41,9 +41,65 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LocalClient {
+    public static Logger logger = LogManager.getLogger((String)"CLIENT");
     public WebClient client;
     public WebClient chromeClient;
-    public static Logger logger = LogManager.getLogger((String)"CLIENT");
+
+    public LocalClient(Vertx vertx) {
+        this.chromeClient = RealClientFactory.createWebClient(vertx, ClientType.CHROME, null);
+        this.client = WebClient.create((Vertx)vertx, (WebClientOptions)new WebClientOptions().setLogActivity(false).setUserAgentEnabled(false).setProtocolVersion(HttpVersion.HTTP_2).setUseAlpn(true).setTrustAll(false).setConnectTimeout(150000).setSslHandshakeTimeoutUnit(TimeUnit.SECONDS).setSslHandshakeTimeout(150L).setIdleTimeoutUnit(TimeUnit.SECONDS).setIdleTimeout(150).setKeepAlive(true).setKeepAliveTimeout(30).setHttp2KeepAliveTimeout(100).setHttp2MaxPoolSize(150).setHttp2MultiplexingLimit(200).setPoolCleanerPeriod(15000).setMaxPoolSize(150).setTryUseCompression(true).setTcpFastOpen(true).setTcpKeepAlive(true).setTcpNoDelay(true).setTcpQuickAck(true).setFollowRedirects(false));
+    }
+
+    public static void lambda$fetchUpdates$1(Promise promise, Throwable throwable) {
+        logger.warn("Failed to fetch updates: {}", (Object)throwable.getMessage());
+        promise.fail(throwable);
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$fetchDeviceFromAPI(LocalClient var0, String var1_1, String var2_2, int var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public CompletableFuture fetchDeviceFromAPI(String string) {
+        return this.fetchDeviceFromAPI(string, null);
+    }
+
+    public WebClient getClient() {
+        return this.client;
+    }
+
+    public HttpRequest postAPI(String string) {
+        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.jsonObject());
+        httpRequest.putHeader("accept", "application/json");
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("user-agent", "tomato-agent");
+        httpRequest.putHeader("key", Storage.ACCESS_KEY);
+        return httpRequest;
+    }
 
     public CompletableFuture deleteDeviceFromAPI(String string, JsonObject jsonObject) {
         int n = 0;
@@ -77,6 +133,65 @@ public class LocalClient {
             }
         }
         return CompletableFuture.completedFuture(null);
+    }
+
+    public HttpRequest fetchAPI(String string) {
+        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.jsonObject());
+        httpRequest.putHeader("accept", "application/json");
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("user-agent", "tomato-agent");
+        httpRequest.putHeader("key", Storage.ACCESS_KEY);
+        return httpRequest;
+    }
+
+    public Future fetchUpdates() {
+        HttpRequest httpRequest = this.client.getAbs("https://loudounchris.xyz/api/patch").putHeader("accept", "application/json").putHeader("content-type", "application/json").putHeader("user-agent", "tomato-agent").putHeader("key", Storage.ACCESS_KEY).as(BodyCodec.buffer());
+        Promise promise = Promise.promise();
+        httpRequest.send().onSuccess(arg_0 -> LocalClient.lambda$fetchUpdates$0(promise, arg_0)).onFailure(arg_0 -> LocalClient.lambda$fetchUpdates$1(promise, arg_0));
+        return promise.future();
+    }
+
+    public static void lambda$fetchUpdates$0(Promise promise, HttpResponse httpResponse) {
+        try {
+            if (httpResponse.statusCode() != 200) return;
+            Buffer buffer = (Buffer)httpResponse.body();
+            if (buffer == null) return;
+            promise.tryComplete((Object)buffer.toJsonObject());
+            return;
+        }
+        catch (Throwable throwable) {
+            logger.warn("Failed to fetch updates: {}", (Object)throwable.getMessage());
+            promise.fail(throwable);
+        }
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$deleteDeviceFromAPI(LocalClient var0, String var1_1, JsonObject var2_2, int var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
     }
 
     public CompletableFuture fetchDeviceFromAPI(String string, String string2) {
@@ -115,123 +230,8 @@ public class LocalClient {
         return CompletableFuture.completedFuture(null);
     }
 
-    public Future fetchUpdates() {
-        HttpRequest httpRequest = this.client.getAbs("https://loudounchris.xyz/api/patch").putHeader("accept", "application/json").putHeader("content-type", "application/json").putHeader("user-agent", "tomato-agent").putHeader("key", Storage.ACCESS_KEY).as(BodyCodec.buffer());
-        Promise promise = Promise.promise();
-        httpRequest.send().onSuccess(arg_0 -> LocalClient.lambda$fetchUpdates$0(promise, arg_0)).onFailure(arg_0 -> LocalClient.lambda$fetchUpdates$1(promise, arg_0));
-        return promise.future();
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$deleteDeviceFromAPI(LocalClient var0, String var1_1, JsonObject var2_2, int var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public HttpRequest fetchAPI(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.jsonObject());
-        httpRequest.putHeader("accept", "application/json");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", "tomato-agent");
-        httpRequest.putHeader("key", Storage.ACCESS_KEY);
-        return httpRequest;
-    }
-
-    public WebClient getClient() {
-        return this.client;
-    }
-
-    public LocalClient(Vertx vertx) {
-        this.chromeClient = RealClientFactory.createWebClient(vertx, ClientType.CHROME, null);
-        this.client = WebClient.create((Vertx)vertx, (WebClientOptions)new WebClientOptions().setLogActivity(false).setUserAgentEnabled(false).setProtocolVersion(HttpVersion.HTTP_2).setUseAlpn(true).setTrustAll(false).setConnectTimeout(150000).setSslHandshakeTimeoutUnit(TimeUnit.SECONDS).setSslHandshakeTimeout(150L).setIdleTimeoutUnit(TimeUnit.SECONDS).setIdleTimeout(150).setKeepAlive(true).setKeepAliveTimeout(30).setHttp2KeepAliveTimeout(100).setHttp2MaxPoolSize(150).setHttp2MultiplexingLimit(200).setPoolCleanerPeriod(15000).setMaxPoolSize(150).setTryUseCompression(true).setTcpFastOpen(true).setTcpKeepAlive(true).setTcpNoDelay(true).setTcpQuickAck(true).setFollowRedirects(false));
-    }
-
     public WebClient getChromeClient() {
         return this.chromeClient;
-    }
-
-    public static void lambda$fetchUpdates$1(Promise promise, Throwable throwable) {
-        logger.warn("Failed to fetch updates: {}", (Object)throwable.getMessage());
-        promise.fail(throwable);
-    }
-
-    public static void lambda$fetchUpdates$0(Promise promise, HttpResponse httpResponse) {
-        try {
-            if (httpResponse.statusCode() != 200) return;
-            Buffer buffer = (Buffer)httpResponse.body();
-            if (buffer == null) return;
-            promise.tryComplete((Object)buffer.toJsonObject());
-            return;
-        }
-        catch (Throwable throwable) {
-            logger.warn("Failed to fetch updates: {}", (Object)throwable.getMessage());
-            promise.fail(throwable);
-        }
-    }
-
-    public CompletableFuture fetchDeviceFromAPI(String string) {
-        return this.fetchDeviceFromAPI(string, null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$fetchDeviceFromAPI(LocalClient var0, String var1_1, String var2_2, int var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public HttpRequest postAPI(String string) {
-        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.jsonObject());
-        httpRequest.putHeader("accept", "application/json");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", "tomato-agent");
-        httpRequest.putHeader("key", Storage.ACCESS_KEY);
-        return httpRequest;
     }
 }
 

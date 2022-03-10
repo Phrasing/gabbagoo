@@ -11,12 +11,8 @@ import org.jctools.queues.MpmcUnboundedXaddArrayQueue;
 
 public class ZipCodeGroup {
     public boolean zipBanned = false;
-    public String zipCode;
     public MpmcUnboundedXaddArrayQueue<Profile> profiles;
-
-    public String toString() {
-        return "zipCode=" + this.zipCode + " profiles={" + this.profiles + "}";
-    }
+    public String zipCode;
 
     public void returnProfile(Profile profile) {
         this.profiles.offer((Object)profile);
@@ -27,13 +23,17 @@ public class ZipCodeGroup {
         this.profiles = new MpmcUnboundedXaddArrayQueue(256);
     }
 
-    public Profile getProfile() {
-        return (Profile)this.profiles.poll();
-    }
-
     public ZipCodeGroup put(Profile profile) {
         this.profiles.offer((Object)profile);
         return this;
+    }
+
+    public String toString() {
+        return "zipCode=" + this.zipCode + " profiles={" + this.profiles + "}";
+    }
+
+    public Profile getProfile() {
+        return (Profile)this.profiles.poll();
     }
 }
 

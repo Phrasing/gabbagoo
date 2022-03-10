@@ -44,12 +44,61 @@ public abstract class TaskActor
 extends AbstractVerticle
 implements Actor {
     public Logger logger;
-    public N apiClient;
-    public CompletableFuture<Void> sleepFuture = null;
     public static Logger netLogger = LogManager.getLogger((String)"NET_LOGGER");
-    public int id;
-    public Task task;
     public boolean running = false;
+    public Task task;
+    public N apiClient;
+    public int id;
+    public CompletableFuture<Void> sleepFuture = null;
+
+    public void netLogWarn(String string) {
+        this.netLog(Level.WARN, string);
+    }
+
+    public CompletableFuture randomSleep(int n) {
+        try {
+            if (n <= 0) return CompletableFuture.completedFuture(null);
+            int n2 = ThreadLocalRandom.current().nextInt((int)Math.min((double)n, (double)n / Double.longBitsToDouble(4608308318706860032L)), (int)((double)n * Double.longBitsToDouble(4608308318706860032L)));
+            return this.sleep(n2);
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public static Void lambda$start$1(Throwable throwable) {
+        return null;
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$GETREQ(TaskActor var0, String var1_1, HttpRequest var2_2, Integer var3_3, String[] var4_4, int var5_5, CompletableFuture var6_8, HttpResponse var7_9, Throwable var8_11, int var9_12, Object var10_13) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
 
     public CompletableFuture execute(String string, Function function, Supplier supplier, Object object) {
         this.logger.info(string);
@@ -118,6 +167,85 @@ implements Actor {
         return this.logger;
     }
 
+    public void lambda$sleep$2(Long l) {
+        try {
+            this.sleepFuture.complete(null);
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+    }
+
+    public void lambda$start$0(Void void_, Throwable throwable) {
+        this.vertx.undeploy(super.deploymentID());
+    }
+
+    public void netLogError(String string) {
+        this.netLog(Level.ERROR, string);
+    }
+
+    public TaskActor(int n) {
+        this.id = n;
+        this.logger = LogManager.getLogger((String)String.format("[%s][TASK-%s]", this.getClass().getSimpleName().toUpperCase(), String.format("%04d", this.id)));
+    }
+
+    public void stop() {
+        this.running = false;
+        try {
+            ((TaskApiClient)this.apiClient).close();
+        }
+        catch (Exception exception) {
+            this.logger.error("Error on stop: {}", (Object)exception.getMessage());
+        }
+        this.logger.warn("Stopped.");
+        super.stop();
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$execute(TaskActor var0, String var1_1, Function var2_2, Supplier var3_3, Object var4_4, HttpRequest var5_5, CompletableFuture var6_7, HttpResponse var7_8, int var8_10, Optional var9_12, String var10_13, Throwable var11_14, int var12_15, Object var13_16) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public void start() {
+        try {
+            MDC.put("version", "1.0.242");
+            MDC.put("user", Storage.ACCESS_KEY);
+            MDC.put("session", App.SESSION_HASH);
+            this.logger.info("Starting.");
+            this.running = true;
+            ((CompletableFuture)this.run().whenComplete(this::lambda$start$0)).exceptionally(TaskActor::lambda$start$1);
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+    }
+
     public CompletableFuture GETREQ(String string, HttpRequest httpRequest, Integer n, String ... stringArray) {
         this.logger.info(string);
         while (this.running) {
@@ -179,16 +307,25 @@ implements Actor {
         return CompletableFuture.completedFuture(null);
     }
 
-    public void stop() {
-        this.running = false;
-        try {
-            ((TaskApiClient)this.apiClient).close();
+    public CompletableFuture sleep(int n) {
+        if (this.sleepFuture != null) {
+            this.sleepFuture = null;
         }
-        catch (Exception exception) {
-            this.logger.error("Error on stop: {}", (Object)exception.getMessage());
-        }
-        this.logger.warn("Stopped.");
-        super.stop();
+        this.sleepFuture = new ContextCompletableFuture();
+        this.vertx.setTimer((long)n, this::lambda$sleep$2);
+        return this.sleepFuture;
+    }
+
+    public TaskApiClient getClient() {
+        return this.apiClient;
+    }
+
+    public void netLogInfo(String string) {
+        this.netLog(Level.INFO, string);
+    }
+
+    public void setClient(TaskApiClient taskApiClient) {
+        this.apiClient = taskApiClient;
     }
 
     public void netLog(Level level, String string) {
@@ -199,143 +336,6 @@ implements Actor {
             return;
         }
         netLogger.log(level, "{} {}", (Object)this.logger.getName(), (Object)string);
-    }
-
-    public TaskApiClient getClient() {
-        return this.apiClient;
-    }
-
-    public CompletableFuture sleep(int n) {
-        if (this.sleepFuture != null) {
-            this.sleepFuture = null;
-        }
-        this.sleepFuture = new ContextCompletableFuture();
-        this.vertx.setTimer((long)n, this::lambda$sleep$2);
-        return this.sleepFuture;
-    }
-
-    public void lambda$start$0(Void void_, Throwable throwable) {
-        this.vertx.undeploy(super.deploymentID());
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$execute(TaskActor var0, String var1_1, Function var2_2, Supplier var3_3, Object var4_4, HttpRequest var5_5, CompletableFuture var6_7, HttpResponse var7_8, int var8_10, Optional var9_12, String var10_13, Throwable var11_14, int var12_15, Object var13_16) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public void netLogError(String string) {
-        this.netLog(Level.ERROR, string);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$GETREQ(TaskActor var0, String var1_1, HttpRequest var2_2, Integer var3_3, String[] var4_4, int var5_5, CompletableFuture var6_8, HttpResponse var7_9, Throwable var8_11, int var9_12, Object var10_13) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public static Void lambda$start$1(Throwable throwable) {
-        return null;
-    }
-
-    public void netLogInfo(String string) {
-        this.netLog(Level.INFO, string);
-    }
-
-    public void netLogWarn(String string) {
-        this.netLog(Level.WARN, string);
-    }
-
-    public void setClient(TaskApiClient taskApiClient) {
-        this.apiClient = taskApiClient;
-    }
-
-    public void lambda$sleep$2(Long l) {
-        try {
-            this.sleepFuture.complete(null);
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
-
-    public CompletableFuture randomSleep(int n) {
-        try {
-            if (n <= 0) return CompletableFuture.completedFuture(null);
-            int n2 = ThreadLocalRandom.current().nextInt((int)Math.min((double)n, (double)n / Double.longBitsToDouble(4608308318706860032L)), (int)((double)n * Double.longBitsToDouble(4608308318706860032L)));
-            return this.sleep(n2);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public TaskActor(int n) {
-        this.id = n;
-        this.logger = LogManager.getLogger((String)String.format("[%s][TASK-%s]", this.getClass().getSimpleName().toUpperCase(), String.format("%04d", this.id)));
-    }
-
-    public void start() {
-        try {
-            MDC.put("version", "1.0.241");
-            MDC.put("user", Storage.ACCESS_KEY);
-            MDC.put("session", App.SESSION_HASH);
-            this.logger.info("Starting.");
-            this.running = true;
-            ((CompletableFuture)this.run().whenComplete(this::lambda$start$0)).exceptionally(TaskActor::lambda$start$1);
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
     }
 }
 

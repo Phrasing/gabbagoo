@@ -16,12 +16,12 @@ public class PacketEncoder
 implements Handler {
     public Handler<Buffer> bufferHandler;
 
-    public void handle(Object object) {
-        this.handle((Packet)object);
-    }
-
     public PacketEncoder(Handler handler) {
         this.bufferHandler = handler;
+    }
+
+    public void handle(Object object) {
+        this.handle((Packet)object);
     }
 
     public void handle(Packet packet) {

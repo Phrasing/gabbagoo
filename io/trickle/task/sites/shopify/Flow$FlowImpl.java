@@ -8,9 +8,15 @@ import java.util.Map;
 
 public class Flow$FlowImpl
 implements Flow$Actions {
+    public boolean needsPrice;
     public boolean needsAuthTokens;
     public Map<String, String> requiredCookies;
-    public boolean needsPrice;
+
+    public Flow$FlowImpl(boolean bl, boolean bl2, Map map) {
+        this.needsPrice = bl;
+        this.needsAuthTokens = bl2;
+        this.requiredCookies = map;
+    }
 
     @Override
     public boolean needsPrice() {
@@ -20,12 +26,6 @@ implements Flow$Actions {
     @Override
     public boolean needsAuthTokens() {
         return this.needsAuthTokens;
-    }
-
-    public Flow$FlowImpl(boolean bl, boolean bl2, Map map) {
-        this.needsPrice = bl;
-        this.needsAuthTokens = bl2;
-        this.requiredCookies = map;
     }
 
     @Override

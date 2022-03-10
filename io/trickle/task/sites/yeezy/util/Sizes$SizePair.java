@@ -6,8 +6,8 @@ package io.trickle.task.sites.yeezy.util;
 import io.trickle.task.sites.yeezy.util.Sizes$Size;
 
 public class Sizes$SizePair {
-    public String sizeNum;
     public Sizes$Size sizeVariant;
+    public String sizeNum;
 
     public String toString() {
         return this.sizeVariant.toString();

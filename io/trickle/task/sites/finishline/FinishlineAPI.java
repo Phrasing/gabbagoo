@@ -20,11 +20,6 @@ extends TaskApiClient {
     public String site;
     public Task task;
 
-    public FinishlineAPI(Task task, Site site) {
-        this.task = task;
-        this.site = site.toString().toLowerCase();
-    }
-
     public HttpRequest homePage() {
         HttpRequest httpRequest = this.client.getAbs("https://www.finishline.com/").timeout(TimeUnit.SECONDS.toMillis(30L)).as(BodyCodec.string());
         httpRequest.putHeaders(Headers$Pseudo.MASP.get());
@@ -39,6 +34,11 @@ extends TaskApiClient {
         httpRequest.putHeader("Accept-Encoding", "gzip, deflate, br");
         httpRequest.putHeader("Accept-Language", "en-US,en;q=0.9");
         return httpRequest;
+    }
+
+    public FinishlineAPI(Task task, Site site) {
+        this.task = task;
+        this.site = site.toString().toLowerCase();
     }
 
     public HttpRequest cartSession() {

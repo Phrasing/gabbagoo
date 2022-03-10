@@ -44,106 +44,142 @@ import java.util.regex.Matcher;
 
 public class MobilePX
 extends PerimeterX {
-    public long requestTiming;
-    public DesktopPX captchaDelegate = null;
-    public Site site = Site.WALMART;
-    public long expiryTime = -1L;
     public SecondPayload secondPayload;
+    public Site site = Site.WALMART;
+    public DesktopPX captchaDelegate = null;
+    public long requestTiming;
     public boolean hasSolvedOnCurrentVid = false;
+    public long expiryTime = -1L;
     public long timerId = -1L;
 
-    @Override
-    public CompletableFuture solve() {
-        if (this.secondPayload == null) {
-            if (!this.logger.isDebugEnabled()) return this.initialise();
-            this.logger.debug("Second payload is null on solve(). Performing hard reinitialization (full-reset)");
-            return this.initialise();
-        }
-        try {
-            FirstPayload firstPayload = new FirstPayload(this.secondPayload, this.secondPayload.sdkInitCount, this.requestTiming, this.site);
-            CompletableFuture completableFuture = this.sendPayload(firstPayload);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solve(this, firstPayload, completableFuture2, null, null, 1, arg_0));
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$solveCaptcha(MobilePX var0, String var1_1, String var2_2, String var3_3, CompletableFuture var4_4, String var5_5, int var6_6, Object var7_7) {
+        switch (var6_6) {
+            case 0: {
+                v0 = VertxUtil.hardCodedSleep(15000L);
+                if (!v0.isDone()) {
+                    var5_5 = v0;
+                    return var5_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.token.MobilePX java.lang.String java.lang.String java.lang.String java.util.concurrent.CompletableFuture java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((MobilePX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var5_5, null, (int)1));
+                }
+                ** GOTO lbl10
             }
-            JsonObject jsonObject = (JsonObject)completableFuture.join();
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Fetched first payload: {}", (Object)jsonObject.encodePrettily());
-            }
-            this.secondPayload = new SecondPayload(firstPayload, jsonObject, this.requestTiming, this.site);
-            CompletableFuture completableFuture3 = this.sendPayload(this.secondPayload);
-            if (!completableFuture3.isDone()) {
-                CompletableFuture completableFuture4 = completableFuture3;
-                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solve(this, firstPayload, completableFuture4, jsonObject, null, 2, arg_0));
-            }
-            JsonObject jsonObject2 = (JsonObject)completableFuture3.join();
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Fetched second payload: {}", (Object)jsonObject2.encodePrettily());
-            }
-            if (!this.onResult(jsonObject2.toString())) throw new Exception("Failed solving sensor");
-            return CompletableFuture.completedFuture(true);
-        }
-        catch (Throwable throwable) {
-            this.logger.warn("Error solving sensor: {}. Retrying...", (Object)throwable.getMessage());
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug((Object)throwable);
-            }
-            CompletableFuture completableFuture = VertxUtil.randomSleep(10000L);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture5 = completableFuture;
-                return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solve(this, null, completableFuture5, null, throwable, 3, arg_0));
-            }
-            completableFuture.join();
-            return CompletableFuture.completedFuture(false);
-        }
-    }
-
-    public static RequestOptions collectorRequest(Site site) {
-        String string = "";
-        Object object = "";
-        switch (MobilePX$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
             case 1: {
-                string = "PX9Qx3Rve4";
-                object = "PerimeterX Android SDK/" + "v1.13.2".substring(1);
-                return new RequestOptions().setAbsoluteURI("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).setHeaders(Headers$Pseudo.MPAS.get()).putHeader("user-agent", (String)object).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
+                v0 = var4_4;
+lbl10:
+                // 2 sources
+
+                v0.join();
+                if (var0.captchaDelegate == null) {
+                    var0.captchaDelegate = new DesktopPX(null);
+                }
+                if ((var4_4 = null) == null) return CompletableFuture.completedFuture(false);
+                var0.logger.info("Successfully solved captcha!");
+                if (var0.logger.isDebugEnabled()) {
+                    var0.logger.debug("Mobile captcha response: {}", var4_4);
+                }
+                var0.scheduleKeepaliveAfterCaptcha();
+                var0.result = var4_4;
+                var0.hasSolvedOnCurrentVid = true;
+                v1 = var0.solve();
+                if (!v1.isDone()) {
+                    var5_5 = v1;
+                    return var5_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.token.MobilePX java.lang.String java.lang.String java.lang.String java.util.concurrent.CompletableFuture java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((MobilePX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var5_5, (String)var4_4, (int)2));
+                }
+                ** GOTO lbl29
             }
             case 2: {
-                string = "PXUArm9B04";
-                object = "PerimeterX Android SDK/" + "v1.8.0".substring(1);
-                return new RequestOptions().setAbsoluteURI("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).setHeaders(Headers$Pseudo.MPAS.get()).putHeader("user-agent", (String)object).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
+                v1 = var4_4;
+                var4_4 = var5_5;
+lbl29:
+                // 2 sources
+
+                v1.join();
+                return CompletableFuture.completedFuture(true);
             }
         }
-        return new RequestOptions().setAbsoluteURI("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).setHeaders(Headers$Pseudo.MPAS.get()).putHeader("user-agent", (String)object).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
+        throw new IllegalArgumentException();
     }
 
-    public CompletableFuture onKeepalive() {
-        try {
-            CompletableFuture completableFuture = this.sendKeepAlive();
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$onKeepalive(this, completableFuture2, 1, arg_0));
-            }
-            JsonObject jsonObject = (JsonObject)completableFuture.join();
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Received keep-alive response: {}", (Object)jsonObject.encodePrettily());
-            }
-            if (this.onResult(jsonObject.toString())) {
-                if (!this.logger.isDebugEnabled()) return CompletableFuture.completedFuture(null);
-                this.logger.debug("Solved keepalive: {}", this.result);
+    public boolean onResult(String string) {
+        Matcher matcher = BAKE_PATTERN.matcher(string);
+        if (!matcher.find()) return false;
+        this.result = "3:" + matcher.group(1);
+        this.scheduleKeepalive();
+        if (!this.logger.isDebugEnabled()) return true;
+        this.logger.debug("New PX token value: {}", this.result);
+        return true;
+    }
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$onKeepalive(MobilePX var0, CompletableFuture var1_1, int var2_3, Object var3_5) {
+        switch (var2_3) {
+            case 0: {
+                try {
+                    v0 = var0.sendKeepAlive();
+                    if (!v0.isDone()) {
+                        var2_4 = v0;
+                        return var2_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$onKeepalive(io.trickle.task.antibot.impl.px.payload.token.MobilePX java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((MobilePX)var0, (CompletableFuture)var2_4, (int)1));
+                    }
+lbl8:
+                    // 3 sources
+
+                    while (true) {
+                        var1_1 = (JsonObject)v0.join();
+                        if (var0.logger.isDebugEnabled()) {
+                            var0.logger.debug("Received keep-alive response: {}", (Object)var1_1.encodePrettily());
+                        }
+                        if (var0.onResult(var1_1.toString())) {
+                            if (var0.logger.isDebugEnabled() == false) return CompletableFuture.completedFuture(null);
+                            var0.logger.debug("Solved keepalive: {}", var0.result);
+                            return CompletableFuture.completedFuture(null);
+                        }
+                        if (var0.logger.isDebugEnabled()) {
+                            var0.logger.debug("Failed to solve keepalive. Retrying in 5s");
+                        }
+                        var0.scheduleKeepAlive(5000L);
+                        return CompletableFuture.completedFuture(null);
+                    }
+                }
+                catch (Throwable var1_2) {
+                    var0.logger.warn("Error on keepalive: {}", (Object)var1_2.getMessage());
+                    if (var0.logger.isDebugEnabled() == false) return CompletableFuture.completedFuture(null);
+                    var0.logger.debug((Object)var1_2);
+                }
                 return CompletableFuture.completedFuture(null);
             }
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug("Failed to solve keepalive. Retrying in 5s");
+            case 1: {
+                v0 = var1_1;
+                ** continue;
             }
-            this.scheduleKeepAlive(5000L);
-            return CompletableFuture.completedFuture(null);
         }
-        catch (Throwable throwable) {
-            this.logger.warn("Error on keepalive: {}", (Object)throwable.getMessage());
-            if (!this.logger.isDebugEnabled()) return CompletableFuture.completedFuture(null);
-            this.logger.debug((Object)throwable);
+        throw new IllegalArgumentException();
+    }
+
+    public CompletableFuture sendPayload(Payload payload) {
+        if (payload == null) {
+            return CompletableFuture.failedFuture(new Exception("Provided payload is null"));
         }
-        return CompletableFuture.completedFuture(null);
+        HttpRequest httpRequest = this.client.request(HttpMethod.POST, MobilePX.collectorRequest(this.site)).as(BodyCodec.jsonObject());
+        return this.execute(httpRequest, payload.asForm());
+    }
+
+    @Override
+    public String getDeviceLang() {
+        if (!this.logger.isDebugEnabled()) return "en-GB,en;q=0.9";
+        this.logger.debug("Device lang should not be used with MobilePX");
+        return "en-GB,en;q=0.9";
+    }
+
+    public CompletableFuture sendKeepAlive() {
+        if (this.secondPayload == null) {
+            return CompletableFuture.failedFuture(new Exception("Data payload is null"));
+        }
+        HttpRequest httpRequest = this.client.request(HttpMethod.POST, MobilePX.collectorRequest(this.site)).as(BodyCodec.jsonObject());
+        return this.execute(httpRequest, this.secondPayload.asKeepAliveForm());
     }
 
     public CompletableFuture execute(HttpRequest httpRequest, Object object) {
@@ -216,6 +252,93 @@ extends PerimeterX {
         return CompletableFuture.failedFuture(new Exception("Failed to send payload"));
     }
 
+    public void cancelTimer() {
+        if (this.vertx == null) return;
+        if (this.timerId == -1L) return;
+        if (this.vertx.cancelTimer(this.timerId) && this.logger.isDebugEnabled()) {
+            this.logger.debug("Cancelled keep-alive timer of id '{}' early", (Object)this.timerId);
+        }
+        this.timerId = -1L;
+    }
+
+    public void scheduleKeepaliveAfterCaptcha() {
+        this.scheduleKeepAlive(TimeUnit.MINUTES.toMillis(5L));
+    }
+
+    public static RequestOptions collectorRequest(Site site) {
+        String string = "";
+        Object object = "";
+        switch (MobilePX$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
+            case 1: {
+                string = "PX9Qx3Rve4";
+                object = "PerimeterX Android SDK/" + "v1.13.2".substring(1);
+                return new RequestOptions().setAbsoluteURI("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).setHeaders(Headers$Pseudo.MPAS.get()).putHeader("user-agent", (String)object).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
+            }
+            case 2: {
+                string = "PXUArm9B04";
+                object = "PerimeterX Android SDK/" + "v1.8.0".substring(1);
+                return new RequestOptions().setAbsoluteURI("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).setHeaders(Headers$Pseudo.MPAS.get()).putHeader("user-agent", (String)object).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
+            }
+        }
+        return new RequestOptions().setAbsoluteURI("https://collector-" + string.toLowerCase() + ".perimeterx.net/api/v1/collector/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).setHeaders(Headers$Pseudo.MPAS.get()).putHeader("user-agent", (String)object).putHeader("content-type", "application/x-www-form-urlencoded").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
+    }
+
+    public MobilePX(TaskActor taskActor) {
+        super(taskActor);
+    }
+
+    @Override
+    public String getDeviceAcceptEncoding() {
+        if (!this.logger.isDebugEnabled()) return "gzip, deflate, br";
+        this.logger.debug("Device encoding should not be used with MobilePX");
+        return "gzip, deflate, br";
+    }
+
+    @Override
+    public String getDeviceSecUA() {
+        return "\"Google Chrome\";v=\"94\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"94\"";
+    }
+
+    @Override
+    public void close() {
+        this.cancelTimer();
+        super.close();
+    }
+
+    public CompletableFuture onKeepalive() {
+        try {
+            CompletableFuture completableFuture = this.sendKeepAlive();
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$onKeepalive(this, completableFuture2, 1, arg_0));
+            }
+            JsonObject jsonObject = (JsonObject)completableFuture.join();
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Received keep-alive response: {}", (Object)jsonObject.encodePrettily());
+            }
+            if (this.onResult(jsonObject.toString())) {
+                if (!this.logger.isDebugEnabled()) return CompletableFuture.completedFuture(null);
+                this.logger.debug("Solved keepalive: {}", this.result);
+                return CompletableFuture.completedFuture(null);
+            }
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Failed to solve keepalive. Retrying in 5s");
+            }
+            this.scheduleKeepAlive(5000L);
+            return CompletableFuture.completedFuture(null);
+        }
+        catch (Throwable throwable) {
+            this.logger.warn("Error on keepalive: {}", (Object)throwable.getMessage());
+            if (!this.logger.isDebugEnabled()) return CompletableFuture.completedFuture(null);
+            this.logger.debug((Object)throwable);
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public void lambda$startTimer$0(Long l) {
+        this.onKeepalive();
+    }
+
     /*
      * Exception decompiling
      */
@@ -245,23 +368,62 @@ extends PerimeterX {
         throw new IllegalStateException("Decompilation failed");
     }
 
+    @Override
+    public String getVid() {
+        if (this.secondPayload != null) return this.secondPayload.VID_HEADER;
+        return null;
+    }
+
+    @Override
+    public void reset() {
+        this.cancelTimer();
+        this.secondPayload = null;
+        this.expiryTime = -1L;
+        this.timerId = -1L;
+        this.hasSolvedOnCurrentVid = false;
+        if (this.captchaDelegate == null) return;
+        this.captchaDelegate.reset();
+    }
+
+    @Override
+    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
+        String string4;
+        CompletableFuture completableFuture = VertxUtil.hardCodedSleep(15000L);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solveCaptcha(this, string, string2, string3, completableFuture2, null, 1, arg_0));
+        }
+        completableFuture.join();
+        if (this.captchaDelegate == null) {
+            this.captchaDelegate = new DesktopPX(null);
+        }
+        if ((string4 = null) == null) return CompletableFuture.completedFuture(false);
+        this.logger.info("Successfully solved captcha!");
+        if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Mobile captcha response: {}", string4);
+        }
+        this.scheduleKeepaliveAfterCaptcha();
+        this.result = string4;
+        this.hasSolvedOnCurrentVid = true;
+        CompletableFuture completableFuture3 = this.solve();
+        if (!completableFuture3.isDone()) {
+            CompletableFuture completableFuture4 = completableFuture3;
+            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solveCaptcha(this, string, string2, string3, completableFuture4, string4, 2, arg_0));
+        }
+        completableFuture3.join();
+        return CompletableFuture.completedFuture(true);
+    }
+
     public void scheduleKeepalive() {
         this.scheduleKeepAlive(TimeUnit.MINUTES.toMillis(4L));
     }
 
-    @Override
-    public String getDeviceUA() {
-        if (!this.logger.isDebugEnabled()) return "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.85 Mobile Safari/537.36";
-        this.logger.debug("Device UA should not be used with MobilePX");
-        return "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.85 Mobile Safari/537.36";
-    }
-
-    public void scheduleKeepaliveAfterCaptcha() {
-        this.scheduleKeepAlive(TimeUnit.MINUTES.toMillis(5L));
-    }
-
-    public MobilePX(TaskActor taskActor) {
-        super(taskActor);
+    public CompletableFuture sendInit(InitPayload initPayload) {
+        if (initPayload == null) {
+            return CompletableFuture.failedFuture(new Exception("Initialisation payload is null"));
+        }
+        HttpRequest httpRequest = this.client.request(HttpMethod.POST, MobilePX.initRequest(this.site)).as(BodyCodec.jsonObject());
+        return this.execute(httpRequest, initPayload.asBuffer(this.site));
     }
 
     /*
@@ -346,21 +508,39 @@ lbl35:
         throw new IllegalArgumentException();
     }
 
-    public void cancelTimer() {
-        if (this.vertx == null) return;
-        if (this.timerId == -1L) return;
-        if (this.vertx.cancelTimer(this.timerId) && this.logger.isDebugEnabled()) {
-            this.logger.debug("Cancelled keep-alive timer of id '{}' early", (Object)this.timerId);
-        }
-        this.timerId = -1L;
+    @Override
+    public String getDeviceUA() {
+        if (!this.logger.isDebugEnabled()) return "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.85 Mobile Safari/537.36";
+        this.logger.debug("Device UA should not be used with MobilePX");
+        return "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.85 Mobile Safari/537.36";
     }
 
-    public CompletableFuture sendPayload(Payload payload) {
-        if (payload == null) {
-            return CompletableFuture.failedFuture(new Exception("Provided payload is null"));
+    public static RequestOptions initRequest(Site site) {
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.setAbsoluteURI("https://px-conf.perimeterx.net/api/v1/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).putHeader("content-type", "application/json; charset=utf-8").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
+        switch (MobilePX$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
+            case 1: {
+                requestOptions.putHeader("user-agent", "okhttp/4.9.0");
+                return requestOptions;
+            }
+            case 2: {
+                requestOptions.putHeader("user-agent", "okhttp/3.12.1");
+                return requestOptions;
+            }
         }
-        HttpRequest httpRequest = this.client.request(HttpMethod.POST, MobilePX.collectorRequest(this.site)).as(BodyCodec.jsonObject());
-        return this.execute(httpRequest, payload.asForm());
+        return requestOptions;
+    }
+
+    public void startTimer() {
+        if (this.vertx == null) {
+            if (!this.logger.isDebugEnabled()) return;
+            this.logger.debug("Unable to start keepalive timer: Vertx context is null");
+            return;
+        }
+        this.cancelTimer();
+        this.timerId = this.vertx.setTimer(this.expiryTime, this::lambda$startTimer$0);
+        if (!this.logger.isDebugEnabled()) return;
+        this.logger.debug("Scheduled keep-alive to be sent in {}ms", (Object)this.expiryTime);
     }
 
     public void scheduleKeepAlive(long l) {
@@ -369,17 +549,49 @@ lbl35:
     }
 
     @Override
-    public String getVid() {
-        if (this.secondPayload != null) return this.secondPayload.VID_HEADER;
-        return null;
-    }
-
-    public CompletableFuture sendKeepAlive() {
+    public CompletableFuture solve() {
         if (this.secondPayload == null) {
-            return CompletableFuture.failedFuture(new Exception("Data payload is null"));
+            if (!this.logger.isDebugEnabled()) return this.initialise();
+            this.logger.debug("Second payload is null on solve(). Performing hard reinitialization (full-reset)");
+            return this.initialise();
         }
-        HttpRequest httpRequest = this.client.request(HttpMethod.POST, MobilePX.collectorRequest(this.site)).as(BodyCodec.jsonObject());
-        return this.execute(httpRequest, this.secondPayload.asKeepAliveForm());
+        try {
+            FirstPayload firstPayload = new FirstPayload(this.secondPayload, this.secondPayload.sdkInitCount, this.requestTiming, this.site);
+            CompletableFuture completableFuture = this.sendPayload(firstPayload);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solve(this, firstPayload, completableFuture2, null, null, 1, arg_0));
+            }
+            JsonObject jsonObject = (JsonObject)completableFuture.join();
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Fetched first payload: {}", (Object)jsonObject.encodePrettily());
+            }
+            this.secondPayload = new SecondPayload(firstPayload, jsonObject, this.requestTiming, this.site);
+            CompletableFuture completableFuture3 = this.sendPayload(this.secondPayload);
+            if (!completableFuture3.isDone()) {
+                CompletableFuture completableFuture4 = completableFuture3;
+                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solve(this, firstPayload, completableFuture4, jsonObject, null, 2, arg_0));
+            }
+            JsonObject jsonObject2 = (JsonObject)completableFuture3.join();
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug("Fetched second payload: {}", (Object)jsonObject2.encodePrettily());
+            }
+            if (!this.onResult(jsonObject2.toString())) throw new Exception("Failed solving sensor");
+            return CompletableFuture.completedFuture(true);
+        }
+        catch (Throwable throwable) {
+            this.logger.warn("Error solving sensor: {}. Retrying...", (Object)throwable.getMessage());
+            if (this.logger.isDebugEnabled()) {
+                this.logger.debug((Object)throwable);
+            }
+            CompletableFuture completableFuture = VertxUtil.randomSleep(10000L);
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture5 = completableFuture;
+                return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solve(this, null, completableFuture5, null, throwable, 3, arg_0));
+            }
+            completableFuture.join();
+            return CompletableFuture.completedFuture(false);
+        }
     }
 
     @Override
@@ -457,218 +669,6 @@ lbl35:
             ++n;
         }
         return CompletableFuture.failedFuture(new Exception("Failed to initialise antibot API"));
-    }
-
-    public void lambda$startTimer$0(Long l) {
-        this.onKeepalive();
-    }
-
-    @Override
-    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
-        String string4;
-        CompletableFuture completableFuture = VertxUtil.hardCodedSleep(15000L);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solveCaptcha(this, string, string2, string3, completableFuture2, null, 1, arg_0));
-        }
-        completableFuture.join();
-        if (this.captchaDelegate == null) {
-            this.captchaDelegate = new DesktopPX(null);
-        }
-        if ((string4 = null) == null) return CompletableFuture.completedFuture(false);
-        this.logger.info("Successfully solved captcha!");
-        if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Mobile captcha response: {}", string4);
-        }
-        this.scheduleKeepaliveAfterCaptcha();
-        this.result = string4;
-        this.hasSolvedOnCurrentVid = true;
-        CompletableFuture completableFuture3 = this.solve();
-        if (!completableFuture3.isDone()) {
-            CompletableFuture completableFuture4 = completableFuture3;
-            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> MobilePX.async$solveCaptcha(this, string, string2, string3, completableFuture4, string4, 2, arg_0));
-        }
-        completableFuture3.join();
-        return CompletableFuture.completedFuture(true);
-    }
-
-    public CompletableFuture sendInit(InitPayload initPayload) {
-        if (initPayload == null) {
-            return CompletableFuture.failedFuture(new Exception("Initialisation payload is null"));
-        }
-        HttpRequest httpRequest = this.client.request(HttpMethod.POST, MobilePX.initRequest(this.site)).as(BodyCodec.jsonObject());
-        return this.execute(httpRequest, initPayload.asBuffer(this.site));
-    }
-
-    @Override
-    public String getDeviceAcceptEncoding() {
-        if (!this.logger.isDebugEnabled()) return "gzip, deflate, br";
-        this.logger.debug("Device encoding should not be used with MobilePX");
-        return "gzip, deflate, br";
-    }
-
-    public static RequestOptions initRequest(Site site) {
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.setAbsoluteURI("https://px-conf.perimeterx.net/api/v1/mobile").setMethod(HttpMethod.POST).setTimeout(TimeUnit.SECONDS.toMillis(30L)).putHeader("content-type", "application/json; charset=utf-8").putHeader("content-length", "DEFAULT_VALUE").putHeader("accept-encoding", "gzip");
-        switch (MobilePX$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
-            case 1: {
-                requestOptions.putHeader("user-agent", "okhttp/4.9.0");
-                return requestOptions;
-            }
-            case 2: {
-                requestOptions.putHeader("user-agent", "okhttp/3.12.1");
-                return requestOptions;
-            }
-        }
-        return requestOptions;
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$onKeepalive(MobilePX var0, CompletableFuture var1_1, int var2_3, Object var3_5) {
-        switch (var2_3) {
-            case 0: {
-                try {
-                    v0 = var0.sendKeepAlive();
-                    if (!v0.isDone()) {
-                        var2_4 = v0;
-                        return var2_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$onKeepalive(io.trickle.task.antibot.impl.px.payload.token.MobilePX java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((MobilePX)var0, (CompletableFuture)var2_4, (int)1));
-                    }
-lbl8:
-                    // 3 sources
-
-                    while (true) {
-                        var1_1 = (JsonObject)v0.join();
-                        if (var0.logger.isDebugEnabled()) {
-                            var0.logger.debug("Received keep-alive response: {}", (Object)var1_1.encodePrettily());
-                        }
-                        if (var0.onResult(var1_1.toString())) {
-                            if (var0.logger.isDebugEnabled() == false) return CompletableFuture.completedFuture(null);
-                            var0.logger.debug("Solved keepalive: {}", var0.result);
-                            return CompletableFuture.completedFuture(null);
-                        }
-                        if (var0.logger.isDebugEnabled()) {
-                            var0.logger.debug("Failed to solve keepalive. Retrying in 5s");
-                        }
-                        var0.scheduleKeepAlive(5000L);
-                        return CompletableFuture.completedFuture(null);
-                    }
-                }
-                catch (Throwable var1_2) {
-                    var0.logger.warn("Error on keepalive: {}", (Object)var1_2.getMessage());
-                    if (var0.logger.isDebugEnabled() == false) return CompletableFuture.completedFuture(null);
-                    var0.logger.debug((Object)var1_2);
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var1_1;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public boolean onResult(String string) {
-        Matcher matcher = BAKE_PATTERN.matcher(string);
-        if (!matcher.find()) return false;
-        this.result = "3:" + matcher.group(1);
-        this.scheduleKeepalive();
-        if (!this.logger.isDebugEnabled()) return true;
-        this.logger.debug("New PX token value: {}", this.result);
-        return true;
-    }
-
-    @Override
-    public String getDeviceLang() {
-        if (!this.logger.isDebugEnabled()) return "en-GB,en;q=0.9";
-        this.logger.debug("Device lang should not be used with MobilePX");
-        return "en-GB,en;q=0.9";
-    }
-
-    @Override
-    public String getDeviceSecUA() {
-        return "\"Google Chrome\";v=\"94\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"94\"";
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$solveCaptcha(MobilePX var0, String var1_1, String var2_2, String var3_3, CompletableFuture var4_4, String var5_5, int var6_6, Object var7_7) {
-        switch (var6_6) {
-            case 0: {
-                v0 = VertxUtil.hardCodedSleep(15000L);
-                if (!v0.isDone()) {
-                    var5_5 = v0;
-                    return var5_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.token.MobilePX java.lang.String java.lang.String java.lang.String java.util.concurrent.CompletableFuture java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((MobilePX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var5_5, null, (int)1));
-                }
-                ** GOTO lbl10
-            }
-            case 1: {
-                v0 = var4_4;
-lbl10:
-                // 2 sources
-
-                v0.join();
-                if (var0.captchaDelegate == null) {
-                    var0.captchaDelegate = new DesktopPX(null);
-                }
-                if ((var4_4 = null) == null) return CompletableFuture.completedFuture(false);
-                var0.logger.info("Successfully solved captcha!");
-                if (var0.logger.isDebugEnabled()) {
-                    var0.logger.debug("Mobile captcha response: {}", var4_4);
-                }
-                var0.scheduleKeepaliveAfterCaptcha();
-                var0.result = var4_4;
-                var0.hasSolvedOnCurrentVid = true;
-                v1 = var0.solve();
-                if (!v1.isDone()) {
-                    var5_5 = v1;
-                    return var5_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.token.MobilePX java.lang.String java.lang.String java.lang.String java.util.concurrent.CompletableFuture java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((MobilePX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var5_5, (String)var4_4, (int)2));
-                }
-                ** GOTO lbl29
-            }
-            case 2: {
-                v1 = var4_4;
-                var4_4 = var5_5;
-lbl29:
-                // 2 sources
-
-                v1.join();
-                return CompletableFuture.completedFuture(true);
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    @Override
-    public void reset() {
-        this.cancelTimer();
-        this.secondPayload = null;
-        this.expiryTime = -1L;
-        this.timerId = -1L;
-        this.hasSolvedOnCurrentVid = false;
-        if (this.captchaDelegate == null) return;
-        this.captchaDelegate.reset();
-    }
-
-    @Override
-    public void close() {
-        this.cancelTimer();
-        super.close();
-    }
-
-    public void startTimer() {
-        if (this.vertx == null) {
-            if (!this.logger.isDebugEnabled()) return;
-            this.logger.debug("Unable to start keepalive timer: Vertx context is null");
-            return;
-        }
-        this.cancelTimer();
-        this.timerId = this.vertx.setTimer(this.expiryTime, this::lambda$startTimer$0);
-        if (!this.logger.isDebugEnabled()) return;
-        this.logger.debug("Scheduled keep-alive to be sent in {}ms", (Object)this.expiryTime);
     }
 
     /*

@@ -33,54 +33,17 @@ import java.util.concurrent.TimeUnit;
 public enum VertxSingleton {
     INSTANCE;
 
-    public Vertx vertx;
-    public LocalClient client;
     public Map<String, Buffer> cachedCaptchaBodies;
-    public String[] captchaEps = new String[0];
+    public LocalClient client;
+    public Vertx vertx;
     public ProxyPoolClient proxyPoolClient;
-
-    public Vertx get() {
-        return this.vertx;
-    }
-
-    public void register() {
-        this.vertx.eventBus().localConsumer("login.loader", this::loginHandler);
-    }
-
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public VertxSingleton() {
-        this.vertx = Vertx.vertx((VertxOptions)new VertxOptions().setWorkerPoolSize(2).setMaxWorkerExecuteTime(10L).setBlockedThreadCheckInterval(1L).setBlockedThreadCheckIntervalUnit(TimeUnit.HOURS).setMaxWorkerExecuteTimeUnit(TimeUnit.MINUTES).setPreferNativeTransport(true));
-        this.vertx.eventBus().registerDefaultCodec(SharedCaptchaToken.class, (MessageCodec)new DirectObjectCodec(SharedCaptchaToken.class));
-        this.vertx.eventBus().registerDefaultCodec(Account.class, (MessageCodec)new DirectObjectCodec(Account.class));
-        this.vertx.exceptionHandler(VertxSingleton::lambda$new$0);
-        this.register();
-        this.client = new LocalClient(this.vertx);
-        this.proxyPoolClient = new ProxyPoolClient();
-        this.cachedCaptchaBodies = new ConcurrentHashMap<String, Buffer>();
-        this.initCachedCaptchaBodies();
-    }
-
-    public void loginHandler(Message message) {
-        Graphing.analyse((String)message.body());
-    }
-
-    public void lambda$initCachedCaptchaBodies$1(String string, Buffer buffer) {
-        System.out.println("put it in");
-        this.cachedCaptchaBodies.put(string, buffer);
-    }
-
-    public static void lambda$new$0(Throwable throwable) {
-    }
-
-    public LocalClient getLocalClient() {
-        return this.client;
-    }
+    public String[] captchaEps = new String[0];
 
     public ProxyPoolClient getProxyPoolClient() {
         return this.proxyPoolClient;
+    }
+
+    public static void lambda$new$0(Throwable throwable) {
     }
 
     public void initCachedCaptchaBodies() {
@@ -105,6 +68,43 @@ public enum VertxSingleton {
             Request.executeTillOk(httpRequest).thenAccept(arg_0 -> this.lambda$initCachedCaptchaBodies$1(string, arg_0));
             ++n2;
         }
+    }
+
+    public void register() {
+        this.vertx.eventBus().localConsumer("login.loader", this::loginHandler);
+    }
+
+    public void lambda$initCachedCaptchaBodies$1(String string, Buffer buffer) {
+        System.out.println("put it in");
+        this.cachedCaptchaBodies.put(string, buffer);
+    }
+
+    public Vertx get() {
+        return this.vertx;
+    }
+
+    public LocalClient getLocalClient() {
+        return this.client;
+    }
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public VertxSingleton() {
+        this.vertx = Vertx.vertx((VertxOptions)new VertxOptions().setWorkerPoolSize(2).setMaxWorkerExecuteTime(10L).setBlockedThreadCheckInterval(1L).setBlockedThreadCheckIntervalUnit(TimeUnit.HOURS).setMaxWorkerExecuteTimeUnit(TimeUnit.MINUTES).setPreferNativeTransport(true));
+        this.vertx.eventBus().registerDefaultCodec(SharedCaptchaToken.class, (MessageCodec)new DirectObjectCodec(SharedCaptchaToken.class));
+        this.vertx.eventBus().registerDefaultCodec(Account.class, (MessageCodec)new DirectObjectCodec(Account.class));
+        this.vertx.exceptionHandler(VertxSingleton::lambda$new$0);
+        this.register();
+        this.client = new LocalClient(this.vertx);
+        this.proxyPoolClient = new ProxyPoolClient();
+        this.cachedCaptchaBodies = new ConcurrentHashMap<String, Buffer>();
+        this.initCachedCaptchaBodies();
+    }
+
+    public void loginHandler(Message message) {
+        Graphing.analyse((String)message.body());
     }
 }
 

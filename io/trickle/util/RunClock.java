@@ -7,9 +7,18 @@ import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
 
 public class RunClock {
-    public boolean stopped;
-    public long timeTillRun;
     public long finishTime;
+    public long timeTillRun;
+    public boolean stopped;
+
+    public long getTimeTillRun() {
+        return this.timeTillRun;
+    }
+
+    public void start() {
+        this.finishTime = System.currentTimeMillis() + 300000L;
+        this.stopped = false;
+    }
 
     public static RunClock create() {
         return new RunClock();
@@ -28,15 +37,6 @@ public class RunClock {
         this.timeTillRun = n == 45 || n == 15 ? 2L : (n > 45 ? TimeUnit.MINUTES.toMillis(74 - n) : (n < 15 ? TimeUnit.MINUTES.toMillis(14 - n) : TimeUnit.MINUTES.toMillis(44 - n)));
         this.stopped = true;
         this.finishTime = 0L;
-    }
-
-    public long getTimeTillRun() {
-        return this.timeTillRun;
-    }
-
-    public void start() {
-        this.finishTime = System.currentTimeMillis() + 300000L;
-        this.stopped = false;
     }
 }
 

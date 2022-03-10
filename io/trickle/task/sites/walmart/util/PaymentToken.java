@@ -9,38 +9,17 @@ import java.util.UUID;
 
 public class PaymentToken {
     public String keyId;
-    public String integrityCheck;
-    public String encryptedCvv;
-    public String sid;
-    public String piHash;
+    public String encryptedPan;
     public String phase;
     public String encrypted4111;
-    public String encryptedPan;
+    public String sid;
+    public String piHash;
+    public String integrityCheck;
+    public String encryptedCvv;
     public String vid;
-
-    public String getPiHash() {
-        return this.piHash;
-    }
-
-    public static PaymentToken prepareAndGenerate(String string, String string2, String string3) {
-        Objects.requireNonNull(string);
-        Objects.requireNonNull(string2);
-        Objects.requireNonNull(string3);
-        return PaymentToken.fromArr(Encryptor.prepareAndEncrypt(string, string2, string3));
-    }
-
-    public boolean isPiHashSet() {
-        if (this.piHash == null) return false;
-        if (this.piHash.isBlank()) return false;
-        return true;
-    }
 
     public void set4111Encrypted(String string) {
         this.encrypted4111 = string;
-    }
-
-    public String getSid() {
-        return this.sid;
     }
 
     public PaymentToken(String string, String string2, String string3, String string4, String string5) {
@@ -53,46 +32,23 @@ public class PaymentToken {
         this.vid = UUID.randomUUID().toString();
     }
 
-    public String getVid() {
-        return this.vid;
+    public boolean isPiHashSet() {
+        if (this.piHash == null) return false;
+        if (this.piHash.isBlank()) return false;
+        return true;
     }
 
-    public static PaymentToken fromString(String string) {
-        String[] stringArray = string.split("#");
-        return PaymentToken.fromArr(stringArray);
-    }
-
-    public String toString() {
-        return "PaymentToken{encryptedPan='" + this.encryptedPan + "', encryptedCvv='" + this.encryptedCvv + "', integrityCheck='" + this.integrityCheck + "', keyId='" + this.keyId + "', phase='" + this.phase + "', piHash='" + this.piHash + "'}";
-    }
-
-    public String getEncryptedCvv() {
-        return this.encryptedCvv;
-    }
-
-    public void setPiHash(String string) {
-        this.piHash = string;
+    public String getPhase() {
+        return this.phase;
     }
 
     public String getKeyId() {
         return this.keyId;
     }
 
-    public String getIntegrityCheck() {
-        return this.integrityCheck;
-    }
-
-    public String getEncryptedPan() {
-        return this.encryptedPan;
-    }
-
-    public String getEncrypted4111() {
-        return this.encrypted4111;
-    }
-
-    public static PaymentToken fromArr(String[] stringArray) {
-        Objects.requireNonNull(stringArray);
-        return new PaymentToken(stringArray[0], stringArray[1], stringArray[2], stringArray[3], stringArray[4]);
+    public static PaymentToken fromString(String string) {
+        String[] stringArray = string.split("#");
+        return PaymentToken.fromArr(stringArray);
     }
 
     public static PaymentToken generate(String string, String string2) {
@@ -101,8 +57,52 @@ public class PaymentToken {
         return PaymentToken.fromArr(Encryptor.encrypt(string, string2));
     }
 
-    public String getPhase() {
-        return this.phase;
+    public String getPiHash() {
+        return this.piHash;
+    }
+
+    public String getVid() {
+        return this.vid;
+    }
+
+    public static PaymentToken prepareAndGenerate(String string, String string2, String string3) {
+        Objects.requireNonNull(string);
+        Objects.requireNonNull(string2);
+        Objects.requireNonNull(string3);
+        return PaymentToken.fromArr(Encryptor.prepareAndEncrypt(string, string2, string3));
+    }
+
+    public void setPiHash(String string) {
+        this.piHash = string;
+    }
+
+    public String toString() {
+        return "PaymentToken{encryptedPan='" + this.encryptedPan + "', encryptedCvv='" + this.encryptedCvv + "', integrityCheck='" + this.integrityCheck + "', keyId='" + this.keyId + "', phase='" + this.phase + "', piHash='" + this.piHash + "'}";
+    }
+
+    public String getEncryptedPan() {
+        return this.encryptedPan;
+    }
+
+    public String getIntegrityCheck() {
+        return this.integrityCheck;
+    }
+
+    public String getSid() {
+        return this.sid;
+    }
+
+    public static PaymentToken fromArr(String[] stringArray) {
+        Objects.requireNonNull(stringArray);
+        return new PaymentToken(stringArray[0], stringArray[1], stringArray[2], stringArray[3], stringArray[4]);
+    }
+
+    public String getEncryptedCvv() {
+        return this.encryptedCvv;
+    }
+
+    public String getEncrypted4111() {
+        return this.encrypted4111;
     }
 }
 

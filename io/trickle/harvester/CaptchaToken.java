@@ -14,51 +14,59 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CaptchaToken {
-    public static Pattern CAP_PATTERN = Pattern.compile("<div class=\"checkpoint__wrapper content.*?</form>.*?</div>.*?</div>", 32);
-    public Iterable<Cookie> cookies;
-    public String domain;
-    public String proxyStr;
-    public CookieJar cookieJar;
-    public static Pattern HCAP_REPLACE_PATTERN = Pattern.compile("else if \\(hcaptchaElement && !hcaptchaElement.value\\).*?}", 32);
-    public boolean checkpoint;
     public boolean used = false;
-    public String html;
-    public RealClient client;
+    public CookieJar cookieJar;
+    public Iterable<Cookie> cookies;
     public String originalHtml;
     public String token;
+    public static Pattern CAP_PATTERN = Pattern.compile("<div class=\"checkpoint__wrapper content.*?</form>.*?</div>.*?</div>", 32);
+    public static Pattern HCAP_REPLACE_PATTERN = Pattern.compile("else if \\(hcaptchaElement && !hcaptchaElement.value\\).*?}", 32);
+    public String html;
+    public RealClient client;
+    public boolean checkpoint;
+    public String proxyStr;
+    public String domain;
+
+    public void setTokenValues(String string) {
+        this.token = string;
+    }
 
     public static void main(String[] stringArray) {
         System.out.println(CaptchaToken.v2Html(Deobfuscator.readJsFile("hicc.html")));
+    }
+
+    public String getProxyStr() {
+        return this.proxyStr;
+    }
+
+    public CaptchaToken(String string, boolean bl, Iterable iterable, String string2, CookieJar cookieJar, String string3, RealClient realClient) {
+        this.domain = string;
+        this.checkpoint = bl;
+        this.token = null;
+        this.cookies = iterable;
+        this.proxyStr = string2;
+        this.cookieJar = cookieJar;
+        this.originalHtml = string3;
+        this.html = CaptchaToken.v2Html(this.originalHtml);
+        this.client = realClient;
+    }
+
+    public void expire() {
+        this.used = true;
     }
 
     public String getDomain() {
         return this.domain;
     }
 
-    public void setTokenValues(String string) {
-        this.token = string;
+    public Iterable getCookies() {
+        return this.cookies;
     }
 
-    public CookieJar getCookieJar() {
-        return this.cookieJar;
-    }
-
-    public String getHtml() {
-        return this.html;
-    }
-
-    public CaptchaToken(String string) {
-        this.domain = string;
-        this.checkpoint = false;
-        this.token = null;
-    }
-
-    public String getToken() {
-        return this.token;
-    }
-
-    public String getProxyStr() {
-        return this.proxyStr;
+    public static String modifyHcaptchaCallback(String string) {
+        Matcher matcher = HCAP_REPLACE_PATTERN.matcher(string);
+        if (!matcher.find()) return string;
+        return matcher.replaceAll(matcher.group(0) + " else {\n                                            window.dispatchEvent(new Event('captchaSuccess', {bubbles: true, cancelable: true}));\n                                        }");
     }
 
     public boolean isCheckpoint() {
@@ -78,34 +86,26 @@ public class CaptchaToken {
         return "<!doctype html>\n<html class=\"no-js\" lang=\"en\">\n" + string2 + "\n<script>\nconst doesTokenExist = () => {\n    if((document.querySelector('[name=\"g-recaptcha-response\"]') && document.querySelector('[name=\"g-recaptcha-response\"]').value && document.querySelector('[name=\"g-recaptcha-response\"]').value.length > 0) || (document.querySelector('[name=\"h-captcha-response\"]') && document.querySelector('[name=\"h-captcha-response\"]').value && document.querySelector('[name=\"h-captcha-response\"]').value.length > 0)) {\n        window.completion.completed(JSON.stringify(Object.fromEntries(Array.from(new FormData(document.querySelector('form[action=\"/checkpoint\"]'))))));\n        return true;\n    }\n\n    return false;\n};\n\nnew Promise(resolve => {\n    window.addEventListener('captchaSuccess', () => {\n        const isValid = doesTokenExist();\n        if(!isValid) {\n            const intervalVal = setInterval(() => {\n                const isValid = doesTokenExist();\n                if(isValid) clearInterval(intervalVal);\n            }, 50);\n        }\n        setTimeout(() => document.querySelector(\"html\").innerHTML = `<h2>Waiting for captcha</h2>`, 25000);\n    }, false);\n});\nconst grecp = document.getElementById(\"g-recaptcha\")\nconst observer = new ResizeObserver(entries => {\n  var boundRect = grecp.getBoundingClientRect();  \n  if (boundRect.height > 0)  \n      console.log(JSON.stringify(boundRect));\n})\nobserver.observe(grecp);\n</script>\n</html>";
     }
 
-    public Iterable getCookies() {
-        return this.cookies;
+    public String getHtml() {
+        return this.html;
     }
 
     public boolean isUsed() {
         return this.used;
     }
 
-    public CaptchaToken(String string, boolean bl, Iterable iterable, String string2, CookieJar cookieJar, String string3, RealClient realClient) {
+    public String getToken() {
+        return this.token;
+    }
+
+    public CaptchaToken(String string) {
         this.domain = string;
-        this.checkpoint = bl;
+        this.checkpoint = false;
         this.token = null;
-        this.cookies = iterable;
-        this.proxyStr = string2;
-        this.cookieJar = cookieJar;
-        this.originalHtml = string3;
-        this.html = CaptchaToken.v2Html(this.originalHtml);
-        this.client = realClient;
     }
 
-    public void expire() {
-        this.used = true;
-    }
-
-    public static String modifyHcaptchaCallback(String string) {
-        Matcher matcher = HCAP_REPLACE_PATTERN.matcher(string);
-        if (!matcher.find()) return string;
-        return matcher.replaceAll(matcher.group(0) + " else {\n                                            window.dispatchEvent(new Event('captchaSuccess', {bubbles: true, cancelable: true}));\n                                        }");
+    public CookieJar getCookieJar() {
+        return this.cookieJar;
     }
 }
 

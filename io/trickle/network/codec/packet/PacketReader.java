@@ -13,13 +13,26 @@ public class PacketReader {
     public Buffer buffer;
     public int readerIndex;
 
-    public PacketReader(Buffer buffer) {
-        this.buffer = buffer;
-        this.readerIndex = 0;
+    public String readString() {
+        int n = this.readInt();
+        String string = this.buffer.getString(this.readerIndex, this.readerIndex + n);
+        this.readerIndex += n;
+        return string;
+    }
+
+    public long readLong() {
+        long l = this.buffer.getLong(this.readerIndex);
+        this.readerIndex += 8;
+        return l;
     }
 
     public static PacketReader create(Buffer buffer) {
         return new PacketReader(buffer);
+    }
+
+    public PacketReader(Buffer buffer) {
+        this.buffer = buffer;
+        this.readerIndex = 0;
     }
 
     public byte readByte() {
@@ -28,10 +41,8 @@ public class PacketReader {
         return by;
     }
 
-    public long readLong() {
-        long l = this.buffer.getLong(this.readerIndex);
-        this.readerIndex += 8;
-        return l;
+    public static PacketReader create(Packet packet) {
+        return new PacketReader(packet);
     }
 
     public boolean readBoolean() {
@@ -45,15 +56,8 @@ public class PacketReader {
         return s;
     }
 
-    public String readString() {
-        int n = this.readInt();
-        String string = this.buffer.getString(this.readerIndex, this.readerIndex + n);
-        this.readerIndex += n;
-        return string;
-    }
-
-    public static PacketReader create(Packet packet) {
-        return new PacketReader(packet);
+    public Buffer getBuffer() {
+        return this.buffer;
     }
 
     public int readInt() {
@@ -64,10 +68,6 @@ public class PacketReader {
 
     public PacketReader(Packet packet) {
         this(packet.getPayload());
-    }
-
-    public Buffer getBuffer() {
-        return this.buffer;
     }
 }
 

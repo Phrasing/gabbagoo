@@ -18,6 +18,10 @@ public class FootlockerAPI
 extends TaskApiClient {
     public Task task;
 
+    public FootlockerAPI(Task task) {
+        this.task = task;
+    }
+
     public HttpRequest homePage() {
         HttpRequest httpRequest = this.client.getAbs("https://www.finishline.com/").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
         httpRequest.putHeaders(Headers$Pseudo.MASP.get());
@@ -32,10 +36,6 @@ extends TaskApiClient {
         httpRequest.putHeader("Accept-Encoding", "gzip, deflate, br");
         httpRequest.putHeader("Accept-Language", "en-US,en;q=0.9");
         return httpRequest;
-    }
-
-    public FootlockerAPI(Task task) {
-        this.task = task;
     }
 }
 

@@ -8,6 +8,43 @@ import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
+    public static long[] fillArrRandInt256(long[] lArray) {
+        int n = 0;
+        while (n < lArray.length) {
+            lArray[n] = ThreadLocalRandom.current().nextInt(256);
+            ++n;
+        }
+        return lArray;
+    }
+
+    @Deprecated
+    public static String buildWebUA() {
+        StringBuilder stringBuilder = new StringBuilder("Walmart/210");
+        int n = 0;
+        while (true) {
+            if (n >= 7) {
+                stringBuilder.append(" Walmart WMTAPP v21.");
+                stringBuilder.append("3.0");
+                return stringBuilder.toString();
+            }
+            stringBuilder.append(ThreadLocalRandom.current().nextInt(10));
+            ++n;
+        }
+    }
+
+    public static String st(long[] lArray, boolean bl) {
+        Object object = "";
+        int n = 0;
+        while (n < 16) {
+            if (bl && n >= 4 && n <= 10 && n % 2 == 0) {
+                object = (String)object + "-";
+            }
+            object = (String)object + Long.toHexString(lArray[n] + 256L).substring(1, 3);
+            ++n;
+        }
+        return object;
+    }
+
     public static String genUet() {
         long[] lArray = new long[10];
         long[] lArray2 = new long[16];
@@ -36,39 +73,6 @@ public class Utils {
         }
     }
 
-    public static String rot13(String string) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int n = 0;
-        while (n < string.length()) {
-            char c2 = string.charAt(n);
-            if (c2 >= 'a' && c2 <= 'm') {
-                c2 = (char)(c2 + 13);
-            } else if (c2 >= 'A' && c2 <= 'M') {
-                c2 = (char)(c2 + 13);
-            } else if (c2 >= 'n' && c2 <= 'z') {
-                c2 = (char)(c2 - 13);
-            } else if (c2 >= 'N' && c2 <= 'Z') {
-                c2 = (char)(c2 - 13);
-            }
-            stringBuilder.append(c2);
-            ++n;
-        }
-        return stringBuilder.toString();
-    }
-
-    public static String st(long[] lArray, boolean bl) {
-        Object object = "";
-        int n = 0;
-        while (n < 16) {
-            if (bl && n >= 4 && n <= 10 && n % 2 == 0) {
-                object = (String)object + "-";
-            }
-            object = (String)object + Long.toHexString(lArray[n] + 256L).substring(1, 3);
-            ++n;
-        }
-        return object;
-    }
-
     @Deprecated
     public static String buildUA() {
         int n;
@@ -95,28 +99,24 @@ public class Utils {
         return stringBuilder.toString();
     }
 
-    public static long[] fillArrRandInt256(long[] lArray) {
+    public static String rot13(String string) {
+        StringBuilder stringBuilder = new StringBuilder();
         int n = 0;
-        while (n < lArray.length) {
-            lArray[n] = ThreadLocalRandom.current().nextInt(256);
-            ++n;
-        }
-        return lArray;
-    }
-
-    @Deprecated
-    public static String buildWebUA() {
-        StringBuilder stringBuilder = new StringBuilder("Walmart/210");
-        int n = 0;
-        while (true) {
-            if (n >= 7) {
-                stringBuilder.append(" Walmart WMTAPP v21.");
-                stringBuilder.append("3.0");
-                return stringBuilder.toString();
+        while (n < string.length()) {
+            char c2 = string.charAt(n);
+            if (c2 >= 'a' && c2 <= 'm') {
+                c2 = (char)(c2 + 13);
+            } else if (c2 >= 'A' && c2 <= 'M') {
+                c2 = (char)(c2 + 13);
+            } else if (c2 >= 'n' && c2 <= 'z') {
+                c2 = (char)(c2 - 13);
+            } else if (c2 >= 'N' && c2 <= 'Z') {
+                c2 = (char)(c2 - 13);
             }
-            stringBuilder.append(ThreadLocalRandom.current().nextInt(10));
+            stringBuilder.append(c2);
             ++n;
         }
+        return stringBuilder.toString();
     }
 }
 

@@ -33,9 +33,17 @@ LoadableAsync {
     public Vertx vertx;
     public static String SITEKEY_PATH;
 
-    @Override
-    public void initialise() {
-        logger.debug("Initialised.");
+    public static Buffer lambda$load$0(Throwable throwable) {
+        logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", (Object)"/sitekeys.json".replace("/", ""));
+        return Buffer.buffer((String)"{}");
+    }
+
+    public JsonObject getSitekeys() {
+        return this.SITEKEY_STORAGE;
+    }
+
+    public SitekeyController(Vertx vertx) {
+        this.vertx = vertx;
     }
 
     public Future lambda$load$1(JsonObject jsonObject) {
@@ -44,23 +52,9 @@ LoadableAsync {
         return Future.succeededFuture();
     }
 
-    @Override
-    public void terminate() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        fileSystem.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
-    }
-
-    public JsonObject parseFile(String string) {
-        return new JsonObject(string);
-    }
-
-    public static Buffer lambda$load$0(Throwable throwable) {
-        logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", (Object)"/sitekeys.json".replace("/", ""));
-        return Buffer.buffer((String)"{}");
-    }
-
-    public SitekeyController(Vertx vertx) {
-        this.vertx = vertx;
+    static {
+        SITEKEY_PATH = "/sitekeys.json";
+        logger = LogManager.getLogger(SitekeyController.class);
     }
 
     @Override
@@ -77,13 +71,19 @@ LoadableAsync {
         logger.error("Unable to update sitekeys.json");
     }
 
-    static {
-        SITEKEY_PATH = "/sitekeys.json";
-        logger = LogManager.getLogger(SitekeyController.class);
+    @Override
+    public void initialise() {
+        logger.debug("Initialised.");
     }
 
-    public JsonObject getSitekeys() {
-        return this.SITEKEY_STORAGE;
+    public JsonObject parseFile(String string) {
+        return new JsonObject(string);
+    }
+
+    @Override
+    public void terminate() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        fileSystem.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
     }
 }
 

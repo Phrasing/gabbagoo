@@ -11,6 +11,10 @@ public enum PaymentMethod {
 
     public String method;
 
+    public String getFirstLetterUppercase() {
+        return this.method.charAt(0) + this.method.substring(1).toLowerCase();
+    }
+
     public String get() {
         return this.method;
     }
@@ -37,10 +41,6 @@ public enum PaymentMethod {
             }
         }
         return MASTERCARD;
-    }
-
-    public String getFirstLetterUppercase() {
-        return this.method.charAt(0) + this.method.substring(1).toLowerCase();
     }
 }
 

@@ -9,60 +9,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Devices$GeneratedDevice
 implements Devices$Device {
-    public int width;
-    public int height;
-    public String platform;
     public String userAgent;
+    public String platform;
+    public int height;
+    public int width;
     public static String[] resolutions = new String[]{"412x732", "412x869", "412x824", "412x846", "412x847", "412x732", "360x740", "480x853", "360x740", "360x640", "375x667", "414x896", "412x869", "360x780", "393x851", "375x812", "360x720", "414x736", "480x853"};
 
     @Override
-    public int getInnerWidth() {
-        return this.width;
-    }
-
-    @Override
-    public int getInnerHeight() {
-        return this.height;
-    }
-
-    @Override
-    public String getProductSub() {
-        return "20030107";
-    }
-
-    @Override
-    public String getAppCodeName() {
-        return "Mozilla";
-    }
-
-    @Override
-    public int getWidth() {
-        return this.width;
-    }
-
-    @Override
-    public String getProduct() {
-        return "Gecko";
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
-    }
-
-    @Override
-    public int getAvailWidth() {
-        return this.width;
-    }
-
-    @Override
-    public String getAppName() {
-        return "Netscape";
-    }
-
-    @Override
-    public String getPlatform() {
-        return this.platform;
+    public String getUserAgent() {
+        return this.userAgent;
     }
 
     public Devices$GeneratedDevice() {
@@ -74,8 +29,57 @@ implements Devices$Device {
     }
 
     @Override
-    public String getUserAgent() {
-        return this.userAgent;
+    public int getAvailHeight() {
+        return this.height;
+    }
+
+    @Override
+    public int getAvailWidth() {
+        return this.width;
+    }
+
+    @Override
+    public String getAppCodeName() {
+        return "Mozilla";
+    }
+
+    @Override
+    public int getHeight() {
+        return this.height;
+    }
+
+    @Override
+    public String getProductSub() {
+        return "20030107";
+    }
+
+    @Override
+    public String getPlatform() {
+        return this.platform;
+    }
+
+    @Override
+    public String getAppName() {
+        return "Netscape";
+    }
+
+    @Override
+    public String getProduct() {
+        return "Gecko";
+    }
+
+    @Override
+    public int getWidth() {
+        return this.width;
+    }
+
+    @Override
+    public int getInnerHeight() {
+        return this.height;
+    }
+
+    public static String getRandomUA() {
+        return Devices.userAgents[ThreadLocalRandom.current().nextInt(Devices.userAgents.length)];
     }
 
     @Override
@@ -89,13 +93,9 @@ implements Devices$Device {
         }
     }
 
-    public static String getRandomUA() {
-        return Devices.userAgents[ThreadLocalRandom.current().nextInt(Devices.userAgents.length)];
-    }
-
     @Override
-    public int getAvailHeight() {
-        return this.height;
+    public int getInnerWidth() {
+        return this.width;
     }
 }
 

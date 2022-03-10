@@ -43,103 +43,80 @@ import java.util.regex.Pattern;
 
 public class Hibbett
 extends TaskActor {
-    public RunClock clock;
-    public List<PXToken> tokens;
-    public boolean scheduledMode;
-    public HibbettAPI api;
-    public int previousResponseLen = 0;
-    public String instanceSignal;
     public String itemKeyword;
-    public static Pattern ITEM_ID_PATTERN = Pattern.compile("([0-z]*?)\\.HTML");
-    public Task task;
-    public int previousResponseHash = 0;
-    public boolean griefMode;
+    public boolean scheduledMode;
+    public int previousResponseLen = 0;
+    public HibbettAPI api;
     public boolean shardMode;
+    public Task task;
+    public List<PXToken> tokens;
+    public boolean griefMode;
+    public static Pattern ITEM_ID_PATTERN = Pattern.compile("([0-z]*?)\\.HTML");
+    public int previousResponseHash = 0;
+    public String instanceSignal;
+    public RunClock clock;
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$submitPayment(Hibbett var0, String var1_1, String var2_2, String var3_3, Integer var4_4, String var5_5, String var6_6, JsonObject var7_7, HttpRequest var8_8, CompletableFuture var9_10, HttpResponse var10_11, JsonObject var11_12, int var12_14, Throwable var13_19, int var14_20, Object var15_21) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
+    public JsonArray sortSizes(JsonArray jsonArray) {
+        JsonArray jsonArray2 = new JsonArray();
+        while (jsonArray.size() != 0) {
+            int n = ThreadLocalRandom.current().nextInt(jsonArray.size());
+            JsonObject jsonObject = jsonArray.getJsonObject(n);
+            if (jsonObject.getBoolean("isAvailable").booleanValue()) {
+                jsonArray2.add(0, (Object)jsonObject);
+            } else {
+                jsonArray2.add((Object)jsonObject);
+            }
+            jsonArray.remove(n);
+        }
+        return jsonArray2;
     }
 
-    public CompletableFuture getSizes(String string, String string2) {
-        int n = 0;
-        this.logger.info("Waiting for restock");
+    public CompletableFuture submitPayment(String string, String string2, String string3, Integer n, String string4, String string5) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("amount", (Object)n);
+        jsonObject.put("encryptedCVNValue", (Object)string4);
+        jsonObject.put("paymentObject", (Object)new JsonObject().put("cardType", (Object)this.getProfile().getPaymentMethod().getFirstLetterUppercase()).put("creditCardToken", (Object)string5).put("expirationMonth", (Object)Integer.parseInt(this.getProfile().getExpiryMonth())).put("expirationYear", (Object)Integer.parseInt(this.getProfile().getExpiryYear())).put("nameOnCard", (Object)(this.getProfile().getFirstName() + " " + this.getProfile().getLastName())).put("number", (Object)("************" + this.getProfile().getCardNumber().substring(12))));
+        jsonObject.put("type", (Object)"CREDIT_CARD");
+        this.logger.info("Submitting payment");
         while (this.running) {
-            if (n++ >= 99999999) return CompletableFuture.completedFuture(null);
             if (!this.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
             try {
-                HttpRequest httpRequest = this.api.checkStock(string, string2, this.itemKeyword);
-                CompletableFuture completableFuture = Request.send(httpRequest);
+                HttpRequest httpRequest = this.api.submitPayment(string, string2, string3);
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
                 if (!completableFuture.isDone()) {
                     CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
                 }
                 HttpResponse httpResponse = (HttpResponse)completableFuture.join();
                 if (httpResponse == null) continue;
-                JsonObject jsonObject = httpResponse.bodyAsJsonObject();
                 if (httpResponse.statusCode() == 200) {
-                    if (jsonObject.containsKey("skus")) {
-                        JsonArray jsonArray = jsonObject.getJsonArray("skus");
-                        if (jsonArray.size() == 0) continue;
-                        return CompletableFuture.completedFuture(jsonArray);
-                    }
-                    this.logger.info("No sizes available (p)");
-                    CompletableFuture completableFuture3 = VertxUtil.sleep(this.task.getMonitorDelay());
-                    if (!completableFuture3.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture3;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture4, httpResponse, jsonObject, 0, null, 2, arg_0));
-                    }
-                    completableFuture3.join();
-                    continue;
+                    return CompletableFuture.completedFuture(null);
                 }
-                this.logger.warn("Waiting for restock (p): status:'{}'", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture5 = this.api.handleBadResponse(httpResponse.statusCode(), jsonObject.containsKey("vid") ? jsonObject.getString("vid") : this.api.getPXToken().getVid(), jsonObject.containsKey("uuid") ? jsonObject.getString("uuid") : null);
+                this.logger.warn("Submitting billing: status:'{}'", (Object)httpResponse.statusCode());
+                JsonObject jsonObject2 = httpResponse.bodyAsJsonObject();
+                CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : this.api.getPXToken().getVid(), jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.api.isSkip()) continue;
+                CompletableFuture completableFuture5 = VertxUtil.randomSleep(this.task.getRetryDelay());
                 if (!completableFuture5.isDone()) {
                     CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture6, httpResponse, jsonObject, 0, null, 3, arg_0));
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
                 }
-                int n2 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.api.isSkip()) continue;
-                CompletableFuture completableFuture7 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture7.isDone()) {
-                    CompletableFuture completableFuture8 = completableFuture7;
-                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture8, httpResponse, jsonObject, n2, null, 4, arg_0));
-                }
-                completableFuture7.join();
+                completableFuture5.join();
             }
             catch (Throwable throwable) {
-                this.logger.error("Error occurred waiting for restock (p): {}", (Object)throwable.getMessage());
+                this.logger.error("Error occurred billing: {}", (Object)throwable.getMessage());
                 if (!this.shouldRunOnSchedule()) {
                     return CompletableFuture.completedFuture(null);
                 }
                 CompletableFuture completableFuture = super.randomSleep(5000);
                 if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture9 = completableFuture;
-                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, null, completableFuture9, null, null, 0, throwable, 5, arg_0));
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, null, completableFuture7, null, null, 0, throwable, 4, arg_0));
                 }
                 completableFuture.join();
             }
@@ -387,11 +364,11 @@ lbl148:
     /*
      * Exception decompiling
      */
-    public static CompletableFuture async$getSizes(Hibbett var0, String var1_1, String var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_6, HttpResponse var6_7, JsonObject var7_8, int var8_10, Throwable var9_16, int var10_17, Object var11_18) {
+    public static CompletableFuture async$processPayment(Hibbett var0, String var1_1, String var2_2, String var3_3, int var4_4, HttpRequest var5_5, CompletableFuture var6_7, HttpResponse var7_8, JsonObject var8_9, int var9_11, Throwable var10_16, int var11_17, Object var12_18) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
          *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
@@ -411,21 +388,6 @@ lbl148:
          *     at java.base/java.lang.Thread.run(Thread.java:833)
          */
         throw new IllegalStateException("Decompilation failed");
-    }
-
-    public void handleFailureWebhooks(String string, Buffer buffer) {
-        if (this.previousResponseHash != 0 && this.previousResponseLen == buffer.length()) {
-            if (this.previousResponseHash == buffer.hashCode()) return;
-        }
-        try {
-            Analytics.failure(string, this.task, buffer.toJsonObject(), this.api.proxyString());
-            this.previousResponseHash = buffer.hashCode();
-            this.previousResponseLen = buffer.length();
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
     }
 
     /*
@@ -509,6 +471,207 @@ lbl46:
         return true;
     }
 
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$getSizes(Hibbett var0, String var1_1, String var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_6, HttpResponse var6_7, JsonObject var7_8, int var8_10, Throwable var9_16, int var10_17, Object var11_18) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public void handleFailureWebhooks(String string, Buffer buffer) {
+        if (this.previousResponseHash != 0 && this.previousResponseLen == buffer.length()) {
+            if (this.previousResponseHash == buffer.hashCode()) return;
+        }
+        try {
+            Analytics.failure(string, this.task, buffer.toJsonObject(), this.api.proxyString());
+            this.previousResponseHash = buffer.hashCode();
+            this.previousResponseLen = buffer.length();
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$atc(Hibbett var0, JsonArray var1_1, String var2_2, String var3_3, String var4_4, int var5_5, JsonObject var6_6, String var7_8, HttpRequest var8_9, CompletableFuture var9_10, HttpResponse var10_11, JsonObject var11_12, int var12_14, Throwable var13_20, int var14_21, Object var15_22) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public JsonObject atcPayload(JsonArray jsonArray, String string, int n) {
+        String string2 = this.task.getSize().equals("random") ? jsonArray.getJsonObject(n % jsonArray.size()).getString("id") : this.selectSpecificSize(jsonArray);
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("customerId", (Object)string);
+        jsonObject.put("personalizations", (Object)new JsonArray());
+        jsonObject.put("product", (Object)new JsonObject().put("id", (Object)this.itemKeyword).put("isRaffle", (Object)false));
+        jsonObject.put("quantity", (Object)1);
+        jsonObject.put("sku", (Object)new JsonObject().put("id", (Object)string2));
+        JsonObject jsonObject2 = new JsonObject();
+        jsonObject2.put("cartItems", (Object)new JsonArray().add((Object)jsonObject));
+        return jsonObject2;
+    }
+
+    public CompletableFuture getSizes(String string, String string2) {
+        int n = 0;
+        this.logger.info("Waiting for restock");
+        while (this.running) {
+            if (n++ >= 99999999) return CompletableFuture.completedFuture(null);
+            if (!this.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            try {
+                HttpRequest httpRequest = this.api.checkStock(string, string2, this.itemKeyword);
+                CompletableFuture completableFuture = Request.send(httpRequest);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject = httpResponse.bodyAsJsonObject();
+                if (httpResponse.statusCode() == 200) {
+                    if (jsonObject.containsKey("skus")) {
+                        JsonArray jsonArray = jsonObject.getJsonArray("skus");
+                        if (jsonArray.size() == 0) continue;
+                        return CompletableFuture.completedFuture(jsonArray);
+                    }
+                    this.logger.info("No sizes available (p)");
+                    CompletableFuture completableFuture3 = VertxUtil.sleep(this.task.getMonitorDelay());
+                    if (!completableFuture3.isDone()) {
+                        CompletableFuture completableFuture4 = completableFuture3;
+                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture4, httpResponse, jsonObject, 0, null, 2, arg_0));
+                    }
+                    completableFuture3.join();
+                    continue;
+                }
+                this.logger.warn("Waiting for restock (p): status:'{}'", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture5 = this.api.handleBadResponse(httpResponse.statusCode(), jsonObject.containsKey("vid") ? jsonObject.getString("vid") : this.api.getPXToken().getVid(), jsonObject.containsKey("uuid") ? jsonObject.getString("uuid") : null);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture6, httpResponse, jsonObject, 0, null, 3, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.api.isSkip()) continue;
+                CompletableFuture completableFuture7 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture7.isDone()) {
+                    CompletableFuture completableFuture8 = completableFuture7;
+                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, httpRequest, completableFuture8, httpResponse, jsonObject, n2, null, 4, arg_0));
+                }
+                completableFuture7.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred waiting for restock (p): {}", (Object)throwable.getMessage());
+                if (!this.shouldRunOnSchedule()) {
+                    return CompletableFuture.completedFuture(null);
+                }
+                CompletableFuture completableFuture = super.randomSleep(5000);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture9 = completableFuture;
+                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$getSizes(this, string, string2, n, null, completableFuture9, null, null, 0, throwable, 5, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public Profile getProfile() {
+        return this.task.getProfile();
+    }
+
+    public Hibbett(Task task, int n) {
+        super(n);
+        String string;
+        this.task = task;
+        this.api = new HibbettAPI(this.task);
+        super.setClient(this.api);
+        Matcher matcher = ITEM_ID_PATTERN.matcher(this.task.getKeywords()[0]);
+        if (matcher.find()) {
+            string = matcher.group(1);
+        } else {
+            this.logger.error("Error parsing keyword: {}", (Object)this.task.getKeywords()[0]);
+            this.logger.warn("Defaulting to '{}' as keyword", (Object)this.task.getKeywords()[0]);
+            string = this.task.getKeywords()[0];
+        }
+        this.itemKeyword = this.instanceSignal = string;
+        this.griefMode = false;
+        this.scheduledMode = this.task.getMode().contains("schedule");
+        this.shardMode = false;
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$submitPayment(Hibbett var0, String var1_1, String var2_2, String var3_3, Integer var4_4, String var5_5, String var6_6, JsonObject var7_7, HttpRequest var8_8, CompletableFuture var9_10, HttpResponse var10_11, JsonObject var11_12, int var12_14, Throwable var13_19, int var14_20, Object var15_21) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
     public CompletableFuture processPayment(String string, String string2, String string3) {
         int n = 0;
         this.logger.info("Processing...");
@@ -571,6 +734,130 @@ lbl46:
             }
         }
         return CompletableFuture.completedFuture(false);
+    }
+
+    public String selectSpecificSize(JsonArray jsonArray) {
+        int n = 0;
+        while (n < jsonArray.size()) {
+            JsonObject jsonObject = jsonArray.getJsonObject(n);
+            if (jsonObject.getString("size").replace(".0", "").equals(this.task.getSize())) {
+                return jsonObject.getString("id");
+            }
+            ++n;
+        }
+        throw new Exception("Size not found");
+    }
+
+    public CompletableFuture atc(JsonArray jsonArray, String string, String string2, String string3) {
+        int n = -1;
+        this.logger.info("Adding to cart");
+        while (this.running) {
+            if (!this.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            try {
+                JsonObject jsonObject = this.atcPayload(jsonArray, string2, ++n);
+                String string4 = jsonObject.getJsonArray("cartItems").getJsonObject(0).getJsonObject("sku").getString("id");
+                HttpRequest httpRequest = this.api.atc(string, string2, string3, string4);
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject2 = httpResponse.bodyAsJsonObject();
+                if (httpResponse.statusCode() == 200) {
+                    if (!jsonObject2.toString().contains("quantity restriction") && !jsonObject2.toString().contains("isn't available") && jsonObject2.containsKey("itemCount") && jsonObject2.getInteger("itemCount") == 1) {
+                        Integer n2;
+                        VertxUtil.sendSignal(this.instanceSignal, string4);
+                        if (jsonObject2.getNumber("total") == null) {
+                            n2 = jsonObject2.getInteger("subTotal");
+                            return CompletableFuture.completedFuture(n2);
+                        }
+                        n2 = jsonObject2.getInteger("total");
+                        return CompletableFuture.completedFuture(n2);
+                    }
+                    this.logger.info("Failed to ATC (empty cart)");
+                    CompletableFuture completableFuture3 = VertxUtil.signalSleep(this.instanceSignal, this.task.getMonitorDelay());
+                    if (!completableFuture3.isDone()) {
+                        CompletableFuture completableFuture4 = completableFuture3;
+                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
+                    }
+                    completableFuture3.join();
+                    continue;
+                }
+                this.logger.warn("Failed ATC: status:'{}'", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture5 = this.api.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : this.api.getPXToken().getVid(), jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture6, httpResponse, jsonObject2, 0, null, 3, arg_0));
+                }
+                int n3 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
+                if (n3 != 0 || !this.api.isSkip()) continue;
+                CompletableFuture completableFuture7 = VertxUtil.signalSleep(this.instanceSignal, this.task.getMonitorDelay());
+                if (!completableFuture7.isDone()) {
+                    CompletableFuture completableFuture8 = completableFuture7;
+                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture8, httpResponse, jsonObject2, n3, null, 4, arg_0));
+                }
+                completableFuture7.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred ATC: {}", (Object)throwable.getMessage());
+                throwable.printStackTrace();
+                if (!this.shouldRunOnSchedule()) {
+                    return CompletableFuture.completedFuture(null);
+                }
+                CompletableFuture completableFuture = super.randomSleep(5000);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture9 = completableFuture;
+                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, null, null, null, completableFuture9, null, null, 0, throwable, 5, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public CompletableFuture run() {
+        if (this.scheduledMode) {
+            boolean bl;
+            this.clock = RunClock.create();
+            this.logger.info("Scheduled run planned in {}minute(s)", (Object)TimeUnit.MINUTES.convert(this.clock.getTimeTillRun(), TimeUnit.MILLISECONDS));
+            CompletableFuture completableFuture = VertxUtil.hardCodedSleep(this.clock.getTimeTillRun());
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$run(this, completableFuture2, 1, arg_0));
+            }
+            completableFuture.join();
+            this.clock.start();
+            this.logger.info("Running on schedule...");
+            try {
+                CompletableFuture completableFuture3 = this.runNormal();
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$run(this, completableFuture4, 2, arg_0));
+                }
+                bl = (Boolean)completableFuture3.join();
+            }
+            catch (Throwable throwable) {
+                throwable.printStackTrace();
+                bl = false;
+            }
+            if (bl) return CompletableFuture.completedFuture(null);
+            PXTokenBase pXTokenBase = this.api.getPXToken();
+            if (pXTokenBase != null && pXTokenBase.deploymentID() != null && !pXTokenBase.deploymentID().isEmpty()) {
+                this.vertx.undeploy(pXTokenBase.deploymentID());
+            }
+            this.api.setPxToken(null);
+            return this.run();
+        }
+        CompletableFuture completableFuture = this.runNormal();
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture5 = completableFuture;
+            return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$run(this, completableFuture5, 3, arg_0));
+        }
+        completableFuture.join();
+        return CompletableFuture.completedFuture(null);
     }
 
     public CompletableFuture runNormal() {
@@ -666,293 +953,6 @@ lbl46:
             throwable.printStackTrace();
             return CompletableFuture.completedFuture(false);
         }
-    }
-
-    public CompletableFuture submitPayment(String string, String string2, String string3, Integer n, String string4, String string5) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("amount", (Object)n);
-        jsonObject.put("encryptedCVNValue", (Object)string4);
-        jsonObject.put("paymentObject", (Object)new JsonObject().put("cardType", (Object)this.getProfile().getPaymentMethod().getFirstLetterUppercase()).put("creditCardToken", (Object)string5).put("expirationMonth", (Object)Integer.parseInt(this.getProfile().getExpiryMonth())).put("expirationYear", (Object)Integer.parseInt(this.getProfile().getExpiryYear())).put("nameOnCard", (Object)(this.getProfile().getFirstName() + " " + this.getProfile().getLastName())).put("number", (Object)("************" + this.getProfile().getCardNumber().substring(12))));
-        jsonObject.put("type", (Object)"CREDIT_CARD");
-        this.logger.info("Submitting payment");
-        while (this.running) {
-            if (!this.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            try {
-                HttpRequest httpRequest = this.api.submitPayment(string, string2, string3);
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 200) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                this.logger.warn("Submitting billing: status:'{}'", (Object)httpResponse.statusCode());
-                JsonObject jsonObject2 = httpResponse.bodyAsJsonObject();
-                CompletableFuture completableFuture3 = this.api.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : this.api.getPXToken().getVid(), jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.api.isSkip()) continue;
-                CompletableFuture completableFuture5 = VertxUtil.randomSleep(this.task.getRetryDelay());
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred billing: {}", (Object)throwable.getMessage());
-                if (!this.shouldRunOnSchedule()) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                CompletableFuture completableFuture = super.randomSleep(5000);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$submitPayment(this, string, string2, string3, n, string4, string5, jsonObject, null, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$processPayment(Hibbett var0, String var1_1, String var2_2, String var3_3, int var4_4, HttpRequest var5_5, CompletableFuture var6_7, HttpResponse var7_8, JsonObject var8_9, int var9_11, Throwable var10_16, int var11_17, Object var12_18) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public Hibbett(Task task, int n) {
-        super(n);
-        String string;
-        this.task = task;
-        this.api = new HibbettAPI(this.task);
-        super.setClient(this.api);
-        Matcher matcher = ITEM_ID_PATTERN.matcher(this.task.getKeywords()[0]);
-        if (matcher.find()) {
-            string = matcher.group(1);
-        } else {
-            this.logger.error("Error parsing keyword: {}", (Object)this.task.getKeywords()[0]);
-            this.logger.warn("Defaulting to '{}' as keyword", (Object)this.task.getKeywords()[0]);
-            string = this.task.getKeywords()[0];
-        }
-        this.itemKeyword = this.instanceSignal = string;
-        this.griefMode = false;
-        this.scheduledMode = this.task.getMode().contains("schedule");
-        this.shardMode = false;
-    }
-
-    public CompletableFuture atc(JsonArray jsonArray, String string, String string2, String string3) {
-        int n = -1;
-        this.logger.info("Adding to cart");
-        while (this.running) {
-            if (!this.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            try {
-                JsonObject jsonObject = this.atcPayload(jsonArray, string2, ++n);
-                String string4 = jsonObject.getJsonArray("cartItems").getJsonObject(0).getJsonObject("sku").getString("id");
-                HttpRequest httpRequest = this.api.atc(string, string2, string3, string4);
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject2 = httpResponse.bodyAsJsonObject();
-                if (httpResponse.statusCode() == 200) {
-                    if (!jsonObject2.toString().contains("quantity restriction") && !jsonObject2.toString().contains("isn't available") && jsonObject2.containsKey("itemCount") && jsonObject2.getInteger("itemCount") == 1) {
-                        Integer n2;
-                        VertxUtil.sendSignal(this.instanceSignal, string4);
-                        if (jsonObject2.getNumber("total") == null) {
-                            n2 = jsonObject2.getInteger("subTotal");
-                            return CompletableFuture.completedFuture(n2);
-                        }
-                        n2 = jsonObject2.getInteger("total");
-                        return CompletableFuture.completedFuture(n2);
-                    }
-                    this.logger.info("Failed to ATC (empty cart)");
-                    CompletableFuture completableFuture3 = VertxUtil.signalSleep(this.instanceSignal, this.task.getMonitorDelay());
-                    if (!completableFuture3.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture3;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
-                    }
-                    completableFuture3.join();
-                    continue;
-                }
-                this.logger.warn("Failed ATC: status:'{}'", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture5 = this.api.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : this.api.getPXToken().getVid(), jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture6, httpResponse, jsonObject2, 0, null, 3, arg_0));
-                }
-                int n3 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
-                if (n3 != 0 || !this.api.isSkip()) continue;
-                CompletableFuture completableFuture7 = VertxUtil.signalSleep(this.instanceSignal, this.task.getMonitorDelay());
-                if (!completableFuture7.isDone()) {
-                    CompletableFuture completableFuture8 = completableFuture7;
-                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, jsonObject, string4, httpRequest, completableFuture8, httpResponse, jsonObject2, n3, null, 4, arg_0));
-                }
-                completableFuture7.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred ATC: {}", (Object)throwable.getMessage());
-                throwable.printStackTrace();
-                if (!this.shouldRunOnSchedule()) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                CompletableFuture completableFuture = super.randomSleep(5000);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture9 = completableFuture;
-                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$atc(this, jsonArray, string, string2, string3, n, null, null, null, completableFuture9, null, null, 0, throwable, 5, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$atc(Hibbett var0, JsonArray var1_1, String var2_2, String var3_3, String var4_4, int var5_5, JsonObject var6_6, String var7_8, HttpRequest var8_9, CompletableFuture var9_10, HttpResponse var10_11, JsonObject var11_12, int var12_14, Throwable var13_20, int var14_21, Object var15_22) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public JsonObject atcPayload(JsonArray jsonArray, String string, int n) {
-        String string2 = this.task.getSize().equals("random") ? jsonArray.getJsonObject(n % jsonArray.size()).getString("id") : this.selectSpecificSize(jsonArray);
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("customerId", (Object)string);
-        jsonObject.put("personalizations", (Object)new JsonArray());
-        jsonObject.put("product", (Object)new JsonObject().put("id", (Object)this.itemKeyword).put("isRaffle", (Object)false));
-        jsonObject.put("quantity", (Object)1);
-        jsonObject.put("sku", (Object)new JsonObject().put("id", (Object)string2));
-        JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.put("cartItems", (Object)new JsonArray().add((Object)jsonObject));
-        return jsonObject2;
-    }
-
-    public Profile getProfile() {
-        return this.task.getProfile();
-    }
-
-    public String selectSpecificSize(JsonArray jsonArray) {
-        int n = 0;
-        while (n < jsonArray.size()) {
-            JsonObject jsonObject = jsonArray.getJsonObject(n);
-            if (jsonObject.getString("size").replace(".0", "").equals(this.task.getSize())) {
-                return jsonObject.getString("id");
-            }
-            ++n;
-        }
-        throw new Exception("Size not found");
-    }
-
-    @Override
-    public CompletableFuture run() {
-        if (this.scheduledMode) {
-            boolean bl;
-            this.clock = RunClock.create();
-            this.logger.info("Scheduled run planned in {}minute(s)", (Object)TimeUnit.MINUTES.convert(this.clock.getTimeTillRun(), TimeUnit.MILLISECONDS));
-            CompletableFuture completableFuture = VertxUtil.hardCodedSleep(this.clock.getTimeTillRun());
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$run(this, completableFuture2, 1, arg_0));
-            }
-            completableFuture.join();
-            this.clock.start();
-            this.logger.info("Running on schedule...");
-            try {
-                CompletableFuture completableFuture3 = this.runNormal();
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$run(this, completableFuture4, 2, arg_0));
-                }
-                bl = (Boolean)completableFuture3.join();
-            }
-            catch (Throwable throwable) {
-                throwable.printStackTrace();
-                bl = false;
-            }
-            if (bl) return CompletableFuture.completedFuture(null);
-            PXTokenBase pXTokenBase = this.api.getPXToken();
-            if (pXTokenBase != null && pXTokenBase.deploymentID() != null && !pXTokenBase.deploymentID().isEmpty()) {
-                this.vertx.undeploy(pXTokenBase.deploymentID());
-            }
-            this.api.setPxToken(null);
-            return this.run();
-        }
-        CompletableFuture completableFuture = this.runNormal();
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture5 = completableFuture;
-            return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Hibbett.async$run(this, completableFuture5, 3, arg_0));
-        }
-        completableFuture.join();
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public JsonArray sortSizes(JsonArray jsonArray) {
-        JsonArray jsonArray2 = new JsonArray();
-        while (jsonArray.size() != 0) {
-            int n = ThreadLocalRandom.current().nextInt(jsonArray.size());
-            JsonObject jsonObject = jsonArray.getJsonObject(n);
-            if (jsonObject.getBoolean("isAvailable").booleanValue()) {
-                jsonArray2.add(0, (Object)jsonObject);
-            } else {
-                jsonArray2.add((Object)jsonObject);
-            }
-            jsonArray.remove(n);
-        }
-        return jsonArray2;
     }
 }
 

@@ -13,18 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class URLParser {
-    public static Pattern ENCODED_STR_PAT;
+    public static Pattern FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
+    public static Pattern ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
     public List<String> urls;
-    public static Pattern FUNCTION_VAR_PAT;
     public Map<String, Decoding> decodingMap;
-
-    public URLParser(String string) {
-        string = string.replace("{", "\n").replace("}", "\n").replace(";", "\n");
-        this.decodingMap = new HashMap<String, Decoding>();
-        this.urls = new ArrayList<String>();
-        this.parseFuncVars(string);
-        this.parseUrls(string);
-    }
 
     public void parseFuncVars(String string) {
         Matcher matcher = FUNCTION_VAR_PAT.matcher(string);
@@ -37,9 +29,12 @@ public class URLParser {
         }
     }
 
-    static {
-        FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
-        ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
+    public URLParser(String string) {
+        string = string.replace("{", "\n").replace("}", "\n").replace(";", "\n");
+        this.decodingMap = new HashMap<String, Decoding>();
+        this.urls = new ArrayList<String>();
+        this.parseFuncVars(string);
+        this.parseUrls(string);
     }
 
     public void parseUrls(String string) {

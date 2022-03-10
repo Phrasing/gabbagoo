@@ -14,8 +14,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class SolveFuture
 extends ContextCompletableFuture {
-    public CompletableFuture<Pair<String[], String>> imageFuture = new CompletableFuture();
     public CaptchaToken captchaToken;
+    public CompletableFuture<Pair<String[], String>> imageFuture = new CompletableFuture();
     public CompletableFuture<JsonArray> clickFuture = new CompletableFuture();
 
     public CaptchaToken getEmptyCaptchaToken() {
