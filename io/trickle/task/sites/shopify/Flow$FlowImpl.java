@@ -12,12 +12,6 @@ implements Flow$Actions {
     public boolean needsAuthTokens;
     public Map<String, String> requiredCookies;
 
-    public Flow$FlowImpl(boolean bl, boolean bl2, Map map) {
-        this.needsPrice = bl;
-        this.needsAuthTokens = bl2;
-        this.requiredCookies = map;
-    }
-
     @Override
     public boolean needsPrice() {
         return this.needsPrice;
@@ -31,6 +25,12 @@ implements Flow$Actions {
     @Override
     public Map requiredCookies() {
         return this.requiredCookies;
+    }
+
+    public Flow$FlowImpl(boolean bl, boolean bl2, Map map) {
+        this.needsPrice = bl;
+        this.needsAuthTokens = bl2;
+        this.requiredCookies = map;
     }
 }
 

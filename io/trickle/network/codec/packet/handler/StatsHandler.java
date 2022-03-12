@@ -28,6 +28,11 @@ implements PacketHandler {
     }
 
     @Override
+    public PacketType getType() {
+        return PacketType.INT_VARIABLE_SIZED;
+    }
+
+    @Override
     public void handle(Packet packet, Handler handler) {
         PacketReader packetReader = PacketReader.create(packet);
         int n = packetReader.readInt();
@@ -42,11 +47,6 @@ implements PacketHandler {
         catch (Throwable throwable) {
             // empty catch block
         }
-    }
-
-    @Override
-    public PacketType getType() {
-        return PacketType.INT_VARIABLE_SIZED;
     }
 
     @Override

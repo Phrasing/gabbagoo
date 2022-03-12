@@ -18,11 +18,11 @@ KeyListener {
     public TextField passwordField;
 
     @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        String string = this.passwordField.getText();
-        if (string.isBlank()) return;
-        System.out.println("Password added -> " + string);
-        ((TaskController)Engine.get().getModule(Controller.TASK)).massPassword(string);
+    public void keyPressed(KeyEvent keyEvent) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
     }
 
     public PasswordOverrideListener(TextField textField) {
@@ -34,11 +34,11 @@ KeyListener {
     }
 
     @Override
-    public void keyPressed(KeyEvent keyEvent) {
-    }
-
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
+    public void actionPerformed(ActionEvent actionEvent) {
+        String string = this.passwordField.getText();
+        if (string.isBlank()) return;
+        System.out.println("Password added -> " + string);
+        ((TaskController)Engine.get().getModule(Controller.TASK)).massPassword(string);
     }
 }
 

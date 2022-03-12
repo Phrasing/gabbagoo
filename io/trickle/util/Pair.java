@@ -7,12 +7,12 @@ public class Pair {
     public V second;
     public T first;
 
+    public Pair() {
+    }
+
     public Pair(Object object, Object object2) {
         this.first = object;
         this.second = object2;
-    }
-
-    public Pair() {
     }
 }
 

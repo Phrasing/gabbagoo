@@ -44,43 +44,37 @@ import java.util.regex.Matcher;
 
 public class DesktopPX
 extends PerimeterX {
-    public String secUA;
-    public Function<HttpResponse<?>, Buffer> okayAndConversionFunc;
-    public static CharSequence DEFAULT_SEC_UA;
-    public String vid;
-    public static CharSequence CFP_VALUE;
-    public Function<HttpResponse<?>, Buffer> setupDevice = this::lambda$new$1;
-    public String uuid;
-    public String sid;
-    public static CharSequence ONE_VALUE;
-    public JsonObject cookieSession;
-    public static CharSequence PX3_VALUE;
-    public static CharSequence CTS_VALUE;
     public String userAgent;
-    public JsonArray performance;
-    public long waitTime;
-    public TaskApiClient delegate;
-    public static CharSequence DEFAULT_UA;
-    public long lockoutTiming = -1L;
-    public static CharSequence RF_VALUE;
-    public MultiMap cachedResponse = null;
-    public static CharSequence FP_VALUE;
     public static CharSequence VID_COOKIE;
-    public static CharSequence PXHD_VALUE;
+    public Function<HttpResponse<?>, Buffer> setupDevice = this::lambda$new$1;
+    public JsonObject cookieSession;
+    public String uuid;
+    public JsonArray performance;
+    public Function<HttpResponse<?>, Buffer> okayAndConversionFunc = this::lambda$new$2;
+    public static CharSequence DEFAULT_SEC_UA;
+    public String secUA;
+    public MultiMap cachedResponse = null;
+    public static CharSequence CFP_VALUE;
+    public TaskApiClient delegate;
     public static Site site;
-    public static Function<HttpResponse<?>, String> okayStatusFunc;
-    public String deviceNumber = "undefined";
+    public static CharSequence FP_VALUE;
+    public static CharSequence RF_VALUE;
     public static CharSequence PXDE_VALUE;
+    public static Function<HttpResponse<?>, String> okayStatusFunc;
+    public static CharSequence PXHD_VALUE;
+    public static CharSequence DEFAULT_UA;
+    public String deviceNumber = "undefined";
+    public long lockoutTiming = -1L;
+    public String vid;
+    public static CharSequence PX3_VALUE;
+    public static CharSequence ONE_VALUE;
+    public static CharSequence CTS_VALUE;
+    public String sid;
+    public long waitTime;
 
-    public DesktopPX(TaskActor taskActor) {
-        super(taskActor, ClientType.CHROME);
-        this.okayAndConversionFunc = this::lambda$new$2;
-        this.cookieSession = new JsonObject();
-        this.delegate = taskActor.getClient();
-    }
-
-    public HttpRequest lambda$solve$4() {
-        return this.apiRequest("2", null);
+    @Override
+    public String getDeviceLang() {
+        return "en-US,en;q=0.9";
     }
 
     /*
@@ -108,72 +102,6 @@ lbl10:
         throw new IllegalArgumentException();
     }
 
-    public HttpRequest bundleReq() {
-        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/assets/js/bundle").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
-    public HttpRequest collectorReq() {
-        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/api/v2/collector").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
-    public HttpRequest lambda$initialise$10() {
-        return this.apiRequest("ua", null).method(HttpMethod.GET);
-    }
-
-    @Override
-    public String getDeviceSecUA() {
-        if (this.secUA != null) return this.secUA;
-        return DEFAULT_SEC_UA.toString();
-    }
-
-    @Override
-    public String getDeviceAcceptEncoding() {
-        return "gzip, deflate, br";
-    }
-
-    public Buffer lambda$new$1(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        this.userAgent = httpResponse.bodyAsString();
-        this.secUA = httpResponse.getHeader("sec-ua");
-        this.deviceNumber = httpResponse.getHeader("device");
-        return httpResponse.bodyAsBuffer();
-    }
-
-    public static String lambda$static$0(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        return httpResponse.bodyAsString();
-    }
-
     public HttpRequest apiRequest(String string, Boolean bl) {
         HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().postAbs("https://trickle-px-oygn7nn37q-uc.a.run.app/gen/" + string + ".json").as(BodyCodec.buffer()).addQueryParam("mobile", "false");
         if (bl == null) return httpRequest;
@@ -181,12 +109,90 @@ lbl10:
         return httpRequest;
     }
 
+    public boolean isBool(JsonObject jsonObject) {
+        Object object = jsonObject.getValue("error", null);
+        if (object == null) return false;
+        return object instanceof Boolean;
+    }
+
+    @Override
+    public CompletableFuture initialise() {
+        CompletableFuture completableFuture = this.execute("Initiating...", this.setupDevice, this::lambda$initialise$10, null);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$initialise(this, completableFuture2, 1, arg_0));
+        }
+        completableFuture.join();
+        return CompletableFuture.completedFuture(true);
+    }
+
+    static {
+        DEFAULT_UA = AsciiString.cached((String)"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36");
+        DEFAULT_SEC_UA = AsciiString.cached((String)"\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
+        VID_COOKIE = AsciiString.cached((String)"_pxvid");
+        RF_VALUE = AsciiString.cached((String)"_pxff_rf");
+        FP_VALUE = AsciiString.cached((String)"_pxff_fp");
+        ONE_VALUE = AsciiString.cached((String)"1");
+        CFP_VALUE = AsciiString.cached((String)"_pxff_cfp");
+        CTS_VALUE = AsciiString.cached((String)"pxcts");
+        PXHD_VALUE = AsciiString.cached((String)"_pxhd");
+        PX3_VALUE = AsciiString.cached((String)"_px3");
+        PXDE_VALUE = AsciiString.cached((String)"_pxde");
+        site = Site.WALMART;
+        okayStatusFunc = DesktopPX::lambda$static$0;
+    }
+
+    public HttpRequest imageReq(Buffer buffer) {
+        HttpRequest httpRequest = this.client.getAbs("https://collector-pxu6b0qd2s.px-client.net/b/g?" + buffer.toString()).as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.getDeviceUA());
+        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.walmart.com");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.walmart.com/");
+        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.getDeviceLang());
+        return httpRequest;
+    }
+
+    public HttpRequest lambda$solveCaptcha$7() {
+        return this.apiRequest("img", true);
+    }
+
     public HttpRequest lambda$solveCaptcha$6() {
         return this.apiRequest("2", true);
     }
 
-    public HttpRequest lambda$solveCaptcha$9() {
-        return this.apiRequest("3", true);
+    @Override
+    public String getDeviceUA() {
+        if (this.userAgent != null) return this.userAgent;
+        return DEFAULT_UA.toString();
+    }
+
+    public JsonObject buildReqBody(String string, JsonArray jsonArray) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("pxhd", (Object)this.delegate.getCookies().getCookieValue("_pxhd"));
+        jsonObject.put("uuid", (Object)this.uuid);
+        jsonObject.put("sid", (Object)this.sid);
+        jsonObject.put("vid", (Object)this.vid);
+        jsonObject.put("firstResponse", (Object)string);
+        jsonObject.put("performance", (Object)jsonArray);
+        jsonObject.put("cts", (Object)this.delegate.getCookies().getCookieValue(String.valueOf(CTS_VALUE)));
+        jsonObject.put("device", (Object)this.deviceNumber);
+        return jsonObject;
+    }
+
+    @Override
+    public String getDeviceAcceptEncoding() {
+        return "gzip, deflate, br";
+    }
+
+    public HttpRequest lambda$solveCaptcha$8(Buffer buffer) {
+        return this.imageReq(buffer);
     }
 
     /*
@@ -303,57 +309,64 @@ lbl67:
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public void reset() {
-        this.cookieSession = new JsonObject();
-        this.userAgent = null;
-        this.deviceNumber = "undefined";
-    }
-
-    public HttpRequest lambda$solveCaptcha$8(Buffer buffer) {
-        return this.imageReq(buffer);
-    }
-
-    public JsonObject buildReqBody(String string, JsonArray jsonArray) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("pxhd", (Object)this.delegate.getCookies().getCookieValue("_pxhd"));
-        jsonObject.put("uuid", (Object)this.uuid);
-        jsonObject.put("sid", (Object)this.sid);
-        jsonObject.put("vid", (Object)this.vid);
-        jsonObject.put("firstResponse", (Object)string);
-        jsonObject.put("performance", (Object)jsonArray);
-        jsonObject.put("cts", (Object)this.delegate.getCookies().getCookieValue(String.valueOf(CTS_VALUE)));
-        jsonObject.put("device", (Object)this.deviceNumber);
-        return jsonObject;
+    public HttpRequest lambda$solveCaptcha$9() {
+        return this.apiRequest("3", true);
     }
 
     @Override
-    public String getDeviceUA() {
-        if (this.userAgent != null) return this.userAgent;
-        return DEFAULT_UA.toString();
+    public CompletableFuture solve() {
+        int n = 1;
+        if (n > 30) return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+        CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solve$3, this.buildReqBody(null, null));
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture2, null, null, null, 1, arg_0));
+        }
+        Buffer buffer = (Buffer)completableFuture.join();
+        CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep(this.waitTime);
+        if (!completableFuture3.isDone()) {
+            CompletableFuture completableFuture4 = completableFuture3;
+            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture4, buffer, null, null, 2, arg_0));
+        }
+        completableFuture3.join();
+        CompletableFuture completableFuture5 = this.execute("Sensor 1/2", okayStatusFunc, this::collectorReq, buffer);
+        if (!completableFuture5.isDone()) {
+            CompletableFuture completableFuture6 = completableFuture5;
+            return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture6, buffer, null, null, 3, arg_0));
+        }
+        String string = (String)completableFuture5.join();
+        CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solve$4, this.buildReqBody(string, this.performance));
+        if (!completableFuture7.isDone()) {
+            CompletableFuture completableFuture8 = completableFuture7;
+            return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture8, buffer, string, null, 4, arg_0));
+        }
+        Buffer buffer2 = (Buffer)completableFuture7.join();
+        CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep(this.waitTime);
+        if (!completableFuture9.isDone()) {
+            CompletableFuture completableFuture10 = completableFuture9;
+            return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture10, buffer, string, buffer2, 5, arg_0));
+        }
+        completableFuture9.join();
+        CompletableFuture completableFuture11 = this.execute("Sensor 2/2", okayStatusFunc, this::collectorReq, buffer2);
+        if (!completableFuture11.isDone()) {
+            CompletableFuture completableFuture12 = completableFuture11;
+            return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture12, buffer, string, buffer2, 6, arg_0));
+        }
+        String string2 = (String)completableFuture11.join();
+        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
+        if (this.getVid() != null && !this.getVid().isBlank()) {
+            multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
+        }
+        multiMap.add(RF_VALUE, ONE_VALUE);
+        multiMap.add(FP_VALUE, ONE_VALUE);
+        multiMap.add(CFP_VALUE, ONE_VALUE);
+        this.parseResultCookies(string2, multiMap);
+        return CompletableFuture.completedFuture(multiMap);
     }
 
-    public HttpRequest imageReq(Buffer buffer) {
-        HttpRequest httpRequest = this.client.getAbs("https://collector-pxu6b0qd2s.px-client.net/b/g?" + buffer.toString()).as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
-    public boolean isBool(JsonObject jsonObject) {
-        Object object = jsonObject.getValue("error", null);
-        if (object == null) return false;
-        return object instanceof Boolean;
+    public static String lambda$static$0(HttpResponse httpResponse) {
+        if (httpResponse.statusCode() != 200) return null;
+        return httpResponse.bodyAsString();
     }
 
     public CompletableFuture execute(String string, Function function, Supplier supplier, Object object) {
@@ -413,6 +426,48 @@ lbl67:
             }
         }
         return CompletableFuture.failedFuture(new Exception("Failed to execute " + string));
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$execute(DesktopPX var0, String var1_1, Function var2_2, Supplier var3_3, Object var4_4, int var5_5, HttpRequest var6_6, CompletableFuture var7_8, HttpResponse var8_9, int var9_11, Optional var10_13, Throwable var11_14, int var12_15, Object var13_16) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public DesktopPX(TaskActor taskActor) {
+        super(taskActor, ClientType.CHROME);
+        this.cookieSession = new JsonObject();
+        this.delegate = taskActor.getClient();
+    }
+
+    @Override
+    public void reset() {
+        this.cookieSession = new JsonObject();
+        this.userAgent = null;
+        this.deviceNumber = "undefined";
     }
 
     @Override
@@ -527,24 +582,66 @@ lbl67:
         return this.cookieSession.getString("vid", null);
     }
 
-    static {
-        DEFAULT_UA = AsciiString.cached((String)"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36");
-        DEFAULT_SEC_UA = AsciiString.cached((String)"\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        VID_COOKIE = AsciiString.cached((String)"_pxvid");
-        RF_VALUE = AsciiString.cached((String)"_pxff_rf");
-        FP_VALUE = AsciiString.cached((String)"_pxff_fp");
-        ONE_VALUE = AsciiString.cached((String)"1");
-        CFP_VALUE = AsciiString.cached((String)"_pxff_cfp");
-        CTS_VALUE = AsciiString.cached((String)"pxcts");
-        PXHD_VALUE = AsciiString.cached((String)"_pxhd");
-        PX3_VALUE = AsciiString.cached((String)"_px3");
-        PXDE_VALUE = AsciiString.cached((String)"_pxde");
-        site = Site.WALMART;
-        okayStatusFunc = DesktopPX::lambda$static$0;
+    public HttpRequest lambda$solve$4() {
+        return this.apiRequest("2", null);
+    }
+
+    public void parseResultCookies(String string, MultiMap multiMap) {
+        try {
+            Matcher matcher = PXDE_PATTERN.matcher(string);
+            Matcher matcher2 = BAKE_PATTERN.matcher(string);
+            if (matcher2.find()) {
+                multiMap.add(PX3_VALUE, (CharSequence)matcher2.group(1));
+            }
+            if (!matcher.find()) return;
+            multiMap.add(PXDE_VALUE, (CharSequence)matcher.group(1));
+            return;
+        }
+        catch (Throwable throwable) {
+            if (!this.logger.isDebugEnabled()) return;
+            this.logger.debug("Failed to find px3 or pxde ", throwable);
+        }
+    }
+
+    public Buffer lambda$new$1(HttpResponse httpResponse) {
+        if (httpResponse.statusCode() != 200) return null;
+        this.userAgent = httpResponse.bodyAsString();
+        this.secUA = httpResponse.getHeader("sec-ua");
+        this.deviceNumber = httpResponse.getHeader("device");
+        return httpResponse.bodyAsBuffer();
     }
 
     public HttpRequest lambda$solveCaptcha$5() {
         return this.apiRequest("1", true);
+    }
+
+    public HttpRequest collectorReq() {
+        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/api/v2/collector").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.getDeviceUA());
+        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.walmart.com");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.walmart.com/");
+        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.getDeviceLang());
+        return httpRequest;
+    }
+
+    @Override
+    public String getDeviceSecUA() {
+        if (this.secUA != null) return this.secUA;
+        return DEFAULT_SEC_UA.toString();
+    }
+
+    public HttpRequest lambda$solve$3() {
+        return this.apiRequest("1", null);
     }
 
     /*
@@ -847,125 +944,23 @@ lbl223:
         throw new IllegalArgumentException();
     }
 
-    public HttpRequest lambda$solve$3() {
-        return this.apiRequest("1", null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$execute(DesktopPX var0, String var1_1, Function var2_2, Supplier var3_3, Object var4_4, int var5_5, HttpRequest var6_6, CompletableFuture var7_8, HttpResponse var8_9, int var9_11, Optional var10_13, Throwable var11_14, int var12_15, Object var13_16) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    @Override
-    public CompletableFuture solve() {
-        int n = 1;
-        if (n > 30) return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
-        CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solve$3, this.buildReqBody(null, null));
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture2, null, null, null, 1, arg_0));
-        }
-        Buffer buffer = (Buffer)completableFuture.join();
-        CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep(this.waitTime);
-        if (!completableFuture3.isDone()) {
-            CompletableFuture completableFuture4 = completableFuture3;
-            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture4, buffer, null, null, 2, arg_0));
-        }
-        completableFuture3.join();
-        CompletableFuture completableFuture5 = this.execute("Sensor 1/2", okayStatusFunc, this::collectorReq, buffer);
-        if (!completableFuture5.isDone()) {
-            CompletableFuture completableFuture6 = completableFuture5;
-            return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture6, buffer, null, null, 3, arg_0));
-        }
-        String string = (String)completableFuture5.join();
-        CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solve$4, this.buildReqBody(string, this.performance));
-        if (!completableFuture7.isDone()) {
-            CompletableFuture completableFuture8 = completableFuture7;
-            return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture8, buffer, string, null, 4, arg_0));
-        }
-        Buffer buffer2 = (Buffer)completableFuture7.join();
-        CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep(this.waitTime);
-        if (!completableFuture9.isDone()) {
-            CompletableFuture completableFuture10 = completableFuture9;
-            return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture10, buffer, string, buffer2, 5, arg_0));
-        }
-        completableFuture9.join();
-        CompletableFuture completableFuture11 = this.execute("Sensor 2/2", okayStatusFunc, this::collectorReq, buffer2);
-        if (!completableFuture11.isDone()) {
-            CompletableFuture completableFuture12 = completableFuture11;
-            return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture12, buffer, string, buffer2, 6, arg_0));
-        }
-        String string2 = (String)completableFuture11.join();
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        if (this.getVid() != null && !this.getVid().isBlank()) {
-            multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
-        }
-        multiMap.add(RF_VALUE, ONE_VALUE);
-        multiMap.add(FP_VALUE, ONE_VALUE);
-        multiMap.add(CFP_VALUE, ONE_VALUE);
-        this.parseResultCookies(string2, multiMap);
-        return CompletableFuture.completedFuture(multiMap);
-    }
-
-    public void parseResultCookies(String string, MultiMap multiMap) {
-        try {
-            Matcher matcher = PXDE_PATTERN.matcher(string);
-            Matcher matcher2 = BAKE_PATTERN.matcher(string);
-            if (matcher2.find()) {
-                multiMap.add(PX3_VALUE, (CharSequence)matcher2.group(1));
-            }
-            if (!matcher.find()) return;
-            multiMap.add(PXDE_VALUE, (CharSequence)matcher.group(1));
-            return;
-        }
-        catch (Throwable throwable) {
-            if (!this.logger.isDebugEnabled()) return;
-            this.logger.debug("Failed to find px3 or pxde ", throwable);
-        }
-    }
-
-    public HttpRequest lambda$solveCaptcha$7() {
-        return this.apiRequest("img", true);
-    }
-
-    @Override
-    public CompletableFuture initialise() {
-        CompletableFuture completableFuture = this.execute("Initiating...", this.setupDevice, this::lambda$initialise$10, null);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$initialise(this, completableFuture2, 1, arg_0));
-        }
-        completableFuture.join();
-        return CompletableFuture.completedFuture(true);
-    }
-
-    @Override
-    public String getDeviceLang() {
-        return "en-US,en;q=0.9";
+    public HttpRequest bundleReq() {
+        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/assets/js/bundle").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("user-agent", this.getDeviceUA());
+        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://www.walmart.com");
+        httpRequest.putHeader("sec-fetch-site", "cross-site");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://www.walmart.com/");
+        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+        httpRequest.putHeader("accept-language", this.getDeviceLang());
+        return httpRequest;
     }
 
     public Buffer lambda$new$2(HttpResponse httpResponse) {
@@ -981,6 +976,10 @@ lbl223:
         }
         this.deviceNumber = httpResponse.getHeader("device");
         return httpResponse.bodyAsBuffer();
+    }
+
+    public HttpRequest lambda$initialise$10() {
+        return this.apiRequest("ua", null).method(HttpMethod.GET);
     }
 }
 

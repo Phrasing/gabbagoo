@@ -16,41 +16,42 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class Storage {
-    public static String DISCORD_WEBHOOK;
-    public static int HARVESTER_COUNT_YS;
-    public static String AYCD_API_KEY;
     public static String CONFIG_PATH;
+    public static int HARVESTER_COUNT_YS;
     public static String AYCD_ACCESS_TOKEN;
     public static Preferences prefs;
     public static String ACCESS_KEY;
+    public static String AYCD_API_KEY;
+    public static String DISCORD_WEBHOOK;
 
-    public static void setAccessKey(String string) {
-        ACCESS_KEY = string;
-        prefs.put("KKYF", string);
+    public static String getAccessKey() {
+        return prefs.get("KKYF", "");
+    }
+
+    public static String getDiscordWebhook() {
+        return prefs.get("DSCRD", "");
+    }
+
+    public static int getHarvesterCountYs() {
+        return prefs.getInt("YYSCNT", 1);
+    }
+
+    public static String getAycdAccessToken() {
+        return prefs.get("AAACTK", "");
     }
 
     public static String getAycdApiKey() {
         return prefs.get("AAAPKI", "");
     }
 
-    static {
-        prefs = Preferences.userRoot().node("8399c4c8f76c1fcbaeb99a6fac6e3344");
-        CONFIG_PATH = System.getenv("TRKK_RNT_PPTH") != null ? System.getenv("TRKK_RNT_PPTH") : System.getProperty("user.dir");
-        HARVESTER_COUNT_YS = Storage.getHarvesterCountYs();
-        DISCORD_WEBHOOK = Storage.getDiscordWebhook();
-        ACCESS_KEY = Storage.getAccessKey();
-        AYCD_API_KEY = Storage.getAycdApiKey();
-        AYCD_ACCESS_TOKEN = Storage.getAycdAccessToken();
+    public static void setHarvesterCountYs(int n) {
+        HARVESTER_COUNT_YS = n;
+        prefs.putInt("YYSCNT", n);
     }
 
-    public static void setAycdApiKey(String string) {
-        AYCD_API_KEY = string;
-        prefs.put("AAAPKI", string);
-    }
-
-    public static void setDiscordWebhook(String string) {
-        DISCORD_WEBHOOK = string;
-        prefs.put("DSCRD", string);
+    public static void setAycdAccessToken(String string) {
+        AYCD_ACCESS_TOKEN = string;
+        prefs.put("AAACTK", string);
     }
 
     public static Buffer getAll(String string) {
@@ -64,7 +65,7 @@ public class Storage {
             }
             jsonArray.add((Object)new JsonObject().put("name", (Object)"user").put("value", (Object)System.getProperty("user.name", "NaN")));
             jsonArray.add((Object)new JsonObject().put("name", (Object)"home").put("value", (Object)System.getProperty("user.home", "NaN")));
-            JsonObject jsonObject = new JsonObject().put("timestamp", (Object)Instant.now().toString()).put("footer", (Object)new JsonObject().put("text", (Object)String.format("Trickle v%d.%d.%d", 1, 0, 242)));
+            JsonObject jsonObject = new JsonObject().put("timestamp", (Object)Instant.now().toString()).put("footer", (Object)new JsonObject().put("text", (Object)String.format("Trickle v%d.%d.%d", 1, 0, 248)));
             jsonObject.put("fields", (Object)jsonArray);
             JsonArray jsonArray2 = new JsonArray();
             jsonArray2.add((Object)jsonObject);
@@ -75,30 +76,29 @@ public class Storage {
         }
     }
 
-    public static int getHarvesterCountYs() {
-        return prefs.getInt("YYSCNT", 1);
+    static {
+        prefs = Preferences.userRoot().node("8399c4c8f76c1fcbaeb99a6fac6e3344");
+        CONFIG_PATH = System.getenv("TRKK_RNT_PPTH") != null ? System.getenv("TRKK_RNT_PPTH") : System.getProperty("user.dir");
+        HARVESTER_COUNT_YS = Storage.getHarvesterCountYs();
+        DISCORD_WEBHOOK = Storage.getDiscordWebhook();
+        ACCESS_KEY = Storage.getAccessKey();
+        AYCD_API_KEY = Storage.getAycdApiKey();
+        AYCD_ACCESS_TOKEN = Storage.getAycdAccessToken();
     }
 
-    public static void setHarvesterCountYs(int n) {
-        HARVESTER_COUNT_YS = n;
-        prefs.putInt("YYSCNT", n);
+    public static void setDiscordWebhook(String string) {
+        DISCORD_WEBHOOK = string;
+        prefs.put("DSCRD", string);
     }
 
-    public static void setAycdAccessToken(String string) {
-        AYCD_ACCESS_TOKEN = string;
-        prefs.put("AAACTK", string);
+    public static void setAccessKey(String string) {
+        ACCESS_KEY = string;
+        prefs.put("KKYF", string);
     }
 
-    public static String getAccessKey() {
-        return prefs.get("KKYF", "");
-    }
-
-    public static String getAycdAccessToken() {
-        return prefs.get("AAACTK", "");
-    }
-
-    public static String getDiscordWebhook() {
-        return prefs.get("DSCRD", "");
+    public static void setAycdApiKey(String string) {
+        AYCD_API_KEY = string;
+        prefs.put("AAAPKI", string);
     }
 }
 

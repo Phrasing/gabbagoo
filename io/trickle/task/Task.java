@@ -8,29 +8,80 @@ package io.trickle.task;
 
 import io.trickle.profile.Profile;
 import io.trickle.task.sites.Site;
-import io.trickle.task.sites.yeezy.util.profile.ProfileMap;
+import io.trickle.task.sites.yeezy.util.rotator.ProfileRotator;
 import io.trickle.util.Storage;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import net.openhft.hashing.LongHashFunction;
 
 public class Task {
-    public Site site;
+    public Integer monitorDelayMass;
     public String siteUserEntry;
+    public String captchaKey;
+    public String size;
+    public String hash = "";
     public Profile profile;
     public int taskQuantity;
-    public String size;
-    public String[] keywords;
+    public static ProfileRotator profileRotator = new ProfileRotator();
     public int monitorDelay;
     public String shippingRate;
+    public String[] keywords;
     public String mode;
-    public Integer monitorDelayMass;
-    public String captchaKey;
-    public String password;
-    public static ProfileMap ysProfileMap = new ProfileMap();
-    public String qty;
     public int retryDelay;
-    public String hash = "";
+    public String qty;
+    public String password;
+    public Site site;
+
+    public String getSize() {
+        return this.size;
+    }
+
+    public void enforceDelayLimits() {
+        if (!this.site.equals((Object)Site.WALMART)) {
+            if (!this.site.equals((Object)Site.WALMART_CA)) return;
+        }
+        if (this.mode.contains("desktop")) {
+            this.retryDelay = Math.max(this.retryDelay, 2000);
+            this.monitorDelay = Math.max(this.monitorDelay, 500);
+            return;
+        }
+        this.retryDelay = Math.max(this.retryDelay, 4000);
+        this.monitorDelay = Math.max(this.monitorDelay, 5000);
+    }
+
+    public int getRetryDelay() {
+        return this.retryDelay;
+    }
+
+    public String getSiteUserEntry() {
+        return this.siteUserEntry;
+    }
+
+    public Task copy() {
+        return new Task(this);
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setMonitorDelay(Integer n) {
+        this.monitorDelayMass = n;
+    }
+
+    public String getMode() {
+        return this.mode;
+    }
+
+    public String getCaptchaKey() {
+        return this.captchaKey;
+    }
+
+    public String session() {
+        if (!this.hash.isBlank()) return this.hash;
+        this.hash = String.valueOf(LongHashFunction.wy_3().hashChars(Storage.ACCESS_KEY != null ? Storage.ACCESS_KEY : "") + (long)super.hashCode());
+        return this.hash;
+    }
 
     public Task(String[] stringArray) {
         this.site = Site.getSite(stringArray[19]);
@@ -53,22 +104,10 @@ public class Task {
         }
         this.shippingRate = this.shippingRate.replace("\r", "").replace("\n", "");
         this.enforceDelayLimits();
-        if (this.site != Site.YEEZY) return;
-        try {
-            ysProfileMap.put(this);
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
     }
 
-    public Task copy() {
-        return new Task(this);
-    }
-
-    public void setKeywords(String[] stringArray) {
-        this.keywords = stringArray;
+    public String[] getKeywords() {
+        return this.keywords;
     }
 
     public int getMonitorDelay() {
@@ -81,92 +120,8 @@ public class Task {
         return n;
     }
 
-    public String[] getKeywords() {
-        return this.keywords;
-    }
-
-    public String getShippingRate() {
-        return this.shippingRate;
-    }
-
-    public String toString() {
-        if ("Task{site=" + this.site + ", siteUserEntry='" + this.siteUserEntry + "', profile=" + this.profile + ", size='" + this.size + "', qty='" + this.qty + "', mode='" + this.mode + "', captchaKey='" + this.captchaKey + "', taskQuantity=" + this.taskQuantity + ", keywords=" + Arrays.toString(this.keywords) + ", retryDelay=" + this.retryDelay + ", monitorDelay=" + this.monitorDelay + ", shippingRate='" + this.shippingRate == null) {
-            return "NaN";
-        }
-        String string = this.shippingRate + "', monitorDelayMass=" + this.monitorDelayMass + "}";
-        return string;
-    }
-
-    public String getCaptchaKey() {
-        return this.captchaKey;
-    }
-
-    public String getQty() {
-        return this.qty;
-    }
-
-    public static String randomizeCase(String string) {
-        StringBuilder stringBuilder = new StringBuilder(string.length());
-        char[] cArray = string.toCharArray();
-        int n = cArray.length;
-        int n2 = 0;
-        while (n2 < n) {
-            char c2 = cArray[n2];
-            stringBuilder.append(ThreadLocalRandom.current().nextBoolean() ? Character.toLowerCase(c2) : Character.toUpperCase(c2));
-            ++n2;
-        }
-        return stringBuilder.toString();
-    }
-
-    public void setPassword(String string) {
-        this.password = string;
-    }
-
-    public String session() {
-        if (!this.hash.isBlank()) return this.hash;
-        this.hash = String.valueOf(LongHashFunction.wy_3().hashChars(Storage.ACCESS_KEY != null ? Storage.ACCESS_KEY : "") + (long)super.hashCode());
-        return this.hash;
-    }
-
-    public Site getSite() {
-        return this.site;
-    }
-
-    public void enforceDelayLimits() {
-        if (!this.site.equals((Object)Site.WALMART)) {
-            if (!this.site.equals((Object)Site.WALMART_CA)) return;
-        }
-        if (this.mode.contains("desktop")) {
-            this.retryDelay = Math.max(this.retryDelay, 2000);
-            this.monitorDelay = Math.max(this.monitorDelay, 500);
-            return;
-        }
-        this.retryDelay = Math.max(this.retryDelay, 4000);
-        this.monitorDelay = Math.max(this.monitorDelay, 5000);
-    }
-
-    public String getMode() {
-        return this.mode;
-    }
-
-    public String getSiteUserEntry() {
-        return this.siteUserEntry;
-    }
-
-    public int getRetryDelay() {
-        return this.retryDelay;
-    }
-
-    public Profile getProfile() {
-        return this.profile;
-    }
-
-    public int getTaskQuantity() {
-        return this.taskQuantity;
-    }
-
-    public String getSize() {
-        return this.size;
+    public void setKeywords(String[] stringArray) {
+        this.keywords = stringArray;
     }
 
     public Task(Task task) {
@@ -183,14 +138,60 @@ public class Task {
         this.monitorDelay = task.monitorDelay;
         this.shippingRate = task.shippingRate;
         this.monitorDelayMass = task.monitorDelayMass;
+        if (this.site != Site.YEEZY) return;
+        if (this.taskQuantity == 0) return;
+        try {
+            profileRotator.put(this);
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
     }
 
-    public void setMonitorDelay(Integer n) {
-        this.monitorDelayMass = n;
+    public String toString() {
+        if ("Task{site=" + this.site + ", siteUserEntry='" + this.siteUserEntry + "', profile=" + this.profile + ", size='" + this.size + "', qty='" + this.qty + "', mode='" + this.mode + "', captchaKey='" + this.captchaKey + "', taskQuantity=" + this.taskQuantity + ", keywords=" + Arrays.toString(this.keywords) + ", retryDelay=" + this.retryDelay + ", monitorDelay=" + this.monitorDelay + ", shippingRate='" + this.shippingRate == null) {
+            return "NaN";
+        }
+        String string = this.shippingRate + "', monitorDelayMass=" + this.monitorDelayMass + "}";
+        return string;
     }
 
-    public String getPassword() {
-        return this.password;
+    public void setPassword(String string) {
+        this.password = string;
+    }
+
+    public String getShippingRate() {
+        return this.shippingRate;
+    }
+
+    public String getQty() {
+        return this.qty;
+    }
+
+    public Site getSite() {
+        return this.site;
+    }
+
+    public int getTaskQuantity() {
+        return this.taskQuantity;
+    }
+
+    public static String randomizeCase(String string) {
+        StringBuilder stringBuilder = new StringBuilder(string.length());
+        char[] cArray = string.toCharArray();
+        int n = cArray.length;
+        int n2 = 0;
+        while (n2 < n) {
+            char c2 = cArray[n2];
+            stringBuilder.append(ThreadLocalRandom.current().nextBoolean() ? Character.toLowerCase(c2) : Character.toUpperCase(c2));
+            ++n2;
+        }
+        return stringBuilder.toString();
+    }
+
+    public Profile getProfile() {
+        return this.profile;
     }
 }
 

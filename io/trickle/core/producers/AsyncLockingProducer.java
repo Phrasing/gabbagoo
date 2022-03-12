@@ -16,10 +16,6 @@ import io.vertx.core.shareddata.Lock;
 public abstract class AsyncLockingProducer
 extends AsyncProducer
 implements Handler {
-    public void handle(Object object) {
-        this.handle((AsyncResult)object);
-    }
-
     public void handle(AsyncResult asyncResult) {
         if (asyncResult.succeeded()) {
             Lock lock = (Lock)asyncResult.result();
@@ -32,6 +28,10 @@ implements Handler {
             return;
         }
         super.fail("Failed to get lock");
+    }
+
+    public void handle(Object object) {
+        this.handle((AsyncResult)object);
     }
 
     public abstract void handle();

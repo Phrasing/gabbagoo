@@ -43,61 +43,117 @@ import org.slf4j.MDC;
 public abstract class TaskActor
 extends AbstractVerticle
 implements Actor {
-    public Logger logger;
-    public static Logger netLogger = LogManager.getLogger((String)"NET_LOGGER");
-    public boolean running = false;
-    public Task task;
-    public N apiClient;
     public int id;
+    public static Logger netLogger = LogManager.getLogger((String)"NET_LOGGER");
     public CompletableFuture<Void> sleepFuture = null;
+    public N apiClient;
+    public Task task;
+    public Logger logger;
+    public boolean running = false;
 
-    public void netLogWarn(String string) {
-        this.netLog(Level.WARN, string);
+    public TaskApiClient getClient() {
+        return this.apiClient;
     }
 
-    public CompletableFuture randomSleep(int n) {
+    public TaskActor(int n) {
+        this.id = n;
+        this.logger = LogManager.getLogger((String)String.format("[%s][TASK-%s]", this.getClass().getSimpleName().toUpperCase(), String.format("%04d", this.id)));
+    }
+
+    public void start() {
         try {
-            if (n <= 0) return CompletableFuture.completedFuture(null);
-            int n2 = ThreadLocalRandom.current().nextInt((int)Math.min((double)n, (double)n / Double.longBitsToDouble(4608308318706860032L)), (int)((double)n * Double.longBitsToDouble(4608308318706860032L)));
-            return this.sleep(n2);
+            MDC.put("version", "1.0.248");
+            MDC.put("user", Storage.ACCESS_KEY);
+            MDC.put("session", App.SESSION_HASH);
+            this.logger.info("Starting.");
+            this.running = true;
+            ((CompletableFuture)this.run().whenComplete(this::lambda$start$0)).exceptionally(TaskActor::lambda$start$1);
+            return;
         }
         catch (Throwable throwable) {
             // empty catch block
         }
-        return CompletableFuture.completedFuture(null);
+    }
+
+    public Logger getLogger() {
+        return this.logger;
+    }
+
+    public void stop() {
+        this.running = false;
+        try {
+            ((TaskApiClient)this.apiClient).close();
+        }
+        catch (Exception exception) {
+            this.logger.error("Error on stop: {}", (Object)exception.getMessage());
+        }
+        this.logger.warn("Stopped.");
+        super.stop();
     }
 
     public static Void lambda$start$1(Throwable throwable) {
         return null;
     }
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$GETREQ(TaskActor var0, String var1_1, HttpRequest var2_2, Integer var3_3, String[] var4_4, int var5_5, CompletableFuture var6_8, HttpResponse var7_9, Throwable var8_11, int var9_12, Object var10_13) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
+    public CompletableFuture GETREQ(String string, HttpRequest httpRequest, Integer n, String ... stringArray) {
+        this.logger.info(string);
+        while (this.running) {
+            try {
+                HttpResponse httpResponse;
+                HttpResponse httpResponse2;
+                int n2;
+                int n3 = n2 = stringArray == null || n != null && n == 302 ? 1 : 0;
+                if (n2 != 0) {
+                    CompletableFuture completableFuture = Request.send(httpRequest.as(BodyCodec.none()));
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture2 = completableFuture;
+                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, n2, completableFuture2, null, null, 1, arg_0));
+                    }
+                    httpResponse2 = (HttpResponse)completableFuture.join();
+                } else {
+                    CompletableFuture completableFuture = Request.send(httpRequest);
+                    if (!completableFuture.isDone()) {
+                        CompletableFuture completableFuture3 = completableFuture;
+                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, n2, completableFuture3, null, null, 2, arg_0));
+                    }
+                    httpResponse2 = httpResponse = (HttpResponse)completableFuture.join();
+                }
+                if (httpResponse != null) {
+                    boolean bl;
+                    if (httpResponse.statusCode() == 302) {
+                        bl = stringArray == null || httpResponse.getHeader("location").contains(stringArray[0]);
+                    } else {
+                        boolean bl2 = bl = stringArray == null || Utils.containsAllWords(httpResponse.bodyAsString(), stringArray);
+                    }
+                    if ((n == null || httpResponse.statusCode() == n.intValue()) && bl) {
+                        String string2;
+                        if (n2 != 0) {
+                            string2 = httpResponse.getHeader("location");
+                            return CompletableFuture.completedFuture(string2);
+                        }
+                        string2 = httpResponse.bodyAsString();
+                        return CompletableFuture.completedFuture(string2);
+                    }
+                    this.logger.warn("Failed " + string.toLowerCase(Locale.ROOT) + ": '{}'", (Object)(httpResponse.statusCode() + httpResponse.statusMessage()));
+                }
+                CompletableFuture completableFuture = VertxUtil.randomSleep(this.task.getMonitorDelay());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, n2, completableFuture4, httpResponse, null, 3, arg_0));
+                }
+                completableFuture.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error " + string.toLowerCase(Locale.ROOT) + ": {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(this.task.getRetryDelay());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture5 = completableFuture;
+                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, 0, completableFuture5, null, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
     public CompletableFuture execute(String string, Function function, Supplier supplier, Object object) {
@@ -163,43 +219,53 @@ implements Actor {
         return CompletableFuture.failedFuture(new Exception("Failed to execute " + string));
     }
 
-    public Logger getLogger() {
-        return this.logger;
+    public void netLogInfo(String string) {
+        this.netLog(Level.INFO, string);
     }
 
-    public void lambda$sleep$2(Long l) {
+    public CompletableFuture randomSleep(int n) {
         try {
-            this.sleepFuture.complete(null);
-            return;
+            if (n <= 0) return CompletableFuture.completedFuture(null);
+            int n2 = ThreadLocalRandom.current().nextInt((int)Math.min((double)n, (double)n / Double.longBitsToDouble(4608308318706860032L)), (int)((double)n * Double.longBitsToDouble(4608308318706860032L)));
+            return this.sleep(n2);
         }
         catch (Throwable throwable) {
             // empty catch block
         }
+        return CompletableFuture.completedFuture(null);
     }
 
-    public void lambda$start$0(Void void_, Throwable throwable) {
-        this.vertx.undeploy(super.deploymentID());
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$GETREQ(TaskActor var0, String var1_1, HttpRequest var2_2, Integer var3_3, String[] var4_4, int var5_5, CompletableFuture var6_8, HttpResponse var7_9, Throwable var8_11, int var9_12, Object var10_13) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
     }
 
-    public void netLogError(String string) {
-        this.netLog(Level.ERROR, string);
-    }
-
-    public TaskActor(int n) {
-        this.id = n;
-        this.logger = LogManager.getLogger((String)String.format("[%s][TASK-%s]", this.getClass().getSimpleName().toUpperCase(), String.format("%04d", this.id)));
-    }
-
-    public void stop() {
-        this.running = false;
-        try {
-            ((TaskApiClient)this.apiClient).close();
-        }
-        catch (Exception exception) {
-            this.logger.error("Error on stop: {}", (Object)exception.getMessage());
-        }
-        this.logger.warn("Stopped.");
-        super.stop();
+    public void netLogWarn(String string) {
+        this.netLog(Level.WARN, string);
     }
 
     /*
@@ -231,82 +297,6 @@ implements Actor {
         throw new IllegalStateException("Decompilation failed");
     }
 
-    public void start() {
-        try {
-            MDC.put("version", "1.0.242");
-            MDC.put("user", Storage.ACCESS_KEY);
-            MDC.put("session", App.SESSION_HASH);
-            this.logger.info("Starting.");
-            this.running = true;
-            ((CompletableFuture)this.run().whenComplete(this::lambda$start$0)).exceptionally(TaskActor::lambda$start$1);
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
-
-    public CompletableFuture GETREQ(String string, HttpRequest httpRequest, Integer n, String ... stringArray) {
-        this.logger.info(string);
-        while (this.running) {
-            try {
-                HttpResponse httpResponse;
-                HttpResponse httpResponse2;
-                int n2;
-                int n3 = n2 = stringArray == null || n != null && n == 302 ? 1 : 0;
-                if (n2 != 0) {
-                    CompletableFuture completableFuture = Request.send(httpRequest.as(BodyCodec.none()));
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, n2, completableFuture2, null, null, 1, arg_0));
-                    }
-                    httpResponse2 = (HttpResponse)completableFuture.join();
-                } else {
-                    CompletableFuture completableFuture = Request.send(httpRequest);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture3 = completableFuture;
-                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, n2, completableFuture3, null, null, 2, arg_0));
-                    }
-                    httpResponse2 = httpResponse = (HttpResponse)completableFuture.join();
-                }
-                if (httpResponse != null) {
-                    boolean bl;
-                    if (httpResponse.statusCode() == 302) {
-                        bl = stringArray == null || httpResponse.getHeader("location").contains(stringArray[0]);
-                    } else {
-                        boolean bl2 = bl = stringArray == null || Utils.containsAllWords(httpResponse.bodyAsString(), stringArray);
-                    }
-                    if ((n == null || httpResponse.statusCode() == n.intValue()) && bl) {
-                        String string2;
-                        if (n2 != 0) {
-                            string2 = httpResponse.getHeader("location");
-                            return CompletableFuture.completedFuture(string2);
-                        }
-                        string2 = httpResponse.bodyAsString();
-                        return CompletableFuture.completedFuture(string2);
-                    }
-                    this.logger.warn("Failed " + string.toLowerCase(Locale.ROOT) + ": '{}'", (Object)(httpResponse.statusCode() + httpResponse.statusMessage()));
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep(this.task.getMonitorDelay());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, n2, completableFuture4, httpResponse, null, 3, arg_0));
-                }
-                completableFuture.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error " + string.toLowerCase(Locale.ROOT) + ": {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(this.task.getRetryDelay());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> TaskActor.async$GETREQ(this, string, httpRequest, n, stringArray, 0, completableFuture5, null, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
     public CompletableFuture sleep(int n) {
         if (this.sleepFuture != null) {
             this.sleepFuture = null;
@@ -316,19 +306,24 @@ implements Actor {
         return this.sleepFuture;
     }
 
-    public TaskApiClient getClient() {
-        return this.apiClient;
-    }
-
-    public void netLogInfo(String string) {
-        this.netLog(Level.INFO, string);
+    public void lambda$start$0(Void void_, Throwable throwable) {
+        this.vertx.undeploy(super.deploymentID());
     }
 
     public void setClient(TaskApiClient taskApiClient) {
         this.apiClient = taskApiClient;
     }
 
+    public void netLogError(String string) {
+        this.netLog(Level.ERROR, string);
+    }
+
     public void netLog(Level level, String string) {
+        if (string.contains("Client is closed")) return;
+        if (string.contains("VertxException")) return;
+        if (string.contains("SSLHandshakeException")) return;
+        if (string.contains("SslClosedEngineException")) return;
+        if (string.contains("ProxyConnectException")) return;
         if (string.contains("HttpProxyConnectException")) return;
         if (string.contains("UnknownHostException")) return;
         if (string.contains("AnnotatedSocketException")) return;
@@ -336,6 +331,16 @@ implements Actor {
             return;
         }
         netLogger.log(level, "{} {}", (Object)this.logger.getName(), (Object)string);
+    }
+
+    public void lambda$sleep$2(Long l) {
+        try {
+            this.sleepFuture.complete(null);
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
     }
 }
 

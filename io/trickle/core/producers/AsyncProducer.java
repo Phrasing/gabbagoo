@@ -13,20 +13,20 @@ import io.vertx.core.Promise;
 public abstract class AsyncProducer {
     public Promise<T> callback = Promise.promise();
 
-    public void fail(Throwable throwable) {
-        this.callback.fail(throwable);
+    public Future getProduct() {
+        return this.callback.future();
     }
 
-    public void fail(String string) {
-        this.callback.fail(string);
+    public void fail(Throwable throwable) {
+        this.callback.fail(throwable);
     }
 
     public void produce(Object object) {
         this.callback.complete(object);
     }
 
-    public Future getProduct() {
-        return this.callback.future();
+    public void fail(String string) {
+        this.callback.fail(string);
     }
 }
 

@@ -23,6 +23,10 @@ import javax.swing.JPanel;
 public class BasicGUI {
     public boolean closed = false;
 
+    public boolean isClosed() {
+        return this.closed;
+    }
+
     public BasicGUI() {
         JPanel jPanel = new JPanel(new FlowLayout(3, 5, 2));
         Label label = new Label("Delay     ");
@@ -76,10 +80,6 @@ public class BasicGUI {
         frame.addWindowListener(new BasicGUI$1(this, frame));
         frame.setVisible(true);
         frame.setResizable(false);
-    }
-
-    public boolean isClosed() {
-        return this.closed;
     }
 }
 

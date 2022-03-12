@@ -14,10 +14,6 @@ public class CLI {
     public static boolean LOAD_GATE = true;
     public static String listenerID = null;
 
-    public static void lambda$deployObserver$0(String string) {
-        listenerID = string;
-    }
-
     public static void setTitle(String string) {
     }
 
@@ -27,6 +23,10 @@ public class CLI {
 
     public static void deployObserver() {
         VertxSingleton.INSTANCE.get().deployVerticle((Verticle)new CLI$CLIUpdater()).onSuccess(CLI::lambda$deployObserver$0);
+    }
+
+    public static void lambda$deployObserver$0(String string) {
+        listenerID = string;
     }
 }
 

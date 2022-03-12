@@ -8,8 +8,38 @@ import io.trickle.task.sites.walmart.util.encryption.CMAC;
 import io.trickle.task.sites.walmart.util.encryption.Encryptor;
 
 public class SDW {
-    public static String HEX = "0123456789abcdef";
     public Aes aes;
+    public static String HEX = "0123456789abcdef";
+
+    public String reformat(String string, String string2) {
+        Object object = "";
+        int n = 0;
+        int n2 = 0;
+        while (n2 < string2.length()) {
+            if (n < string.length() && Encryptor.base10.indexOf(string2.charAt(n2)) >= 0) {
+                object = (String)object + string.charAt(n);
+                ++n;
+            } else {
+                object = (String)object + string2.charAt(n2);
+            }
+            ++n2;
+        }
+        return object;
+    }
+
+    public SDW(Aes aes) {
+        this.aes = aes;
+    }
+
+    public String integrity(String string, String string2, String string3) {
+        String string4 = Character.toString(0) + Character.toString(string2.length()) + string2 + Character.toString(0) + Character.toString(string3.length()) + string3;
+        long[] lArray = Encryptor.hexToWords(string);
+        lArray[3] = lArray[3] ^ 1L;
+        Aes aes = this.aes.cipher(lArray);
+        CMAC cMAC = new CMAC();
+        int[] nArray = cMAC.compute(aes, string4);
+        return this.wordToHex(nArray[0]) + this.wordToHex(nArray[1]);
+    }
 
     public String wordToHex(int n) {
         int n2 = 32;
@@ -48,36 +78,6 @@ public class SDW {
             n -= 2;
         }
         return n2 % 10;
-    }
-
-    public SDW(Aes aes) {
-        this.aes = aes;
-    }
-
-    public String reformat(String string, String string2) {
-        Object object = "";
-        int n = 0;
-        int n2 = 0;
-        while (n2 < string2.length()) {
-            if (n < string.length() && Encryptor.base10.indexOf(string2.charAt(n2)) >= 0) {
-                object = (String)object + string.charAt(n);
-                ++n;
-            } else {
-                object = (String)object + string2.charAt(n2);
-            }
-            ++n2;
-        }
-        return object;
-    }
-
-    public String integrity(String string, String string2, String string3) {
-        String string4 = Character.toString(0) + Character.toString(string2.length()) + string2 + Character.toString(0) + Character.toString(string3.length()) + string3;
-        long[] lArray = Encryptor.hexToWords(string);
-        lArray[3] = lArray[3] ^ 1L;
-        Aes aes = this.aes.cipher(lArray);
-        CMAC cMAC = new CMAC();
-        int[] nArray = cMAC.compute(aes, string4);
-        return this.wordToHex(nArray[0]) + this.wordToHex(nArray[1]);
     }
 }
 

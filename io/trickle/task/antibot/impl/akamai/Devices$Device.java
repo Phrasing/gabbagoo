@@ -9,94 +9,94 @@ package io.trickle.task.antibot.impl.akamai;
 import io.vertx.core.json.JsonObject;
 
 public interface Devices$Device {
-    public int getScreenAvailWidth();
+    public int getScreenWidth();
 
-    public boolean isCookieEnabled();
-
-    public String getCanvas2();
-
-    public String getDeviceMotion();
-
-    public String getLanguage();
-
-    public int hasInstallTrigger();
-
-    public int getColorDepth();
-
-    public String getUserAgent();
-
-    public long getNavigatorFasSettings();
-
-    public String getTouchEvent();
-
-    public boolean sessionStorageKey();
+    public int hasMozInnerScreen();
 
     public int getInnerWidth();
 
-    public boolean isJavaEnabled();
+    public boolean sessionStorageKey();
 
-    public boolean isBrave();
+    public int hasForEach();
+
+    public int hasVibrate();
+
+    public int hasRTCPeerConnection();
+
+    public int isOnline();
+
+    public int getInnerHeight();
+
+    public String getProduct();
+
+    public String getPluginInfo();
+
+    public int hasHTMLElement();
+
+    public int hasActiveXObject();
+
+    public JsonObject getWindowPerms();
+
+    public int hasFileReader();
+
+    public String getSed();
+
+    public boolean indexedDBKey();
 
     public int getDocumentMode();
+
+    public String getLanguage();
+
+    public int getScreenAvailWidth();
+
+    public int getTimezoneOffset();
+
+    public boolean isJavaEnabled();
+
+    public int hasBattery();
 
     public String getCanvas1();
 
     public boolean webrtcKey();
 
-    public int getScreenHeight();
-
-    public int getDoNotTrack();
-
-    public int getOuterWidth();
-
-    public int hasActiveXObject();
-
-    public int hasMozInnerScreen();
-
-    public int getScreenWidth();
+    public int hasInstallTrigger();
 
     public int isChrome();
 
-    public String getProductSub();
-
-    public int hasFileReader();
-
-    public boolean localStorageKey();
-
-    public int isOnline();
-
-    public int getScreenAvailHeight();
-
-    public String getDeviceOrientation();
-
-    public int getTimezoneOffset();
-
-    public int hasForEach();
-
-    public boolean indexedDBKey();
-
-    public int hasRTCPeerConnection();
-
-    public int getInnerHeight();
-
-    public String getPluginInfo();
-
-    public int hasBattery();
-
-    public String getProduct();
-
-    public int hasVibrate();
-
-    public int isOpera();
+    public int getPluginLength();
 
     public int getPixelDepth();
 
-    public String getSed();
+    public int getColorDepth();
 
-    public int getPluginLength();
+    public String getUserAgent();
 
-    public int hasHTMLElement();
+    public String getDeviceMotion();
 
-    public JsonObject getWindowPerms();
+    public boolean localStorageKey();
+
+    public int getDoNotTrack();
+
+    public int isOpera();
+
+    public int getScreenAvailHeight();
+
+    public int getOuterWidth();
+
+    public long getNavigatorFasSettings();
+
+    public int getScreenHeight();
+
+    public String getTouchEvent();
+
+    public boolean isCookieEnabled();
+
+    public String getCanvas2();
+
+    public String getProductSub();
+
+    public String getDeviceOrientation();
+
+    public boolean isBrave();
 }
 

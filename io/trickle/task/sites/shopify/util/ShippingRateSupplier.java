@@ -12,19 +12,19 @@ public class ShippingRateSupplier
 implements Supplier {
     public String rate;
 
-    public String get() {
-        return this.rate;
-    }
-
-    public void updateRate(String string) {
-        this.rate = string;
-    }
-
     public Object get() {
         return this.get();
     }
 
     public ShippingRateSupplier(String string) {
+        this.rate = string;
+    }
+
+    public String get() {
+        return this.rate;
+    }
+
+    public void updateRate(String string) {
         this.rate = string;
     }
 }

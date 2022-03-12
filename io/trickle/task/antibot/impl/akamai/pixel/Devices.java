@@ -20,14 +20,6 @@ extends Enum {
         return null;
     }
 
-    public static Devices$Device genFromJson(JsonObject jsonObject) {
-        return new Devices$DeviceImpl(jsonObject.getBoolean("ap"), jsonObject.getJsonObject("bt", null), jsonObject.getString("fonts"), jsonObject.getString("fh"), null, jsonObject.getString("bp"), jsonObject.getJsonObject("sr"), jsonObject.getJsonObject("dp"), jsonObject.getString("lt"), jsonObject.getString("ps"), jsonObject.getString("cv"), jsonObject.getBoolean("fp"), jsonObject.getBoolean("sp"), jsonObject.getString("br"), jsonObject.getBoolean("ieps"), jsonObject.getBoolean("av"), jsonObject.getInteger("b"), jsonObject.getInteger("c"), "", Double.parseDouble(jsonObject.getString("jsv")), jsonObject.getJsonObject("nav"), jsonObject.getJsonObject("crc"), jsonObject.getString("nap"), jsonObject.getBoolean("fc"));
-    }
-
-    public static Devices valueOf(String string) {
-        return Enum.valueOf(Devices.class, string);
-    }
-
     /*
      * WARNING - Possible parameter corruption
      * WARNING - void declaration
@@ -35,6 +27,14 @@ extends Enum {
     public Devices() {
         void var2_-1;
         void var1_-1;
+    }
+
+    public static Devices$Device genFromJson(JsonObject jsonObject) {
+        return new Devices$DeviceImpl(jsonObject.getBoolean("ap"), jsonObject.getJsonObject("bt", null), jsonObject.getString("fonts"), jsonObject.getString("fh"), null, jsonObject.getString("bp"), jsonObject.getJsonObject("sr"), jsonObject.getJsonObject("dp"), jsonObject.getString("lt"), jsonObject.getString("ps"), jsonObject.getString("cv"), jsonObject.getBoolean("fp"), jsonObject.getBoolean("sp"), jsonObject.getString("br"), jsonObject.getBoolean("ieps"), jsonObject.getBoolean("av"), jsonObject.getInteger("b"), jsonObject.getInteger("c"), "", Double.parseDouble(jsonObject.getString("jsv")), jsonObject.getJsonObject("nav"), jsonObject.getJsonObject("crc"), jsonObject.getString("nap"), jsonObject.getBoolean("fc"));
+    }
+
+    public static Devices valueOf(String string) {
+        return Enum.valueOf(Devices.class, string);
     }
 
     public static Devices[] values() {

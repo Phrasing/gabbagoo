@@ -45,23 +45,19 @@ import java.util.stream.Collectors;
 public class Engine
 implements Module {
     public CompletableFuture<Void> startPromise;
-    public JsonObject clientConfiguration;
-    public static boolean initialised = false;
-    public static Engine INSTANCE;
     public Vertx vertx = VertxSingleton.INSTANCE.get();
+    public static boolean initialised = false;
+    public JsonObject clientConfiguration;
     public SocketClient client;
     public Map<Controller, Module> modules = new HashMap<Controller, Module>();
+    public static Engine INSTANCE;
 
-    public void initModules() {
-        this.modules.values().forEach(Module::initialise);
+    public static LoadableAsync lambda$loadAsyncModules$16(Module module) {
+        return (LoadableAsync)((Object)module);
     }
 
-    public static boolean lambda$unloadModules$13(Module module) {
-        return module instanceof Flushable;
-    }
-
-    public static boolean lambda$loadAsyncModules$15(Module module) {
-        return module instanceof LoadableAsync;
+    public static Flushable lambda$unloadModules$14(Module module) {
+        return (Flushable)((Object)module);
     }
 
     @Override
@@ -69,6 +65,99 @@ implements Module {
         this.terminateModules();
         this.client.disconnect();
         this.vertx.undeploy(this.client.deploymentID());
+    }
+
+    public void terminateModules() {
+        this.modules.values().forEach(Module::terminate);
+    }
+
+    public void lambda$scheduleUpdates$8(Long l) {
+        this.loadClientConfig();
+    }
+
+    public void lambda$initialise$2(AsyncResult asyncResult) {
+        System.out.println("Fetched client patches of version: " + this.clientConfiguration.getString("version", String.valueOf(this.clientConfiguration.hashCode())));
+        this.scheduleUpdates();
+        if (this.startPromise == null) return;
+        this.startPromise.complete(null);
+    }
+
+    public CompletableFuture initialisePromise() {
+        this.startPromise = new CompletableFuture();
+        this.initialise();
+        return this.startPromise;
+    }
+
+    public void lambda$initialise$3(CompositeFuture compositeFuture) {
+        this.vertx.deployVerticle((Verticle)new WebhookWorker());
+        this.vertx.deployVerticle((Verticle)new MetricsWorker());
+        this.loadClientConfig().onComplete(this::lambda$initialise$2);
+    }
+
+    public CompositeFuture loadAsyncModules() {
+        List list = this.modules.values().stream().filter(Engine::lambda$loadAsyncModules$15).map(Engine::lambda$loadAsyncModules$16).map(LoadableAsync::load).collect(Collectors.toList());
+        return CompositeFuture.all(list);
+    }
+
+    public SocketClient getClient() {
+        return this.client;
+    }
+
+    public void scheduleUpdates() {
+        VertxSingleton.INSTANCE.get().setPeriodic(TimeUnit.SECONDS.toMillis(30L), this::lambda$scheduleUpdates$8);
+    }
+
+    public Module getModule(Controller controller) {
+        return this.modules.get((Object)controller);
+    }
+
+    public void lambda$initialise$4() {
+        if (initialised) return;
+        initialised = true;
+        this.build();
+        this.loadModules();
+        this.loadAsyncModules().onSuccess(this::lambda$initialise$1).onSuccess(this::lambda$initialise$3).onFailure(Throwable::printStackTrace);
+    }
+
+    public void lambda$initialise$0(Promise promise) {
+        this.initModules();
+    }
+
+    public static boolean lambda$unloadModules$13(Module module) {
+        return module instanceof Flushable;
+    }
+
+    public void lambda$initialise$1(CompositeFuture compositeFuture) {
+        this.vertx.executeBlocking(this::lambda$initialise$0);
+    }
+
+    public void install(Controller controller, Module module) {
+        this.modules.put(controller, module);
+    }
+
+    public void lambda$loadClientConfig$9(JsonObject jsonObject) {
+        if (jsonObject == null) return;
+        this.clientConfiguration = jsonObject;
+    }
+
+    public JsonObject getClientConfiguration() {
+        return this.clientConfiguration;
+    }
+
+    public static Future lambda$loadClientConfig$10(JsonObject jsonObject) {
+        return Future.succeededFuture();
+    }
+
+    public static boolean lambda$loadModules$11(Module module) {
+        return module instanceof Loadable;
+    }
+
+    public static Loadable lambda$loadModules$12(Module module) {
+        return (Loadable)((Object)module);
+    }
+
+    public void lambda$initialise$6(String string) {
+        this.client.login().onComplete(this::lambda$initialise$5);
     }
 
     /*
@@ -82,110 +171,6 @@ implements Module {
             // ** MonitorExit[var0] (shouldn't be in output)
             return INSTANCE;
         }
-    }
-
-    public void lambda$loadClientConfig$9(JsonObject jsonObject) {
-        if (jsonObject == null) return;
-        this.clientConfiguration = jsonObject;
-    }
-
-    public static boolean lambda$loadModules$11(Module module) {
-        return module instanceof Loadable;
-    }
-
-    public void lambda$initialise$4() {
-        if (initialised) return;
-        initialised = true;
-        this.build();
-        this.loadModules();
-        this.loadAsyncModules().onSuccess(this::lambda$initialise$1).onSuccess(this::lambda$initialise$3).onFailure(Throwable::printStackTrace);
-    }
-
-    public void unloadModules() {
-        this.modules.values().stream().filter(Engine::lambda$unloadModules$13).map(Engine::lambda$unloadModules$14).forEach(Flushable::flush);
-    }
-
-    public void loadModules() {
-        this.modules.values().stream().filter(Engine::lambda$loadModules$11).map(Engine::lambda$loadModules$12).forEach(Loadable::load);
-    }
-
-    public static LoadableAsync lambda$loadAsyncModules$16(Module module) {
-        return (LoadableAsync)((Object)module);
-    }
-
-    public void lambda$scheduleUpdates$8(Long l) {
-        this.loadClientConfig();
-    }
-
-    public void scheduleUpdates() {
-        VertxSingleton.INSTANCE.get().setPeriodic(TimeUnit.SECONDS.toMillis(30L), this::lambda$scheduleUpdates$8);
-    }
-
-    public void terminateModules() {
-        this.modules.values().forEach(Module::terminate);
-    }
-
-    public void lambda$initialise$1(CompositeFuture compositeFuture) {
-        this.vertx.executeBlocking(this::lambda$initialise$0);
-    }
-
-    public static Flushable lambda$unloadModules$14(Module module) {
-        return (Flushable)((Object)module);
-    }
-
-    public void lambda$initialise$2(AsyncResult asyncResult) {
-        System.out.println("Fetched client patches of version: " + this.clientConfiguration.getString("version", String.valueOf(this.clientConfiguration.hashCode())));
-        this.scheduleUpdates();
-        if (this.startPromise == null) return;
-        this.startPromise.complete(null);
-    }
-
-    public void lambda$initialise$0(Promise promise) {
-        this.initModules();
-    }
-
-    public void install(Controller controller, Module module) {
-        this.modules.put(controller, module);
-    }
-
-    public JsonObject getClientConfiguration() {
-        return this.clientConfiguration;
-    }
-
-    public Module getModule(Controller controller) {
-        return this.modules.get((Object)controller);
-    }
-
-    public Engine() {
-        this.client = new SocketClient();
-        this.clientConfiguration = new JsonObject().put("version", (Object)"default");
-    }
-
-    public void lambda$initialise$6(String string) {
-        this.client.login().onComplete(this::lambda$initialise$5);
-    }
-
-    public CompletableFuture initialisePromise() {
-        this.startPromise = new CompletableFuture();
-        this.initialise();
-        return this.startPromise;
-    }
-
-    public static Future lambda$loadClientConfig$10(JsonObject jsonObject) {
-        return Future.succeededFuture();
-    }
-
-    public static void lambda$initialise$7(Throwable throwable) {
-        System.out.println("Failed connecting to trickle server");
-        System.exit(-1);
-    }
-
-    public Future loadClientConfig() {
-        return VertxSingleton.INSTANCE.getLocalClient().fetchUpdates().onSuccess(this::lambda$loadClientConfig$9).compose(Engine::lambda$loadClientConfig$10);
-    }
-
-    public static Loadable lambda$loadModules$12(Module module) {
-        return (Loadable)((Object)module);
     }
 
     public void lambda$initialise$5(AsyncResult asyncResult) {
@@ -202,19 +187,8 @@ implements Module {
         System.exit(1);
     }
 
-    public void lambda$initialise$3(CompositeFuture compositeFuture) {
-        this.vertx.deployVerticle((Verticle)new WebhookWorker());
-        this.vertx.deployVerticle((Verticle)new MetricsWorker());
-        this.loadClientConfig().onComplete(this::lambda$initialise$2);
-    }
-
-    public SocketClient getClient() {
-        return this.client;
-    }
-
-    public CompositeFuture loadAsyncModules() {
-        List list = this.modules.values().stream().filter(Engine::lambda$loadAsyncModules$15).map(Engine::lambda$loadAsyncModules$16).map(LoadableAsync::load).collect(Collectors.toList());
-        return CompositeFuture.all(list);
+    public void unloadModules() {
+        this.modules.values().stream().filter(Engine::lambda$unloadModules$13).map(Engine::lambda$unloadModules$14).forEach(Flushable::flush);
     }
 
     public void build() {
@@ -226,9 +200,35 @@ implements Module {
         this.install(Controller.LOGIN, new LoginController(this.vertx));
     }
 
+    public Future loadClientConfig() {
+        return VertxSingleton.INSTANCE.getLocalClient().fetchUpdates().onSuccess(this::lambda$loadClientConfig$9).compose(Engine::lambda$loadClientConfig$10);
+    }
+
+    public void loadModules() {
+        this.modules.values().stream().filter(Engine::lambda$loadModules$11).map(Engine::lambda$loadModules$12).forEach(Loadable::load);
+    }
+
     @Override
     public void initialise() {
         this.vertx.deployVerticle((Verticle)this.client).onSuccess(this::lambda$initialise$6).onFailure(Engine::lambda$initialise$7);
+    }
+
+    public static void lambda$initialise$7(Throwable throwable) {
+        System.out.println("Failed connecting to trickle server");
+        System.exit(-1);
+    }
+
+    public void initModules() {
+        this.modules.values().forEach(Module::initialise);
+    }
+
+    public static boolean lambda$loadAsyncModules$15(Module module) {
+        return module instanceof LoadableAsync;
+    }
+
+    public Engine() {
+        this.client = new SocketClient();
+        this.clientConfiguration = new JsonObject().put("version", (Object)"default");
     }
 }
 

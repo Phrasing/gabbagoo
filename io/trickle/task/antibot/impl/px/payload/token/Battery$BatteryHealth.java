@@ -7,12 +7,12 @@ public enum Battery$BatteryHealth {
     GOOD;
 
 
-    public static Battery$BatteryHealth get() {
-        return GOOD;
-    }
-
     public String toString() {
         return this.name().toLowerCase();
+    }
+
+    public static Battery$BatteryHealth get() {
+        return GOOD;
     }
 }
 

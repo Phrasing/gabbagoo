@@ -20,37 +20,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JFrame;
 
 public class WindowedBrowser {
-    public static AtomicInteger harvesterCounter;
-    public Engine browserEngine;
+    public static Dimension SCREEN_DIMENSION = Toolkit.getDefaultToolkit().getScreenSize();
     public JFrame frame;
-    public static Dimension SCREEN_DIMENSION;
-    public Browser browser;
     public int currentHarvesterNumber;
+    public Browser browser;
+    public static AtomicInteger harvesterCounter = new AtomicInteger(0);
+    public Engine browserEngine;
 
-    public JFrame frame() {
-        return this.frame;
-    }
-
-    public void setTitle(int n, String string) {
-        this.frame.setTitle("Trickle Harvester-YS-" + n + " " + string);
-    }
-
-    public WindowedBrowser(Engine engine) {
-        this.browserEngine = engine;
-        this.currentHarvesterNumber = harvesterCounter.incrementAndGet();
-    }
-
-    static {
-        SCREEN_DIMENSION = Toolkit.getDefaultToolkit().getScreenSize();
-        harvesterCounter = new AtomicInteger(0);
-    }
-
-    public void close() {
-        if (this.frame != null) {
-            this.frame.dispatchEvent(new WindowEvent(this.frame, 201));
-        }
-        if (this.browser.isClosed()) return;
-        this.browser.close();
+    public void enlarge() {
+        this.frame.setSize(700, 700);
+        this.frame.setAlwaysOnTop(true);
+        this.frame.setAlwaysOnTop(false);
     }
 
     public void createWindow() {
@@ -76,18 +56,33 @@ public class WindowedBrowser {
         this.frame.setVisible(true);
     }
 
+    public void setTitle(int n, String string) {
+        this.frame.setTitle("Trickle Harvester-YS-" + n + " " + string);
+    }
+
+    public JFrame frame() {
+        return this.frame;
+    }
+
+    public WindowedBrowser(Engine engine) {
+        this.browserEngine = engine;
+        this.currentHarvesterNumber = harvesterCounter.incrementAndGet();
+    }
+
     public Browser browser() {
         return this.browser;
     }
 
-    public void setTitle(String string) {
-        this.frame.setTitle("Trickle Harvester-" + string);
+    public void close() {
+        if (this.frame != null) {
+            this.frame.dispatchEvent(new WindowEvent(this.frame, 201));
+        }
+        if (this.browser.isClosed()) return;
+        this.browser.close();
     }
 
-    public void enlarge() {
-        this.frame.setSize(700, 700);
-        this.frame.setAlwaysOnTop(true);
-        this.frame.setAlwaysOnTop(false);
+    public void setTitle(String string) {
+        this.frame.setTitle("Trickle Harvester-" + string);
     }
 }
 

@@ -9,45 +9,74 @@ import io.trickle.task.sites.shopify.constants.Countries;
 import io.trickle.task.sites.shopify.constants.States;
 
 public class Profile {
-    public String address1;
-    public String address2;
-    public String city;
-    public String email;
-    public String accountEmail = null;
-    public String accountPassword = null;
-    public String firstName;
-    public PaymentMethod paymentMethod;
-    public String country;
-    public CardType cardType;
-    public String fullCountry;
-    public String cvv;
-    public String zip;
-    public String cardNumber;
-    public String lastName;
-    public String phone;
-    public String expiryYear;
     public String state;
-    public String expiryMonth;
+    public String city;
+    public String expiryYear;
+    public CardType cardType;
+    public String lastName;
+    public String accountPassword = null;
+    public String zip;
+    public String firstName;
+    public String address1;
+    public String country;
+    public String accountEmail = null;
     public String fullState;
-
-    public PaymentMethod getPaymentMethod() {
-        return this.paymentMethod;
-    }
-
-    public void setAccountPassword(String string) {
-        this.accountPassword = string;
-    }
-
-    public String getAddress1() {
-        return this.address1;
-    }
+    public String expiryMonth;
+    public String cardNumber;
+    public String cvv;
+    public String address2;
+    public String email;
+    public PaymentMethod paymentMethod;
+    public String fullCountry;
+    public String phone;
 
     public String getCvv() {
         return this.cvv;
     }
 
-    public String getCardNumber() {
-        return this.cardNumber;
+    public String getExpiryMonth() {
+        return this.expiryMonth;
+    }
+
+    public String getCountry() {
+        return this.country;
+    }
+
+    public String getExpiryYear() {
+        return this.expiryYear;
+    }
+
+    public String getAddress2() {
+        return this.address2;
+    }
+
+    public String getLastName() {
+        return this.lastName;
+    }
+
+    public String getZip() {
+        return this.zip;
+    }
+
+    public String getAccountPassword() {
+        return this.accountPassword;
+    }
+
+    public void setAccountEmail(String string) {
+        this.accountEmail = string;
+    }
+
+    public String getState() {
+        return this.state;
+    }
+
+    public CardType getCardType() {
+        return this.cardType;
+    }
+
+    public String getLastDigits() {
+        if (this.cardNumber.length() <= 4) return this.cardNumber;
+        return this.cardNumber.substring(this.cardNumber.length() - 4);
     }
 
     public Profile(Profile profile) {
@@ -72,25 +101,54 @@ public class Profile {
         this.accountEmail = profile.accountEmail;
     }
 
-    public String getLastDigits() {
-        if (this.cardNumber.length() <= 4) return this.cardNumber;
-        return this.cardNumber.substring(this.cardNumber.length() - 4);
+    public PaymentMethod getPaymentMethod() {
+        return this.paymentMethod;
     }
 
-    public Profile copy() {
-        return new Profile(this);
+    public String getFirstName() {
+        return this.firstName;
     }
 
-    public String toString() {
-        return "Profile{firstName='" + this.firstName + "', lastName='" + this.lastName + "', email='" + this.email + "', phone='" + this.phone + "', address1='" + this.address1 + "', address2='" + this.address2 + "', state='" + this.state + "', fullState='" + this.fullState + "', city='" + this.city + "', country='" + this.country + "', fullCountry='" + this.fullCountry + "', zip='" + this.zip + "', paymentMethod=" + this.paymentMethod + ", cardType=" + this.cardType + ", cardNumber='" + this.cardNumber + "', expiryYear='" + this.expiryYear + "', expiryMonth='" + this.expiryMonth + "', cvv='" + this.cvv + "', accountEmail='" + this.accountEmail + "'}";
+    public String getFullCountry() {
+        return this.fullCountry;
     }
 
-    public String getPhone() {
-        return this.phone;
+    public String getAddress1() {
+        return this.address1;
     }
 
-    public String getExpiryYear() {
-        return this.expiryYear;
+    public String getFullState() {
+        return this.fullState;
+    }
+
+    public String getCardNumber() {
+        return this.cardNumber;
+    }
+
+    public void setAccountPassword(String string) {
+        this.accountPassword = string;
+    }
+
+    public Profile() {
+        this.firstName = null;
+        this.lastName = null;
+        this.email = null;
+        this.phone = null;
+        this.address1 = null;
+        this.address2 = null;
+        this.state = null;
+        this.fullState = null;
+        this.city = null;
+        this.country = null;
+        this.fullCountry = null;
+        this.zip = null;
+        this.paymentMethod = null;
+        this.cardType = null;
+        this.cardNumber = null;
+        this.expiryYear = null;
+        this.expiryMonth = null;
+        this.cvv = null;
+        this.accountEmail = null;
     }
 
     public String getAccountEmail() {
@@ -125,24 +183,8 @@ public class Profile {
         this.fullCountry = Countries.fullCountryName(this.country);
     }
 
-    public String getZip() {
-        return this.zip;
-    }
-
-    public String getExpiryMonth() {
-        return this.expiryMonth;
-    }
-
-    public String getFullCountry() {
-        return this.fullCountry;
-    }
-
     public String getCity() {
         return this.city;
-    }
-
-    public CardType getCardType() {
-        return this.cardType;
     }
 
     public String getEmail() {
@@ -155,36 +197,12 @@ public class Profile {
         return string;
     }
 
-    public String getLastName() {
-        return this.lastName;
+    public String getPhone() {
+        return this.phone;
     }
 
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    public String getState() {
-        return this.state;
-    }
-
-    public String getAddress2() {
-        return this.address2;
-    }
-
-    public String getCountry() {
-        return this.country;
-    }
-
-    public void setAccountEmail(String string) {
-        this.accountEmail = string;
-    }
-
-    public String getAccountPassword() {
-        return this.accountPassword;
-    }
-
-    public String getFullState() {
-        return this.fullState;
+    public Profile copy() {
+        return new Profile(this);
     }
 
     public String splitCard() {
@@ -200,6 +218,10 @@ public class Profile {
             n += 4;
         }
         return stringBuilder.toString();
+    }
+
+    public String toString() {
+        return "Profile{firstName='" + this.firstName + "', lastName='" + this.lastName + "', email='" + this.email + "', phone='" + this.phone + "', address1='" + this.address1 + "', address2='" + this.address2 + "', state='" + this.state + "', fullState='" + this.fullState + "', city='" + this.city + "', country='" + this.country + "', fullCountry='" + this.fullCountry + "', zip='" + this.zip + "', paymentMethod=" + this.paymentMethod + ", cardType=" + this.cardType + ", cardNumber='" + this.cardNumber + "', expiryYear='" + this.expiryYear + "', expiryMonth='" + this.expiryMonth + "', cvv='" + this.cvv + "', accountEmail='" + this.accountEmail + "'}";
     }
 }
 

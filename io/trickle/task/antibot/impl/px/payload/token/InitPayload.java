@@ -22,6 +22,50 @@ public class InitPayload
 implements Payload {
     public Devices$Device device;
 
+    public static CompletableFuture fetch() {
+        try {
+            CompletableFuture completableFuture = InitPayload.getDeviceFromAPI();
+            if (!completableFuture.isDone()) {
+                CompletableFuture completableFuture2 = completableFuture;
+                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> InitPayload.async$fetch(completableFuture2, 1, arg_0));
+            }
+            Devices$Device devices$Device = (Devices$Device)completableFuture.join();
+            return CompletableFuture.completedFuture(new InitPayload(devices$Device));
+        }
+        catch (Throwable throwable) {
+            return CompletableFuture.failedFuture(throwable);
+        }
+    }
+
+    public static CompletableFuture getDeviceFromAPI() {
+        return Devices.deviceFromAPI();
+    }
+
+    public InitPayload(Devices$Device devices$Device) {
+        this.device = devices$Device;
+    }
+
+    public InitPayload() {
+        this.device = Devices.random();
+    }
+
+    public Buffer asBuffer(Site site) {
+        switch (InitPayload$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
+            case 1: {
+                return Buffer.buffer((String)("{\"app_id\":\"PX9Qx3Rve4\",\"device_os_name\":\"Android\",\"device_os_version\":\"" + this.device.getApiLevel() + "\",\"sdk_version\":\"v1.13.2\",\"app_version\":\"4.15.0\"}"));
+            }
+            case 2: {
+                return Buffer.buffer((String)("{\"app_id\":\"PXUArm9B04\",\"device_os_name\":\"Android\",\"device_os_version\":\"" + this.device.getApiLevel() + "\",\"sdk_version\":\"v1.8.0\",\"app_version\":\"21.12\"}"));
+            }
+        }
+        throw new Exception("Invalid PX site initialized");
+    }
+
+    @Override
+    public MultiMap asForm() {
+        throw new RuntimeException("Unsupported Operation");
+    }
+
     /*
      * Unable to fully structure code
      */
@@ -50,50 +94,6 @@ lbl13:
             }
         }
         throw new IllegalArgumentException();
-    }
-
-    public InitPayload() {
-        this.device = Devices.random();
-    }
-
-    public InitPayload(Devices$Device devices$Device) {
-        this.device = devices$Device;
-    }
-
-    @Override
-    public MultiMap asForm() {
-        throw new RuntimeException("Unsupported Operation");
-    }
-
-    public static CompletableFuture getDeviceFromAPI() {
-        return Devices.deviceFromAPI();
-    }
-
-    public static CompletableFuture fetch() {
-        try {
-            CompletableFuture completableFuture = InitPayload.getDeviceFromAPI();
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> InitPayload.async$fetch(completableFuture2, 1, arg_0));
-            }
-            Devices$Device devices$Device = (Devices$Device)completableFuture.join();
-            return CompletableFuture.completedFuture(new InitPayload(devices$Device));
-        }
-        catch (Throwable throwable) {
-            return CompletableFuture.failedFuture(throwable);
-        }
-    }
-
-    public Buffer asBuffer(Site site) {
-        switch (InitPayload$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
-            case 1: {
-                return Buffer.buffer((String)("{\"app_id\":\"PX9Qx3Rve4\",\"device_os_name\":\"Android\",\"device_os_version\":\"" + this.device.getApiLevel() + "\",\"sdk_version\":\"v1.13.2\",\"app_version\":\"4.15.0\"}"));
-            }
-            case 2: {
-                return Buffer.buffer((String)("{\"app_id\":\"PXUArm9B04\",\"device_os_name\":\"Android\",\"device_os_version\":\"" + this.device.getApiLevel() + "\",\"sdk_version\":\"v1.8.0\",\"app_version\":\"21.12\"}"));
-            }
-        }
-        throw new Exception("Invalid PX site initialized");
     }
 }
 

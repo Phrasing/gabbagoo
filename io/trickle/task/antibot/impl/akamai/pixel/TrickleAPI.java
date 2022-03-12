@@ -20,53 +20,54 @@ public class TrickleAPI
 implements Pixel {
     public Devices$Device device;
 
-    public boolean getFC() {
-        return this.device.isFc();
+    public String getFonts() {
+        return this.device.getFonts();
     }
 
-    public String getBT() {
-        if (this.device.getBt() != null) return this.device.getBt().toString();
-        return "0";
-    }
-
-    public String getBP() {
-        return this.device.getBp();
-    }
-
-    public boolean getAP() {
-        return this.device.isAp();
-    }
-
-    public JsonObject getNav() {
-        return this.device.getNav();
-    }
-
-    public String getCV() {
-        return this.device.getCv();
+    public boolean getFP() {
+        return this.device.isFp();
     }
 
     public String getNap() {
         return this.device.getNap();
     }
 
-    public boolean getAV() {
-        return this.device.isAv();
-    }
-
-    public String getPS() {
-        return this.device.getPs();
-    }
-
-    public String getFontHash() {
-        return this.device.getFh();
-    }
-
-    public boolean getSP() {
-        return this.device.isSp();
+    public String getTiming() {
+        int n = 37 + ThreadLocalRandom.current().nextInt(-3, 4);
+        int n2 = 270 + ThreadLocalRandom.current().nextInt(-5, 5);
+        int n3 = 392 + ThreadLocalRandom.current().nextInt(-5, 6);
+        int n4 = 510 + ThreadLocalRandom.current().nextInt(-5, 5);
+        int n5 = 616 + ThreadLocalRandom.current().nextInt(-5, 6);
+        int n6 = ThreadLocalRandom.current().nextInt(9, 12);
+        return "{\"1\":" + n + ",\"2\":" + n2 + ",\"3\":" + n3 + ",\"4\":" + n4 + ",\"5\":" + n5 + ",\"profile\":{\"bp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"sr\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"dp\":0,\"lt\":0,\"ps\":" + ThreadLocalRandom.current().nextInt(0, 2) + ",\"cv\":" + ThreadLocalRandom.current().nextInt(22, 24) + ",\"fp\":0,\"sp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"br\":0,\"ieps\":0,\"av\":0,\"z1\":" + ThreadLocalRandom.current().nextInt(10, 11) + ",\"jsv\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nav\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nap\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"crc\":0,\"z2\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"z3\":1,\"z4\":0,\"z5\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"fonts\":" + n6 + "},\"main\":" + ThreadLocalRandom.current().nextInt(101, 104) + ",\"compute\":" + n + ",\"send\":" + (n5 + n6) + "}";
     }
 
     public JsonObject getSR() {
         return this.device.getSr();
+    }
+
+    public String getCV() {
+        return this.device.getCv();
+    }
+
+    public JsonObject getDP() {
+        return this.device.getDp();
+    }
+
+    public boolean getAV() {
+        return this.device.isAv();
+    }
+
+    public String getZ(String string) {
+        return "{\"a\":" + string + ",\"b\":" + this.device.getB() + ",\"c\":" + this.device.getC() + "}";
+    }
+
+    public boolean getFC() {
+        return this.device.isFc();
+    }
+
+    public String getFontHash() {
+        return this.device.getFh();
     }
 
     @Override
@@ -106,38 +107,17 @@ implements Pixel {
         return CompletableFuture.completedFuture(multiMap);
     }
 
-    public String getZ(String string) {
-        return "{\"a\":" + string + ",\"b\":" + this.device.getB() + ",\"c\":" + this.device.getC() + "}";
-    }
-
-    public boolean getFP() {
-        return this.device.isFp();
-    }
-
-    public String getZH() {
-        return this.device.getZh();
-    }
-
-    public boolean getIEPS() {
-        return this.device.isIeps();
-    }
-
     public TrickleAPI(JsonObject jsonObject) {
         this.device = Devices.genFromJson(jsonObject);
     }
 
-    public double getJSV() {
-        return this.device.getJsv();
+    public JsonObject getNav() {
+        return this.device.getNav();
     }
 
-    public String getTiming() {
-        int n = 37 + ThreadLocalRandom.current().nextInt(-3, 4);
-        int n2 = 270 + ThreadLocalRandom.current().nextInt(-5, 5);
-        int n3 = 392 + ThreadLocalRandom.current().nextInt(-5, 6);
-        int n4 = 510 + ThreadLocalRandom.current().nextInt(-5, 5);
-        int n5 = 616 + ThreadLocalRandom.current().nextInt(-5, 6);
-        int n6 = ThreadLocalRandom.current().nextInt(9, 12);
-        return "{\"1\":" + n + ",\"2\":" + n2 + ",\"3\":" + n3 + ",\"4\":" + n4 + ",\"5\":" + n5 + ",\"profile\":{\"bp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"sr\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"dp\":0,\"lt\":0,\"ps\":" + ThreadLocalRandom.current().nextInt(0, 2) + ",\"cv\":" + ThreadLocalRandom.current().nextInt(22, 24) + ",\"fp\":0,\"sp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"br\":0,\"ieps\":0,\"av\":0,\"z1\":" + ThreadLocalRandom.current().nextInt(10, 11) + ",\"jsv\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nav\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nap\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"crc\":0,\"z2\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"z3\":1,\"z4\":0,\"z5\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"fonts\":" + n6 + "},\"main\":" + ThreadLocalRandom.current().nextInt(101, 104) + ",\"compute\":" + n + ",\"send\":" + (n5 + n6) + "}";
+    public String getBT() {
+        if (this.device.getBt() != null) return this.device.getBt().toString();
+        return "0";
     }
 
     @Override
@@ -145,20 +125,40 @@ implements Pixel {
         return CompletableFuture.failedFuture(new Exception("Unsupported method"));
     }
 
-    public JsonObject getDP() {
-        return this.device.getDp();
+    public String getZH() {
+        return this.device.getZh();
     }
 
-    public String getFonts() {
-        return this.device.getFonts();
+    public String getBR() {
+        return this.device.getBr();
+    }
+
+    public boolean getIEPS() {
+        return this.device.isIeps();
+    }
+
+    public boolean getAP() {
+        return this.device.isAp();
     }
 
     public JsonObject getCRC() {
         return this.device.getCrc();
     }
 
-    public String getBR() {
-        return this.device.getBr();
+    public double getJSV() {
+        return this.device.getJsv();
+    }
+
+    public boolean getSP() {
+        return this.device.isSp();
+    }
+
+    public String getPS() {
+        return this.device.getPs();
+    }
+
+    public String getBP() {
+        return this.device.getBp();
     }
 
     public String getLT() {

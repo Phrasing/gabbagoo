@@ -23,21 +23,6 @@ public class Script {
     public ThreadLocal<Context> jsCtx;
     public Source source;
 
-    public static Context builder() {
-        return Context.newBuilder((String[])new String[0]).allowHostAccess(HostAccess.ALL).allowNativeAccess(true).allowPolyglotAccess(PolyglotAccess.ALL).build();
-    }
-
-    public Script(String string) {
-        this.source = Source.newBuilder((String)"js", (CharSequence)string, (String)"src.js").build();
-        this.jsCtx = new ThreadLocal();
-    }
-
-    public Value execute(String string) {
-        Context context = this.getContext();
-        Value value = context.getBindings("js").getMember(string);
-        return value.execute(new Object[0]);
-    }
-
     public static Script fromCode(String string) {
         try {
             return new Script(string);
@@ -48,13 +33,14 @@ public class Script {
         }
     }
 
-    public Context getContext() {
-        Context context = this.jsCtx.get();
-        if (context != null) return context;
-        Context context2 = Script.builder();
-        context2.eval(this.source);
-        this.jsCtx.set(context2);
-        return this.getContext();
+    public static Context builder() {
+        return Context.newBuilder((String[])new String[0]).allowHostAccess(HostAccess.ALL).allowNativeAccess(true).allowPolyglotAccess(PolyglotAccess.ALL).build();
+    }
+
+    public Value execute(String string) {
+        Context context = this.getContext();
+        Value value = context.getBindings("js").getMember(string);
+        return value.execute(new Object[0]);
     }
 
     public String call(String string, String ... stringArray) {
@@ -76,6 +62,20 @@ public class Script {
             System.out.println("Error loading script: " + iOException.getMessage());
             return null;
         }
+    }
+
+    public Context getContext() {
+        Context context = this.jsCtx.get();
+        if (context != null) return context;
+        Context context2 = Script.builder();
+        context2.eval(this.source);
+        this.jsCtx.set(context2);
+        return this.getContext();
+    }
+
+    public Script(String string) {
+        this.source = Source.newBuilder((String)"js", (CharSequence)string, (String)"src.js").build();
+        this.jsCtx = new ThreadLocal();
     }
 }
 

@@ -11,6 +11,21 @@ public enum PaymentMethod {
 
     public String method;
 
+    public static PaymentMethod detectMethod(String string) {
+        switch (string.charAt(0)) {
+            case '3': {
+                return AMEX;
+            }
+            case '4': {
+                return VISA;
+            }
+            case '6': {
+                return DISCOVER;
+            }
+        }
+        return MASTERCARD;
+    }
+
     public String getFirstLetterUppercase() {
         return this.method.charAt(0) + this.method.substring(1).toLowerCase();
     }
@@ -26,21 +41,6 @@ public enum PaymentMethod {
     public PaymentMethod() {
         void var3_1;
         this.method = var3_1;
-    }
-
-    public static PaymentMethod detectMethod(String string) {
-        switch (string.charAt(0)) {
-            case '3': {
-                return AMEX;
-            }
-            case '4': {
-                return VISA;
-            }
-            case '6': {
-                return DISCOVER;
-            }
-        }
-        return MASTERCARD;
     }
 }
 

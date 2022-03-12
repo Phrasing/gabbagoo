@@ -8,41 +8,43 @@ import io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Battery {
-    public float voltageVector;
-    public String chargingMethod;
     public double voltage;
-    public float VOLT_CONVERT_RATIO = Battery.jitter(Float.intBitsToFloat(1003713950), Float.intBitsToFloat(917327619));
-    public static float VOLT_TO_PERCENT_RATIO;
     public long lastCheckTime;
+    public float voltageVector;
     public static float MIN_VOLT;
     public Battery$ChargingStatus chargingStatus;
-    public static float MAX_VOLT;
     public String batteryHealth;
+    public static float VOLT_TO_PERCENT_RATIO;
     public int batteryPercent;
+    public float VOLT_CONVERT_RATIO = Battery.jitter(Float.intBitsToFloat(1003713950), Float.intBitsToFloat(917327619));
     public double temperature;
+    public String chargingMethod;
+    public static float MAX_VOLT;
     public String batteryType;
 
-    static {
-        MIN_VOLT = Float.intBitsToFloat(1080386962);
-        VOLT_TO_PERCENT_RATIO = Float.intBitsToFloat(1003713950);
-        MAX_VOLT = Float.intBitsToFloat(1082689629);
+    public static Battery get() {
+        String string;
+        Battery$ChargingStatus battery$ChargingStatus = Battery$ChargingStatus.get();
+        Battery$BatteryHealth battery$BatteryHealth = Battery$BatteryHealth.get();
+        String string2 = battery$BatteryHealth.toString();
+        if (ThreadLocalRandom.current().nextBoolean()) {
+            string = "Li-ion";
+            return new Battery(string2, battery$ChargingStatus, string);
+        }
+        string = "Unknown";
+        return new Battery(string2, battery$ChargingStatus, string);
     }
 
-    public static float randVoltage() {
-        return (float)ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(4615253599725813760L), Double.longBitsToDouble(4616489834658136064L));
+    public double getTemperature() {
+        return this.temperature;
     }
 
-    public String getChargingStatus() {
-        return this.chargingStatus.toString();
+    public int getBatteryPercent() {
+        return this.batteryPercent;
     }
 
-    public String toString() {
-        return "batteryPercent=" + this.batteryPercent + "%, voltage=" + this.voltage + ", method=" + this.chargingStatus;
-    }
-
-    public static double roundTemperature(double d) {
-        double d2 = Math.pow(Double.longBitsToDouble(0x4024000000000000L), Double.longBitsToDouble(0x3FF0000000000000L));
-        return (double)Math.round(d * d2) / d2;
+    public String getBatteryType() {
+        return this.batteryType;
     }
 
     public static double roundVoltage(double d) {
@@ -62,9 +64,12 @@ public class Battery {
         this.recalculate();
     }
 
-    public void updateValuesAfterStatusChange() {
-        this.voltageVector = this.chargingStatus.changeVector();
-        this.chargingMethod = this.chargingStatus.chargingMethod();
+    public static double randTemp() {
+        return ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4033000000000000L), Double.longBitsToDouble(0x4040800000000000L));
+    }
+
+    public static float randVoltage() {
+        return (float)ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(4615253599725813760L), Double.longBitsToDouble(4616489834658136064L));
     }
 
     public void recalculate() {
@@ -92,37 +97,30 @@ public class Battery {
         this.temperature += ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(-4616189618054758400L), Double.longBitsToDouble(0x3FF0000000000000L));
     }
 
-    public String getBatteryType() {
-        return this.batteryType;
-    }
-
-    public int getBatteryPercent() {
-        return this.batteryPercent;
-    }
-
-    public static Battery get() {
-        String string;
-        Battery$ChargingStatus battery$ChargingStatus = Battery$ChargingStatus.get();
-        Battery$BatteryHealth battery$BatteryHealth = Battery$BatteryHealth.get();
-        String string2 = battery$BatteryHealth.toString();
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            string = "Li-ion";
-            return new Battery(string2, battery$ChargingStatus, string);
-        }
-        string = "Unknown";
-        return new Battery(string2, battery$ChargingStatus, string);
+    public static double roundTemperature(double d) {
+        double d2 = Math.pow(Double.longBitsToDouble(0x4024000000000000L), Double.longBitsToDouble(0x3FF0000000000000L));
+        return (double)Math.round(d * d2) / d2;
     }
 
     public String getChargingMethod() {
         return this.chargingMethod;
     }
 
-    public double getTemperature() {
-        return this.temperature;
+    public String getBatteryHealth() {
+        return this.batteryHealth;
     }
 
-    public static double randTemp() {
-        return ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4033000000000000L), Double.longBitsToDouble(0x4040800000000000L));
+    public String getChargingStatus() {
+        return this.chargingStatus.toString();
+    }
+
+    public double getVoltage() {
+        return this.voltage;
+    }
+
+    public void updateValuesAfterStatusChange() {
+        this.voltageVector = this.chargingStatus.changeVector();
+        this.chargingMethod = this.chargingStatus.chargingMethod();
     }
 
     public static float jitter(float f, float f2) {
@@ -131,12 +129,14 @@ public class Battery {
         return f + f3;
     }
 
-    public String getBatteryHealth() {
-        return this.batteryHealth;
+    static {
+        MAX_VOLT = Float.intBitsToFloat(1082689629);
+        VOLT_TO_PERCENT_RATIO = Float.intBitsToFloat(1003713950);
+        MIN_VOLT = Float.intBitsToFloat(1080386962);
     }
 
-    public double getVoltage() {
-        return this.voltage;
+    public String toString() {
+        return "batteryPercent=" + this.batteryPercent + "%, voltage=" + this.voltage + ", method=" + this.chargingStatus;
     }
 }
 

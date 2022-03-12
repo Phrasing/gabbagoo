@@ -6,10 +6,10 @@ package io.trickle.task.sites.shopify;
 import java.util.Map;
 
 public interface Flow$Actions {
-    public boolean needsPrice();
+    public boolean needsAuthTokens();
 
     public Map requiredCookies();
 
-    public boolean needsAuthTokens();
+    public boolean needsPrice();
 }
 

@@ -29,20 +29,38 @@ import java.util.regex.Pattern;
 
 public class ShopifyAPI
 extends TaskApiClient {
-    public static int EXCEPTION_RETRY_DELAY = 3000;
+    public String SEC_UA;
+    public static String[] api_ua;
     public String UA;
+    public boolean isOOS;
+    public String SHOP_ID;
+    public static Pattern VER_PATTERN;
+    public String API_TOKEN;
+    public static int EXCEPTION_RETRY_DELAY;
+    public String SITE_URL;
     public String key;
     public boolean isFirstProcessingPageVisit;
-    public boolean isOOS;
-    public String API_TOKEN;
-    public String SHOP_ID;
-    public static String[] api_ua;
-    public String SITE_URL;
-    public String SEC_UA;
-    public static Pattern VER_PATTERN;
 
-    public String getBaseCheckoutURL() {
-        return "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/";
+    public HttpRequest genAcc() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/account").as(BodyCodec.none());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/account/register");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
     }
 
     public HttpRequest elJS(String object) {
@@ -66,214 +84,27 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public ShopifyAPI(Task task, RealClient realClient) {
-        super(realClient);
-        this.SITE_URL = SiteParser.getURLFromSite(task);
-        this.UA = api_ua[ThreadLocalRandom.current().nextInt(api_ua.length)];
-        String string = Utils.parseChromeVer(this.UA);
-        this.SEC_UA = "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"" + string + "\", \"Google Chrome\";v=\"" + string + "\"";
-    }
-
-    public HttpRequest newQueue() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/queue/poll").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/throttle/queue");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest fakePatchPayment(String string) {
-        return this.postPaymentWithOption(string, true);
-    }
-
-    public HttpRequest contactAPI(String string) {
-        HttpRequest httpRequest = this.client.patchAbs("https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string).as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("authorization", this.API_TOKEN);
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest submitPassword() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/password").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/password");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest cartJS() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart.js").as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/products/" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public MultiMap challengeForm(String string, String string2) {
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        multiMap.set("authenticity_token", string);
-        multiMap.set("g-recaptcha-response", string2);
-        return multiMap;
-    }
-
-    public JsonObject monitorGraphBody() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("query", (Object)"\n  {\n    products(first: 10) {\n      edges {\n        node {\n          id\n          title\n          variants(first: 40) {\n            edges {\n              node {\n                id\n                quantityAvailable\n                metafield(namespace: \"my_fields\", key: \"next_drop\") {\n                  value\n                }\n                selectedOptions {\n                  name\n                  value\n                }\n                image {\n                  originalSrc\n                }\n                priceV2 {\n                  amount\n                  currencyCode\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }");
-        jsonObject.put("variables", (Object)new JsonObject());
-        return jsonObject;
-    }
-
-    public HttpRequest shippingPage(String string) {
-        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
-        if (this.checkIsOOS()) {
-            string2 = string2 + "/shipping_rates";
-        }
-        string2 = string2 + "?previous_step=contact_information&step=shipping_method";
-        if (this.key != null) {
-            string2 = string2 + "&key=" + this.key;
-        }
-        HttpRequest httpRequest = this.client.getAbs(string2).as(BodyCodec.buffer());
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public void setInstock() {
-        this.isOOS = false;
-    }
-
-    public HttpRequest atcAJAX(String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart/add.js?id=" + string).as(BodyCodec.buffer());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public MultiMap emptyCheckoutViaCartForm() {
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        multiMap.set("updates[]", "1");
-        multiMap.set("attributes[checkout_clicked]", "true");
-        multiMap.set("checkout", "");
-        return multiMap;
-    }
-
-    public String getSiteURL() {
-        return this.SITE_URL;
-    }
-
-    public HttpRequest postShippingRate(String string) {
+    public HttpRequest postPaymentWithOption(String string, boolean bl) {
         String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
         if (this.key != null) {
-            string2 = string2 + "&key=" + this.key;
+            string2 = string2 + "?key=" + this.key;
         }
-        HttpRequest httpRequest = this.client.postAbs(string2).as(BodyCodec.buffer());
+        HttpRequest httpRequest = bl ? this.client.patchAbs(string2).as(BodyCodec.buffer()) : this.client.postAbs(string2).as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
         httpRequest.putHeader("upgrade-insecure-requests", "1");
         httpRequest.putHeader("origin", "https://" + this.SITE_URL);
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("content-type", !bl ? "application/x-www-form-urlencoded" : "DONT_SET");
         httpRequest.putHeader("user-agent", this.UA);
         httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
         httpRequest.putHeader("sec-fetch-site", "same-origin");
         httpRequest.putHeader("sec-fetch-mode", "navigate");
         httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string + "?previous_step=shipping_method&step=payment_method");
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
-    }
-
-    public HttpRequest login() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/account/login").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/account/login?return_url=%2Faccount");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public boolean checkIsOOS() {
-        if (!this.isOOS) return false;
-        this.isOOS = false;
-        return true;
     }
 
     public HttpRequest emptyCheckoutViaCart() {
@@ -298,38 +129,45 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public JsonObject graphCheckoutBody(String string) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("query", (Object)("\n  mutation {\n    cartCreate(\n      input: { lines: [{merchandiseId: \"" + string + "\", quantity: 1}, ] }\n    ) {\n      cart {\n        checkoutUrl,\n        id\n      }\n    }\n  }\n"));
-        jsonObject.put("variables", (Object)new JsonObject());
-        return jsonObject;
-    }
-
-    public HttpRequest basicATC() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/cart/add").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+    public HttpRequest stripeInitRequest(String string) {
+        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.buffer());
         httpRequest.putHeader("upgrade-insecure-requests", "1");
         httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
         httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/products/" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest oldQueue() {
+        String string = this.client.cookieStore().getCookieValue("_shopify_ctd");
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/checkout/poll?js_poll=1").as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/throttle/queue?_ctd=" + string + "&_ctd_update");
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
     }
 
-    public HttpRequest postPayment(String string) {
-        return this.postPaymentWithOption(string, false);
+    public String getSiteURL() {
+        return this.SITE_URL;
     }
 
-    public HttpRequest oosPage(String string) {
+    public HttpRequest graphCCheckoutPage(String string) {
         HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.buffer());
         httpRequest.putHeader("upgrade-insecure-requests", "1");
         httpRequest.putHeader("user-agent", this.UA);
@@ -344,67 +182,6 @@ extends TaskApiClient {
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
-    }
-
-    public HttpRequest postContact(String string) {
-        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
-        if (this.key != null) {
-            string2 = string2 + "?key=" + this.key;
-        }
-        HttpRequest httpRequest = this.client.postAbs(string2).as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public String fakeCheckoutPath() {
-        String string = "abcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder stringBuilder = new StringBuilder();
-        while (stringBuilder.length() < 32) {
-            int n = (int)(ThreadLocalRandom.current().nextFloat() * (float)"abcdefghijklmnopqrstuvwxyz0123456789".length());
-            stringBuilder.append("abcdefghijklmnopqrstuvwxyz0123456789".charAt(n));
-        }
-        return stringBuilder.toString();
-    }
-
-    public HttpRequest fetchNewQueueUrl() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/throttle/queue").as(BodyCodec.buffer());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL);
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public ShopifyAPI(Task task) {
-        this.SITE_URL = SiteParser.getURLFromSite(task);
-        this.UA = api_ua[ThreadLocalRandom.current().nextInt(api_ua.length)];
-        String string = Utils.parseChromeVer(this.UA);
-        this.SEC_UA = "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"" + string + "\", \"Google Chrome\";v=\"" + string + "\"";
     }
 
     public HttpRequest getProcessingRedirect(String string) {
@@ -434,11 +211,46 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public HttpRequest homepage() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/").as(BodyCodec.buffer());
+    public HttpRequest submitCheckpoint() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/checkpoint").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("cache-control", "max-age=0");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/checkpoint?return_to=https%3A%2F%2F" + this.SITE_URL + "%2Fcheckout");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest paymentStatusAPI(String string) {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/api/checkouts/" + string + "/payments/").as(BodyCodec.buffer());
+        httpRequest.putHeader("x-shopify-uniquetoken", this.getCookies().getCookieValue("_shopify_y"));
+        httpRequest.putHeader("authorization", this.API_TOKEN);
+        httpRequest.putHeader("accept", "application/json");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("x-shopify-visittoken", this.getCookies().getCookieValue("_shopify_s"));
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public void setOOS() {
+        this.isOOS = true;
+    }
+
+    public HttpRequest atcAJAX(String string) {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart/add.js?id=" + string).as(BodyCodec.buffer());
         httpRequest.putHeader("upgrade-insecure-requests", "1");
         httpRequest.putHeader("user-agent", this.UA);
         httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
@@ -446,33 +258,12 @@ extends TaskApiClient {
         httpRequest.putHeader("sec-fetch-mode", "navigate");
         httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest upsellATC() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/cart/add.js").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/products/" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
-    }
-
-    public boolean getIsOOS() {
-        return this.isOOS;
     }
 
     public HttpRequest calculateTaxesWallets(String string) {
@@ -497,35 +288,8 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public HttpRequest paymentPage(String string) {
-        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
-        if (this.getOOSDirect()) {
-            string2 = string2 + "/shipping_rates";
-        }
-        string2 = string2 + "?previous_step=shipping_method&step=payment_method";
-        if (this.key != null) {
-            string2 = string2 + "&key=" + this.key;
-        }
-        HttpRequest httpRequest = this.client.getAbs(string2).as(BodyCodec.buffer());
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string + "?previous_step=shipping_method&step=payment_method");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest meta() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/payments/config.json").as(BodyCodec.buffer());
+    public HttpRequest cart() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart").as(BodyCodec.buffer());
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
@@ -541,40 +305,21 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public HttpRequest stripeInitRequest(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.buffer());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest shippingRateAPI(String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/wallets/checkouts/" + string + "/shipping_rates.json").as(BodyCodec.buffer());
-        httpRequest.putHeader("x-shopify-uniquetoken", this.getCookies().getCookieValue("_shopify_y"));
+    public HttpRequest processAPI(String string) {
+        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
+        if (this.key != null) {
+            string2 = string2 + "?key=" + this.key;
+        }
+        HttpRequest httpRequest = this.client.patchAbs(string2).as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("x-shopify-uniquetoken", UUID.randomUUID().toString());
         httpRequest.putHeader("authorization", this.API_TOKEN);
         httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("accept", "application/json");
         httpRequest.putHeader("user-agent", this.UA);
         httpRequest.putHeader("x-shopify-visittoken", this.getCookies().getCookieValue("_shopify_s"));
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
-    }
-
-    public boolean markProcessingPageAsVisited() {
-        if (!this.isFirstProcessingPageVisit) return false;
-        this.isFirstProcessingPageVisit = false;
-        return true;
     }
 
     public HttpRequest processingRedirect(String string) {
@@ -596,27 +341,38 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public HttpRequest checkpointPage() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/checkpoint?return_to=https%3A%2F%2F" + this.SITE_URL + "%2Fcheckout").as(BodyCodec.buffer());
-        httpRequest.putHeader("cache-control", "max-age=0");
+    public boolean checkIsOOS() {
+        if (!this.isOOS) return false;
+        this.isOOS = false;
+        return true;
+    }
+
+    public HttpRequest productsJSON(boolean bl) {
+        HttpRequest httpRequest = this.client.getAbs(bl ? "https://" + this.SITE_URL + "/products.json?order=" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE) : "https://" + this.SITE_URL + "/products.json?limit=250").as(BodyCodec.buffer());
         httpRequest.putHeader("upgrade-insecure-requests", "1");
-        if (Harvester.HARVESTER_UA != null) {
-            httpRequest.putHeader("user-agent", Harvester.HARVESTER_UA);
-        } else {
-            httpRequest.putHeader("user-agent", this.UA);
-        }
+        httpRequest.putHeader("user-agent", this.UA);
         httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-site", "none");
         httpRequest.putHeader("sec-fetch-mode", "navigate");
         httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/checkout");
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
+    }
+
+    public void setShopID(String string) {
+        this.SHOP_ID = string;
+    }
+
+    public ShopifyAPI(Task task) {
+        this.SITE_URL = SiteParser.getURLFromSite(task);
+        this.UA = api_ua[ThreadLocalRandom.current().nextInt(api_ua.length)];
+        String string = Utils.parseChromeVer(this.UA);
+        this.SEC_UA = "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"" + string + "\", \"Google Chrome\";v=\"" + string + "\"";
     }
 
     public HttpRequest submitChallenge() {
@@ -665,8 +421,133 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public HttpRequest genAcc() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/account").as(BodyCodec.none());
+    public String calculateAccessToken() {
+        if (this.SITE_URL.equals("mntd-staging.myshopify.com")) {
+            return "97aecd9d74bdf081bc0320959d805231";
+        }
+        if (this.SITE_URL.equals("getmntd-ca.myshopify.com")) {
+            return "34d6cd77755dc21434a9d808511aad92";
+        }
+        if (this.SITE_URL.equals("getmntd-eu.myshopify.com")) {
+            return "a822ea3bbe64015438d40b50dbaa685b";
+        }
+        if (!this.SITE_URL.equals("getmntd-uk.myshopify.com")) return "ef2a2e78515db639ca895bac3616ec0b";
+        return "960af41b3dad3a0972e3b5ae3e594507";
+    }
+
+    public boolean markProcessingPageAsVisited() {
+        if (!this.isFirstProcessingPageVisit) return false;
+        this.isFirstProcessingPageVisit = false;
+        return true;
+    }
+
+    public HttpRequest meta() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/payments/config.json").as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest homepage() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/").as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest shippingPage(String string) {
+        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
+        if (this.checkIsOOS()) {
+            string2 = string2 + "/shipping_rates";
+        }
+        string2 = string2 + "?previous_step=contact_information&step=shipping_method";
+        if (this.key != null) {
+            string2 = string2 + "&key=" + this.key;
+        }
+        HttpRequest httpRequest = this.client.getAbs(string2).as(BodyCodec.buffer());
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest walletsPutDetails(String string) {
+        HttpRequest httpRequest = this.client.putAbs("https://" + this.SITE_URL + "/api/checkouts/" + string + ".json").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("x-shopify-uniquetoken", this.getCookies().getCookieValue("_shopify_y"));
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("authorization", this.API_TOKEN);
+        httpRequest.putHeader("x-shopify-checkout-version", "2018-03-05");
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("accept", "application/json");
+        httpRequest.putHeader("x-shopify-wallets-caller", "costanza");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("x-shopify-visittoken", this.getCookies().getCookieValue("_shopify_s"));
+        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/collections/frontpage");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest basicATC() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/cart/add").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/products/" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest submitPassword() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/password").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("cache-control", "max-age=0");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
@@ -681,15 +562,35 @@ extends TaskApiClient {
         httpRequest.putHeader("sec-fetch-mode", "navigate");
         httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/account/register");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/password");
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
     }
 
-    public HttpRequest fetchQueueUrl() {
-        String string = this.client.cookieStore().getCookieValue("_shopify_ctd");
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/throttle/queue?_ctd=" + string + "&_ctd_update").as(BodyCodec.buffer());
+    public HttpRequest upsellATC() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/cart/add.js").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/products/" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest fetchNewQueueUrl() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/throttle/queue").as(BodyCodec.buffer());
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
@@ -705,29 +606,145 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public void setOOS() {
-        this.isOOS = true;
+    public HttpRequest shippingRateOld(String string, String string2, String string3) {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart/shipping_rates.json?shipping_address[zip]=" + string.replace(" ", "%20") + "&shipping_address[country]=" + string2.replace(" ", "%20") + "&shipping_address[province]=" + string3).as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
     }
 
-    public HttpRequest graphCheckoutGen() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/api/2021-10/graphql.json").as(BodyCodec.buffer());
-        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        httpRequest.putHeader("x-shopify-storefront-access-token", this.calculateAccessToken());
-        httpRequest.putHeader("DNT", "1");
-        httpRequest.putHeader("content-type", "application/json");
+    static {
+        EXCEPTION_RETRY_DELAY = 3000;
+        VER_PATTERN = Pattern.compile("Chrome/([0-9][0-9])");
+        api_ua = new String[]{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.56", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.146 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.50", "Mozilla/5.0 (X11; CrOS x86_64 13597.66.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.109 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.53", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.146 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36"};
+    }
+
+    public HttpRequest clearCart() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart/clear.js").as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("User-Agent", this.UA);
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("Accept", "*/*");
-        httpRequest.putHeader("Origin", "https://getmntd.com");
-        httpRequest.putHeader("Sec-Fetch-Site", "cross-site");
-        httpRequest.putHeader("Sec-Fetch-Mode", "cors");
-        httpRequest.putHeader("Sec-Fetch-Dest", "empty");
-        httpRequest.putHeader("Referer", "https://getmntd.com/");
-        httpRequest.putHeader("Accept-Encoding", "gzip, deflate");
-        httpRequest.putHeader("Accept-Language", "en-US,en;q=0.9");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "none");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
+    }
+
+    public ShopifyAPI(Task task, RealClient realClient) {
+        super(realClient);
+        this.SITE_URL = SiteParser.getURLFromSite(task);
+        this.UA = api_ua[ThreadLocalRandom.current().nextInt(api_ua.length)];
+        String string = Utils.parseChromeVer(this.UA);
+        this.SEC_UA = "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"" + string + "\", \"Google Chrome\";v=\"" + string + "\"";
+    }
+
+    public JsonObject graphCheckoutBody(String string) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("query", (Object)("\n  mutation {\n    cartCreate(\n      input: { lines: [{merchandiseId: \"" + string + "\", quantity: 1}, ] }\n    ) {\n      cart {\n        checkoutUrl,\n        id\n      }\n    }\n  }\n"));
+        jsonObject.put("variables", (Object)new JsonObject());
+        return jsonObject;
+    }
+
+    public HttpRequest paymentPage(String string) {
+        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
+        if (this.getOOSDirect()) {
+            string2 = string2 + "/shipping_rates";
+        }
+        string2 = string2 + "?previous_step=shipping_method&step=payment_method";
+        if (this.key != null) {
+            string2 = string2 + "&key=" + this.key;
+        }
+        HttpRequest httpRequest = this.client.getAbs(string2).as(BodyCodec.buffer());
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string + "?previous_step=shipping_method&step=payment_method");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest contactAPI(String string) {
+        HttpRequest httpRequest = this.client.patchAbs("https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string).as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("authorization", this.API_TOKEN);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest postContact(String string) {
+        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
+        if (this.key != null) {
+            string2 = string2 + "?key=" + this.key;
+        }
+        HttpRequest httpRequest = this.client.postAbs(string2).as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest cartJS() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart.js").as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/products/" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public String getBaseCheckoutURL() {
+        return "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/";
     }
 
     public HttpRequest emptyCheckout(boolean bl) {
@@ -754,75 +771,37 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    static {
-        VER_PATTERN = Pattern.compile("Chrome/([0-9][0-9])");
-        api_ua = new String[]{"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.56", "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.146 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.50", "Mozilla/5.0 (X11; CrOS x86_64 13597.66.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.109 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.53", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_2_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_0_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.146 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36"};
-    }
-
-    public HttpRequest cart() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart").as(BodyCodec.buffer());
+    public HttpRequest paymentToken(WebClient webClient) {
+        HttpRequest httpRequest = webClient.postAbs("https://deposit.us.shopifycs.com/sessions").as(BodyCodec.buffer());
+        httpRequest.putHeader("Host", "deposit.us.shopifycs.com");
+        httpRequest.putHeader("Connection", "keep-alive");
+        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("Accept", "application/json");
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        httpRequest.putHeader("User-Agent", this.UA);
+        httpRequest.putHeader("Content-Type", "application/json");
+        httpRequest.putHeader("Origin", "https://checkout.shopifycs.com");
+        httpRequest.putHeader("Sec-Fetch-Site", "same-site");
+        httpRequest.putHeader("Sec-Fetch-Mode", "cors");
+        httpRequest.putHeader("Sec-Fetch-Dest", "empty");
+        httpRequest.putHeader("Referer", "https://checkout.shopifycs.com/");
+        httpRequest.putHeader("Accept-Encoding", "gzip, deflate");
+        httpRequest.putHeader("Accept-Language", "en-US,en;q=0.9");
         return httpRequest;
     }
 
-    public HttpRequest rawCheckoutUrl(String string) {
-        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
-        if (this.key != null) {
-            string2 = string2 + "?key=" + this.key;
-        }
-        HttpRequest httpRequest = this.client.getAbs(string2).as(BodyCodec.buffer());
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/checkpoint?return_to=https%3A%2F%2F" + this.SITE_URL + "%2Fcart");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
+    public HttpRequest fakePatchPayment(String string) {
+        return this.postPaymentWithOption(string, true);
     }
 
-    public String calculateAccessToken() {
-        if (this.SITE_URL.equals("mntd-staging.myshopify.com")) {
-            return "97aecd9d74bdf081bc0320959d805231";
-        }
-        if (this.SITE_URL.equals("getmntd-ca.myshopify.com")) {
-            return "34d6cd77755dc21434a9d808511aad92";
-        }
-        if (this.SITE_URL.equals("getmntd-eu.myshopify.com")) {
-            return "a822ea3bbe64015438d40b50dbaa685b";
-        }
-        if (!this.SITE_URL.equals("getmntd-uk.myshopify.com")) return "ef2a2e78515db639ca895bac3616ec0b";
-        return "960af41b3dad3a0972e3b5ae3e594507";
-    }
-
-    public HttpRequest processAPI(String string) {
-        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
-        if (this.key != null) {
-            string2 = string2 + "?key=" + this.key;
-        }
-        HttpRequest httpRequest = this.client.patchAbs(string2).as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("x-shopify-uniquetoken", UUID.randomUUID().toString());
+    public HttpRequest shippingRateAPI(String string) {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/wallets/checkouts/" + string + "/shipping_rates.json").as(BodyCodec.buffer());
+        httpRequest.putHeader("x-shopify-uniquetoken", this.getCookies().getCookieValue("_shopify_y"));
         httpRequest.putHeader("authorization", this.API_TOKEN);
         httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("accept", "application/json");
         httpRequest.putHeader("user-agent", this.UA);
         httpRequest.putHeader("x-shopify-visittoken", this.getCookies().getCookieValue("_shopify_s"));
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
@@ -830,34 +809,26 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public HttpRequest postPaymentWithOption(String string, boolean bl) {
-        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
-        if (this.key != null) {
-            string2 = string2 + "?key=" + this.key;
-        }
-        HttpRequest httpRequest = bl ? this.client.patchAbs(string2).as(BodyCodec.buffer()) : this.client.postAbs(string2).as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
-        httpRequest.putHeader("content-type", !bl ? "application/x-www-form-urlencoded" : "DONT_SET");
-        httpRequest.putHeader("user-agent", this.UA);
+    public HttpRequest fetchQueueUrl() {
+        String string = this.client.cookieStore().getCookieValue("_shopify_ctd");
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/throttle/queue?_ctd=" + string + "&_ctd_update").as(BodyCodec.buffer());
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
         httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("user-agent", this.UA);
         httpRequest.putHeader("sec-fetch-site", "same-origin");
         httpRequest.putHeader("sec-fetch-mode", "navigate");
         httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string + "?previous_step=shipping_method&step=payment_method");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL);
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
     }
 
-    public HttpRequest clearCart() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart/clear.js").as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+    public HttpRequest oosPage(String string) {
+        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.buffer());
         httpRequest.putHeader("upgrade-insecure-requests", "1");
         httpRequest.putHeader("user-agent", this.UA);
         httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
@@ -865,13 +836,88 @@ extends TaskApiClient {
         httpRequest.putHeader("sec-fetch-mode", "navigate");
         httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
     }
 
-    public HttpRequest submitCheckpoint() {
-        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/checkpoint").as(BodyCodec.buffer());
+    public MultiMap emptyCheckoutViaCartForm() {
+        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
+        multiMap.set("updates[]", "1");
+        multiMap.set("attributes[checkout_clicked]", "true");
+        multiMap.set("checkout", "");
+        return multiMap;
+    }
+
+    public HttpRequest challengePage() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/challenge").as(BodyCodec.buffer());
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/account/login");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public boolean getOOSDirect() {
+        return this.isOOS;
+    }
+
+    public HttpRequest newQueue() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/queue/poll").as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("accept", "*/*");
+        httpRequest.putHeader("origin", "https://" + this.SITE_URL);
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "cors");
+        httpRequest.putHeader("sec-fetch-dest", "empty");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/throttle/queue");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public String fakeCheckoutPath() {
+        String string = "abcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder stringBuilder = new StringBuilder();
+        while (stringBuilder.length() < 32) {
+            int n = (int)(ThreadLocalRandom.current().nextFloat() * (float)"abcdefghijklmnopqrstuvwxyz0123456789".length());
+            stringBuilder.append("abcdefghijklmnopqrstuvwxyz0123456789".charAt(n));
+        }
+        return stringBuilder.toString();
+    }
+
+    public boolean getIsOOS() {
+        return this.isOOS;
+    }
+
+    public void setAPIToken(String string) {
+        if (string == null) {
+            System.out.println("No api key was found for this site, please contact the discord to add this site to the sitelist to run smoother.");
+            return;
+        }
+        this.API_TOKEN = "Basic " + Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public HttpRequest login() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/account/login").as(BodyCodec.buffer());
         httpRequest.putHeader("content-length", "DEFAULT_VALUE");
         httpRequest.putHeader("cache-control", "max-age=0");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
@@ -886,10 +932,21 @@ extends TaskApiClient {
         httpRequest.putHeader("sec-fetch-mode", "navigate");
         httpRequest.putHeader("sec-fetch-user", "?1");
         httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/checkpoint?return_to=https%3A%2F%2F" + this.SITE_URL + "%2Fcheckout");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/account/login?return_url=%2Faccount");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
+    }
+
+    public void setInstock() {
+        this.isOOS = false;
+    }
+
+    public JsonObject monitorGraphBody() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("query", (Object)"\n  {\n    products(first: 10) {\n      edges {\n        node {\n          id\n          title\n          variants(first: 40) {\n            edges {\n              node {\n                id\n                quantityAvailable\n                metafield(namespace: \"my_fields\", key: \"next_drop\") {\n                  value\n                }\n                selectedOptions {\n                  name\n                  value\n                }\n                image {\n                  originalSrc\n                }\n                priceV2 {\n                  amount\n                  currencyCode\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }");
+        jsonObject.put("variables", (Object)new JsonObject());
+        return jsonObject;
     }
 
     public HttpRequest changeJS() {
@@ -912,135 +969,28 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public HttpRequest shippingRateOld(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/cart/shipping_rates.json?shipping_address[zip]=" + string.replace(" ", "%20") + "&shipping_address[country]=" + string2.replace(" ", "%20") + "&shipping_address[province]=" + string3).as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
+    public HttpRequest postPayment(String string) {
+        return this.postPaymentWithOption(string, false);
     }
 
-    public void setAPIToken(String string) {
-        if (string == null) {
-            System.out.println("No api key was found for this site, please contact the discord to add this site to the sitelist to run smoother.");
-            return;
-        }
-        this.API_TOKEN = "Basic " + Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public void setShopID(String string) {
-        this.SHOP_ID = string;
-    }
-
-    public HttpRequest paymentToken(WebClient webClient) {
-        HttpRequest httpRequest = webClient.postAbs("https://deposit.us.shopifycs.com/sessions").as(BodyCodec.buffer());
-        httpRequest.putHeader("Host", "deposit.us.shopifycs.com");
-        httpRequest.putHeader("Connection", "keep-alive");
+    public HttpRequest graphCheckoutGen() {
+        HttpRequest httpRequest = this.client.postAbs("https://" + this.SITE_URL + "/api/2021-10/graphql.json").as(BodyCodec.buffer());
         httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("Accept", "application/json");
+        httpRequest.putHeader("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
+        httpRequest.putHeader("x-shopify-storefront-access-token", this.calculateAccessToken());
+        httpRequest.putHeader("DNT", "1");
+        httpRequest.putHeader("content-type", "application/json");
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
         httpRequest.putHeader("User-Agent", this.UA);
-        httpRequest.putHeader("Content-Type", "application/json");
-        httpRequest.putHeader("Origin", "https://checkout.shopifycs.com");
-        httpRequest.putHeader("Sec-Fetch-Site", "same-site");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
+        httpRequest.putHeader("Accept", "*/*");
+        httpRequest.putHeader("Origin", "https://getmntd.com");
+        httpRequest.putHeader("Sec-Fetch-Site", "cross-site");
         httpRequest.putHeader("Sec-Fetch-Mode", "cors");
         httpRequest.putHeader("Sec-Fetch-Dest", "empty");
-        httpRequest.putHeader("Referer", "https://checkout.shopifycs.com/");
+        httpRequest.putHeader("Referer", "https://getmntd.com/");
         httpRequest.putHeader("Accept-Encoding", "gzip, deflate");
         httpRequest.putHeader("Accept-Language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest graphCCheckoutPage(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.buffer());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest challengePage() {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/challenge").as(BodyCodec.buffer());
-        httpRequest.putHeader("cache-control", "max-age=0");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/account/login");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest oldQueue() {
-        String string = this.client.cookieStore().getCookieValue("_shopify_ctd");
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/checkout/poll?js_poll=1").as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/throttle/queue?_ctd=" + string + "&_ctd_update");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest paymentStatusAPI(String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/api/checkouts/" + string + "/payments/").as(BodyCodec.buffer());
-        httpRequest.putHeader("x-shopify-uniquetoken", this.getCookies().getCookieValue("_shopify_y"));
-        httpRequest.putHeader("authorization", this.API_TOKEN);
-        httpRequest.putHeader("accept", "application/json");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("x-shopify-visittoken", this.getCookies().getCookieValue("_shopify_s"));
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        return httpRequest;
-    }
-
-    public HttpRequest productsJSON(boolean bl) {
-        HttpRequest httpRequest = this.client.getAbs(bl ? "https://" + this.SITE_URL + "/products.json?order=" + ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE) : "https://" + this.SITE_URL + "/products.json?limit=250").as(BodyCodec.buffer());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;
     }
 
@@ -1068,29 +1018,80 @@ extends TaskApiClient {
         return httpRequest;
     }
 
-    public boolean getOOSDirect() {
-        return this.isOOS;
+    public MultiMap challengeForm(String string, String string2) {
+        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
+        multiMap.set("authenticity_token", string);
+        multiMap.set("g-recaptcha-response", string2);
+        return multiMap;
     }
 
-    public HttpRequest walletsPutDetails(String string) {
-        HttpRequest httpRequest = this.client.putAbs("https://" + this.SITE_URL + "/api/checkouts/" + string + ".json").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+    public HttpRequest checkpointPage() {
+        HttpRequest httpRequest = this.client.getAbs("https://" + this.SITE_URL + "/checkpoint?return_to=https%3A%2F%2F" + this.SITE_URL + "%2Fcheckout").as(BodyCodec.buffer());
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        if (Harvester.HARVESTER_UA != null) {
+            httpRequest.putHeader("user-agent", Harvester.HARVESTER_UA);
+        } else {
+            httpRequest.putHeader("user-agent", this.UA);
+        }
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
         httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
-        httpRequest.putHeader("x-shopify-uniquetoken", this.getCookies().getCookieValue("_shopify_y"));
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
-        httpRequest.putHeader("authorization", this.API_TOKEN);
-        httpRequest.putHeader("x-shopify-checkout-version", "2018-03-05");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("accept", "application/json");
-        httpRequest.putHeader("x-shopify-wallets-caller", "costanza");
-        httpRequest.putHeader("user-agent", this.UA);
-        httpRequest.putHeader("x-shopify-visittoken", this.getCookies().getCookieValue("_shopify_s"));
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/checkout");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest postShippingRate(String string) {
+        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
+        if (this.key != null) {
+            string2 = string2 + "&key=" + this.key;
+        }
+        HttpRequest httpRequest = this.client.postAbs(string2).as(BodyCodec.buffer());
+        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
         httpRequest.putHeader("origin", "https://" + this.SITE_URL);
+        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
         httpRequest.putHeader("sec-fetch-site", "same-origin");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/collections/frontpage");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/");
+        httpRequest.putHeader("accept-encoding", "gzip, deflate");
+        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
+        return httpRequest;
+    }
+
+    public HttpRequest rawCheckoutUrl(String string) {
+        String string2 = "https://" + this.SITE_URL + "/" + this.SHOP_ID + "/checkouts/" + string;
+        if (this.key != null) {
+            string2 = string2 + "?key=" + this.key;
+        }
+        HttpRequest httpRequest = this.client.getAbs(string2).as(BodyCodec.buffer());
+        httpRequest.putHeader("cache-control", "max-age=0");
+        httpRequest.putHeader("upgrade-insecure-requests", "1");
+        httpRequest.putHeader("user-agent", this.UA);
+        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+        httpRequest.putHeader("sec-fetch-site", "same-origin");
+        httpRequest.putHeader("sec-fetch-mode", "navigate");
+        httpRequest.putHeader("sec-fetch-user", "?1");
+        httpRequest.putHeader("sec-fetch-dest", "document");
+        httpRequest.putHeader("sec-ch-ua", this.SEC_UA);
+        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
+        httpRequest.putHeader("sec-ch-ua-platform", "\"Windows\"");
+        httpRequest.putHeader("referer", "https://" + this.SITE_URL + "/checkpoint?return_to=https%3A%2F%2F" + this.SITE_URL + "%2Fcart");
         httpRequest.putHeader("accept-encoding", "gzip, deflate");
         httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
         return httpRequest;

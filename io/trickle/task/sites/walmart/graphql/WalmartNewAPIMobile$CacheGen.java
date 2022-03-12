@@ -15,23 +15,6 @@ import java.security.NoSuchAlgorithmException;
 public class WalmartNewAPIMobile$CacheGen {
     public static char[] cArr2 = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-    public static String mo17628e(byte[] byArray) {
-        char[] cArray = new char[byArray.length * 2];
-        int n = 0;
-        byte[] byArray2 = byArray;
-        int n2 = byArray2.length;
-        int n3 = 0;
-        while (n3 < n2) {
-            byte by = byArray2[n3];
-            int n4 = n + 1;
-            cArray[n] = cArr2[by >> 4 & 0xF];
-            n = n4 + 1;
-            cArray[n4] = cArr2[by & 0xF];
-            ++n3;
-        }
-        return new String(cArray);
-    }
-
     public static String hash(String string) {
         byte[] byArray = string.getBytes(StandardCharsets.UTF_8);
         try {
@@ -52,6 +35,23 @@ public class WalmartNewAPIMobile$CacheGen {
         jsonObject2.put("extensions", (Object)new JsonObject().put("persistedQuery", (Object)new JsonObject().put("version", (Object)1).put("sha256Hash", (Object)string)));
         jsonObject2.put("query", (Object)jsonObject.getString("query"));
         return WalmartNewAPIMobile$CacheGen.hash(jsonObject2.toString());
+    }
+
+    public static String mo17628e(byte[] byArray) {
+        char[] cArray = new char[byArray.length * 2];
+        int n = 0;
+        byte[] byArray2 = byArray;
+        int n2 = byArray2.length;
+        int n3 = 0;
+        while (n3 < n2) {
+            byte by = byArray2[n3];
+            int n4 = n + 1;
+            cArray[n] = cArr2[by >> 4 & 0xF];
+            n = n4 + 1;
+            cArray[n4] = cArr2[by & 0xF];
+            ++n3;
+        }
+        return new String(cArray);
     }
 }
 

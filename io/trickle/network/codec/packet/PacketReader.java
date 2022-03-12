@@ -10,15 +10,8 @@ import io.trickle.network.codec.packet.Packet;
 import io.vertx.core.buffer.Buffer;
 
 public class PacketReader {
-    public Buffer buffer;
     public int readerIndex;
-
-    public String readString() {
-        int n = this.readInt();
-        String string = this.buffer.getString(this.readerIndex, this.readerIndex + n);
-        this.readerIndex += n;
-        return string;
-    }
+    public Buffer buffer;
 
     public long readLong() {
         long l = this.buffer.getLong(this.readerIndex);
@@ -26,28 +19,13 @@ public class PacketReader {
         return l;
     }
 
-    public static PacketReader create(Buffer buffer) {
-        return new PacketReader(buffer);
-    }
-
-    public PacketReader(Buffer buffer) {
-        this.buffer = buffer;
-        this.readerIndex = 0;
-    }
-
-    public byte readByte() {
-        byte by = this.buffer.getByte(this.readerIndex);
-        ++this.readerIndex;
-        return by;
+    public boolean readBoolean() {
+        if (this.readByte() == 0) return false;
+        return true;
     }
 
     public static PacketReader create(Packet packet) {
         return new PacketReader(packet);
-    }
-
-    public boolean readBoolean() {
-        if (this.readByte() == 0) return false;
-        return true;
     }
 
     public short readShort() {
@@ -56,8 +34,9 @@ public class PacketReader {
         return s;
     }
 
-    public Buffer getBuffer() {
-        return this.buffer;
+    public PacketReader(Buffer buffer) {
+        this.buffer = buffer;
+        this.readerIndex = 0;
     }
 
     public int readInt() {
@@ -66,8 +45,29 @@ public class PacketReader {
         return n;
     }
 
+    public String readString() {
+        int n = this.readInt();
+        String string = this.buffer.getString(this.readerIndex, this.readerIndex + n);
+        this.readerIndex += n;
+        return string;
+    }
+
     public PacketReader(Packet packet) {
         this(packet.getPayload());
+    }
+
+    public Buffer getBuffer() {
+        return this.buffer;
+    }
+
+    public byte readByte() {
+        byte by = this.buffer.getByte(this.readerIndex);
+        ++this.readerIndex;
+        return by;
+    }
+
+    public static PacketReader create(Buffer buffer) {
+        return new PacketReader(buffer);
     }
 }
 

@@ -14,16 +14,25 @@ import io.vertx.core.json.JsonObject;
 import java.util.Arrays;
 
 public class Metric {
-    public String proxy;
+    public String account;
     public String sizeQty;
-    public String sku;
+    public String proxy;
     public String orderNumber;
     public String email;
-    public String account;
-    public String mode;
+    public String sku;
     public String site;
-    public String product;
+    public String mode;
     public String delays;
+    public String product;
+
+    public JsonObject asApiForm() {
+        return new JsonObject().put("name", (Object)this.product).put("sku", (Object)this.sku).put("licenseKey", (Object)("trickle-" + Storage.ACCESS_KEY)).put("site", (Object)this.site).put("size", (Object)this.sizeQty).put("ts", (Object)System.currentTimeMillis());
+    }
+
+    public String asCsvEntry() {
+        String string = this.site + "," + String.format("\"%s\"", this.product) + "," + this.sku + "," + this.sizeQty + "," + this.delays + "," + this.mode + "," + this.proxy + "," + this.email + "," + this.account + "," + this.orderNumber;
+        return string.trim() + "\n";
+    }
 
     public Metric(String string, String string2, String string3, String string4, String string5, String string6, String string7, String string8, String string9, String string10) {
         this.product = string;
@@ -38,21 +47,8 @@ public class Metric {
         this.orderNumber = string10;
     }
 
-    public JsonObject asApiForm() {
-        return new JsonObject().put("name", (Object)this.product).put("sku", (Object)this.sku).put("licenseKey", (Object)("trickle-" + Storage.ACCESS_KEY)).put("site", (Object)this.site).put("size", (Object)this.sizeQty).put("ts", (Object)System.currentTimeMillis());
-    }
-
     public static String lambda$create$0(Task task) {
         return Arrays.toString(task.getKeywords());
-    }
-
-    public String asCsvEntry() {
-        String string = this.site + "," + String.format("\"%s\"", this.product) + "," + this.sku + "," + this.sizeQty + "," + this.delays + "," + this.mode + "," + this.proxy + "," + this.email + "," + this.account + "," + this.orderNumber;
-        return string.trim() + "\n";
-    }
-
-    public static Metric$Builder builder() {
-        return new Metric$Builder();
     }
 
     public static Metric create(Task task, JsonObject jsonObject, String string) {
@@ -65,6 +61,10 @@ public class Metric {
         if (task.getProfile().getAccountPassword() == null) return metric$Builder.build();
         metric$Builder.setAccount(task.getProfile().getAccountEmail() + ":" + task.getProfile().getAccountPassword());
         return metric$Builder.build();
+    }
+
+    public static Metric$Builder builder() {
+        return new Metric$Builder();
     }
 }
 

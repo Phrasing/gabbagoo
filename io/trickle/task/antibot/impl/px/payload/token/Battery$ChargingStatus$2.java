@@ -8,8 +8,13 @@ import io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus;
 
 public class Battery$ChargingStatus$2
 extends Battery$ChargingStatus {
-    public static float VOLT_DROP_PER_MIN = Float.intBitsToFloat(983815946);
-    public static float VOLTAGE_DEPLETION_FLUX = Float.intBitsToFloat(943080854);
+    public static float VOLTAGE_DEPLETION_FLUX;
+    public static float VOLT_DROP_PER_MIN;
+
+    static {
+        VOLT_DROP_PER_MIN = Float.intBitsToFloat(983815946);
+        VOLTAGE_DEPLETION_FLUX = Float.intBitsToFloat(943080854);
+    }
 
     @Override
     public float changeVector() {

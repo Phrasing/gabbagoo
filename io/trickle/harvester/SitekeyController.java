@@ -28,39 +28,19 @@ import org.apache.logging.log4j.Logger;
 public class SitekeyController
 implements Module,
 LoadableAsync {
-    public static Logger logger;
     public JsonObject SITEKEY_STORAGE;
+    public static String SITEKEY_PATH = "/sitekeys.json";
+    public static Logger logger = LogManager.getLogger(SitekeyController.class);
     public Vertx vertx;
-    public static String SITEKEY_PATH;
 
-    public static Buffer lambda$load$0(Throwable throwable) {
-        logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", (Object)"/sitekeys.json".replace("/", ""));
-        return Buffer.buffer((String)"{}");
-    }
-
-    public JsonObject getSitekeys() {
-        return this.SITEKEY_STORAGE;
-    }
-
-    public SitekeyController(Vertx vertx) {
-        this.vertx = vertx;
-    }
-
-    public Future lambda$load$1(JsonObject jsonObject) {
-        logger.debug("Loaded sitekeys");
-        this.SITEKEY_STORAGE = jsonObject;
-        return Future.succeededFuture();
-    }
-
-    static {
-        SITEKEY_PATH = "/sitekeys.json";
-        logger = LogManager.getLogger(SitekeyController.class);
+    public JsonObject parseFile(String string) {
+        return new JsonObject(string);
     }
 
     @Override
-    public Future load() {
+    public void terminate() {
         FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile(Storage.CONFIG_PATH + "/sitekeys.json").otherwise(SitekeyController::lambda$load$0).map(Buffer::toString).map(this::parseFile).compose(this::lambda$load$1);
+        fileSystem.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
     }
 
     public static void lambda$terminate$2(AsyncResult asyncResult) {
@@ -72,18 +52,33 @@ LoadableAsync {
     }
 
     @Override
+    public Future load() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        return fileSystem.readFile(Storage.CONFIG_PATH + "/sitekeys.json").otherwise(SitekeyController::lambda$load$0).map(Buffer::toString).map(this::parseFile).compose(this::lambda$load$1);
+    }
+
+    public JsonObject getSitekeys() {
+        return this.SITEKEY_STORAGE;
+    }
+
+    @Override
     public void initialise() {
         logger.debug("Initialised.");
     }
 
-    public JsonObject parseFile(String string) {
-        return new JsonObject(string);
+    public static Buffer lambda$load$0(Throwable throwable) {
+        logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", (Object)"/sitekeys.json".replace("/", ""));
+        return Buffer.buffer((String)"{}");
     }
 
-    @Override
-    public void terminate() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        fileSystem.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
+    public Future lambda$load$1(JsonObject jsonObject) {
+        logger.debug("Loaded sitekeys");
+        this.SITEKEY_STORAGE = jsonObject;
+        return Future.succeededFuture();
+    }
+
+    public SitekeyController(Vertx vertx) {
+        this.vertx = vertx;
     }
 }
 

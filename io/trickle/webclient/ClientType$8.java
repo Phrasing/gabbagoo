@@ -19,15 +19,6 @@ implements X509TrustManager {
     }
 
     @Override
-    public void checkClientTrusted(X509Certificate[] x509CertificateArray, String string) {
-    }
-
-    @Override
-    public X509Certificate[] getAcceptedIssuers() {
-        return new X509Certificate[0];
-    }
-
-    @Override
     public void checkServerTrusted(X509Certificate[] x509CertificateArray, String string) {
         X509Certificate[] x509CertificateArray2 = x509CertificateArray;
         int n = x509CertificateArray2.length;
@@ -40,6 +31,15 @@ implements X509TrustManager {
             }
             ++n2;
         }
+    }
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] x509CertificateArray, String string) {
+    }
+
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+        return new X509Certificate[0];
     }
 }
 

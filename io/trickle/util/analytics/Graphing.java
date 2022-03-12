@@ -23,6 +23,10 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 public class Graphing {
+    public static void analyse(String string) {
+        CompletableFuture.runAsync(() -> Graphing.lambda$analyse$0(string));
+    }
+
     public static void lambda$analyse$0(String string) {
         CompletableFuture completableFuture;
         Object object;
@@ -59,10 +63,6 @@ public class Graphing {
             // empty catch block
         }
         System.exit(0);
-    }
-
-    public static void analyse(String string) {
-        CompletableFuture.runAsync(() -> Graphing.lambda$analyse$0(string));
     }
 }
 

@@ -9,10 +9,6 @@ import java.util.Map;
 public class States {
     public static Map<String, String> STATES = new HashMap<String, String>();
 
-    public static String fullStateName(String string) {
-        return STATES.get(string);
-    }
-
     static {
         STATES.put("AK", "Alaska");
         STATES.put("AL", "Alabama");
@@ -129,6 +125,10 @@ public class States {
         STATES.put("QC", "Quebec");
         STATES.put("SK", "Saskatchewan");
         STATES.put("YT", "Yukon");
+    }
+
+    public static String fullStateName(String string) {
+        return STATES.get(string);
     }
 }
 

@@ -13,10 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class URLParser {
-    public static Pattern FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
-    public static Pattern ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
-    public List<String> urls;
+    public static Pattern ENCODED_STR_PAT;
+    public static Pattern FUNCTION_VAR_PAT;
     public Map<String, Decoding> decodingMap;
+    public List<String> urls;
 
     public void parseFuncVars(String string) {
         Matcher matcher = FUNCTION_VAR_PAT.matcher(string);
@@ -51,6 +51,11 @@ public class URLParser {
             }
             catch (Exception exception) {}
         }
+    }
+
+    static {
+        FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
+        ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
     }
 
     public static void main(String[] stringArray) {

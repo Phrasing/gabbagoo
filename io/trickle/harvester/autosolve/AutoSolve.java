@@ -19,25 +19,25 @@ import org.slf4j.Logger;
 
 public class AutoSolve
 extends AbstractAutoSolveManager {
-    public AutoSolve(OkHttpClient.Builder builder, String string) {
-        super(builder, string);
+    public void onStatusChanged(AutoSolveStatus autoSolveStatus) {
+    }
+
+    public void onCaptchaTokenRequestCancelled(CaptchaTokenRequest captchaTokenRequest) {
+    }
+
+    public void onCaptchaTokenReceived(CaptchaToken captchaToken) {
     }
 
     public Logger getLogger() {
         return super.getLogger();
     }
 
-    public void onCaptchaTokenRequestCancelled(CaptchaTokenRequest captchaTokenRequest) {
+    public AutoSolve(OkHttpClient.Builder builder, String string) {
+        super(builder, string);
     }
 
     public AutoSolve(String string) {
         super(string);
-    }
-
-    public void onCaptchaTokenReceived(CaptchaToken captchaToken) {
-    }
-
-    public void onStatusChanged(AutoSolveStatus autoSolveStatus) {
     }
 }
 

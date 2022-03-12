@@ -20,6 +20,21 @@ public class UUIDv1 {
         return stringArray;
     }
 
+    public static String Cn(int[] nArray, int n) {
+        int n2 = 0;
+        String[] stringArray = gg;
+        return stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]];
+    }
+
+    public static int[] fillArrRandInt256(int[] nArray) {
+        int n = 0;
+        while (n < nArray.length) {
+            nArray[n] = ThreadLocalRandom.current().nextInt(256);
+            ++n;
+        }
+        return nArray;
+    }
+
     public static String genUUIDv1() {
         int[] nArray;
         long l;
@@ -60,21 +75,6 @@ public class UUIDv1 {
             ++n4;
         }
         return UUIDv1.Cn(nArray3, 0);
-    }
-
-    public static int[] fillArrRandInt256(int[] nArray) {
-        int n = 0;
-        while (n < nArray.length) {
-            nArray[n] = ThreadLocalRandom.current().nextInt(256);
-            ++n;
-        }
-        return nArray;
-    }
-
-    public static String Cn(int[] nArray, int n) {
-        int n2 = 0;
-        String[] stringArray = gg;
-        return stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]];
     }
 }
 

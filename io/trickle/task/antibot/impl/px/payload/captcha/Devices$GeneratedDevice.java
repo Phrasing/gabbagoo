@@ -10,10 +10,36 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Devices$GeneratedDevice
 implements Devices$Device {
     public String userAgent;
-    public String platform;
     public int height;
-    public int width;
     public static String[] resolutions = new String[]{"412x732", "412x869", "412x824", "412x846", "412x847", "412x732", "360x740", "480x853", "360x740", "360x640", "375x667", "414x896", "412x869", "360x780", "393x851", "375x812", "360x720", "414x736", "480x853"};
+    public int width;
+    public String platform;
+
+    @Override
+    public int getInnerWidth() {
+        return this.width;
+    }
+
+    @Override
+    public String getAppVersion() {
+        try {
+            String string = this.getUserAgent().split("/")[0].concat("/");
+            return this.getUserAgent().replace(string, "");
+        }
+        catch (Throwable throwable) {
+            return this.getUserAgent().replace("Mozilla/", "");
+        }
+    }
+
+    @Override
+    public int getAvailHeight() {
+        return this.height;
+    }
+
+    @Override
+    public String getAppName() {
+        return "Netscape";
+    }
 
     @Override
     public String getUserAgent() {
@@ -29,23 +55,8 @@ implements Devices$Device {
     }
 
     @Override
-    public int getAvailHeight() {
-        return this.height;
-    }
-
-    @Override
     public int getAvailWidth() {
         return this.width;
-    }
-
-    @Override
-    public String getAppCodeName() {
-        return "Mozilla";
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
     }
 
     @Override
@@ -59,8 +70,8 @@ implements Devices$Device {
     }
 
     @Override
-    public String getAppName() {
-        return "Netscape";
+    public int getHeight() {
+        return this.height;
     }
 
     @Override
@@ -73,29 +84,18 @@ implements Devices$Device {
         return this.width;
     }
 
-    @Override
-    public int getInnerHeight() {
-        return this.height;
-    }
-
     public static String getRandomUA() {
         return Devices.userAgents[ThreadLocalRandom.current().nextInt(Devices.userAgents.length)];
     }
 
     @Override
-    public String getAppVersion() {
-        try {
-            String string = this.getUserAgent().split("/")[0].concat("/");
-            return this.getUserAgent().replace(string, "");
-        }
-        catch (Throwable throwable) {
-            return this.getUserAgent().replace("Mozilla/", "");
-        }
+    public String getAppCodeName() {
+        return "Mozilla";
     }
 
     @Override
-    public int getInnerWidth() {
-        return this.width;
+    public int getInnerHeight() {
+        return this.height;
     }
 }
 

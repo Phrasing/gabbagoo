@@ -34,40 +34,72 @@ import org.apache.logging.log4j.Logger;
 
 public class BrowserHarvesterController
 extends AbstractSharedHarvesterController {
+    public AtomicInteger passedCounter;
     public static Logger logger = LogManager.getLogger(BrowserHarvesterController.class);
     public Vertx vertx;
     public static Predicate<SharedHarvester> removePredicate = BrowserHarvesterController::lambda$static$0;
     public List<SharedHarvester> passedHarvesters;
     public int count;
-    public AtomicInteger passedCounter;
 
-    public CompletableFuture initHarvesters() {
-        if (this.count == this.harvesters.size()) {
-            return CompletableFuture.completedFuture(null);
+    public void lambda$initHarvesters$3(BrowserSharedHarvester browserSharedHarvester, AsyncResult asyncResult) {
+        if (asyncResult.succeeded()) {
+            logger.info("Harvester deployed with worker id: {}", asyncResult.result());
+            return;
         }
-        int n = this.count - this.harvesters.size();
-        logger.info("Initialising {} harvesters", (Object)n);
-        int n2 = 0;
-        while (n2 < n) {
+        logger.warn("Failed to launch harvester: {}", (Object)asyncResult.cause().getMessage());
+        try {
+            this.harvesters.remove(browserSharedHarvester);
+            browserSharedHarvester.stop(Promise.promise());
+            return;
+        }
+        catch (Throwable throwable) {
+            logger.warn("Error cleaning up staled harvester: {}", (Object)throwable.getMessage());
+        }
+    }
+
+    public static int lambda$shouldSwap$2(int n, int n2) {
+        if (++n2 >= n) return 0;
+        int n3 = n2;
+        return n3;
+    }
+
+    public void lambda$startCounter$1(Long l) {
+        try {
+            this.passedHarvesters.removeIf(removePredicate);
+            Iterator<SharedHarvester> iterator = this.harvesters.iterator();
+            while (iterator.hasNext()) {
+                SharedHarvester sharedHarvester = iterator.next();
+                if (sharedHarvester.passCount() <= 0 || this.passedHarvesters.contains(sharedHarvester)) continue;
+                this.passedHarvesters.add(sharedHarvester);
+            }
+            return;
+        }
+        catch (Throwable throwable) {
+            logger.error("Count assigment error: {}", (Object)throwable.getMessage());
+        }
+    }
+
+    @Override
+    public Optional shouldSwap(String string) {
+        Optional<Object> optional;
+        int n;
+        if (!this.passedHarvesters.isEmpty()) {
             try {
-                BrowserSharedHarvester browserSharedHarvester = new BrowserSharedHarvester(n2);
-                this.harvesters.add(browserSharedHarvester);
-                CompletableFuture completableFuture = this.vertx.deployVerticle((Verticle)browserSharedHarvester).onComplete(arg_0 -> this.lambda$initHarvesters$3(browserSharedHarvester, arg_0)).toCompletionStage().toCompletableFuture();
-                logger.info("Waiting for harvester[{}] to start...", (Object)n2);
-                CompletableFuture completableFuture2 = completableFuture;
-                if (!completableFuture2.isDone()) {
-                    CompletableFuture completableFuture3 = completableFuture2;
-                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> BrowserHarvesterController.async$initHarvesters(this, n, n2, browserSharedHarvester, completableFuture, completableFuture3, 1, arg_0));
+                for (SharedHarvester sharedHarvester : this.passedHarvesters) {
+                    if (!sharedHarvester.id().equalsIgnoreCase(string)) continue;
+                    return Optional.empty();
                 }
-                completableFuture2.join();
             }
             catch (Throwable throwable) {
-                logger.warn("Error occurred on initialisation stage: {}", (Object)throwable.getMessage());
-                return CompletableFuture.failedFuture(throwable);
+                logger.warn("Error occurred on distribution: {}", (Object)throwable.getMessage());
             }
-            ++n2;
         }
-        return CompletableFuture.completedFuture(null);
+        if ((n = this.passedHarvesters.size()) == 0) {
+            optional = Optional.empty();
+            return optional;
+        }
+        optional = Optional.of(this.passedHarvesters.get(this.passedCounter.getAndUpdate(arg_0 -> BrowserHarvesterController.lambda$shouldSwap$2(n, arg_0))).id());
+        return optional;
     }
 
     public BrowserHarvesterController(Vertx vertx, int n) {
@@ -78,10 +110,19 @@ extends AbstractSharedHarvesterController {
         this.startCounter();
     }
 
-    public static int lambda$shouldSwap$2(int n, int n2) {
-        if (++n2 >= n) return 0;
-        int n3 = n2;
-        return n3;
+    @Override
+    public CompletableFuture initialise() {
+        logger.info("Waiting to start!");
+        return this.initHarvesters();
+    }
+
+    public void startCounter() {
+        this.vertx.setPeriodic(5000L, this::lambda$startCounter$1);
+    }
+
+    public static boolean lambda$static$0(SharedHarvester sharedHarvester) {
+        if ((long)sharedHarvester.passCount() > 0L) return false;
+        return true;
     }
 
     /*
@@ -131,74 +172,33 @@ lbl19:
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public Optional shouldSwap(String string) {
-        Optional<Object> optional;
-        int n;
-        if (!this.passedHarvesters.isEmpty()) {
+    public CompletableFuture initHarvesters() {
+        if (this.count == this.harvesters.size()) {
+            return CompletableFuture.completedFuture(null);
+        }
+        int n = this.count - this.harvesters.size();
+        logger.info("Initialising {} harvesters", (Object)n);
+        int n2 = 0;
+        while (n2 < n) {
             try {
-                for (SharedHarvester sharedHarvester : this.passedHarvesters) {
-                    if (!sharedHarvester.id().equalsIgnoreCase(string)) continue;
-                    return Optional.empty();
+                BrowserSharedHarvester browserSharedHarvester = new BrowserSharedHarvester(n2);
+                this.harvesters.add(browserSharedHarvester);
+                CompletableFuture completableFuture = this.vertx.deployVerticle((Verticle)browserSharedHarvester).onComplete(arg_0 -> this.lambda$initHarvesters$3(browserSharedHarvester, arg_0)).toCompletionStage().toCompletableFuture();
+                logger.info("Waiting for harvester[{}] to start...", (Object)n2);
+                CompletableFuture completableFuture2 = completableFuture;
+                if (!completableFuture2.isDone()) {
+                    CompletableFuture completableFuture3 = completableFuture2;
+                    return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> BrowserHarvesterController.async$initHarvesters(this, n, n2, browserSharedHarvester, completableFuture, completableFuture3, 1, arg_0));
                 }
+                completableFuture2.join();
             }
             catch (Throwable throwable) {
-                logger.warn("Error occurred on distribution: {}", (Object)throwable.getMessage());
+                logger.warn("Error occurred on initialisation stage: {}", (Object)throwable.getMessage());
+                return CompletableFuture.failedFuture(throwable);
             }
+            ++n2;
         }
-        if ((n = this.passedHarvesters.size()) == 0) {
-            optional = Optional.empty();
-            return optional;
-        }
-        optional = Optional.of(this.passedHarvesters.get(this.passedCounter.getAndUpdate(arg_0 -> BrowserHarvesterController.lambda$shouldSwap$2(n, arg_0))).id());
-        return optional;
-    }
-
-    public void lambda$startCounter$1(Long l) {
-        try {
-            this.passedHarvesters.removeIf(removePredicate);
-            Iterator<SharedHarvester> iterator = this.harvesters.iterator();
-            while (iterator.hasNext()) {
-                SharedHarvester sharedHarvester = iterator.next();
-                if (sharedHarvester.passCount() <= 0 || this.passedHarvesters.contains(sharedHarvester)) continue;
-                this.passedHarvesters.add(sharedHarvester);
-            }
-            return;
-        }
-        catch (Throwable throwable) {
-            logger.error("Count assigment error: {}", (Object)throwable.getMessage());
-        }
-    }
-
-    public void lambda$initHarvesters$3(BrowserSharedHarvester browserSharedHarvester, AsyncResult asyncResult) {
-        if (asyncResult.succeeded()) {
-            logger.info("Harvester deployed with worker id: {}", asyncResult.result());
-            return;
-        }
-        logger.warn("Failed to launch harvester: {}", (Object)asyncResult.cause().getMessage());
-        try {
-            this.harvesters.remove(browserSharedHarvester);
-            browserSharedHarvester.stop(Promise.promise());
-            return;
-        }
-        catch (Throwable throwable) {
-            logger.warn("Error cleaning up staled harvester: {}", (Object)throwable.getMessage());
-        }
-    }
-
-    public void startCounter() {
-        this.vertx.setPeriodic(5000L, this::lambda$startCounter$1);
-    }
-
-    @Override
-    public CompletableFuture initialise() {
-        logger.info("Waiting to start!");
-        return this.initHarvesters();
-    }
-
-    public static boolean lambda$static$0(SharedHarvester sharedHarvester) {
-        if ((long)sharedHarvester.passCount() > 0L) return false;
-        return true;
+        return CompletableFuture.completedFuture(null);
     }
 }
 

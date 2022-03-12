@@ -38,20 +38,14 @@ import org.apache.logging.log4j.Logger;
 public class ProxyController
 implements Module,
 LoadableAsync {
-    public String fileName;
     public static Logger logger = LogManager.getLogger(ProxyController.class);
-    public Vertx vertx;
+    public String fileName;
     public List<Proxy> proxies;
-    public String LOCK_IDENTITY;
-    public AtomicInteger cRandomized;
     public List<Proxy> proxiesRandomized;
+    public AtomicInteger cRandomized;
+    public Vertx vertx;
+    public String LOCK_IDENTITY;
     public AtomicInteger c = new AtomicInteger(0);
-
-    @Override
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile(Storage.CONFIG_PATH + this.fileName).otherwise(arg_0 -> this.lambda$load$0(fileSystem, arg_0)).map(Buffer::toString).map(this::parseFile).map(this.proxies::addAll).compose(this::lambda$load$1);
-    }
 
     public Future lambda$load$1(Boolean bl) {
         this.proxiesRandomized = new ArrayList<Proxy>(this.proxies);
@@ -60,14 +54,26 @@ LoadableAsync {
     }
 
     @Override
+    public Future load() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        return fileSystem.readFile(Storage.CONFIG_PATH + this.fileName).otherwise(arg_0 -> this.lambda$load$0(fileSystem, arg_0)).map(Buffer::toString).map(this::parseFile).map(this.proxies::addAll).compose(this::lambda$load$1);
+    }
+
+    @Override
     public void initialise() {
         logger.debug("Initialised.");
     }
 
-    public Future getProxy() {
-        RandomProxyProducer randomProxyProducer = new RandomProxyProducer(this.proxies);
-        this.vertx.sharedData().getLock(this.LOCK_IDENTITY, (Handler)randomProxyProducer);
-        return randomProxyProducer.getProduct();
+    public ProxyController(Vertx vertx) {
+        this.cRandomized = new AtomicInteger(0);
+        this.proxies = new ArrayList<Proxy>();
+        this.vertx = vertx;
+        this.fileName = "/proxies.txt";
+        this.LOCK_IDENTITY = UUID.randomUUID().toString();
+    }
+
+    public int loadedProxies() {
+        return this.proxies.size();
     }
 
     public Buffer lambda$load$0(FileSystem fileSystem, Throwable throwable) {
@@ -76,14 +82,12 @@ LoadableAsync {
         return Buffer.buffer((String)"");
     }
 
-    public static int lambda$getProxyRandomCyclic$2(int n, int n2) {
-        if (++n2 >= n) return 0;
-        int n3 = n2;
-        return n3;
-    }
-
-    public int loadedProxies() {
-        return this.proxies.size();
+    public ProxyController(Vertx vertx, String string) {
+        this.cRandomized = new AtomicInteger(0);
+        this.proxies = new ArrayList<Proxy>();
+        this.vertx = vertx;
+        this.fileName = string;
+        this.LOCK_IDENTITY = UUID.randomUUID().toString();
     }
 
     public Proxy getProxyCyclic() {
@@ -100,35 +104,6 @@ LoadableAsync {
         return proxy;
     }
 
-    public List parseFile(String string) {
-        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).map(ProxyController::lambda$parseFile$4).map(Proxy::fromArray).filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    public static String[] lambda$parseFile$4(String string) {
-        return string.split(":");
-    }
-
-    public ProxyController(Vertx vertx) {
-        this.cRandomized = new AtomicInteger(0);
-        this.proxies = new ArrayList<Proxy>();
-        this.vertx = vertx;
-        this.fileName = "/proxies.txt";
-        this.LOCK_IDENTITY = UUID.randomUUID().toString();
-    }
-
-    public ProxyController(Vertx vertx, String string) {
-        this.cRandomized = new AtomicInteger(0);
-        this.proxies = new ArrayList<Proxy>();
-        this.vertx = vertx;
-        this.fileName = string;
-        this.LOCK_IDENTITY = UUID.randomUUID().toString();
-    }
-
-    @Override
-    public void terminate() {
-        this.proxies.clear();
-    }
-
     public Proxy getProxyRandomCyclic() {
         Proxy proxy;
         int n = this.proxiesRandomized.size();
@@ -140,10 +115,35 @@ LoadableAsync {
         return proxy;
     }
 
+    @Override
+    public void terminate() {
+        this.proxies.clear();
+    }
+
+    public List parseFile(String string) {
+        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).map(ProxyController::lambda$parseFile$4).map(Proxy::fromArray).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    public Future getProxy() {
+        RandomProxyProducer randomProxyProducer = new RandomProxyProducer(this.proxies);
+        this.vertx.sharedData().getLock(this.LOCK_IDENTITY, (Handler)randomProxyProducer);
+        return randomProxyProducer.getProduct();
+    }
+
+    public static int lambda$getProxyRandomCyclic$2(int n, int n2) {
+        if (++n2 >= n) return 0;
+        int n3 = n2;
+        return n3;
+    }
+
     public static int lambda$getProxyCyclic$3(int n, int n2) {
         if (++n2 >= n) return 0;
         int n3 = n2;
         return n3;
+    }
+
+    public static String[] lambda$parseFile$4(String string) {
+        return string.split(":");
     }
 
     public Optional getProxyPlain() {

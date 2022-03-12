@@ -20,14 +20,25 @@ import java.util.function.Function;
 
 public class Devices
 extends Enum {
-    public static Devices[] $VALUES;
     public static /* enum */ Devices PX_SDK_ANDROID;
-    public static /* enum */ Devices Z3_JX_WIN;
-    public static /* enum */ Devices CHROME_89;
     public static String[] userAgents;
+    public static /* enum */ Devices CHROME_89;
+    public static Devices[] $VALUES;
+    public static /* enum */ Devices Z3_JX_WIN;
 
-    public static CompletableFuture randomMobileBrowser() {
-        return Devices.deviceFromAPI(true);
+    public static CompletableFuture deviceFromAPI(boolean bl) {
+        JsonObject jsonObject = new JsonObject("{\"PX31\":\"126.8696939282454\",\"PX32\":\"b908567e93d9ed24c036da7986349e97\",\"PX714\":\"64556c77\",\"PX725\":\"10207b2f\",\"PX1157\":8,\"PX1019\":\"7d688b1b\",\"PX274\":\"d8442dbbacb1f4373f81a7419bab5bdc\",\"PX275\":true,\"PX441\":[],\"PX276\":\"ecef9571da5dbf97122cfec494559a23\",\"PX440\":[],\"PX210\":\"WebKit WebGL\",\"PX209\":\"WebKit\",\"PX277\":\"WebGL 1.0 (OpenGL ES 2.0 Chromium)\",\"PX281\":[\"ANGLE_instanced_arrays\",\"EXT_blend_minmax\",\"EXT_color_buffer_half_float\",\"EXT_disjoint_timer_query\",\"EXT_float_blend\",\"EXT_frag_depth\",\"EXT_shader_texture_lod\",\"EXT_texture_compression_rgtc\",\"EXT_texture_filter_anisotropic\",\"WEBKIT_EXT_texture_filter_anisotropic\",\"EXT_sRGB\",\"OES_element_index_uint\",\"OES_fbo_render_mipmap\",\"OES_standard_derivatives\",\"OES_texture_float\",\"OES_texture_float_linear\",\"OES_texture_half_float\",\"OES_texture_half_float_linear\",\"OES_vertex_array_object\",\"WEBGL_color_buffer_float\",\"WEBGL_compressed_texture_s3tc\",\"WEBKIT_WEBGL_compressed_texture_s3tc\",\"WEBGL_compressed_texture_s3tc_srgb\",\"WEBGL_debug_renderer_info\",\"WEBGL_debug_shaders\",\"WEBGL_depth_texture\",\"WEBKIT_WEBGL_depth_texture\",\"WEBGL_draw_buffers\",\"WEBGL_lose_context\",\"WEBKIT_WEBGL_lose_context\",\"WEBGL_multi_draw\"],\"PX282\":[\"[1, 1]\",\"[1, 64]\",8,\"yes\",8,24,8,16,80,16384,1024,16384,16,16384,31,16,16,1024,\"[16384, 16384]\",\"no_fp\",23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127],\"PX280\":\"Apple M1 Max\",\"PX279\":\"Apple\",\"PX278\":\"WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)\",\"PX248\":[],\"PX249\":[\"_pxAppId\",\"_pxJsClientSrc\",\"_pxFirstPartyEnabled\",\"_pxHostUrl\",\"_pxreCaptchaTheme\",\"_PXETnJ2Y5H\",\"_pxToggleOpenForm\",\"_pxUuidCopyToClipboard\",\"_pxSubmitForm\",\"_pxItemSelected\",\"_pxAction\",\"_pxMobile\",\"_u6b0qd2Shandler\",\"_pxInit\"],\"PX264\":33,\"PX266\":\"35075f32b425586f4fecda6e4634c0b7\",\"PX265\":true,\"PX1156\":[\"Andale Mono\",\"Arial\",\"Arial Black\",\"Arial Hebrew\",\"Arial Narrow\",\"Arial Rounded MT Bold\",\"Arial Unicode MS\",\"Comic Sans MS\",\"Courier\",\"Courier New\",\"Geneva\",\"Georgia\",\"Helvetica\",\"Helvetica Neue\",\"Impact\",\"LUCIDA GRANDE\",\"Microsoft Sans Serif\",\"Monaco\",\"Palatino\",\"Tahoma\",\"Times\",\"Times New Roman\",\"Trebuchet MS\",\"Verdana\",\"Wingdings\",\"Wingdings 2\",\"Wingdings 3\",\"Academy Engraved LET\",\"American Typewriter\",\"Apple Chancery\",\"Apple Color Emoji\",\"Apple SD Gothic Neo\",\"AVENIR\",\"Ayuthaya\",\"Bangla Sangam MN\",\"Baskerville\",\"Big Caslon\",\"Bodoni 72\",\"Bodoni 72 Oldstyle\",\"Bodoni 72 Smallcaps\",\"Bradley Hand\",\"Brush Script MT\",\"Chalkboard\",\"Chalkboard SE\",\"Chalkduster\",\"Cochin\",\"Copperplate\",\"Didot\",\"Euphemia UCAS\",\"Futura\",\"Geeza Pro\",\"Gill Sans\",\"Gujarati Sangam MN\",\"Gurmukhi MN\",\"Heiti SC\",\"Heiti TC\",\"Hiragino Kaku Gothic ProN\",\"Hiragino Mincho ProN\",\"Hoefler Text\",\"Kailasa\",\"Kannada Sangam MN\",\"Krungthep\",\"Malayalam Sangam MN\",\"Marion\",\"Marker Felt\",\"Nadeem\",\"Noteworthy\",\"OPTIMA\",\"Oriya Sangam MN\",\"Papyrus\",\"Party LET\",\"Plantagenet Cherokee\",\"Rockwell\",\"Savoye LET\",\"Sinhala Sangam MN\",\"Skia\",\"Snell Roundhand\",\"Tamil Sangam MN\",\"Telugu Sangam MN\",\"Thonburi\",\"Zapfino\"],\"PX1174\":\"{\\\"sqrt\\\":2.2227587494850775e-162,\\\"tan\\\":-6.731094208094579,\\\"cos\\\":0.9884836639831203,\\\"sin\\\":1.2246467991473532e-16,\\\"log\\\":1.768128183913931,\\\"exp\\\":22026.465794806718,\\\"acos\\\":1.5707963267948966,\\\"atan\\\":1.2626272556789115,\\\"asin\\\":0.5235987755982989}\",\"PX364\":[\"PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"Chrome PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"Chromium PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"Microsoft Edge PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"WebKit built-in PDF::Portable Document Format::application/pdf~pdf::text/pdf~pdf\"],\"PX286\":1,\"PX312\":\"d41d8cd98f00b204e9800998ecf8427e\",\"PX311\":\"fd7149bbfb316699ef918fa7bb7510a8\",\"PX310\":\"fd7149bbfb316699ef918fa7bb7510a8\",\"PX409\":0,\"PX287\":10,\"PX288\":true,\"PX289\":true,\"PX290\":true,\"PX291\":false,\"PX292\":\"missing\",\"PX293\":true,\"PX63\":\"MacIntel\",\"PX1033\":\"e0eaf10e\",\"PX1139\":false,\"PX1020\":\"7766a52d\",\"PX1021\":\"64ba5649\",\"PX1022\":\"6a90378d\",\"PX1035\":true,\"PX1025\":false,\"PX145\":true,\"PX146\":true,\"PX149\":true,\"PX150\":true,\"screenXPos\":0,\"screenYPos\":25,\"outerHeight\":1354,\"outerWidth\":1633,\"PX229\":24,\"PX230\":24,\"PX91\":3440,\"PX92\":1440,\"PX269\":3440,\"PX270\":1355,\"PX185\":1243,\"PX186\":150,\"PX187\":0,\"PX188\":0,\"PX95\":true,\"PX397\":false,\"PX400\":111,\"PX404\":\"144|66|66|172|80\",\"PX90\":[\"loadTimes\",\"csi\",\"app\",\"runtime\"],\"PX190\":\"\",\"PX399\":\"false\",\"PX411\":1,\"PX548\":-1,\"PX547\":true,\"PX170\":5,\"PX85\":[\"PDF Viewer\",\"Chrome PDF Viewer\",\"Chromium PDF Viewer\",\"Microsoft Edge PDF Viewer\",\"WebKit built-in PDF\"],\"PX59\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36\",\"PX61\":\"en-US\",\"PX313\":[\"en-US\",\"en\"],\"PX86\":true,\"PX154\":300,\"PX88\":true,\"PX133\":true,\"PX169\":2,\"PX62\":\"Gecko\",\"PX69\":\"20030107\",\"PX64\":\"5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36\",\"PX65\":\"Netscape\",\"PX66\":\"Mozilla\",\"PX60\":true,\"PX87\":true,\"PX68\":true,\"PX405\":true,\"PX134\":true,\"PX89\":true,\"PX147\":false,\"PX155\":\"Tue Nov 09 2021 13:54:13 GMT-0500 (Eastern Standard Time)\",\"PX236\":false,\"PX194\":false,\"PX195\":true,\"PX237\":0,\"PX238\":\"missing\",\"PX208\":\"visible\",\"PX218\":0,\"PX231\":1354,\"PX232\":1633,\"PX254\":false,\"PX295\":false,\"PX268\":false,\"PX166\":true,\"PX138\":true,\"PX143\":true,\"PX139\":true,\"PX163\":false,\"PX247\":0,\"PX142\":true,\"PX135\":true,\"PX167\":true,\"PX148\":false,\"PX140\":true,\"PX144\":true,\"PX715\":\"\",\"PX724\":\"10207b2f\",\"PX729\":\"90e65465\",\"PX1179\":true,\"PX1180\":true,\"PX1173\":2,\"PX443\":true,\"PX466\":true,\"PX467\":true,\"PX468\":true,\"PX716\":\"9f762773\",\"PX717\":\"dae10548\",\"PX727\":\"\",\"PX723\":\"a3d12c4\",\"PX726\":\"82002457\",\"PX722\":\"a3d12c4\",\"PX191\":0,\"PX94\":1,\"PX120\":[],\"PX141\":false,\"PX55\":\"\",\"PX1144\":true,\"safari\":false,\"chrome\":true,\"firefox\":false,\"PX671\":\"9dc3799\",\"PX673\":\"759d4537\",\"PX696\":\"10be1de5\",\"PX675\":\"55de5b09\",\"PX676\":true,\"PX677\":\"703978d7\",\"PX668\":\"58b99ae8\",\"PX1155\":\"4g\",\"PX1154\":false,\"PX1153\":0,\"PX1152\":10,\"scrollbarWidth\":16,\"PX184\":true}");
+        CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/browserDeviceUnfiltered.json?ak=false&mobile=" + bl);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Devices.async$deviceFromAPI((int)(bl ? 1 : 0), jsonObject, completableFuture2, 1, arg_0));
+        }
+        JsonObject jsonObject2 = (JsonObject)completableFuture.join();
+        return CompletableFuture.completedFuture(new Devices$DeviceImpl(jsonObject));
+    }
+
+    public static Devices valueOf(String string) {
+        return Enum.valueOf(Devices.class, string);
     }
 
     public static Devices[] values() {
@@ -40,6 +51,14 @@ extends Enum {
         PX_SDK_ANDROID = new Devices$3();
         $VALUES = new Devices[]{CHROME_89, Z3_JX_WIN, PX_SDK_ANDROID};
         userAgents = new String[0];
+    }
+
+    public static Devices$Device randomLocalWebview() {
+        return new Devices$GeneratedDevice();
+    }
+
+    public static CompletableFuture randomDesktopBrowser() {
+        return Devices.deviceFromAPI(false);
     }
 
     /*
@@ -68,8 +87,12 @@ lbl11:
         throw new IllegalArgumentException();
     }
 
-    public static Devices$Device randomLocalWebview() {
-        return new Devices$GeneratedDevice();
+    public Devices$Device get() {
+        return null;
+    }
+
+    public static CompletableFuture randomMobileBrowser() {
+        return Devices.deviceFromAPI(true);
     }
 
     /*
@@ -79,29 +102,6 @@ lbl11:
     public Devices() {
         void var2_-1;
         void var1_-1;
-    }
-
-    public static CompletableFuture randomDesktopBrowser() {
-        return Devices.deviceFromAPI(false);
-    }
-
-    public static Devices valueOf(String string) {
-        return Enum.valueOf(Devices.class, string);
-    }
-
-    public static CompletableFuture deviceFromAPI(boolean bl) {
-        JsonObject jsonObject = new JsonObject("{\"PX31\":\"126.8696939282454\",\"PX32\":\"b908567e93d9ed24c036da7986349e97\",\"PX714\":\"64556c77\",\"PX725\":\"10207b2f\",\"PX1157\":8,\"PX1019\":\"7d688b1b\",\"PX274\":\"d8442dbbacb1f4373f81a7419bab5bdc\",\"PX275\":true,\"PX441\":[],\"PX276\":\"ecef9571da5dbf97122cfec494559a23\",\"PX440\":[],\"PX210\":\"WebKit WebGL\",\"PX209\":\"WebKit\",\"PX277\":\"WebGL 1.0 (OpenGL ES 2.0 Chromium)\",\"PX281\":[\"ANGLE_instanced_arrays\",\"EXT_blend_minmax\",\"EXT_color_buffer_half_float\",\"EXT_disjoint_timer_query\",\"EXT_float_blend\",\"EXT_frag_depth\",\"EXT_shader_texture_lod\",\"EXT_texture_compression_rgtc\",\"EXT_texture_filter_anisotropic\",\"WEBKIT_EXT_texture_filter_anisotropic\",\"EXT_sRGB\",\"OES_element_index_uint\",\"OES_fbo_render_mipmap\",\"OES_standard_derivatives\",\"OES_texture_float\",\"OES_texture_float_linear\",\"OES_texture_half_float\",\"OES_texture_half_float_linear\",\"OES_vertex_array_object\",\"WEBGL_color_buffer_float\",\"WEBGL_compressed_texture_s3tc\",\"WEBKIT_WEBGL_compressed_texture_s3tc\",\"WEBGL_compressed_texture_s3tc_srgb\",\"WEBGL_debug_renderer_info\",\"WEBGL_debug_shaders\",\"WEBGL_depth_texture\",\"WEBKIT_WEBGL_depth_texture\",\"WEBGL_draw_buffers\",\"WEBGL_lose_context\",\"WEBKIT_WEBGL_lose_context\",\"WEBGL_multi_draw\"],\"PX282\":[\"[1, 1]\",\"[1, 64]\",8,\"yes\",8,24,8,16,80,16384,1024,16384,16,16384,31,16,16,1024,\"[16384, 16384]\",\"no_fp\",23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127,23,127,127],\"PX280\":\"Apple M1 Max\",\"PX279\":\"Apple\",\"PX278\":\"WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)\",\"PX248\":[],\"PX249\":[\"_pxAppId\",\"_pxJsClientSrc\",\"_pxFirstPartyEnabled\",\"_pxHostUrl\",\"_pxreCaptchaTheme\",\"_PXETnJ2Y5H\",\"_pxToggleOpenForm\",\"_pxUuidCopyToClipboard\",\"_pxSubmitForm\",\"_pxItemSelected\",\"_pxAction\",\"_pxMobile\",\"_u6b0qd2Shandler\",\"_pxInit\"],\"PX264\":33,\"PX266\":\"35075f32b425586f4fecda6e4634c0b7\",\"PX265\":true,\"PX1156\":[\"Andale Mono\",\"Arial\",\"Arial Black\",\"Arial Hebrew\",\"Arial Narrow\",\"Arial Rounded MT Bold\",\"Arial Unicode MS\",\"Comic Sans MS\",\"Courier\",\"Courier New\",\"Geneva\",\"Georgia\",\"Helvetica\",\"Helvetica Neue\",\"Impact\",\"LUCIDA GRANDE\",\"Microsoft Sans Serif\",\"Monaco\",\"Palatino\",\"Tahoma\",\"Times\",\"Times New Roman\",\"Trebuchet MS\",\"Verdana\",\"Wingdings\",\"Wingdings 2\",\"Wingdings 3\",\"Academy Engraved LET\",\"American Typewriter\",\"Apple Chancery\",\"Apple Color Emoji\",\"Apple SD Gothic Neo\",\"AVENIR\",\"Ayuthaya\",\"Bangla Sangam MN\",\"Baskerville\",\"Big Caslon\",\"Bodoni 72\",\"Bodoni 72 Oldstyle\",\"Bodoni 72 Smallcaps\",\"Bradley Hand\",\"Brush Script MT\",\"Chalkboard\",\"Chalkboard SE\",\"Chalkduster\",\"Cochin\",\"Copperplate\",\"Didot\",\"Euphemia UCAS\",\"Futura\",\"Geeza Pro\",\"Gill Sans\",\"Gujarati Sangam MN\",\"Gurmukhi MN\",\"Heiti SC\",\"Heiti TC\",\"Hiragino Kaku Gothic ProN\",\"Hiragino Mincho ProN\",\"Hoefler Text\",\"Kailasa\",\"Kannada Sangam MN\",\"Krungthep\",\"Malayalam Sangam MN\",\"Marion\",\"Marker Felt\",\"Nadeem\",\"Noteworthy\",\"OPTIMA\",\"Oriya Sangam MN\",\"Papyrus\",\"Party LET\",\"Plantagenet Cherokee\",\"Rockwell\",\"Savoye LET\",\"Sinhala Sangam MN\",\"Skia\",\"Snell Roundhand\",\"Tamil Sangam MN\",\"Telugu Sangam MN\",\"Thonburi\",\"Zapfino\"],\"PX1174\":\"{\\\"sqrt\\\":2.2227587494850775e-162,\\\"tan\\\":-6.731094208094579,\\\"cos\\\":0.9884836639831203,\\\"sin\\\":1.2246467991473532e-16,\\\"log\\\":1.768128183913931,\\\"exp\\\":22026.465794806718,\\\"acos\\\":1.5707963267948966,\\\"atan\\\":1.2626272556789115,\\\"asin\\\":0.5235987755982989}\",\"PX364\":[\"PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"Chrome PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"Chromium PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"Microsoft Edge PDF Viewer::Portable Document Format::application/pdf~pdf::text/pdf~pdf\",\"WebKit built-in PDF::Portable Document Format::application/pdf~pdf::text/pdf~pdf\"],\"PX286\":1,\"PX312\":\"d41d8cd98f00b204e9800998ecf8427e\",\"PX311\":\"fd7149bbfb316699ef918fa7bb7510a8\",\"PX310\":\"fd7149bbfb316699ef918fa7bb7510a8\",\"PX409\":0,\"PX287\":10,\"PX288\":true,\"PX289\":true,\"PX290\":true,\"PX291\":false,\"PX292\":\"missing\",\"PX293\":true,\"PX63\":\"MacIntel\",\"PX1033\":\"e0eaf10e\",\"PX1139\":false,\"PX1020\":\"7766a52d\",\"PX1021\":\"64ba5649\",\"PX1022\":\"6a90378d\",\"PX1035\":true,\"PX1025\":false,\"PX145\":true,\"PX146\":true,\"PX149\":true,\"PX150\":true,\"screenXPos\":0,\"screenYPos\":25,\"outerHeight\":1354,\"outerWidth\":1633,\"PX229\":24,\"PX230\":24,\"PX91\":3440,\"PX92\":1440,\"PX269\":3440,\"PX270\":1355,\"PX185\":1243,\"PX186\":150,\"PX187\":0,\"PX188\":0,\"PX95\":true,\"PX397\":false,\"PX400\":111,\"PX404\":\"144|66|66|172|80\",\"PX90\":[\"loadTimes\",\"csi\",\"app\",\"runtime\"],\"PX190\":\"\",\"PX399\":\"false\",\"PX411\":1,\"PX548\":-1,\"PX547\":true,\"PX170\":5,\"PX85\":[\"PDF Viewer\",\"Chrome PDF Viewer\",\"Chromium PDF Viewer\",\"Microsoft Edge PDF Viewer\",\"WebKit built-in PDF\"],\"PX59\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36\",\"PX61\":\"en-US\",\"PX313\":[\"en-US\",\"en\"],\"PX86\":true,\"PX154\":300,\"PX88\":true,\"PX133\":true,\"PX169\":2,\"PX62\":\"Gecko\",\"PX69\":\"20030107\",\"PX64\":\"5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36\",\"PX65\":\"Netscape\",\"PX66\":\"Mozilla\",\"PX60\":true,\"PX87\":true,\"PX68\":true,\"PX405\":true,\"PX134\":true,\"PX89\":true,\"PX147\":false,\"PX155\":\"Tue Nov 09 2021 13:54:13 GMT-0500 (Eastern Standard Time)\",\"PX236\":false,\"PX194\":false,\"PX195\":true,\"PX237\":0,\"PX238\":\"missing\",\"PX208\":\"visible\",\"PX218\":0,\"PX231\":1354,\"PX232\":1633,\"PX254\":false,\"PX295\":false,\"PX268\":false,\"PX166\":true,\"PX138\":true,\"PX143\":true,\"PX139\":true,\"PX163\":false,\"PX247\":0,\"PX142\":true,\"PX135\":true,\"PX167\":true,\"PX148\":false,\"PX140\":true,\"PX144\":true,\"PX715\":\"\",\"PX724\":\"10207b2f\",\"PX729\":\"90e65465\",\"PX1179\":true,\"PX1180\":true,\"PX1173\":2,\"PX443\":true,\"PX466\":true,\"PX467\":true,\"PX468\":true,\"PX716\":\"9f762773\",\"PX717\":\"dae10548\",\"PX727\":\"\",\"PX723\":\"a3d12c4\",\"PX726\":\"82002457\",\"PX722\":\"a3d12c4\",\"PX191\":0,\"PX94\":1,\"PX120\":[],\"PX141\":false,\"PX55\":\"\",\"PX1144\":true,\"safari\":false,\"chrome\":true,\"firefox\":false,\"PX671\":\"9dc3799\",\"PX673\":\"759d4537\",\"PX696\":\"10be1de5\",\"PX675\":\"55de5b09\",\"PX676\":true,\"PX677\":\"703978d7\",\"PX668\":\"58b99ae8\",\"PX1155\":\"4g\",\"PX1154\":false,\"PX1153\":0,\"PX1152\":10,\"scrollbarWidth\":16,\"PX184\":true}");
-        CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/browserDeviceUnfiltered.json?ak=false&mobile=" + bl);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Devices.async$deviceFromAPI((int)(bl ? 1 : 0), jsonObject, completableFuture2, 1, arg_0));
-        }
-        JsonObject jsonObject2 = (JsonObject)completableFuture.join();
-        return CompletableFuture.completedFuture(new Devices$DeviceImpl(jsonObject));
-    }
-
-    public Devices$Device get() {
-        return null;
     }
 }
 

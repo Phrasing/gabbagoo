@@ -10,6 +10,11 @@ import java.util.stream.Collectors;
 public class Countries {
     public static Map<String, String> COUNTRIES = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
 
+    public static String fullCountryName(String string) {
+        string = string.replace("JAPAN", "JP");
+        return COUNTRIES.get(string);
+    }
+
     static {
         COUNTRIES.put("Afghanistan", "AF");
         COUNTRIES.put("\u00c5land Islands", "AX");
@@ -248,11 +253,6 @@ public class Countries {
         COUNTRIES.put("Zambia", "ZM");
         COUNTRIES.put("Zimbabwe", "ZW");
         COUNTRIES = COUNTRIES.entrySet().stream().collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-    }
-
-    public static String fullCountryName(String string) {
-        string = string.replace("JAPAN", "JP");
-        return COUNTRIES.get(string);
     }
 }
 

@@ -52,64 +52,34 @@ import org.apache.logging.log4j.Logger;
 public class TaskController
 implements Module,
 LoadableAsync {
-    public List<Task> tasks;
-    public AtomicInteger count = new AtomicInteger(1);
-    public Vertx vertx;
-    public int profileCount = 0;
-    public List<TaskActor<?>> actors;
-    public boolean cleaner = false;
     public static Logger logger = LogManager.getLogger(TaskController.class);
-
-    public void cleanUp() {
-        System.gc();
-    }
-
-    public Boolean lambda$load$4(List list) {
-        this.profileCount = list.size();
-        Iterator iterator = list.iterator();
-        block0: while (iterator.hasNext()) {
-            Task task = (Task)iterator.next();
-            int n = 0;
-            while (true) {
-                if (n >= task.getTaskQuantity()) continue block0;
-                this.tasks.add(task.copy());
-                ++n;
-            }
-            break;
-        }
-        return true;
-    }
-
-    public void massEditDelay(long l) {
-        if (l > Integer.MAX_VALUE) {
-            l = Integer.MAX_VALUE;
-        }
-        Iterator<Task> iterator = this.tasks.iterator();
-        while (true) {
-            if (!iterator.hasNext()) {
-                VertxUtil.sendSignal();
-                return;
-            }
-            Task task = iterator.next();
-            task.setMonitorDelay((int)l);
-        }
-    }
-
-    public void switchToDefaultDelay() {
-        Iterator<Task> iterator = this.tasks.iterator();
-        while (true) {
-            if (!iterator.hasNext()) {
-                VertxUtil.sendSignal();
-                return;
-            }
-            Task task = iterator.next();
-            task.setMonitorDelay(null);
-        }
-    }
+    public Vertx vertx;
+    public boolean cleaner = false;
+    public List<Task> tasks;
+    public int profileCount = 0;
+    public AtomicInteger count = new AtomicInteger(1);
+    public List<TaskActor<?>> actors;
 
     @Override
     public void initialise() {
         logger.debug("Initialized.");
+    }
+
+    public void lambda$afterStartCleanup$0(Long l) {
+        this.cleanUp();
+        this.periodicCleanup();
+    }
+
+    public void massPassword(String string) {
+        Iterator<Task> iterator = this.tasks.iterator();
+        while (true) {
+            if (!iterator.hasNext()) {
+                VertxUtil.sendSignal();
+                return;
+            }
+            Task task = iterator.next();
+            task.setPassword(string);
+        }
     }
 
     public TaskController(Vertx vertx) {
@@ -118,20 +88,14 @@ LoadableAsync {
         this.actors = new ArrayList();
     }
 
-    public List parseFile(String string) {
-        List list = Arrays.stream(string.split("\n")).filter(Objects::nonNull).filter(TaskController::lambda$parseFile$6).filter(TaskController::lambda$parseFile$7).map(TaskController::lambda$parseFile$8).collect(Collectors.toList());
-        ArrayList<Task> arrayList = new ArrayList<Task>();
-        Iterator iterator = list.iterator();
-        while (iterator.hasNext()) {
-            String[] stringArray = (String[])iterator.next();
-            try {
-                arrayList.add(this.validateAndCreate(stringArray));
-            }
-            catch (Throwable throwable) {
-                System.out.println("Entry error for row '" + list.indexOf(stringArray) + "': " + throwable.getMessage());
-            }
-        }
-        return arrayList;
+    public static Future lambda$load$5(Boolean bl) {
+        return Future.succeededFuture();
+    }
+
+    @Override
+    public Future load() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        return fileSystem.readFile(Storage.CONFIG_PATH + "/profiles.csv").otherwise(arg_0 -> TaskController.lambda$load$2(fileSystem, arg_0)).map(TaskController::lambda$load$3).map(this::parseFile).map(this::lambda$load$4).compose(TaskController::lambda$load$5);
     }
 
     public Task validateAndCreate(String[] stringArray) {
@@ -165,32 +129,14 @@ LoadableAsync {
         return new Task(stringArray);
     }
 
-    public static String lambda$load$3(Buffer buffer) {
-        return buffer.toString(StandardCharsets.UTF_8);
+    public void periodicCleanup() {
+        this.vertx.setPeriodic(TimeUnit.MINUTES.toMillis(30L), this::lambda$periodicCleanup$1);
     }
 
-    public void stopTasks() {
-        Iterator<TaskActor<?>> iterator = this.actors.iterator();
-        while (true) {
-            if (!iterator.hasNext()) {
-                this.cleanUp();
-                return;
-            }
-            TaskActor<?> taskActor = iterator.next();
-            try {
-                this.vertx.undeploy(taskActor.deploymentID()).result();
-            }
-            catch (Exception exception) {
-            }
+    public void massEditDelay(long l) {
+        if (l > Integer.MAX_VALUE) {
+            l = Integer.MAX_VALUE;
         }
-    }
-
-    public void lambda$afterStartCleanup$0(Long l) {
-        this.cleanUp();
-        this.periodicCleanup();
-    }
-
-    public void massPassword(String string) {
         Iterator<Task> iterator = this.tasks.iterator();
         while (true) {
             if (!iterator.hasNext()) {
@@ -198,93 +144,16 @@ LoadableAsync {
                 return;
             }
             Task task = iterator.next();
-            task.setPassword(string);
+            task.setMonitorDelay((int)l);
         }
-    }
-
-    public void lambda$periodicCleanup$1(Long l) {
-        this.cleanUp();
-    }
-
-    public List getTasks() {
-        return this.tasks;
     }
 
     public int countTasks() {
         return this.tasks.size();
     }
 
-    public static Future lambda$load$5(Boolean bl) {
-        return Future.succeededFuture();
-    }
-
-    @Override
-    public void terminate() {
-        Iterator<TaskActor<?>> iterator = this.actors.iterator();
-        while (true) {
-            if (!iterator.hasNext()) {
-                this.actors.clear();
-                this.tasks.clear();
-                return;
-            }
-            TaskActor<?> taskActor = iterator.next();
-            try {
-                this.vertx.undeploy(taskActor.deploymentID()).result();
-            }
-            catch (Exception exception) {
-            }
-        }
-    }
-
-    public static Buffer lambda$load$2(FileSystem fileSystem, Throwable throwable) {
-        logger.warn("Failed to find profiles.csv. Creating template...");
-        FileUtils.createAndWrite(fileSystem, Storage.CONFIG_PATH + "/profiles.csv", Buffer.buffer((String)"Keyword,SIZE/QUANTITY,FIRST NAME,LAST NAME,EMAIL,PHONE NUMBER,ADDRESS 1,ADDRESS 2,STATE,CITY,ZIP,COUNTRY,CC NUMBER,MONTH,YEAR,CVC,Task Quantity,Retry Delay,Monitor Delay,Site,Mode,2CaptchaKEY\n"));
-        return Buffer.buffer((String)"");
-    }
-
-    public void afterStartCleanup() {
-        this.vertx.setTimer(TimeUnit.MINUTES.toMillis(5L), this::lambda$afterStartCleanup$0);
-    }
-
-    public void massEditLinkOrKeyword(String string) {
-        boolean bl = false;
-        Iterator<Task> iterator = this.tasks.iterator();
-        while (true) {
-            if (!iterator.hasNext()) {
-                if (bl) return;
-                VertxUtil.sendSignal();
-                return;
-            }
-            Task task = iterator.next();
-            task.setKeywords(string.toUpperCase(Locale.ROOT).replace("  ", " ").split(" "));
-            if (task.getSite() != Site.YEEZY) continue;
-            bl = true;
-        }
-    }
-
-    public static boolean lambda$parseFile$7(String string) {
-        if (string.toLowerCase().contains("keyword")) return false;
-        return true;
-    }
-
-    public int profileCount() {
-        return this.profileCount;
-    }
-
-    public static String[] lambda$parseFile$8(String string) {
-        return string.split(",");
-    }
-
-    public void periodicCleanup() {
-        this.vertx.setPeriodic(TimeUnit.MINUTES.toMillis(30L), this::lambda$periodicCleanup$1);
-    }
-
-    public static boolean lambda$parseFile$6(String string) {
-        if (string.isEmpty()) return false;
-        return true;
-    }
-
-    public void startTasks() {
+    public synchronized void startTasks() {
+        Task.profileRotator.finish();
         Iterator<Task> iterator = this.tasks.iterator();
         block14: while (iterator.hasNext()) {
             Task task = iterator.next();
@@ -339,10 +208,142 @@ LoadableAsync {
         }
     }
 
+    public List parseFile(String string) {
+        List list = Arrays.stream(string.split("\n")).filter(Objects::nonNull).filter(TaskController::lambda$parseFile$6).filter(TaskController::lambda$parseFile$7).map(TaskController::lambda$parseFile$8).collect(Collectors.toList());
+        ArrayList<Task> arrayList = new ArrayList<Task>();
+        Iterator iterator = list.iterator();
+        while (iterator.hasNext()) {
+            String[] stringArray = (String[])iterator.next();
+            try {
+                arrayList.add(this.validateAndCreate(stringArray));
+            }
+            catch (Throwable throwable) {
+                System.out.println("Entry error for row '" + list.indexOf(stringArray) + "': " + throwable.getMessage());
+            }
+        }
+        return arrayList;
+    }
+
+    public void massEditLinkOrKeyword(String string) {
+        boolean bl = false;
+        Iterator<Task> iterator = this.tasks.iterator();
+        while (true) {
+            if (!iterator.hasNext()) {
+                if (bl) return;
+                VertxUtil.sendSignal();
+                return;
+            }
+            Task task = iterator.next();
+            task.setKeywords(string.toUpperCase(Locale.ROOT).replace("  ", " ").split(" "));
+            if (task.getSite() != Site.YEEZY) continue;
+            bl = true;
+        }
+    }
+
+    public Boolean lambda$load$4(List list) {
+        this.profileCount = list.size();
+        Iterator iterator = list.iterator();
+        block0: while (iterator.hasNext()) {
+            Task task = (Task)iterator.next();
+            int n = 0;
+            while (true) {
+                if (n >= task.getTaskQuantity()) continue block0;
+                this.tasks.add(task.copy());
+                ++n;
+            }
+            break;
+        }
+        return true;
+    }
+
+    public void cleanUp() {
+        System.gc();
+    }
+
+    public void lambda$periodicCleanup$1(Long l) {
+        this.cleanUp();
+    }
+
+    public static Buffer lambda$load$2(FileSystem fileSystem, Throwable throwable) {
+        logger.warn("Failed to find profiles.csv. Creating template...");
+        FileUtils.createAndWrite(fileSystem, Storage.CONFIG_PATH + "/profiles.csv", Buffer.buffer((String)"Keyword,SIZE/QUANTITY,FIRST NAME,LAST NAME,EMAIL,PHONE NUMBER,ADDRESS 1,ADDRESS 2,STATE,CITY,ZIP,COUNTRY,CC NUMBER,MONTH,YEAR,CVC,Task Quantity,Retry Delay,Monitor Delay,Site,Mode,2CaptchaKEY\n"));
+        return Buffer.buffer((String)"");
+    }
+
+    public int profileCount() {
+        return this.profileCount;
+    }
+
+    public void afterStartCleanup() {
+        this.vertx.setTimer(TimeUnit.MINUTES.toMillis(5L), this::lambda$afterStartCleanup$0);
+    }
+
+    public void switchToDefaultDelay() {
+        Iterator<Task> iterator = this.tasks.iterator();
+        while (true) {
+            if (!iterator.hasNext()) {
+                VertxUtil.sendSignal();
+                return;
+            }
+            Task task = iterator.next();
+            task.setMonitorDelay(null);
+        }
+    }
+
+    public void stopTasks() {
+        Iterator<TaskActor<?>> iterator = this.actors.iterator();
+        while (true) {
+            if (!iterator.hasNext()) {
+                this.cleanUp();
+                return;
+            }
+            TaskActor<?> taskActor = iterator.next();
+            try {
+                this.vertx.undeploy(taskActor.deploymentID()).result();
+            }
+            catch (Exception exception) {
+            }
+        }
+    }
+
     @Override
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile(Storage.CONFIG_PATH + "/profiles.csv").otherwise(arg_0 -> TaskController.lambda$load$2(fileSystem, arg_0)).map(TaskController::lambda$load$3).map(this::parseFile).map(this::lambda$load$4).compose(TaskController::lambda$load$5);
+    public void terminate() {
+        Iterator<TaskActor<?>> iterator = this.actors.iterator();
+        while (true) {
+            if (!iterator.hasNext()) {
+                this.actors.clear();
+                this.tasks.clear();
+                return;
+            }
+            TaskActor<?> taskActor = iterator.next();
+            try {
+                this.vertx.undeploy(taskActor.deploymentID()).result();
+            }
+            catch (Exception exception) {
+            }
+        }
+    }
+
+    public static boolean lambda$parseFile$6(String string) {
+        if (string.isEmpty()) return false;
+        return true;
+    }
+
+    public List getTasks() {
+        return this.tasks;
+    }
+
+    public static boolean lambda$parseFile$7(String string) {
+        if (string.toLowerCase().contains("keyword")) return false;
+        return true;
+    }
+
+    public static String lambda$load$3(Buffer buffer) {
+        return buffer.toString(StandardCharsets.UTF_8);
+    }
+
+    public static String[] lambda$parseFile$8(String string) {
+        return string.split(",");
     }
 }
 

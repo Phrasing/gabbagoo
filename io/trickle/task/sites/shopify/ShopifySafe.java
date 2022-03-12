@@ -30,40 +30,11 @@ import org.apache.logging.log4j.Logger;
 
 public class ShopifySafe
 extends Shopify {
-    public boolean fastPreload;
-    public boolean isGraph;
-    public boolean isContactpreload = false;
     public boolean isPreload = this.task.getMode().contains("preload");
     public String precartItemName = "123456789";
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$run(ShopifySafe var0, int var1_1, CompletableFuture var2_2, String var3_3, ShopifySafe var4_6, String var5_7, JsonObject var6_8, int var7_9, Object var8_11) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [81[DOLOOP]], but top level block is 83[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
+    public boolean fastPreload;
+    public boolean isContactpreload = false;
+    public boolean isGraph = this.task.getMode().contains("graph");
 
     public CompletableFuture preloadContactOnly() {
         String string;
@@ -162,9 +133,33 @@ extends Shopify {
         return CompletableFuture.completedFuture(string2);
     }
 
-    public ShopifySafe(Task task, int n) {
-        super(task, n);
-        this.isGraph = this.task.getMode().contains("graph");
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$run(ShopifySafe var0, int var1_1, CompletableFuture var2_2, String var3_3, ShopifySafe var4_6, String var5_7, JsonObject var6_8, int var7_9, Object var8_11) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [81[DOLOOP]], but top level block is 83[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
     }
 
     public void lambda$run$0(Long l) {
@@ -455,7 +450,7 @@ lbl187:
 lbl205:
                 // 2 sources
 
-                v41.error(v42, (Object)((ShippingRateSupplier)v43.join()).get(), (Object)var0.task.getShippingRate());
+                v41.error(v42, ((ShippingRateSupplier)v43.join()).get(), (Object)var0.task.getShippingRate());
                 v49 = var0.clearWithChangeJS();
                 if (!v49.isDone()) {
                     var6_6 = v49;
@@ -545,6 +540,149 @@ lbl270:
             }
         }
         throw new IllegalArgumentException();
+    }
+
+    public ShopifySafe(Task task, int n) {
+        super(task, n);
+    }
+
+    public CompletableFuture preload() {
+        CompletableFuture completableFuture = this.fetchProductsJSON(false);
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture2, null, null, null, null, null, null, null, 1, arg_0));
+        }
+        JsonArray jsonArray = ((JsonObject)completableFuture.join()).getJsonArray("products");
+        String string = null;
+        while (this.api.getWebClient().isActive()) {
+            String string2;
+            CompletableFuture completableFuture3 = VariantHandler.findPrecartVariant(jsonArray);
+            if (!completableFuture3.isDone()) {
+                CompletableFuture completableFuture4 = completableFuture3;
+                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture4, jsonArray, string, null, null, null, null, null, 2, arg_0));
+            }
+            Triplet triplet = (Triplet)completableFuture3.join();
+            if (triplet == null) {
+                this.isPreload = false;
+                this.logger.error("There is no item to preload. Handling...");
+                return CompletableFuture.completedFuture(null);
+            }
+            this.shippingRate = new CompletableFuture();
+            this.precartItemName = string2 = (String)triplet.first;
+            if (this.task.getSite() == Site.KITH) {
+                CompletableFuture completableFuture5 = this.atcBasic(string2);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture6, jsonArray, string, triplet, string2, null, null, null, 3, arg_0));
+                }
+                completableFuture5.join();
+            } else {
+                CompletableFuture completableFuture7 = this.atcAJAX(string2);
+                if (!completableFuture7.isDone()) {
+                    CompletableFuture completableFuture8 = completableFuture7;
+                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture8, jsonArray, string, triplet, string2, null, null, null, 4, arg_0));
+                }
+                completableFuture7.join();
+            }
+            CompletableFuture completableFuture9 = this.genCheckoutURLViaCart();
+            if (!completableFuture9.isDone()) {
+                CompletableFuture completableFuture10 = completableFuture9;
+                return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture10, jsonArray, string, triplet, string2, null, null, null, 5, arg_0));
+            }
+            string = (String)completableFuture9.join();
+            CompletableFuture completableFuture11 = this.handlePreload(string);
+            if (!completableFuture11.isDone()) {
+                CompletableFuture completableFuture12 = completableFuture11;
+                return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture12, jsonArray, string, triplet, string2, null, null, null, 6, arg_0));
+            }
+            string = (String)completableFuture11.join();
+            if (!((Boolean)triplet.second).booleanValue()) {
+                this.isPreload = false;
+                break;
+            }
+            CompletableFuture completableFuture13 = this.getCheckoutURL(string);
+            if (!completableFuture13.isDone()) {
+                CompletableFuture completableFuture14 = completableFuture13;
+                return ((CompletableFuture)completableFuture14.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture14, jsonArray, string, triplet, string2, null, null, null, 7, arg_0));
+            }
+            completableFuture13.join();
+            if (this.api.getCookies().contains("_shopify_checkpoint")) {
+                CompletableFuture completableFuture15 = this.checkCaptcha(string);
+                if (!completableFuture15.isDone()) {
+                    CompletableFuture completableFuture16 = completableFuture15;
+                    return ((CompletableFuture)completableFuture16.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture16, jsonArray, string, triplet, string2, null, null, null, 8, arg_0));
+                }
+                completableFuture15.join();
+            }
+            CompletableFuture completableFuture17 = this.submitContact(string);
+            if (!completableFuture17.isDone()) {
+                CompletableFuture completableFuture18 = completableFuture17;
+                return ((CompletableFuture)completableFuture18.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture18, jsonArray, string, triplet, string2, null, null, null, 9, arg_0));
+            }
+            completableFuture17.join();
+            CompletableFuture completableFuture19 = this.getShippingRateOld();
+            CompletableFuture<Void> completableFuture20 = CompletableFuture.allOf(completableFuture19, this.getShippingPage(string));
+            if (!completableFuture20.isDone()) {
+                CompletableFuture<Void> completableFuture21 = completableFuture20;
+                return ((CompletableFuture)completableFuture21.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture21, null, null, 10, arg_0));
+            }
+            completableFuture20.join();
+            CompletableFuture completableFuture22 = this.shippingRate;
+            if (!completableFuture22.isDone()) {
+                CompletableFuture completableFuture23 = completableFuture22;
+                return ((CompletableFuture)completableFuture23.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture23, null, null, 11, arg_0));
+            }
+            if (!((String)((ShippingRateSupplier)completableFuture22.join()).get()).equals(this.task.getShippingRate()) && this.task.getShippingRate().length() > 3) {
+                Logger logger = this.logger;
+                CompletableFuture completableFuture24 = this.shippingRate;
+                if (!completableFuture24.isDone()) {
+                    CompletableFuture completableFuture25 = completableFuture24;
+                    String string3 = "The shipping rate could not be preloaded. Attempting another item current: [{}] user: [{}]";
+                    Logger logger2 = logger;
+                    return ((CompletableFuture)completableFuture25.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture25, logger2, string3, 12, arg_0));
+                }
+                logger.error("The shipping rate could not be preloaded. Attempting another item current: [{}] user: [{}]", ((ShippingRateSupplier)completableFuture24.join()).get(), (Object)this.task.getShippingRate());
+                CompletableFuture completableFuture26 = this.clearWithChangeJS();
+                if (!completableFuture26.isDone()) {
+                    CompletableFuture completableFuture27 = completableFuture26;
+                    return ((CompletableFuture)completableFuture27.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture27, null, null, 13, arg_0));
+                }
+                completableFuture26.join();
+                this.shippingRate = new CompletableFuture();
+                if (jsonArray.isEmpty()) {
+                    this.logger.info("There are no items with matching shipping rate. Handling...");
+                    this.api.checkIsOOS();
+                    this.configureShippingRate();
+                    this.isPreload = false;
+                    this.isContactpreload = true;
+                    return CompletableFuture.completedFuture(string);
+                }
+                jsonArray.remove(triplet.third);
+                continue;
+            }
+            CompletableFuture completableFuture28 = this.submitShipping(string);
+            if (!completableFuture28.isDone()) {
+                CompletableFuture completableFuture29 = completableFuture28;
+                return ((CompletableFuture)completableFuture29.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture29, null, null, 14, arg_0));
+            }
+            completableFuture28.join();
+            break;
+        }
+        CompletableFuture completableFuture30 = this.clearWithChangeJS();
+        if (!completableFuture30.isDone()) {
+            CompletableFuture completableFuture31 = completableFuture30;
+            return ((CompletableFuture)completableFuture31.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture31, jsonArray, string, null, null, null, null, null, 15, arg_0));
+        }
+        completableFuture30.join();
+        CompletableFuture completableFuture32 = this.checkCart();
+        if (!completableFuture32.isDone()) {
+            CompletableFuture completableFuture33 = completableFuture32;
+            return ((CompletableFuture)completableFuture33.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture33, jsonArray, string, null, null, null, null, null, 16, arg_0));
+        }
+        completableFuture32.join();
+        this.api.checkIsOOS();
+        this.configureShippingRate();
+        return CompletableFuture.completedFuture(string);
     }
 
     /*
@@ -1125,145 +1263,6 @@ lbl176:
             this.logger.error("Task interrupted: " + throwable.getMessage());
         }
         return null;
-    }
-
-    public CompletableFuture preload() {
-        CompletableFuture completableFuture = this.fetchProductsJSON(false);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture2, null, null, null, null, null, null, null, 1, arg_0));
-        }
-        JsonArray jsonArray = ((JsonObject)completableFuture.join()).getJsonArray("products");
-        String string = null;
-        while (this.api.getWebClient().isActive()) {
-            String string2;
-            CompletableFuture completableFuture3 = VariantHandler.findPrecartVariant(jsonArray);
-            if (!completableFuture3.isDone()) {
-                CompletableFuture completableFuture4 = completableFuture3;
-                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture4, jsonArray, string, null, null, null, null, null, 2, arg_0));
-            }
-            Triplet triplet = (Triplet)completableFuture3.join();
-            if (triplet == null) {
-                this.isPreload = false;
-                this.logger.error("There is no item to preload. Handling...");
-                return CompletableFuture.completedFuture(null);
-            }
-            this.shippingRate = new CompletableFuture();
-            this.precartItemName = string2 = (String)triplet.first;
-            if (this.task.getSite() == Site.KITH) {
-                CompletableFuture completableFuture5 = this.atcBasic(string2);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture6, jsonArray, string, triplet, string2, null, null, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            } else {
-                CompletableFuture completableFuture7 = this.atcAJAX(string2);
-                if (!completableFuture7.isDone()) {
-                    CompletableFuture completableFuture8 = completableFuture7;
-                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture8, jsonArray, string, triplet, string2, null, null, null, 4, arg_0));
-                }
-                completableFuture7.join();
-            }
-            CompletableFuture completableFuture9 = this.genCheckoutURLViaCart();
-            if (!completableFuture9.isDone()) {
-                CompletableFuture completableFuture10 = completableFuture9;
-                return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture10, jsonArray, string, triplet, string2, null, null, null, 5, arg_0));
-            }
-            string = (String)completableFuture9.join();
-            CompletableFuture completableFuture11 = this.handlePreload(string);
-            if (!completableFuture11.isDone()) {
-                CompletableFuture completableFuture12 = completableFuture11;
-                return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture12, jsonArray, string, triplet, string2, null, null, null, 6, arg_0));
-            }
-            string = (String)completableFuture11.join();
-            if (!((Boolean)triplet.second).booleanValue()) {
-                this.isPreload = false;
-                break;
-            }
-            CompletableFuture completableFuture13 = this.getCheckoutURL(string);
-            if (!completableFuture13.isDone()) {
-                CompletableFuture completableFuture14 = completableFuture13;
-                return ((CompletableFuture)completableFuture14.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture14, jsonArray, string, triplet, string2, null, null, null, 7, arg_0));
-            }
-            completableFuture13.join();
-            if (this.api.getCookies().contains("_shopify_checkpoint")) {
-                CompletableFuture completableFuture15 = this.checkCaptcha(string);
-                if (!completableFuture15.isDone()) {
-                    CompletableFuture completableFuture16 = completableFuture15;
-                    return ((CompletableFuture)completableFuture16.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture16, jsonArray, string, triplet, string2, null, null, null, 8, arg_0));
-                }
-                completableFuture15.join();
-            }
-            CompletableFuture completableFuture17 = this.submitContact(string);
-            if (!completableFuture17.isDone()) {
-                CompletableFuture completableFuture18 = completableFuture17;
-                return ((CompletableFuture)completableFuture18.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture18, jsonArray, string, triplet, string2, null, null, null, 9, arg_0));
-            }
-            completableFuture17.join();
-            CompletableFuture completableFuture19 = this.getShippingRateOld();
-            CompletableFuture<Void> completableFuture20 = CompletableFuture.allOf(completableFuture19, this.getShippingPage(string));
-            if (!completableFuture20.isDone()) {
-                CompletableFuture<Void> completableFuture21 = completableFuture20;
-                return ((CompletableFuture)completableFuture21.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture21, null, null, 10, arg_0));
-            }
-            completableFuture20.join();
-            CompletableFuture completableFuture22 = this.shippingRate;
-            if (!completableFuture22.isDone()) {
-                CompletableFuture completableFuture23 = completableFuture22;
-                return ((CompletableFuture)completableFuture23.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture23, null, null, 11, arg_0));
-            }
-            if (!((ShippingRateSupplier)completableFuture22.join()).get().equals(this.task.getShippingRate()) && this.task.getShippingRate().length() > 3) {
-                Logger logger = this.logger;
-                CompletableFuture completableFuture24 = this.shippingRate;
-                if (!completableFuture24.isDone()) {
-                    CompletableFuture completableFuture25 = completableFuture24;
-                    String string3 = "The shipping rate could not be preloaded. Attempting another item current: [{}] user: [{}]";
-                    Logger logger2 = logger;
-                    return ((CompletableFuture)completableFuture25.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture25, logger2, string3, 12, arg_0));
-                }
-                logger.error("The shipping rate could not be preloaded. Attempting another item current: [{}] user: [{}]", (Object)((ShippingRateSupplier)completableFuture24.join()).get(), (Object)this.task.getShippingRate());
-                CompletableFuture completableFuture26 = this.clearWithChangeJS();
-                if (!completableFuture26.isDone()) {
-                    CompletableFuture completableFuture27 = completableFuture26;
-                    return ((CompletableFuture)completableFuture27.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture27, null, null, 13, arg_0));
-                }
-                completableFuture26.join();
-                this.shippingRate = new CompletableFuture();
-                if (jsonArray.isEmpty()) {
-                    this.logger.info("There are no items with matching shipping rate. Handling...");
-                    this.api.checkIsOOS();
-                    this.configureShippingRate();
-                    this.isPreload = false;
-                    this.isContactpreload = true;
-                    return CompletableFuture.completedFuture(string);
-                }
-                jsonArray.remove(triplet.third);
-                continue;
-            }
-            CompletableFuture completableFuture28 = this.submitShipping(string);
-            if (!completableFuture28.isDone()) {
-                CompletableFuture completableFuture29 = completableFuture28;
-                return ((CompletableFuture)completableFuture29.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture19, jsonArray, string, triplet, string2, completableFuture29, null, null, 14, arg_0));
-            }
-            completableFuture28.join();
-            break;
-        }
-        CompletableFuture completableFuture30 = this.clearWithChangeJS();
-        if (!completableFuture30.isDone()) {
-            CompletableFuture completableFuture31 = completableFuture30;
-            return ((CompletableFuture)completableFuture31.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture31, jsonArray, string, null, null, null, null, null, 15, arg_0));
-        }
-        completableFuture30.join();
-        CompletableFuture completableFuture32 = this.checkCart();
-        if (!completableFuture32.isDone()) {
-            CompletableFuture completableFuture33 = completableFuture32;
-            return ((CompletableFuture)completableFuture33.exceptionally(Function.identity())).thenCompose(arg_0 -> ShopifySafe.async$preload(this, completableFuture33, jsonArray, string, null, null, null, null, null, 16, arg_0));
-        }
-        completableFuture32.join();
-        this.api.checkIsOOS();
-        this.configureShippingRate();
-        return CompletableFuture.completedFuture(string);
     }
 }
 

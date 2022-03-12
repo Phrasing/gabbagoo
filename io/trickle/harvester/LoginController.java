@@ -32,20 +32,26 @@ import org.apache.logging.log4j.Logger;
 public class LoginController
 implements Module,
 LoadableAsync {
-    public AtomicReference<ArrayBlockingQueue<LoginFuture>> waitingList = new AtomicReference();
-    public static Logger logger = LogManager.getLogger(TokenController.class);
-    public String LOCK_IDENTITY;
     public AtomicInteger solveCount;
     public Vertx vertx;
+    public static Logger logger = LogManager.getLogger(TokenController.class);
+    public String LOCK_IDENTITY;
+    public AtomicReference<ArrayBlockingQueue<LoginFuture>> waitingList = new AtomicReference();
+
+    @Override
+    public Future load() {
+        return Future.succeededFuture();
+    }
 
     public LoginFuture pollWaitingList() {
         this.solveCount.incrementAndGet();
         return this.waitingList.get().take();
     }
 
-    @Override
-    public void initialise() {
-        logger.debug("Initialised.");
+    public LoginFuture solve(LoginToken loginToken) {
+        LoginFuture loginFuture = new LoginFuture(loginToken);
+        if (this.waitingList.get().offer(loginFuture)) return loginFuture;
+        throw new Exception("Too many tokens to solve!!!");
     }
 
     public static CompletableFuture initBrowserLogin(String string, Iterable iterable, String string2, CookieJar cookieJar, String string3) {
@@ -68,26 +74,16 @@ LoadableAsync {
         }
     }
 
+    @Override
+    public void initialise() {
+        logger.debug("Initialised.");
+    }
+
     public LoginController(Vertx vertx) {
         this.waitingList.set(new ArrayBlockingQueue(300));
         this.vertx = vertx;
         this.LOCK_IDENTITY = UUID.randomUUID().toString();
         this.solveCount = new AtomicInteger(0);
-    }
-
-    @Override
-    public void terminate() {
-    }
-
-    @Override
-    public Future load() {
-        return Future.succeededFuture();
-    }
-
-    public LoginFuture solve(LoginToken loginToken) {
-        LoginFuture loginFuture = new LoginFuture(loginToken);
-        if (this.waitingList.get().offer(loginFuture)) return loginFuture;
-        throw new Exception("Too many tokens to solve!!!");
     }
 
     /*
@@ -123,6 +119,10 @@ lbl18:
             }
         }
         throw new IllegalArgumentException();
+    }
+
+    @Override
+    public void terminate() {
     }
 }
 

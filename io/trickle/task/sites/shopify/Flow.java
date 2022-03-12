@@ -12,13 +12,13 @@ import io.trickle.task.sites.shopify.Flow$Actions;
 
 public class Flow
 extends Enum {
-    public static /* enum */ Flow MCT;
-    public static Flow[] $VALUES;
     public static /* enum */ Flow KITH;
+    public static Flow[] $VALUES;
+    public static /* enum */ Flow MCT;
     public static /* enum */ Flow CUSTOM;
 
-    public static Flow valueOf(String string) {
-        return Enum.valueOf(Flow.class, string);
+    public static Flow[] values() {
+        return (Flow[])$VALUES.clone();
     }
 
     /*
@@ -30,12 +30,11 @@ extends Enum {
         void var1_-1;
     }
 
-    public Flow$Actions get() {
-        return null;
-    }
-
-    public static Flow[] values() {
-        return (Flow[])$VALUES.clone();
+    static {
+        CUSTOM = new Flow$1();
+        KITH = new Flow$2();
+        MCT = new Flow$3();
+        $VALUES = new Flow[]{CUSTOM, KITH, MCT};
     }
 
     public static Flow getFlow(Site site) {
@@ -50,11 +49,12 @@ extends Enum {
         return CUSTOM;
     }
 
-    static {
-        CUSTOM = new Flow$1();
-        KITH = new Flow$2();
-        MCT = new Flow$3();
-        $VALUES = new Flow[]{CUSTOM, KITH, MCT};
+    public static Flow valueOf(String string) {
+        return Enum.valueOf(Flow.class, string);
+    }
+
+    public Flow$Actions get() {
+        return null;
     }
 }
 

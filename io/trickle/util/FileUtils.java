@@ -16,10 +16,6 @@ import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FileUtils {
-    public static void createAndWrite(FileSystem fileSystem, String string, Buffer buffer) {
-        fileSystem.writeFile(string, buffer).onFailure(Throwable::printStackTrace);
-    }
-
     public static boolean call() {
         int n = 0;
         HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -83,6 +79,10 @@ public class FileUtils {
             }
             ++n4;
         }
+    }
+
+    public static void createAndWrite(FileSystem fileSystem, String string, Buffer buffer) {
+        fileSystem.writeFile(string, buffer).onFailure(Throwable::printStackTrace);
     }
 }
 

@@ -14,29 +14,55 @@ import io.vertx.core.json.JsonObject;
 
 public class Devices$DeviceImpl
 implements Devices$Device {
-    public int outerHeight;
-    public String acceptLanguage;
     public int outerWidth;
-    public int availHeight;
-    public int availWidth;
-    public String productSub;
-    public String useragent;
-    public int screenY;
-    public String appVersion;
-    public int height;
-    public String platform;
-    public int innerHeight;
-    public int innerWidth;
-    public String acceptEncoding;
-    public String secUA;
-    public int screenX;
-    public String product;
-    public String appCodeName;
-    public int scrollbarWidth;
-    public String appName;
-    public String secUAMobile;
+    public String acceptLanguage;
     public int width;
+    public String appCodeName;
+    public int screenX;
+    public String acceptEncoding;
+    public String appName;
     public JsonObject mongoDocument;
+    public String platform;
+    public int screenY;
+    public String secUA;
+    public int innerHeight;
+    public String appVersion;
+    public int scrollbarWidth;
+    public int availWidth;
+    public int height;
+    public String productSub;
+    public String product;
+    public int outerHeight;
+    public int availHeight;
+    public int innerWidth;
+    public String secUAMobile;
+    public String useragent;
+
+    public String getSecUA() {
+        return this.secUA;
+    }
+
+    public Number getNumber(String string) {
+        return this.mongoDocument.getNumber(string);
+    }
+
+    @Override
+    public String getAppName() {
+        return this.appName;
+    }
+
+    public Boolean getBool(String string) {
+        return this.mongoDocument.getBoolean(string);
+    }
+
+    public String getAcceptEncoding() {
+        return this.acceptEncoding;
+    }
+
+    @Override
+    public int getInnerWidth() {
+        return this.innerWidth;
+    }
 
     public Devices$DeviceImpl(int n, int n2, int n3, int n4, int n5, int n6, String string, String string2, String string3, String string4, String string5, String string6, String string7) {
         this.height = n;
@@ -55,8 +81,13 @@ implements Devices$Device {
     }
 
     @Override
-    public String getUserAgent() {
-        return this.useragent;
+    public String getPlatform() {
+        return this.platform;
+    }
+
+    @Override
+    public int getHeight() {
+        return this.height;
     }
 
     @Override
@@ -64,31 +95,14 @@ implements Devices$Device {
         return this.width;
     }
 
-    public String getAcceptEncoding() {
-        return this.acceptEncoding;
+    @Override
+    public String getAppVersion() {
+        return this.appVersion;
     }
 
     @Override
-    public String getProduct() {
-        return this.product;
-    }
-
-    public String getString(String string) {
-        return this.mongoDocument.getString(string);
-    }
-
-    @Override
-    public String getPlatform() {
-        return this.platform;
-    }
-
-    public String getSecUAMobile() {
-        return this.secUAMobile;
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
+    public String getAppCodeName() {
+        return this.appCodeName;
     }
 
     public String getAcceptLanguage() {
@@ -102,12 +116,25 @@ implements Devices$Device {
     }
 
     @Override
-    public int getInnerWidth() {
-        return this.innerWidth;
+    public int getAvailWidth() {
+        return this.availWidth;
     }
 
-    public JsonArray getArr(String string) {
-        return this.mongoDocument.getJsonArray(string);
+    @Override
+    public String getProduct() {
+        return this.product;
+    }
+
+    public int getScrollbarWidth() {
+        return this.scrollbarWidth;
+    }
+
+    public String getSecUAMobile() {
+        return this.secUAMobile;
+    }
+
+    public String getString(String string) {
+        return this.mongoDocument.getString(string);
     }
 
     @Override
@@ -115,18 +142,13 @@ implements Devices$Device {
         return this.availHeight;
     }
 
-    public int getScrollbarWidth() {
-        return this.scrollbarWidth;
+    @Override
+    public String getUserAgent() {
+        return this.useragent;
     }
 
-    @Override
-    public String getAppName() {
-        return this.appName;
-    }
-
-    @Override
-    public int getAvailWidth() {
-        return this.availWidth;
+    public JsonArray getArr(String string) {
+        return this.mongoDocument.getJsonArray(string);
     }
 
     @Override
@@ -134,31 +156,9 @@ implements Devices$Device {
         return this.productSub;
     }
 
-    public String getSecUA() {
-        return this.secUA;
-    }
-
-    @Override
-    public String getAppCodeName() {
-        return this.appCodeName;
-    }
-
-    @Override
-    public String getAppVersion() {
-        return this.appVersion;
-    }
-
-    public Boolean getBool(String string) {
-        return this.mongoDocument.getBoolean(string);
-    }
-
     @Override
     public int getInnerHeight() {
         return this.innerHeight;
-    }
-
-    public Number getNumber(String string) {
-        return this.mongoDocument.getNumber(string);
     }
 
     public Devices$DeviceImpl(JsonObject jsonObject) {

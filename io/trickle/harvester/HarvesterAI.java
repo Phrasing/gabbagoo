@@ -13,6 +13,15 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.codec.BodyCodec;
 
 public class HarvesterAI {
+    public static HttpRequest sendAPIReq() {
+        HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().postAbs("https://ai56567.resolved.gg/predict").as(BodyCodec.buffer());
+        httpRequest.putHeader("apiKey", "39a0c05dd5cd4fb485ac62711afbad97");
+        httpRequest.putHeader("content-type", "application/json");
+        httpRequest.putHeader("Accept", "*/*");
+        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
+        return httpRequest;
+    }
+
     public static Pair apiPair(boolean bl, String string) {
         Pair pair = new Pair();
         if (bl) {
@@ -194,15 +203,6 @@ public class HarvesterAI {
         }
         pair.second = "SEGMENTATION";
         return pair;
-    }
-
-    public static HttpRequest sendAPIReq() {
-        HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().postAbs("https://ai56567.resolved.gg/predict").as(BodyCodec.buffer());
-        httpRequest.putHeader("apiKey", "39a0c05dd5cd4fb485ac62711afbad97");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("Accept", "*/*");
-        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        return httpRequest;
     }
 }
 

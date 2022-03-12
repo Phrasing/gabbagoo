@@ -34,17 +34,10 @@ import java.util.function.Function;
 import org.apache.logging.log4j.Logger;
 
 public class SessionPreload {
+    public Logger logger;
     public Profile profile;
     public HibbettAPI client;
-    public Logger logger;
     public Hibbett actor;
-
-    public SessionPreload(Hibbett hibbett) {
-        this.actor = hibbett;
-        this.client = (HibbettAPI)hibbett.getClient();
-        this.profile = hibbett.getProfile();
-        this.logger = hibbett.getLogger();
-    }
 
     public CompletableFuture fetch() {
         Integer n;
@@ -163,553 +156,6 @@ public class SessionPreload {
                 }
             }
         }
-    }
-
-    public CompletableFuture fetchNonce(String string) {
-        int n = 0;
-        while (n++ < 99) {
-            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            HttpRequest httpRequest = this.client.nonce(string);
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject = (JsonObject)httpResponse.body();
-                if (jsonObject.containsKey("nonce")) {
-                    return CompletableFuture.completedFuture(jsonObject.getString("nonce"));
-                }
-                this.logger.error("Error booting up 2. Retrying - {}", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject.containsKey("vid") ? jsonObject.getString("vid") : null, jsonObject.containsKey("uuid") ? jsonObject.getString("uuid") : null);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture4, httpResponse, jsonObject, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.client.isSkip()) continue;
-                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture6, httpResponse, jsonObject, n2, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred step (n): {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$fetchNonce(SessionPreload var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, JsonObject var6_7, int var7_9, Throwable var8_14, int var9_15, Object var10_16) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$submitCvv(SessionPreload var0, String var1_1, JsonObject var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_5, HttpResponse var6_7, JsonObject var7_8, int var8_10, Throwable var9_15, int var10_16, Object var11_17) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture submitCvv(String string) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("cardSecurityCode", (Object)this.profile.getCvv());
-        jsonObject.put("paymentAccountNumber", (Object)this.profile.getCardNumber());
-        int n = 0;
-        while (n++ < 99) {
-            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            HttpRequest httpRequest = this.client.submitCvv(string);
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
-                if (jsonObject2.containsKey("encryptedPaymentAccountNumber") && jsonObject2.containsKey("encryptedCardSecurityCode")) {
-                    return CompletableFuture.completedFuture(new JsonArray().add((Object)jsonObject2.getString("encryptedPaymentAccountNumber")).add((Object)jsonObject2.getString("encryptedCardSecurityCode")));
-                }
-                this.logger.error("Error booting up 4. Retrying - {}", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.client.isSkip()) continue;
-                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred step (2c): {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture submitEmail(String string, String string2) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("email", (Object)this.profile.getEmail());
-        int n = 0;
-        while (n++ < 99) {
-            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            HttpRequest httpRequest = this.client.submitEmail(string, string2);
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
-                if (jsonObject2.containsKey("customerInformation") && jsonObject2.getJsonObject("customerInformation").containsKey("email")) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                this.logger.error("Error booting up 6. Retrying - {}", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.client.isSkip()) continue;
-                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred at basket: {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture createCart(String string) {
-        int n = 0;
-        while (n++ < 99999) {
-            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            HttpRequest httpRequest = this.client.createCart(string);
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, Buffer.buffer((String)""));
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject = (JsonObject)httpResponse.body();
-                if (jsonObject.containsKey("basketId")) {
-                    return CompletableFuture.completedFuture(jsonObject.getString("basketId"));
-                }
-                this.logger.error("Error booting up 5. Retrying - {}", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject.containsKey("vid") ? jsonObject.getString("vid") : null, jsonObject.containsKey("uuid") ? jsonObject.getString("uuid") : null);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture4, httpResponse, jsonObject, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.client.isSkip()) continue;
-                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture6, httpResponse, jsonObject, n2, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred at basket: {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$submitCard(SessionPreload var0, String var1_1, JsonObject var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_5, HttpResponse var6_7, JsonObject var7_8, int var8_10, Throwable var9_15, int var10_16, Object var11_17) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture submitShippingRate(String string, String string2) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("id", (Object)"ANY_GND");
-        int n = 0;
-        while (n++ < 99) {
-            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            HttpRequest httpRequest = this.client.submitShippingRate(string, string2);
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
-                if (jsonObject2.containsKey("shipments") && jsonObject2.getJsonArray("shipments").size() != 0 && jsonObject2.getJsonArray("shipments").getJsonObject(0).containsKey("shippingOption") && jsonObject2.getJsonArray("shipments").getJsonObject(0).getValue("shippingOption") != null) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                this.logger.error("Error booting up 8. Retrying - {}", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.client.isSkip()) continue;
-                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred at (ps1): {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture submitCard(String string) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("paymentAccountNumber", (Object)this.profile.getCardNumber());
-        int n = 0;
-        while (n++ < 99) {
-            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            HttpRequest httpRequest = this.client.submitCard(string);
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
-                if (jsonObject2.containsKey("account_token")) {
-                    return CompletableFuture.completedFuture(jsonObject2.getString("account_token"));
-                }
-                this.logger.error("Error booting up 3. Retrying - {}", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.client.isSkip()) continue;
-                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
-                }
-                completableFuture5.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred step (c): {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$createCart(SessionPreload var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, JsonObject var6_7, int var7_9, Throwable var8_14, int var9_15, Object var10_16) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$submitShipping(SessionPreload var0, String var1_1, String var2_2, String var3_3, JsonObject var4_4, int var5_5, HttpRequest var6_6, CompletableFuture var7_7, HttpResponse var8_9, JsonObject var9_10, HibbettAPI var10_12, int var11_13, Throwable var12_15, int var13_16, Object var14_17) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$submitShippingRate(SessionPreload var0, String var1_1, String var2_2, JsonObject var3_3, int var4_4, HttpRequest var5_5, CompletableFuture var6_6, HttpResponse var7_8, JsonObject var8_9, int var9_11, Throwable var10_16, int var11_17, Object var12_18) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$fetchSession(SessionPreload var0, int var1_1, HttpRequest var2_2, CompletableFuture var3_3, HttpResponse var4_5, JsonObject var5_6, int var6_8, Throwable var7_13, int var8_14, Object var9_15) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
-         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
-         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
-         *     at org.benf.cfr.reader.Main.main(Main.java:49)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture submitShipping(String string, String string2, String string3) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("address1", (Object)this.profile.getAddress1());
-        jsonObject.put("address2", (Object)this.profile.getAddress2());
-        jsonObject.put("city", (Object)(this.profile.getCity().substring(0, 1).toUpperCase() + this.profile.getCity().substring(1).toLowerCase()));
-        jsonObject.put("country", (Object)"US");
-        jsonObject.put("firstName", (Object)(this.profile.getFirstName().substring(0, 1).toUpperCase() + this.profile.getFirstName().substring(1).toLowerCase()));
-        jsonObject.put("lastName", (Object)(this.profile.getLastName().substring(0, 1).toUpperCase() + this.profile.getLastName().substring(1).toLowerCase()));
-        jsonObject.put("phone", (Object)this.profile.getPhone());
-        jsonObject.put("save", (Object)true);
-        jsonObject.put("state", (Object)this.profile.getState());
-        jsonObject.put("zip", (Object)this.profile.getZip());
-        int n = 0;
-        while (n++ < 99) {
-            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
-            HttpRequest httpRequest = this.client.submitShipping(string, string2, string3);
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture2, null, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
-                if (jsonObject2.containsKey("shipments") && jsonObject2.getJsonArray("shipments").size() != 0 && jsonObject2.getJsonArray("shipments").getJsonObject(0).containsKey("shippingAddress") && jsonObject2.getJsonArray("shipments").getJsonObject(0).getValue("shippingAddress") != null) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                this.logger.error("Error booting up 7. Retrying - {}", (Object)httpResponse.statusCode());
-                HibbettAPI hibbettAPI = this.client;
-                CompletableFuture completableFuture3 = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/mobileDeviceWithOS.json");
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    HibbettAPI hibbettAPI2 = hibbettAPI;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, hibbettAPI2, 0, null, 2, arg_0));
-                }
-                hibbettAPI.setDevice((JsonObject)completableFuture3.join());
-                if (!ThreadLocalRandom.current().nextBoolean()) continue;
-                CompletableFuture completableFuture5 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, null, 0, null, 3, arg_0));
-                }
-                int n2 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
-                if (n2 != 0 || !this.client.isSkip()) continue;
-                CompletableFuture completableFuture7 = VertxUtil.randomSleep(5000L);
-                if (!completableFuture7.isDone()) {
-                    CompletableFuture completableFuture8 = completableFuture7;
-                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture8, httpResponse, jsonObject2, null, n2, null, 4, arg_0));
-                }
-                completableFuture7.join();
-            }
-            catch (Throwable throwable) {
-                this.logger.error("Error occurred at (ps): {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture9 = completableFuture;
-                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture9, null, null, null, 0, throwable, 5, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
     }
 
     /*
@@ -1061,8 +507,33 @@ lbl278:
         throw new IllegalArgumentException();
     }
 
-    public static CompletableFuture createSession(Hibbett hibbett) {
-        return new SessionPreload(hibbett).fetch();
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$fetchNonce(SessionPreload var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, JsonObject var6_7, int var7_9, Throwable var8_14, int var9_15, Object var10_16) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
     }
 
     public CompletableFuture fetchSession() {
@@ -1110,10 +581,539 @@ lbl278:
         return CompletableFuture.completedFuture(null);
     }
 
+    public CompletableFuture submitShippingRate(String string, String string2) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("id", (Object)"ANY_GND");
+        int n = 0;
+        while (n++ < 99) {
+            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            HttpRequest httpRequest = this.client.submitShippingRate(string, string2);
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
+                if (jsonObject2.containsKey("shipments") && jsonObject2.getJsonArray("shipments").size() != 0 && jsonObject2.getJsonArray("shipments").getJsonObject(0).containsKey("shippingOption") && jsonObject2.getJsonArray("shipments").getJsonObject(0).getValue("shippingOption") != null) {
+                    return CompletableFuture.completedFuture(null);
+                }
+                this.logger.error("Error booting up 8. Retrying - {}", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.client.isSkip()) continue;
+                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
+                }
+                completableFuture5.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred at (ps1): {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShippingRate(this, string, string2, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture submitEmail(String string, String string2) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("email", (Object)this.profile.getEmail());
+        int n = 0;
+        while (n++ < 99) {
+            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            HttpRequest httpRequest = this.client.submitEmail(string, string2);
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
+                if (jsonObject2.containsKey("customerInformation") && jsonObject2.getJsonObject("customerInformation").containsKey("email")) {
+                    return CompletableFuture.completedFuture(null);
+                }
+                this.logger.error("Error booting up 6. Retrying - {}", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.client.isSkip()) continue;
+                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
+                }
+                completableFuture5.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred at basket: {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitEmail(this, string, string2, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public static CompletableFuture createSession(Hibbett hibbett) {
+        return new SessionPreload(hibbett).fetch();
+    }
+
+    public CompletableFuture fetchNonce(String string) {
+        int n = 0;
+        while (n++ < 99) {
+            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            HttpRequest httpRequest = this.client.nonce(string);
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject = (JsonObject)httpResponse.body();
+                if (jsonObject.containsKey("nonce")) {
+                    return CompletableFuture.completedFuture(jsonObject.getString("nonce"));
+                }
+                this.logger.error("Error booting up 2. Retrying - {}", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject.containsKey("vid") ? jsonObject.getString("vid") : null, jsonObject.containsKey("uuid") ? jsonObject.getString("uuid") : null);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture4, httpResponse, jsonObject, 0, null, 2, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.client.isSkip()) continue;
+                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture6, httpResponse, jsonObject, n2, null, 3, arg_0));
+                }
+                completableFuture5.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred step (n): {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchNonce(this, string, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public CompletableFuture createCart(String string) {
+        int n = 0;
+        while (n++ < 99999) {
+            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            HttpRequest httpRequest = this.client.createCart(string);
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, Buffer.buffer((String)""));
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject = (JsonObject)httpResponse.body();
+                if (jsonObject.containsKey("basketId")) {
+                    return CompletableFuture.completedFuture(jsonObject.getString("basketId"));
+                }
+                this.logger.error("Error booting up 5. Retrying - {}", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject.containsKey("vid") ? jsonObject.getString("vid") : null, jsonObject.containsKey("uuid") ? jsonObject.getString("uuid") : null);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture4, httpResponse, jsonObject, 0, null, 2, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.client.isSkip()) continue;
+                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture6, httpResponse, jsonObject, n2, null, 3, arg_0));
+                }
+                completableFuture5.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred at basket: {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$createCart(this, string, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$submitShipping(SessionPreload var0, String var1_1, String var2_2, String var3_3, JsonObject var4_4, int var5_5, HttpRequest var6_6, CompletableFuture var7_7, HttpResponse var8_9, JsonObject var9_10, HibbettAPI var10_12, int var11_13, Throwable var12_15, int var13_16, Object var14_17) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$submitCard(SessionPreload var0, String var1_1, JsonObject var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_5, HttpResponse var6_7, JsonObject var7_8, int var8_10, Throwable var9_15, int var10_16, Object var11_17) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public CompletableFuture submitShipping(String string, String string2, String string3) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("address1", (Object)this.profile.getAddress1());
+        jsonObject.put("address2", (Object)this.profile.getAddress2());
+        jsonObject.put("city", (Object)(this.profile.getCity().substring(0, 1).toUpperCase() + this.profile.getCity().substring(1).toLowerCase()));
+        jsonObject.put("country", (Object)"US");
+        jsonObject.put("firstName", (Object)(this.profile.getFirstName().substring(0, 1).toUpperCase() + this.profile.getFirstName().substring(1).toLowerCase()));
+        jsonObject.put("lastName", (Object)(this.profile.getLastName().substring(0, 1).toUpperCase() + this.profile.getLastName().substring(1).toLowerCase()));
+        jsonObject.put("phone", (Object)this.profile.getPhone());
+        jsonObject.put("save", (Object)true);
+        jsonObject.put("state", (Object)this.profile.getState());
+        jsonObject.put("zip", (Object)this.profile.getZip());
+        int n = 0;
+        while (n++ < 99) {
+            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            HttpRequest httpRequest = this.client.submitShipping(string, string2, string3);
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture2, null, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
+                if (jsonObject2.containsKey("shipments") && jsonObject2.getJsonArray("shipments").size() != 0 && jsonObject2.getJsonArray("shipments").getJsonObject(0).containsKey("shippingAddress") && jsonObject2.getJsonArray("shipments").getJsonObject(0).getValue("shippingAddress") != null) {
+                    return CompletableFuture.completedFuture(null);
+                }
+                this.logger.error("Error booting up 7. Retrying - {}", (Object)httpResponse.statusCode());
+                HibbettAPI hibbettAPI = this.client;
+                CompletableFuture completableFuture3 = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/mobileDeviceWithOS.json");
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    HibbettAPI hibbettAPI2 = hibbettAPI;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, hibbettAPI2, 0, null, 2, arg_0));
+                }
+                hibbettAPI.setDevice((JsonObject)completableFuture3.join());
+                if (!ThreadLocalRandom.current().nextBoolean()) continue;
+                CompletableFuture completableFuture5 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, null, 0, null, 3, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture5.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.client.isSkip()) continue;
+                CompletableFuture completableFuture7 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture7.isDone()) {
+                    CompletableFuture completableFuture8 = completableFuture7;
+                    return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture8, httpResponse, jsonObject2, null, n2, null, 4, arg_0));
+                }
+                completableFuture7.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred at (ps): {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture9 = completableFuture;
+                    return ((CompletableFuture)completableFuture9.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitShipping(this, string, string2, string3, jsonObject, n, httpRequest, completableFuture9, null, null, null, 0, throwable, 5, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
     /*
      * Exception decompiling
      */
     public static CompletableFuture async$submitEmail(SessionPreload var0, String var1_1, String var2_2, JsonObject var3_3, int var4_4, HttpRequest var5_5, CompletableFuture var6_6, HttpResponse var7_8, JsonObject var8_9, int var9_11, Throwable var10_16, int var11_17, Object var12_18) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$createCart(SessionPreload var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_4, HttpResponse var5_6, JsonObject var6_7, int var7_9, Throwable var8_14, int var9_15, Object var10_16) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$submitShippingRate(SessionPreload var0, String var1_1, String var2_2, JsonObject var3_3, int var4_4, HttpRequest var5_5, CompletableFuture var6_6, HttpResponse var7_8, JsonObject var8_9, int var9_11, Throwable var10_16, int var11_17, Object var12_18) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public CompletableFuture submitCvv(String string) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("cardSecurityCode", (Object)this.profile.getCvv());
+        jsonObject.put("paymentAccountNumber", (Object)this.profile.getCardNumber());
+        int n = 0;
+        while (n++ < 99) {
+            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            HttpRequest httpRequest = this.client.submitCvv(string);
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
+                if (jsonObject2.containsKey("encryptedPaymentAccountNumber") && jsonObject2.containsKey("encryptedCardSecurityCode")) {
+                    return CompletableFuture.completedFuture(new JsonArray().add((Object)jsonObject2.getString("encryptedPaymentAccountNumber")).add((Object)jsonObject2.getString("encryptedCardSecurityCode")));
+                }
+                this.logger.error("Error booting up 4. Retrying - {}", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.client.isSkip()) continue;
+                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
+                }
+                completableFuture5.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred step (2c): {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCvv(this, string, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public SessionPreload(Hibbett hibbett) {
+        this.actor = hibbett;
+        this.client = (HibbettAPI)hibbett.getClient();
+        this.profile = hibbett.getProfile();
+        this.logger = hibbett.getLogger();
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$fetchSession(SessionPreload var0, int var1_1, HttpRequest var2_2, CompletableFuture var3_3, HttpResponse var4_5, JsonObject var5_6, int var6_8, Throwable var7_13, int var8_14, Object var9_15) {
+        /*
+         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
+         * 
+         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
+         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:845)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
+         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
+         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
+         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1042)
+         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:929)
+         *     at org.benf.cfr.reader.Driver.doJarVersionTypes(Driver.java:257)
+         *     at org.benf.cfr.reader.Driver.doJar(Driver.java:139)
+         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:73)
+         *     at org.benf.cfr.reader.Main.main(Main.java:49)
+         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:303)
+         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$null$5(ResourceDecompiling.java:158)
+         *     at java.base/java.lang.Thread.run(Thread.java:833)
+         */
+        throw new IllegalStateException("Decompilation failed");
+    }
+
+    public CompletableFuture submitCard(String string) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("paymentAccountNumber", (Object)this.profile.getCardNumber());
+        int n = 0;
+        while (n++ < 99) {
+            if (!this.actor.shouldRunOnSchedule()) return CompletableFuture.completedFuture(null);
+            HttpRequest httpRequest = this.client.submitCard(string);
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, jsonObject.toBuffer());
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse == null) continue;
+                JsonObject jsonObject2 = (JsonObject)httpResponse.body();
+                if (jsonObject2.containsKey("account_token")) {
+                    return CompletableFuture.completedFuture(jsonObject2.getString("account_token"));
+                }
+                this.logger.error("Error booting up 3. Retrying - {}", (Object)httpResponse.statusCode());
+                CompletableFuture completableFuture3 = this.client.handleBadResponse(httpResponse.statusCode(), jsonObject2.containsKey("vid") ? jsonObject2.getString("vid") : null, jsonObject2.containsKey("uuid") ? jsonObject2.getString("uuid") : null);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture4, httpResponse, jsonObject2, 0, null, 2, arg_0));
+                }
+                int n2 = ((Boolean)completableFuture3.join()).booleanValue() ? 1 : 0;
+                if (n2 != 0 || !this.client.isSkip()) continue;
+                CompletableFuture completableFuture5 = VertxUtil.randomSleep(5000L);
+                if (!completableFuture5.isDone()) {
+                    CompletableFuture completableFuture6 = completableFuture5;
+                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture6, httpResponse, jsonObject2, n2, null, 3, arg_0));
+                }
+                completableFuture5.join();
+            }
+            catch (Throwable throwable) {
+                this.logger.error("Error occurred step (c): {}", (Object)throwable.getMessage());
+                CompletableFuture completableFuture = VertxUtil.randomSleep(5000L);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture7 = completableFuture;
+                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$submitCard(this, string, jsonObject, n, httpRequest, completableFuture7, null, null, 0, throwable, 4, arg_0));
+                }
+                completableFuture.join();
+            }
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /*
+     * Exception decompiling
+     */
+    public static CompletableFuture async$submitCvv(SessionPreload var0, String var1_1, JsonObject var2_2, int var3_3, HttpRequest var4_4, CompletableFuture var5_5, HttpResponse var6_7, JsonObject var7_8, int var8_10, Throwable var9_15, int var10_16, Object var11_17) {
         /*
          * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
          * 

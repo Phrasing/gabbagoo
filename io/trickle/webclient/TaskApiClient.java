@@ -16,12 +16,8 @@ import io.vertx.core.net.ProxyOptions;
 public abstract class TaskApiClient {
     public RealClient client;
 
-    public CookieJar getCookies() {
-        return this.client.cookieStore();
-    }
-
-    public TaskApiClient(ClientType clientType) {
-        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get(), clientType);
+    public TaskApiClient(RealClient realClient) {
+        this.client = realClient;
     }
 
     public boolean rotateProxy() {
@@ -39,16 +35,24 @@ public abstract class TaskApiClient {
         return false;
     }
 
-    public TaskApiClient() {
-        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get());
+    public CookieJar getCookies() {
+        return this.client.cookieStore();
     }
 
     public void close() {
         this.client.close();
     }
 
-    public TaskApiClient(RealClient realClient) {
-        this.client = realClient;
+    public TaskApiClient(ClientType clientType) {
+        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get(), clientType);
+    }
+
+    public TaskApiClient() {
+        this.client = RealClientFactory.buildProxied(VertxSingleton.INSTANCE.get());
+    }
+
+    public RealClient getWebClient() {
+        return this.client;
     }
 
     public String proxyString() {
@@ -58,10 +62,6 @@ public abstract class TaskApiClient {
         }
         if (proxyOptions.getPassword() != null) return String.format("%s:%d:%s:%s", proxyOptions.getHost(), proxyOptions.getPort(), proxyOptions.getUsername(), proxyOptions.getPassword());
         return String.format("%s:%d", proxyOptions.getHost(), proxyOptions.getPort());
-    }
-
-    public RealClient getWebClient() {
-        return this.client;
     }
 }
 

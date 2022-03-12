@@ -4,9 +4,9 @@
 package io.trickle.task.sites.shopify.util;
 
 public class Triplet {
-    public T first;
     public Z third;
     public V second;
+    public T first;
 
     public Triplet(Object object, Object object2, Object object3) {
         this.first = object;

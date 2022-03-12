@@ -9,9 +9,9 @@ package io.trickle.util.analytics;
 import io.vertx.core.json.JsonObject;
 
 public class EmbedContainer {
+    public boolean isMeta;
     public boolean isSuccess;
     public JsonObject webhook;
-    public boolean isMeta;
 
     public EmbedContainer(JsonObject jsonObject) {
         this.isSuccess = true;

@@ -10,8 +10,8 @@ public interface Errors {
 
     static {
         BAD_CART = "CRT expired or empty";
-        BAD_SESSION = "Method Not Allowed";
         CHECKOUT_EXPIRED = "contract has expired";
+        BAD_SESSION = "Method Not Allowed";
     }
 }
 

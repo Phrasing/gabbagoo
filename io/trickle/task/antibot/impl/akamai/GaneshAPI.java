@@ -26,15 +26,11 @@ import java.util.function.Function;
 
 public class GaneshAPI
 implements Pixel {
-    public static String[] api_ua = new String[]{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"};
+    public static String[] api_ua = new String[]{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.109 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36"};
     public String useragent = null;
 
-    public String getUseragent() {
-        return this.useragent;
-    }
-
-    public MultiMap getPixelForm(String string, String string2) {
-        return MultiMap.caseInsensitiveMultiMap().set("scriptVal", string).set("key", "dwayn-hrrth56JH%^JNHRTTHtjrtj56jhrthrtwhrthr").set("mode", "PIXEL").set("ua", this.useragent).set("pixelID", string2);
+    public WebClient client() {
+        return VertxSingleton.INSTANCE.getLocalClient().getClient();
     }
 
     /*
@@ -98,25 +94,27 @@ lbl21:
         throw new IllegalArgumentException();
     }
 
-    public WebClient client() {
-        return VertxSingleton.INSTANCE.getLocalClient().getClient();
+    public void setUseragent(String string) {
+        this.useragent = string;
     }
 
-    @Override
-    public CompletableFuture getPixelReqForm(String string, String string2, String string3) {
-        return CompletableFuture.failedFuture(new Exception("Unsupported method"));
+    public HttpRequest ganeshAPI() {
+        return this.client().postAbs("https://akam-b429.ganeshbot.cloud/Akamai").putHeader("accept", "*/*").putHeader("accept-encoding", "gzip, deflate, br").putHeader("content-type", "application/x-www-form-urlencoded").timeout(50000L).as(BodyCodec.buffer());
     }
 
-    public MultiMap getSensorForm(String string, String string2, String string3, boolean bl) {
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap().set("site", "https://www.yeezysupply.com/products/" + string3).set("key", "dwayn-hrrth56JH%^JNHRTTHtjrtj56jhrthrtwhrthr").set("mode", "API").set("ua", this.useragent).set("abck", string).set("bmsz", string2);
-        if (bl) return multiMap;
-        multiMap.set("events", "false");
-        return multiMap;
+    public String getUseragent() {
+        return this.useragent;
     }
 
-    public CompletableFuture updateUserAgent() {
-        this.useragent = api_ua[ThreadLocalRandom.current().nextInt(api_ua.length)];
-        return CompletableFuture.completedFuture(this.useragent);
+    public static String decode(String string) {
+        String string2 = "56h56hERH%^\u00a3H$%H%\u00a3^YHGTERherthrtwh";
+        StringBuilder stringBuilder = new StringBuilder();
+        int n = 0;
+        while (n < string.length()) {
+            stringBuilder.append((char)(string.charAt(n) ^ string2.charAt(n % string2.length())));
+            ++n;
+        }
+        return stringBuilder.toString();
     }
 
     public CompletableFuture getSensorPayload(String string, String string2, String string3, boolean bl) {
@@ -147,15 +145,40 @@ lbl21:
         return CompletableFuture.completedFuture(null);
     }
 
-    public static String decode(String string) {
-        String string2 = "56h56hERH%^\u00a3H$%H%\u00a3^YHGTERherthrtwh";
-        StringBuilder stringBuilder = new StringBuilder();
+    public MultiMap getPixelForm(String string, String string2) {
+        return MultiMap.caseInsensitiveMultiMap().set("scriptVal", string).set("key", "dwayn-hrrth56JH%^JNHRTTHtjrtj56jhrthrtwhrthr").set("mode", "PIXEL").set("ua", this.useragent).set("pixelID", string2);
+    }
+
+    @Override
+    public CompletableFuture getPixelReqString(String string, String string2, String string3) {
+        HttpRequest httpRequest = this.ganeshAPI();
+        MultiMap multiMap = this.getPixelForm(string3, string);
         int n = 0;
-        while (n < string.length()) {
-            stringBuilder.append((char)(string.charAt(n) ^ string2.charAt(n % string2.length())));
-            ++n;
+        while (n++ <= 1000) {
+            try {
+                CompletableFuture completableFuture = Request.send(httpRequest, multiMap);
+                if (!completableFuture.isDone()) {
+                    CompletableFuture completableFuture2 = completableFuture;
+                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> GaneshAPI.async$getPixelReqString(this, string, string2, string3, httpRequest, multiMap, n, completableFuture2, null, 1, arg_0));
+                }
+                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
+                if (httpResponse != null) {
+                    String string4 = httpResponse.bodyAsString().split("\\*")[0];
+                    return CompletableFuture.completedFuture(string4);
+                }
+                CompletableFuture completableFuture3 = VertxUtil.randomSleep(10000L);
+                if (!completableFuture3.isDone()) {
+                    CompletableFuture completableFuture4 = completableFuture3;
+                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> GaneshAPI.async$getPixelReqString(this, string, string2, string3, httpRequest, multiMap, n, completableFuture4, httpResponse, 2, arg_0));
+                }
+                completableFuture3.join();
+            }
+            catch (Exception exception) {
+                if (exception.getMessage().toLowerCase().contains("ganesh")) continue;
+                System.out.println("API[G] err: " + exception.getMessage());
+            }
         }
-        return stringBuilder.toString();
+        return CompletableFuture.completedFuture(null);
     }
 
     /*
@@ -216,44 +239,21 @@ lbl21:
         throw new IllegalArgumentException();
     }
 
-    public void setUseragent(String string) {
-        this.useragent = string;
-    }
-
-    public HttpRequest ganeshAPI() {
-        return this.client().postAbs("https://akam-b429.ganeshbot.cloud/Akamai").putHeader("accept", "*/*").putHeader("accept-encoding", "gzip, deflate, br").putHeader("content-type", "application/x-www-form-urlencoded").timeout(50000L).as(BodyCodec.buffer());
-    }
-
     @Override
-    public CompletableFuture getPixelReqString(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.ganeshAPI();
-        MultiMap multiMap = this.getPixelForm(string3, string);
-        int n = 0;
-        while (n++ <= 1000) {
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest, multiMap);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> GaneshAPI.async$getPixelReqString(this, string, string2, string3, httpRequest, multiMap, n, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    String string4 = httpResponse.bodyAsString().split("\\*")[0];
-                    return CompletableFuture.completedFuture(string4);
-                }
-                CompletableFuture completableFuture3 = VertxUtil.randomSleep(10000L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> GaneshAPI.async$getPixelReqString(this, string, string2, string3, httpRequest, multiMap, n, completableFuture4, httpResponse, 2, arg_0));
-                }
-                completableFuture3.join();
-            }
-            catch (Exception exception) {
-                if (exception.getMessage().toLowerCase().contains("ganesh")) continue;
-                System.out.println("API[G] err: " + exception.getMessage());
-            }
-        }
-        return CompletableFuture.completedFuture(null);
+    public CompletableFuture getPixelReqForm(String string, String string2, String string3) {
+        return CompletableFuture.failedFuture(new Exception("Unsupported method"));
+    }
+
+    public CompletableFuture updateUserAgent() {
+        this.useragent = api_ua[ThreadLocalRandom.current().nextInt(api_ua.length)];
+        return CompletableFuture.completedFuture(this.useragent);
+    }
+
+    public MultiMap getSensorForm(String string, String string2, String string3, boolean bl) {
+        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap().set("site", "https://www.yeezysupply.com/products/" + string3).set("key", "dwayn-hrrth56JH%^JNHRTTHtjrtj56jhrthrtwhrthr").set("mode", "API").set("ua", this.useragent).set("abck", string).set("bmsz", string2);
+        if (bl) return multiMap;
+        multiMap.set("events", "false");
+        return multiMap;
     }
 }
 

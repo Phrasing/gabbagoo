@@ -8,43 +8,6 @@ import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
-    public static long[] fillArrRandInt256(long[] lArray) {
-        int n = 0;
-        while (n < lArray.length) {
-            lArray[n] = ThreadLocalRandom.current().nextInt(256);
-            ++n;
-        }
-        return lArray;
-    }
-
-    @Deprecated
-    public static String buildWebUA() {
-        StringBuilder stringBuilder = new StringBuilder("Walmart/210");
-        int n = 0;
-        while (true) {
-            if (n >= 7) {
-                stringBuilder.append(" Walmart WMTAPP v21.");
-                stringBuilder.append("3.0");
-                return stringBuilder.toString();
-            }
-            stringBuilder.append(ThreadLocalRandom.current().nextInt(10));
-            ++n;
-        }
-    }
-
-    public static String st(long[] lArray, boolean bl) {
-        Object object = "";
-        int n = 0;
-        while (n < 16) {
-            if (bl && n >= 4 && n <= 10 && n % 2 == 0) {
-                object = (String)object + "-";
-            }
-            object = (String)object + Long.toHexString(lArray[n] + 256L).substring(1, 3);
-            ++n;
-        }
-        return object;
-    }
-
     public static String genUet() {
         long[] lArray = new long[10];
         long[] lArray2 = new long[16];
@@ -71,6 +34,15 @@ public class Utils {
             lArray2[n + 8] = lArray[n];
             ++n;
         }
+    }
+
+    public static long[] fillArrRandInt256(long[] lArray) {
+        int n = 0;
+        while (n < lArray.length) {
+            lArray[n] = ThreadLocalRandom.current().nextInt(256);
+            ++n;
+        }
+        return lArray;
     }
 
     @Deprecated
@@ -117,6 +89,34 @@ public class Utils {
             ++n;
         }
         return stringBuilder.toString();
+    }
+
+    @Deprecated
+    public static String buildWebUA() {
+        StringBuilder stringBuilder = new StringBuilder("Walmart/210");
+        int n = 0;
+        while (true) {
+            if (n >= 7) {
+                stringBuilder.append(" Walmart WMTAPP v21.");
+                stringBuilder.append("3.0");
+                return stringBuilder.toString();
+            }
+            stringBuilder.append(ThreadLocalRandom.current().nextInt(10));
+            ++n;
+        }
+    }
+
+    public static String st(long[] lArray, boolean bl) {
+        Object object = "";
+        int n = 0;
+        while (n < 16) {
+            if (bl && n >= 4 && n <= 10 && n % 2 == 0) {
+                object = (String)object + "-";
+            }
+            object = (String)object + Long.toHexString(lArray[n] + 256L).substring(1, 3);
+            ++n;
+        }
+        return object;
     }
 }
 

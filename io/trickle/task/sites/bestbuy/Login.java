@@ -18,13 +18,13 @@ import java.util.regex.Pattern;
 import javax.mail.search.SearchTerm;
 
 public class Login {
-    public static Pattern ALPHA_PATTERN;
     public static Pattern initDataPattern;
     public static SearchTerm SEARCH_TERM;
+    public String flowOptions;
+    public JsonObject initData;
+    public static Pattern ALPHA_PATTERN;
     public String challengeType;
     public static Pattern CODE_PATTERN;
-    public JsonObject initData;
-    public String flowOptions;
 
     public String getCode() {
         JsonArray jsonArray = this.initData.getJsonArray("codeList");
@@ -39,6 +39,10 @@ public class Login {
         return "no-code";
     }
 
+    public static Login loginValues(String string) {
+        return new Login(string);
+    }
+
     public String getAlpha() {
         JsonArray jsonArray = this.initData.getJsonArray("alpha");
         int n = 0;
@@ -50,10 +54,6 @@ public class Login {
             ++n;
         }
         return "no-alpha";
-    }
-
-    public static Login loginValues(String string) {
-        return new Login(string);
     }
 
     static {

@@ -27,34 +27,14 @@ import org.conscrypt.Conscrypt;
 
 public class ClientType
 extends Enum {
-    public static /* enum */ ClientType BASIC = new ClientType$1();
-    public static /* enum */ ClientType HIBBETT_ANDROID;
     public static /* enum */ ClientType H1;
-    public static /* enum */ ClientType WALMART_PIXEL_3;
-    public static /* enum */ ClientType CHROME;
     public static /* enum */ ClientType PX_SDK_PIXEL_3;
+    public static /* enum */ ClientType BASIC;
     public static /* enum */ ClientType PX_SDK_IOS;
     public static ClientType[] $VALUES;
-
-    public WebClientOptions options() {
-        return null;
-    }
-
-    public static ClientType valueOf(String string) {
-        return Enum.valueOf(ClientType.class, string);
-    }
-
-    public List ciphers() {
-        return new ArrayList();
-    }
-
-    public static ClientType[] values() {
-        return (ClientType[])$VALUES.clone();
-    }
-
-    public WebClientOptions baseOptions(WebClientOptions webClientOptions) {
-        return webClientOptions.setLogActivity(false).setUserAgentEnabled(false).setSsl(true).setUseAlpn(true).setTrustAll(false).setVerifyHost(true).setForceSni(true).setConnectTimeout(150000).setSslHandshakeTimeoutUnit(TimeUnit.SECONDS).setSslHandshakeTimeout(150L).setIdleTimeoutUnit(TimeUnit.SECONDS).setIdleTimeout(150).setKeepAlive(true).setKeepAliveTimeout(30).setHttp2KeepAliveTimeout(100).setHttp2MaxPoolSize(10).setHttp2MultiplexingLimit(250).setPoolCleanerPeriod(15000).setMaxPoolSize(10).setTryUseCompression(true).setTcpFastOpen(true).setTcpKeepAlive(true).setTcpNoDelay(true).setTcpQuickAck(true).setFollowRedirects(false).setTrustOptions(TrustOptions.wrap((TrustManager)new ClientType$8(this)));
-    }
+    public static /* enum */ ClientType CHROME;
+    public static /* enum */ ClientType HIBBETT_ANDROID;
+    public static /* enum */ ClientType WALMART_PIXEL_3;
 
     /*
      * WARNING - Possible parameter corruption
@@ -74,11 +54,12 @@ extends Enum {
         }
     }
 
-    public int getWindowUpdate() {
-        return -1;
+    public WebClientOptions baseOptions(WebClientOptions webClientOptions) {
+        return webClientOptions.setLogActivity(false).setUserAgentEnabled(false).setSsl(true).setUseAlpn(true).setTrustAll(false).setVerifyHost(true).setForceSni(true).setConnectTimeout(150000).setSslHandshakeTimeoutUnit(TimeUnit.SECONDS).setSslHandshakeTimeout(150L).setIdleTimeoutUnit(TimeUnit.SECONDS).setIdleTimeout(150).setKeepAlive(true).setKeepAliveTimeout(30).setHttp2KeepAliveTimeout(100).setHttp2MaxPoolSize(10).setHttp2MultiplexingLimit(250).setPoolCleanerPeriod(15000).setMaxPoolSize(10).setTryUseCompression(true).setTcpFastOpen(true).setTcpKeepAlive(true).setTcpNoDelay(true).setTcpQuickAck(true).setFollowRedirects(false).setTrustOptions(TrustOptions.wrap((TrustManager)new ClientType$8(this)));
     }
 
     static {
+        BASIC = new ClientType$1();
         H1 = new ClientType$2();
         CHROME = new ClientType$3();
         WALMART_PIXEL_3 = new ClientType$4();
@@ -86,6 +67,26 @@ extends Enum {
         PX_SDK_PIXEL_3 = new ClientType$6();
         PX_SDK_IOS = new ClientType$7();
         $VALUES = new ClientType[]{BASIC, H1, CHROME, WALMART_PIXEL_3, HIBBETT_ANDROID, PX_SDK_PIXEL_3, PX_SDK_IOS};
+    }
+
+    public static ClientType[] values() {
+        return (ClientType[])$VALUES.clone();
+    }
+
+    public static ClientType valueOf(String string) {
+        return Enum.valueOf(ClientType.class, string);
+    }
+
+    public int getWindowUpdate() {
+        return -1;
+    }
+
+    public WebClientOptions options() {
+        return null;
+    }
+
+    public List ciphers() {
+        return new ArrayList();
     }
 }
 

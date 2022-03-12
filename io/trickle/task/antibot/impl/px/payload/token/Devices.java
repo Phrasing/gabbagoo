@@ -35,23 +35,62 @@ import java.util.function.Function;
 public class Devices
 extends Enum {
     public static /* enum */ Devices GALAXY_A71;
-    public static /* enum */ Devices GALAXY_S21_ULTRA;
-    public static /* enum */ Devices PIXEL_4A;
+    public static /* enum */ Devices GALAXY_S20;
+    public static /* enum */ Devices GALAXY_S10;
+    public static /* enum */ Devices PIXEL_5;
+    public static /* enum */ Devices G50_Plus;
+    public static /* enum */ Devices Nokia_5;
+    public static /* enum */ Devices SM_A725F;
     public static /* enum */ Devices GALAXY_S8_PLUS;
+    public static /* enum */ Devices GALAXY_S21;
+    public static /* enum */ Devices NOTE_20_ULTRA_2;
+    public static /* enum */ Devices GALAXY_S20_FE;
+    public static Devices[] $VALUES;
+    public static /* enum */ Devices GALAXY_S21_ULTRA;
+    public static /* enum */ Devices NOTE_20_ULTRA;
+    public static /* enum */ Devices GALAXY_A51;
     public static /* enum */ Devices NOTE_8;
     public static /* enum */ Devices GALAXY_S10_GALAXY_TAB_S2;
-    public static /* enum */ Devices GALAXY_A51;
-    public static /* enum */ Devices GALAXY_S10;
-    public static /* enum */ Devices NOTE_20_ULTRA;
-    public static /* enum */ Devices Nokia_5;
-    public static /* enum */ Devices G50_Plus;
-    public static /* enum */ Devices GALAXY_S20_FE;
-    public static /* enum */ Devices SM_A725F;
-    public static /* enum */ Devices GALAXY_S20;
-    public static /* enum */ Devices PIXEL_5;
-    public static /* enum */ Devices NOTE_20_ULTRA_2;
-    public static /* enum */ Devices GALAXY_S21;
-    public static Devices[] $VALUES;
+    public static /* enum */ Devices PIXEL_4A;
+
+    public static Devices[] values() {
+        return (Devices[])$VALUES.clone();
+    }
+
+    public Devices$Device get() {
+        return null;
+    }
+
+    public static CompletableFuture deviceFromAPI() {
+        CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/mobileDeviceWithOS.json");
+        if (!completableFuture.isDone()) {
+            CompletableFuture completableFuture2 = completableFuture;
+            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Devices.async$deviceFromAPI(completableFuture2, 1, arg_0));
+        }
+        JsonObject jsonObject = (JsonObject)completableFuture.join();
+        return CompletableFuture.completedFuture(new Devices$DeviceImpl(jsonObject));
+    }
+
+    static {
+        GALAXY_S20 = new Devices$1();
+        NOTE_8 = new Devices$2();
+        GALAXY_S8_PLUS = new Devices$3();
+        G50_Plus = new Devices$4();
+        Nokia_5 = new Devices$5();
+        GALAXY_S20_FE = new Devices$6();
+        GALAXY_S21 = new Devices$7();
+        NOTE_20_ULTRA = new Devices$8();
+        GALAXY_A71 = new Devices$9();
+        NOTE_20_ULTRA_2 = new Devices$10();
+        GALAXY_S21_ULTRA = new Devices$11();
+        GALAXY_S10 = new Devices$12();
+        GALAXY_S10_GALAXY_TAB_S2 = new Devices$13();
+        PIXEL_4A = new Devices$14();
+        GALAXY_A51 = new Devices$15();
+        PIXEL_5 = new Devices$16();
+        SM_A725F = new Devices$17();
+        $VALUES = new Devices[]{GALAXY_S20, NOTE_8, GALAXY_S8_PLUS, G50_Plus, Nokia_5, GALAXY_S20_FE, GALAXY_S21, NOTE_20_ULTRA, GALAXY_A71, NOTE_20_ULTRA_2, GALAXY_S21_ULTRA, GALAXY_S10, GALAXY_S10_GALAXY_TAB_S2, PIXEL_4A, GALAXY_A51, PIXEL_5, SM_A725F};
+    }
 
     /*
      * Unable to fully structure code
@@ -82,6 +121,10 @@ lbl10:
         return Devices.values()[ThreadLocalRandom.current().nextInt(Devices.values().length)].get();
     }
 
+    public static Devices valueOf(String string) {
+        return Enum.valueOf(Devices.class, string);
+    }
+
     /*
      * WARNING - Possible parameter corruption
      * WARNING - void declaration
@@ -89,49 +132,6 @@ lbl10:
     public Devices() {
         void var2_-1;
         void var1_-1;
-    }
-
-    public static CompletableFuture deviceFromAPI() {
-        CompletableFuture completableFuture = VertxSingleton.INSTANCE.getLocalClient().fetchDeviceFromAPI("https://loudounchris.xyz/api/device/mobileDeviceWithOS.json");
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Devices.async$deviceFromAPI(completableFuture2, 1, arg_0));
-        }
-        JsonObject jsonObject = (JsonObject)completableFuture.join();
-        return CompletableFuture.completedFuture(new Devices$DeviceImpl(jsonObject));
-    }
-
-    public static Devices valueOf(String string) {
-        return Enum.valueOf(Devices.class, string);
-    }
-
-    public static Devices[] values() {
-        return (Devices[])$VALUES.clone();
-    }
-
-    public Devices$Device get() {
-        return null;
-    }
-
-    static {
-        GALAXY_S20 = new Devices$1();
-        NOTE_8 = new Devices$2();
-        GALAXY_S8_PLUS = new Devices$3();
-        G50_Plus = new Devices$4();
-        Nokia_5 = new Devices$5();
-        GALAXY_S20_FE = new Devices$6();
-        GALAXY_S21 = new Devices$7();
-        NOTE_20_ULTRA = new Devices$8();
-        GALAXY_A71 = new Devices$9();
-        NOTE_20_ULTRA_2 = new Devices$10();
-        GALAXY_S21_ULTRA = new Devices$11();
-        GALAXY_S10 = new Devices$12();
-        GALAXY_S10_GALAXY_TAB_S2 = new Devices$13();
-        PIXEL_4A = new Devices$14();
-        GALAXY_A51 = new Devices$15();
-        PIXEL_5 = new Devices$16();
-        SM_A725F = new Devices$17();
-        $VALUES = new Devices[]{GALAXY_S20, NOTE_8, GALAXY_S8_PLUS, G50_Plus, Nokia_5, GALAXY_S20_FE, GALAXY_S21, NOTE_20_ULTRA, GALAXY_A71, NOTE_20_ULTRA_2, GALAXY_S21_ULTRA, GALAXY_S10, GALAXY_S10_GALAXY_TAB_S2, PIXEL_4A, GALAXY_A51, PIXEL_5, SM_A725F};
     }
 }
 

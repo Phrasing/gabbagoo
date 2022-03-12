@@ -32,17 +32,29 @@ import org.apache.logging.log4j.Logger;
 
 public class AutosolveHarvesterController
 extends AbstractSharedHarvesterController {
-    public Vertx vertx;
-    public AtomicInteger c = new AtomicInteger(0);
-    public AbstractAutoSolveManager autoSolve;
+    public static int SHARED_TOKEN_RATIO = 500;
     public ContextCompletableFuture<Void> startFuture;
-    public static boolean $assertionsDisabled;
-    public static Logger logger;
-    public static int SHARED_TOKEN_RATIO;
+    public static boolean $assertionsDisabled = !AutosolveHarvesterController.class.desiredAssertionStatus();
+    public static Logger logger = LogManager.getLogger(AutosolveHarvesterController.class);
+    public AtomicInteger c = new AtomicInteger(0);
+    public Vertx vertx;
+    public AbstractAutoSolveManager autoSolve;
+
+    @Override
+    public CompletableFuture initialise() {
+        if (this.c.getAndIncrement() % 500 != 0) return this.initAutosolve();
+        this.addNewHarvester();
+        return this.initAutosolve();
+    }
 
     @Override
     public Optional shouldSwap(String string) {
         return Optional.empty();
+    }
+
+    public AutosolveHarvesterController(Vertx vertx) {
+        this.vertx = vertx;
+        this.autoSolve = new AutoSolve(new OkHttpClient.Builder(), "Trickle-4ae3fa8b-26fa-4001-8582-8fd27a7beb7e");
     }
 
     public void lambda$connect$0(String string, String string2) {
@@ -74,29 +86,10 @@ extends AbstractSharedHarvesterController {
         }
     }
 
-    public AutosolveHarvesterController(Vertx vertx) {
-        this.vertx = vertx;
-        this.autoSolve = new AutoSolve(new OkHttpClient.Builder(), "Trickle-4ae3fa8b-26fa-4001-8582-8fd27a7beb7e");
-    }
-
-    public void addNewHarvester() {
-        AutosolveHarvester autosolveHarvester = new AutosolveHarvester(this.vertx, this.autoSolve);
-        this.vertx.eventBus().localConsumer(autosolveHarvester.id(), (Handler)autosolveHarvester);
-        this.harvesters.add(autosolveHarvester);
-        logger.info("Added new autosolve harvester: {}", (Object)this.harvesters.size());
-    }
-
     public void connect() {
         String string = Storage.AYCD_ACCESS_TOKEN;
         String string2 = Storage.AYCD_API_KEY;
         CompletableFuture.runAsync(() -> this.lambda$connect$0(string, string2));
-    }
-
-    @Override
-    public CompletableFuture initialise() {
-        if (this.c.getAndIncrement() % 500 != 0) return this.initAutosolve();
-        this.addNewHarvester();
-        return this.initAutosolve();
     }
 
     /*
@@ -134,12 +127,6 @@ lbl17:
         throw new IllegalArgumentException();
     }
 
-    static {
-        SHARED_TOKEN_RATIO = 500;
-        $assertionsDisabled = !AutosolveHarvesterController.class.desiredAssertionStatus();
-        logger = LogManager.getLogger(AutosolveHarvesterController.class);
-    }
-
     public CompletableFuture initAutosolve() {
         if (this.autoSolve.isActive()) {
             return CompletableFuture.completedFuture(null);
@@ -158,6 +145,13 @@ lbl17:
         contextCompletableFuture.toCompletableFuture().join();
         logger.info("Connected Successfully");
         return CompletableFuture.completedFuture(null);
+    }
+
+    public void addNewHarvester() {
+        AutosolveHarvester autosolveHarvester = new AutosolveHarvester(this.vertx, this.autoSolve);
+        this.vertx.eventBus().localConsumer(autosolveHarvester.id(), (Handler)autosolveHarvester);
+        this.harvesters.add(autosolveHarvester);
+        logger.info("Added new autosolve harvester: {}", (Object)this.harvesters.size());
     }
 }
 
