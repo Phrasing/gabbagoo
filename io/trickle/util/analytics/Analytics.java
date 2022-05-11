@@ -1,7 +1,13 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.core.Engine
+ *  io.trickle.task.Task
+ *  io.trickle.util.analytics.EmbedContainer
+ *  io.trickle.util.analytics.webhook.Metric
+ *  io.trickle.util.analytics.webhook.WebhookUtils
+ *  io.trickle.webclient.CookieJar
  *  io.vertx.core.buffer.Buffer
  *  io.vertx.core.json.JsonArray
  *  io.vertx.core.json.JsonObject
@@ -20,19 +26,21 @@ import io.vertx.core.json.JsonObject;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Analytics {
-    public static Pattern IMAGE_URL_PATTERN;
-    public static AtomicInteger success;
-    public static AtomicInteger carts;
-    public static Pattern ORDER_NUMBER_PATTERN;
-    public static ConcurrentLinkedDeque<EmbedContainer> embedQueue;
-    public static ConcurrentLinkedQueue<Metric> metricsQueue;
     public static Pattern PRODUCT_TITLE_PATTERN;
-    public static AtomicInteger fails;
+    public static ConcurrentLinkedDeque<EmbedContainer> embedQueue;
+    public static LongAdder fakePasses;
+    public static Pattern ORDER_NUMBER_PATTERN;
+    public static LongAdder carts;
+    public static ConcurrentLinkedQueue<Metric> metricsQueue;
+    public static LongAdder queuePasses;
+    public static LongAdder success;
+    public static Pattern IMAGE_URL_PATTERN;
+    public static LongAdder fails;
 
     public static JsonObject exportVT(CookieJar cookieJar) {
         JsonObject jsonObject = new JsonObject();
@@ -48,10 +56,33 @@ public class Analytics {
         return matcher.group(1);
     }
 
+    public static void failure(String string, Task task, String string2, String string3) {
+        Analytics.emit(false, string, task, Analytics.createCheckoutJsonShopify(string2), string3);
+    }
+
+    public static void emit(boolean bl, String string, Task task, JsonObject jsonObject, String string2) {
+        EmbedContainer embedContainer = new EmbedContainer(bl, WebhookUtils.buildEmbed((boolean)bl, (Task)task, (String)string, (JsonObject)jsonObject, (String)string2));
+        if (bl) {
+            success.increment();
+            embedQueue.addFirst(embedContainer);
+            metricsQueue.add(Metric.create((Task)task, (JsonObject)jsonObject, (String)string2));
+        } else {
+            if (string.contains("items are no longer available")) return;
+            fails.increment();
+            embedQueue.add(embedContainer);
+        }
+    }
+
+    public static void success(Task task, CookieJar cookieJar, String string) {
+        Analytics.emit(true, null, task, Analytics.exportVT(cookieJar), string);
+    }
+
     static {
-        success = new AtomicInteger(0);
-        carts = new AtomicInteger(0);
-        fails = new AtomicInteger(0);
+        queuePasses = new LongAdder();
+        fakePasses = new LongAdder();
+        carts = new LongAdder();
+        success = new LongAdder();
+        fails = new LongAdder();
         embedQueue = new ConcurrentLinkedDeque();
         metricsQueue = new ConcurrentLinkedQueue();
         PRODUCT_TITLE_PATTERN = Pattern.compile("\"og:title\" content=\"(.*?)\" />");
@@ -59,20 +90,27 @@ public class Analytics {
         ORDER_NUMBER_PATTERN = Pattern.compile("<p class=\"notice__text\">(.*?)</p>");
     }
 
+    public static void warning(String string, Task task) {
+        EmbedContainer embedContainer = new EmbedContainer(WebhookUtils.buildBasicEmbed((Task)task, (String)string));
+        embedQueue.add(embedContainer);
+    }
+
     public static void failure(String string, Task task, JsonObject jsonObject, String string2) {
         Analytics.emit(false, string, task, jsonObject, string2);
     }
 
-    public static JsonObject createCheckoutJsonShopify(String string) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("image", (Object)Analytics.parseImage(string));
-        jsonObject.put("title", (Object)Analytics.parseTitle(string));
-        jsonObject.put("orderId", (Object)Analytics.parseOrderId(string));
-        return jsonObject;
-    }
-
     public static void warningLogged(String string, Task task, Buffer buffer) {
         Analytics.warning(string, task);
+    }
+
+    public static void success(Task task, JsonObject jsonObject, String string) {
+        Analytics.emit(true, null, task, jsonObject, string);
+    }
+
+    public static String parseOrderId(String string) {
+        Matcher matcher = ORDER_NUMBER_PATTERN.matcher(string);
+        if (!matcher.find()) return null;
+        return matcher.group(1);
     }
 
     public static void log(String string, Task task, Object ... objectArray) {
@@ -97,17 +135,10 @@ public class Analytics {
                 jsonObject2.put("extras", (Object)jsonArray);
             }
             Engine.get().getClient().socketLog(6, jsonObject2.toBuffer());
-            return;
         }
         catch (Throwable throwable) {
             // empty catch block
         }
-    }
-
-    public static String parseOrderId(String string) {
-        Matcher matcher = ORDER_NUMBER_PATTERN.matcher(string);
-        if (!matcher.find()) return null;
-        return matcher.group(1);
     }
 
     public static String parseImage(String string) {
@@ -116,40 +147,15 @@ public class Analytics {
         return matcher.group(1);
     }
 
-    public static void warning(String string, Task task) {
-        EmbedContainer embedContainer = new EmbedContainer(WebhookUtils.buildBasicEmbed(task, string));
-        embedQueue.add(embedContainer);
-    }
-
-    public static void emit(boolean bl, String string, Task task, JsonObject jsonObject, String string2) {
-        EmbedContainer embedContainer = new EmbedContainer(bl, WebhookUtils.buildEmbed(bl, task, string, jsonObject, string2));
-        if (bl) {
-            success.incrementAndGet();
-            embedQueue.addFirst(embedContainer);
-            metricsQueue.add(Metric.create(task, jsonObject, string2));
-            return;
-        }
-        if (string.contains("items are no longer available")) {
-            return;
-        }
-        fails.incrementAndGet();
-        embedQueue.add(embedContainer);
-    }
-
-    public static void success(Task task, CookieJar cookieJar, String string) {
-        Analytics.emit(true, null, task, Analytics.exportVT(cookieJar), string);
-    }
-
-    public static void success(Task task, JsonObject jsonObject, String string) {
-        Analytics.emit(true, null, task, jsonObject, string);
-    }
-
     public static void success(Task task, String string, String string2) {
         Analytics.emit(true, null, task, Analytics.createCheckoutJsonShopify(string), string2);
     }
 
-    public static void failure(String string, Task task, String string2, String string3) {
-        Analytics.emit(false, string, task, Analytics.createCheckoutJsonShopify(string2), string3);
+    public static JsonObject createCheckoutJsonShopify(String string) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.put("image", (Object)Analytics.parseImage(string));
+        jsonObject.put("title", (Object)Analytics.parseTitle(string));
+        jsonObject.put("orderId", (Object)Analytics.parseOrderId(string));
+        return jsonObject;
     }
 }
-

@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.core.VertxSingleton
  *  io.vertx.core.buffer.Buffer
  *  io.vertx.core.file.FileSystem
  */
@@ -63,7 +64,7 @@ public class FileUtils {
             // empty catch block
         }
         if (!FileUtils.class.getClassLoader().toString().toLowerCase().contains("native")) {
-            VertxSingleton.INSTANCE.get().eventBus().send("login.loader", (Object)"Logged in!");
+            VertxSingleton.INSTANCE.get().eventBus().send("login.loader", (Object)"class-pathing");
             return true;
         }
         int n4 = 0;
@@ -85,4 +86,3 @@ public class FileUtils {
         fileSystem.writeFile(string, buffer).onFailure(Throwable::printStackTrace);
     }
 }
-

@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.vertx.core.json.JsonObject
@@ -9,52 +9,51 @@ package io.trickle.task.antibot.impl.akamai.pixel;
 import io.vertx.core.json.JsonObject;
 
 public interface Devices$Device {
-    public JsonObject getTiming();
-
-    public String getFonts();
-
-    public String getPs();
-
     public boolean isFp();
-
-    public boolean isAp();
 
     public JsonObject getSr();
 
-    public String getCv();
+    public String getPs();
 
-    public double getJsv();
-
-    public boolean isSp();
-
-    public int getB();
-
-    public String getBr();
-
-    public String getFh();
-
-    public boolean isIeps();
-
-    public String getLt();
-
-    public String getBp();
+    public JsonObject getTiming();
 
     public String getZh();
 
-    public JsonObject getBt();
+    public String getNap();
 
-    public boolean isFc();
+    public int getB();
 
-    public int getC();
+    public boolean isSp();
+
+    public String getBr();
+
+    public JsonObject getDp();
+
+    public double getJsv();
 
     public JsonObject getCrc();
 
-    public boolean isAv();
+    public boolean isIeps();
+
+    public String getFh();
+
+    public String getFonts();
 
     public JsonObject getNav();
 
-    public String getNap();
+    public JsonObject getBt();
 
-    public JsonObject getDp();
+    public String getBp();
+
+    public String getCv();
+
+    public String getLt();
+
+    public boolean isAv();
+
+    public boolean isFc();
+
+    public boolean isAp();
+
+    public int getC();
 }
-

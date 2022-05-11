@@ -1,12 +1,12 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.shopify.util;
 
 public class Triplet {
-    public Z third;
     public V second;
     public T first;
+    public Z third;
 
     public Triplet(Object object, Object object2, Object object3) {
         this.first = object;
@@ -14,4 +14,3 @@ public class Triplet {
         this.third = object3;
     }
 }
-

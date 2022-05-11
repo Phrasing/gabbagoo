@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.shopify.util;
 
@@ -10,11 +10,18 @@ import java.util.function.Supplier;
  */
 public class PaymentTokenSupplier
 implements Supplier {
-    public String token;
     public boolean vaulted;
+    public String token;
 
-    public String get() {
-        return this.token;
+    public PaymentTokenSupplier(String string) {
+        this.token = string;
+        this.vaulted = false;
+    }
+
+    @Deprecated
+    public void setSubmittedSuccessfully() {
+        this.token = "";
+        this.vaulted = true;
     }
 
     public boolean isVaulted() {
@@ -25,15 +32,7 @@ implements Supplier {
         return this.get();
     }
 
-    @Deprecated
-    public void setSubmittedSuccessfully() {
-        this.token = "";
-        this.vaulted = true;
-    }
-
-    public PaymentTokenSupplier(String string) {
-        this.token = string;
-        this.vaulted = false;
+    public String get() {
+        return this.token;
     }
 }
-

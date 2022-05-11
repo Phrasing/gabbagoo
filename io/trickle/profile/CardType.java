@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.profile;
 
@@ -16,6 +16,14 @@ public enum CardType {
     CHINA_UNION_PAY("^62[0-9]{14,17}$");
 
     public Pattern pattern;
+
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public CardType() {
+        this.pattern = null;
+    }
 
     public static CardType detect(String string) {
         CardType[] cardTypeArray = CardType.values();
@@ -36,16 +44,7 @@ public enum CardType {
      * WARNING - void declaration
      */
     public CardType() {
-        this.pattern = null;
-    }
-
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public CardType() {
         void var3_1;
         this.pattern = Pattern.compile((String)var3_1);
     }
 }
-

@@ -1,23 +1,18 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
+ *  io.trickle.task.sites.shopify.util.PriceHandler$1
  */
 package io.trickle.task.sites.shopify.util;
 
 import io.trickle.task.sites.Site;
-import io.trickle.task.sites.shopify.util.PriceHandler$1;
+import io.trickle.task.sites.shopify.util.PriceHandler;
 
 public class PriceHandler {
-    public static boolean isCalculatingTaxes(String string) {
-        return string.contains("hidden\" data-checkout-taxes>");
-    }
-
-    public static int calculateShippingPrice(String string) {
-        String[] stringArray = string.split("-");
-        return Integer.parseInt(stringArray[stringArray.length - 1].replace(".", ""));
-    }
-
     public static int calculateTax(Site site, int n) {
-        switch (PriceHandler$1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
             case 1: {
                 return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
             }
@@ -87,5 +82,14 @@ public class PriceHandler {
         }
         throw new Exception("Tax unable to be calculated");
     }
-}
 
+    public static boolean isCalculatingTaxes(String string) {
+        boolean bl = false;
+        return string.contains("hidden\" data-checkout-taxes>");
+    }
+
+    public static int calculateShippingPrice(String string) {
+        String[] stringArray = string.split("-");
+        return Integer.parseInt(stringArray[stringArray.length - 1].replace(".", ""));
+    }
+}

@@ -1,14 +1,16 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.core.VertxSingleton
+ *  io.trickle.util.concurrent.VertxUtil$SignalEntry
  *  io.vertx.core.Future
  *  io.vertx.core.Vertx
  */
 package io.trickle.util.concurrent;
 
 import io.trickle.core.VertxSingleton;
-import io.trickle.util.concurrent.VertxUtil$SignalEntry;
+import io.trickle.util.concurrent.VertxUtil;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import java.lang.invoke.LambdaMetafactory;
@@ -19,44 +21,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
+/*
+ * Exception performing whole class analysis ignored.
+ */
 public class VertxUtil {
-    public static Set<VertxUtil$SignalEntry> SIGNAL_ENTRIES = ConcurrentHashMap.newKeySet();
+    public static Set<SignalEntry> SIGNAL_ENTRIES = ConcurrentHashMap.newKeySet();
 
-    public static CompletableFuture randomSleep(long l) {
-        return VertxUtil.randomSignalSleep("massChange", l);
-    }
-
-    public static CompletableFuture lock(String string) {
-        return VertxUtil.toStage(Vertx.currentContext().owner().sharedData().getLock(string));
-    }
-
-    public static void sendSignal(String string) {
-        try {
-            Iterator<VertxUtil$SignalEntry> iterator = SIGNAL_ENTRIES.iterator();
-            while (iterator.hasNext()) {
-                VertxUtil$SignalEntry vertxUtil$SignalEntry = iterator.next();
-                if (vertxUtil$SignalEntry.call.isDone() || !vertxUtil$SignalEntry.signal.equals(string)) continue;
-                vertxUtil$SignalEntry.complete();
-                iterator.remove();
-            }
-            return;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
-
-    public static void lambda$hardCodedSleep$0(CompletableFuture completableFuture, Long l) {
-        completableFuture.complete(null);
-    }
-
-    public static CompletableFuture toStage(Future future) {
-        return future.toCompletionStage().toCompletableFuture();
-    }
-
-    public static void lambda$signalSleep$1(VertxUtil$SignalEntry vertxUtil$SignalEntry, Long l) {
-        vertxUtil$SignalEntry.complete();
-        SIGNAL_ENTRIES.remove(vertxUtil$SignalEntry);
+    public static CompletableFuture randomSignalSleep(String string, long l) {
+        if (l <= 1L) return CompletableFuture.completedFuture(null);
+        long l2 = ThreadLocalRandom.current().nextLong(l, Math.round((double)l * Double.longBitsToDouble(4609434218613702656L)));
+        return VertxUtil.signalSleep(string, l2);
     }
 
     public static CompletableFuture handleEagerFuture(CompletableFuture completableFuture) {
@@ -75,34 +49,36 @@ public class VertxUtil {
         return CompletableFuture.completedFuture(null);
     }
 
-    public static CompletableFuture randomSignalSleep(String string, long l) {
-        if (l <= 1L) return CompletableFuture.completedFuture(null);
-        long l2 = ThreadLocalRandom.current().nextLong(l, Math.round((double)l * Double.longBitsToDouble(4609434218613702656L)));
-        return VertxUtil.signalSleep(string, l2);
-    }
-
-    public static CompletableFuture sleep(long l) {
-        return VertxUtil.signalSleep("massChange", l);
-    }
-
-    public static CompletableFuture signalSleep(String string, long l) {
-        if (l <= 1L) return CompletableFuture.completedFuture(null);
-        VertxUtil$SignalEntry vertxUtil$SignalEntry = VertxUtil$SignalEntry.fromSignal(string);
-        try {
-            vertxUtil$SignalEntry.timerId = vertxUtil$SignalEntry.call.getCtx().owner().setTimer(l, arg_0 -> VertxUtil.lambda$signalSleep$1(vertxUtil$SignalEntry, arg_0));
-            SIGNAL_ENTRIES.add(vertxUtil$SignalEntry);
-            return vertxUtil$SignalEntry.call;
-        }
-        catch (Throwable throwable) {
-            return CompletableFuture.completedFuture(null);
-        }
-    }
-
     public static CompletableFuture hardCodedSleep(long l) {
         if (l <= 1L) return CompletableFuture.completedFuture(null);
         CompletableFuture completableFuture = new CompletableFuture();
-        VertxSingleton.INSTANCE.get().setTimer(l, arg_0 -> VertxUtil.lambda$hardCodedSleep$0(completableFuture, arg_0));
+        VertxSingleton.INSTANCE.get().setTimer(l, arg_0 -> VertxUtil.lambda$hardCodedSleep$1(completableFuture, arg_0));
         return completableFuture;
+    }
+
+    public static CompletableFuture toStage(Future future) {
+        return future.toCompletionStage().toCompletableFuture();
+    }
+
+    public static void lambda$signalSleep$2(SignalEntry signalEntry, Long l) {
+        signalEntry.complete();
+        SIGNAL_ENTRIES.remove(signalEntry);
+    }
+
+    public static void sendSignal() {
+        try {
+            Iterator<SignalEntry> iterator = SIGNAL_ENTRIES.iterator();
+            while (iterator.hasNext()) {
+                SignalEntry signalEntry = iterator.next();
+                if (signalEntry.call.isDone()) continue;
+                signalEntry.complete();
+                iterator.remove();
+            }
+            return;
+        }
+        catch (Throwable throwable) {
+            // empty catch block
+        }
     }
 
     /*
@@ -143,13 +119,13 @@ lbl19:
         throw new IllegalArgumentException();
     }
 
-    public static void sendSignal(String string, String string2) {
+    public static void sendSignal(String string) {
         try {
-            Iterator<VertxUtil$SignalEntry> iterator = SIGNAL_ENTRIES.iterator();
+            Iterator<SignalEntry> iterator = SIGNAL_ENTRIES.iterator();
             while (iterator.hasNext()) {
-                VertxUtil$SignalEntry vertxUtil$SignalEntry = iterator.next();
-                if (vertxUtil$SignalEntry.call.isDone() || !vertxUtil$SignalEntry.signal.equals(string)) continue;
-                vertxUtil$SignalEntry.complete(string2);
+                SignalEntry signalEntry = iterator.next();
+                if (signalEntry.call.isDone() || !signalEntry.signal.equals(string)) continue;
+                signalEntry.complete();
                 iterator.remove();
             }
             return;
@@ -159,13 +135,44 @@ lbl19:
         }
     }
 
-    public static void sendSignal() {
+    public static CompletableFuture sleep(long l) {
+        return VertxUtil.signalSleep("massChange", l);
+    }
+
+    public static CompletableFuture yield() {
+        CompletableFuture completableFuture = new CompletableFuture();
+        Vertx.currentContext().runOnContext(arg_0 -> VertxUtil.lambda$yield$0(completableFuture, arg_0));
+        return completableFuture;
+    }
+
+    public static CompletableFuture signalSleep(String string, long l) {
+        if (l <= 1L) return CompletableFuture.completedFuture(null);
+        SignalEntry signalEntry = SignalEntry.fromSignal((String)string);
         try {
-            Iterator<VertxUtil$SignalEntry> iterator = SIGNAL_ENTRIES.iterator();
+            signalEntry.timerId = signalEntry.call.getCtx().owner().setTimer(l, arg_0 -> VertxUtil.lambda$signalSleep$2(signalEntry, arg_0));
+            SIGNAL_ENTRIES.add(signalEntry);
+        }
+        catch (Throwable throwable) {
+            return CompletableFuture.completedFuture(null);
+        }
+        return signalEntry.call;
+    }
+
+    public static void lambda$yield$0(CompletableFuture completableFuture, Void void_) {
+        completableFuture.complete(null);
+    }
+
+    public static void lambda$hardCodedSleep$1(CompletableFuture completableFuture, Long l) {
+        completableFuture.complete(null);
+    }
+
+    public static void sendSignal(String string, Object object) {
+        try {
+            Iterator<SignalEntry> iterator = SIGNAL_ENTRIES.iterator();
             while (iterator.hasNext()) {
-                VertxUtil$SignalEntry vertxUtil$SignalEntry = iterator.next();
-                if (vertxUtil$SignalEntry.call.isDone()) continue;
-                vertxUtil$SignalEntry.complete();
+                SignalEntry signalEntry = iterator.next();
+                if (signalEntry.call.isDone() || !signalEntry.signal.equals(string)) continue;
+                signalEntry.complete(object);
                 iterator.remove();
             }
             return;
@@ -173,6 +180,13 @@ lbl19:
         catch (Throwable throwable) {
             // empty catch block
         }
+    }
+
+    public static CompletableFuture randomSleep(long l) {
+        return VertxUtil.randomSignalSleep("massChange", l);
+    }
+
+    public static CompletableFuture lock(String string) {
+        return VertxUtil.toStage(Vertx.currentContext().owner().sharedData().getLock(string));
     }
 }
-

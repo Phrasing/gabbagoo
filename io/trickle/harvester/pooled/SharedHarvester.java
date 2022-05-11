@@ -1,11 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.harvester.pooled;
 
 public interface SharedHarvester {
-    public String id();
-
     public int passCount();
-}
 
+    public String id();
+}

@@ -1,5 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.walmart.usa.handling.BadSessionException
+ *  io.trickle.task.sites.walmart.usa.handling.CheckoutExpiryException
+ *  io.trickle.task.sites.walmart.usa.handling.EmptyCartException
  */
 package io.trickle.task.sites.walmart.usa.handling;
 
@@ -14,13 +19,12 @@ public enum ErrorStatus {
 
     public static CompletableFuture checkRedirectStatus(String string) {
         if (string.contains("CRT expired or empty")) {
-            return CompletableFuture.failedFuture(new EmptyCartException());
+            return CompletableFuture.failedFuture((Throwable)new EmptyCartException());
         }
         if (string.contains("contract has expired")) {
-            return CompletableFuture.failedFuture(new CheckoutExpiryException());
+            return CompletableFuture.failedFuture((Throwable)new CheckoutExpiryException());
         }
         if (!string.contains("Method Not Allowed")) return CompletableFuture.completedFuture(UNKNOWN);
-        return CompletableFuture.failedFuture(new BadSessionException());
+        return CompletableFuture.failedFuture((Throwable)new BadSessionException());
     }
 }
-

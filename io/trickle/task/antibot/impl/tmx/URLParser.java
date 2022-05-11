@@ -1,5 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.tmx.Decoding
+ *  io.trickle.util.Utils
  */
 package io.trickle.task.antibot.impl.tmx;
 
@@ -13,10 +17,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class URLParser {
-    public static Pattern ENCODED_STR_PAT;
-    public static Pattern FUNCTION_VAR_PAT;
+    public static Pattern FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
+    public static Pattern ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
     public Map<String, Decoding> decodingMap;
     public List<String> urls;
+
+    public void parseUrls(String string) {
+        Matcher matcher = ENCODED_STR_PAT.matcher(string);
+        System.out.println(this.decodingMap.keySet());
+        while (matcher.find()) {
+            try {
+                String string2;
+                String[] stringArray = matcher.group(1).split("\\.");
+                String string3 = string2 = stringArray.length == 2 ? stringArray[0] : stringArray[1];
+                String string4 = this.decodingMap.get(string2 = string2.replace("?", "").trim()).td_f(Integer.valueOf(Integer.parseInt(matcher.group(2))), Integer.valueOf(Integer.parseInt(matcher.group(3))));
+                if (!string4.contains("http")) continue;
+                this.urls.add(string4);
+            }
+            catch (Exception exception) {}
+        }
+    }
 
     public void parseFuncVars(String string) {
         Matcher matcher = FUNCTION_VAR_PAT.matcher(string);
@@ -29,6 +49,11 @@ public class URLParser {
         }
     }
 
+    public static void main(String[] stringArray) {
+        URLParser uRLParser = new URLParser(Utils.readFileAsString((String)"/Users/bayanrasooly/Documents/GitHub/TrickleV1.0/dev/bestbuy/tmx_raw.js"));
+        System.out.println(uRLParser.urls);
+    }
+
     public URLParser(String string) {
         string = string.replace("{", "\n").replace("}", "\n").replace(";", "\n");
         this.decodingMap = new HashMap<String, Decoding>();
@@ -36,31 +61,4 @@ public class URLParser {
         this.parseFuncVars(string);
         this.parseUrls(string);
     }
-
-    public void parseUrls(String string) {
-        Matcher matcher = ENCODED_STR_PAT.matcher(string);
-        System.out.println(this.decodingMap.keySet());
-        while (matcher.find()) {
-            try {
-                String string2;
-                String[] stringArray = matcher.group(1).split("\\.");
-                String string3 = string2 = stringArray.length == 2 ? stringArray[0] : stringArray[1];
-                String string4 = this.decodingMap.get(string2 = string2.replace("?", "").trim()).td_f(Integer.parseInt(matcher.group(2)), Integer.parseInt(matcher.group(3)));
-                if (!string4.contains("http")) continue;
-                this.urls.add(string4);
-            }
-            catch (Exception exception) {}
-        }
-    }
-
-    static {
-        FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
-        ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
-    }
-
-    public static void main(String[] stringArray) {
-        URLParser uRLParser = new URLParser(Utils.readFileAsString("/Users/bayanrasooly/Documents/GitHub/TrickleV1.0/dev/bestbuy/tmx_raw.js"));
-        System.out.println(uRLParser.urls);
-    }
 }
-

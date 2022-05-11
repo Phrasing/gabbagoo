@@ -1,5 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.core.producers.AsyncLockingProducer
+ *  io.trickle.proxy.Proxy
  */
 package io.trickle.proxy;
 
@@ -14,17 +18,15 @@ public class RandomProxyProducer
 extends AsyncLockingProducer {
     public WeakReference<List<Proxy>> reference;
 
-    @Override
     public void handle() {
         List list = (List)this.reference.get();
         try {
             if (list == null) throw new Exception("Proxies list cannot be null");
             Proxy proxy = (Proxy)list.get(ThreadLocalRandom.current().nextInt(list.size()));
-            super.produce(proxy);
-            return;
+            super.produce((Object)proxy);
         }
         catch (Exception exception) {
-            super.fail(exception);
+            super.fail((Throwable)exception);
         }
     }
 
@@ -33,4 +35,3 @@ extends AsyncLockingProducer {
         Objects.requireNonNull((List)this.reference.get());
     }
 }
-

@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.vertx.ext.web.client.HttpResponse
@@ -12,4 +12,3 @@ import io.vertx.ext.web.client.HttpResponse;
 public interface DesktopPXNEW$ResponseHandler {
     public Object handle(HttpResponse var1);
 }
-

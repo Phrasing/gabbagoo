@@ -1,28 +1,28 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.shopify.Flow$Actions
  */
 package io.trickle.task.sites.shopify;
 
-import io.trickle.task.sites.shopify.Flow$Actions;
+import io.trickle.task.sites.shopify.Flow;
 import java.util.Map;
 
 public class Flow$FlowImpl
-implements Flow$Actions {
+implements Flow.Actions {
     public boolean needsPrice;
-    public boolean needsAuthTokens;
     public Map<String, String> requiredCookies;
+    public boolean needsAuthTokens;
 
-    @Override
     public boolean needsPrice() {
         return this.needsPrice;
     }
 
-    @Override
     public boolean needsAuthTokens() {
         return this.needsAuthTokens;
     }
 
-    @Override
     public Map requiredCookies() {
         return this.requiredCookies;
     }
@@ -33,4 +33,3 @@ implements Flow$Actions {
         this.requiredCookies = map;
     }
 }
-

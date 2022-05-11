@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.netty.util.AsciiString
@@ -9,19 +9,19 @@ package io.trickle.util.request;
 import io.netty.util.AsciiString;
 
 public class Headers {
-    public static CharSequence SAME_ORIGIN;
-    public static CharSequence CORS;
-    public static CharSequence SEC_CH_UA;
     public static CharSequence GZIP_DEFLATE_BR;
-    public static CharSequence DEFAULT;
-    public static CharSequence EMPTY;
-    public static CharSequence WINDOWS;
-    public static CharSequence SEC_FETCH_SITE;
-    public static CharSequence _Q0;
-    public static CharSequence SEC_FETCH_DEST;
-    public static CharSequence SEC_FETCH_MODE;
     public static CharSequence SEC_CH_UA_PLATFORM;
+    public static CharSequence SEC_FETCH_DEST;
+    public static CharSequence _Q0;
+    public static CharSequence DEFAULT;
+    public static CharSequence SEC_FETCH_MODE;
+    public static CharSequence SEC_FETCH_SITE;
+    public static CharSequence SAME_ORIGIN;
+    public static CharSequence WINDOWS;
     public static CharSequence SEC_CH_UA_MOBILE;
+    public static CharSequence SEC_CH_UA;
+    public static CharSequence CORS;
+    public static CharSequence EMPTY;
 
     static {
         DEFAULT = AsciiString.cached((String)"DEFAULT_VALUE");
@@ -39,4 +39,3 @@ public class Headers {
         GZIP_DEFLATE_BR = AsciiString.cached((String)"gzip, deflate, br");
     }
 }
-

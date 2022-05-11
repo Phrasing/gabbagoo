@@ -1,7 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.sites.shopify.Shopify
+ *  io.trickle.task.sites.shopify.util.Triplet
  *  io.vertx.core.json.JsonArray
  *  io.vertx.core.json.JsonObject
  */
@@ -20,36 +22,22 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VariantHandler {
-    public static String selectVariantFromLink(JsonObject jsonObject, String string, Shopify shopify) {
-        return VariantHandler.findVariantFromProduct(jsonObject, string, shopify);
+    public static boolean matchesKeyword(JsonObject jsonObject, List list, List list2) {
+        String string3;
+        String string2 = jsonObject.getString("title").toLowerCase();
+        for (String string3 : list) {
+            if (string2.contains(string3)) continue;
+            return false;
+        }
+        Iterator iterator = list2.iterator();
+        do {
+            if (!iterator.hasNext()) return true;
+        } while (!string2.contains(string3 = (String)iterator.next()));
+        return false;
     }
 
-    public static CompletableFuture findPrecartVariant(JsonArray jsonArray) {
-        Triplet triplet = null;
-        if (jsonArray == null) return CompletableFuture.completedFuture(null);
-        int n = jsonArray.size() - 1;
-        while (n >= 0) {
-            JsonObject jsonObject = jsonArray.getJsonObject(n);
-            JsonArray jsonArray2 = jsonObject.getJsonArray("variants");
-            for (int i = 0; i < jsonArray2.size(); ++i) {
-                JsonObject jsonObject2 = jsonArray2.getJsonObject(i);
-                if (jsonObject2.getBoolean("available").booleanValue()) {
-                    String string;
-                    if (triplet == null) {
-                        triplet = new Triplet(jsonObject2.getNumber("id").toString(), true, jsonObject);
-                    }
-                    if ((string = jsonObject.encode()).contains("sneaker")) return CompletableFuture.completedFuture(new Triplet(jsonObject2.getNumber("id").toString(), true, jsonObject));
-                    if (string.contains("BE@RBRICK")) return CompletableFuture.completedFuture(new Triplet(jsonObject2.getNumber("id").toString(), true, jsonObject));
-                    if (string.contains("footwear")) {
-                        return CompletableFuture.completedFuture(new Triplet(jsonObject2.getNumber("id").toString(), true, jsonObject));
-                    }
-                }
-                if (n != 0) continue;
-                return CompletableFuture.completedFuture(Objects.requireNonNullElseGet(triplet, () -> VariantHandler.lambda$findPrecartVariant$0(jsonObject2, jsonObject)));
-            }
-            --n;
-        }
-        return CompletableFuture.completedFuture(null);
+    public static Triplet lambda$findPrecartVariant$0(JsonObject jsonObject, JsonObject jsonObject2) {
+        return new Triplet((Object)jsonObject.getNumber("id").toString(), (Object)false, (Object)jsonObject2);
     }
 
     public static String findVariantFromProduct(JsonObject jsonObject, String string, Shopify shopify) {
@@ -91,46 +79,8 @@ public class VariantHandler {
         throw new Exception("Size not found [" + string + "]");
     }
 
-    public static Triplet lambda$findPrecartVariantOOS$1(JsonObject jsonObject, JsonObject jsonObject2) {
-        return new Triplet(jsonObject.getNumber("id").toString(), false, jsonObject2);
-    }
-
-    public static boolean matchesKeyword(JsonObject jsonObject, List list, List list2) {
-        String string3;
-        String string2 = jsonObject.getString("title").toLowerCase();
-        for (String string3 : list) {
-            if (string2.contains(string3)) continue;
-            return false;
-        }
-        Iterator iterator = list2.iterator();
-        do {
-            if (!iterator.hasNext()) return true;
-        } while (!string2.contains(string3 = (String)iterator.next()));
-        return false;
-    }
-
-    public static CompletableFuture findPrecartVariantOOS(JsonArray jsonArray) {
-        Object t = null;
-        if (jsonArray == null) return CompletableFuture.completedFuture(null);
-        int n = jsonArray.size() - 1;
-        while (n >= 0) {
-            JsonObject jsonObject = jsonArray.getJsonObject(n);
-            JsonArray jsonArray2 = jsonObject.getJsonArray("variants");
-            for (int i = 0; i < jsonArray2.size(); ++i) {
-                JsonObject jsonObject2 = jsonArray2.getJsonObject(i);
-                if (!jsonObject2.getBoolean("available").booleanValue()) {
-                    return CompletableFuture.completedFuture(new Triplet(jsonObject2.getNumber("id").toString(), true, jsonObject));
-                }
-                if (n != 0) continue;
-                return CompletableFuture.completedFuture(Objects.requireNonNullElseGet(t, () -> VariantHandler.lambda$findPrecartVariantOOS$1(jsonObject2, jsonObject)));
-            }
-            --n;
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public static Triplet lambda$findPrecartVariant$0(JsonObject jsonObject, JsonObject jsonObject2) {
-        return new Triplet(jsonObject.getNumber("id").toString(), false, jsonObject2);
+    public static String selectVariantFromLink(JsonObject jsonObject, String string, Shopify shopify) {
+        return VariantHandler.findVariantFromProduct(jsonObject, string, shopify);
     }
 
     public static String selectVariantFromKeyword(JsonObject jsonObject, String string, List list, List list2, Shopify shopify) {
@@ -146,5 +96,56 @@ public class VariantHandler {
         }
         return null;
     }
-}
 
+    public static Triplet lambda$findPrecartVariantOOS$1(JsonObject jsonObject, JsonObject jsonObject2) {
+        return new Triplet((Object)jsonObject.getNumber("id").toString(), (Object)false, (Object)jsonObject2);
+    }
+
+    public static CompletableFuture findPrecartVariant(JsonArray jsonArray) {
+        Triplet triplet = null;
+        if (jsonArray == null) return CompletableFuture.completedFuture(null);
+        int n = jsonArray.size() - 1;
+        while (n >= 0) {
+            JsonObject jsonObject = jsonArray.getJsonObject(n);
+            JsonArray jsonArray2 = jsonObject.getJsonArray("variants");
+            for (int i = 0; i < jsonArray2.size(); ++i) {
+                JsonObject jsonObject2 = jsonArray2.getJsonObject(i);
+                if (jsonObject2.getBoolean("available").booleanValue()) {
+                    String string;
+                    if (triplet == null) {
+                        triplet = new Triplet((Object)jsonObject2.getNumber("id").toString(), (Object)true, (Object)jsonObject);
+                    }
+                    if ((string = jsonObject.encode()).contains("sneaker")) return CompletableFuture.completedFuture(new Triplet((Object)jsonObject2.getNumber("id").toString(), (Object)true, (Object)jsonObject));
+                    if (string.contains("BE@RBRICK")) return CompletableFuture.completedFuture(new Triplet((Object)jsonObject2.getNumber("id").toString(), (Object)true, (Object)jsonObject));
+                    if (string.contains("footwear")) {
+                        return CompletableFuture.completedFuture(new Triplet((Object)jsonObject2.getNumber("id").toString(), (Object)true, (Object)jsonObject));
+                    }
+                }
+                if (n != 0) continue;
+                return CompletableFuture.completedFuture(Objects.requireNonNullElseGet(triplet, () -> VariantHandler.lambda$findPrecartVariant$0(jsonObject2, jsonObject)));
+            }
+            --n;
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+
+    public static CompletableFuture findPrecartVariantOOS(JsonArray jsonArray) {
+        Object t = null;
+        if (jsonArray == null) return CompletableFuture.completedFuture(null);
+        int n = jsonArray.size() - 1;
+        while (n >= 0) {
+            JsonObject jsonObject = jsonArray.getJsonObject(n);
+            JsonArray jsonArray2 = jsonObject.getJsonArray("variants");
+            for (int i = 0; i < jsonArray2.size(); ++i) {
+                JsonObject jsonObject2 = jsonArray2.getJsonObject(i);
+                if (!jsonObject2.getBoolean("available").booleanValue()) {
+                    return CompletableFuture.completedFuture(new Triplet((Object)jsonObject2.getNumber("id").toString(), (Object)true, (Object)jsonObject));
+                }
+                if (n != 0) continue;
+                return CompletableFuture.completedFuture(Objects.requireNonNullElseGet(t, () -> VariantHandler.lambda$findPrecartVariantOOS$1(jsonObject2, jsonObject)));
+            }
+            --n;
+        }
+        return CompletableFuture.completedFuture(null);
+    }
+}

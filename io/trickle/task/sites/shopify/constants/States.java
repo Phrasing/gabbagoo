@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.shopify.constants;
 
@@ -131,4 +131,3 @@ public class States {
         return STATES.get(string);
     }
 }
-

@@ -1,5 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.core.Controller
+ *  io.trickle.core.Engine
+ *  io.trickle.task.TaskController
  */
 package io.trickle.basicgui;
 
@@ -21,12 +26,12 @@ KeyListener {
     public void keyPressed(KeyEvent keyEvent) {
     }
 
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-    }
-
     public PasswordOverrideListener(TextField textField) {
         this.passwordField = textField;
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
     }
 
     @Override
@@ -41,4 +46,3 @@ KeyListener {
         ((TaskController)Engine.get().getModule(Controller.TASK)).massPassword(string);
     }
 }
-

@@ -1,7 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.harvester.CaptchaToken
+ *  io.trickle.util.Pair
+ *  io.trickle.util.concurrent.ContextCompletableFuture
  *  io.vertx.core.json.JsonArray
  */
 package io.trickle.harvester;
@@ -27,4 +30,3 @@ extends ContextCompletableFuture {
         this.captchaToken = captchaToken;
     }
 }
-

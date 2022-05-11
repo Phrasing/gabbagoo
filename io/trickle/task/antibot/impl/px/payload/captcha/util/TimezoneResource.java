@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.antibot.impl.px.payload.captcha.util;
 
@@ -14,4 +14,3 @@ public class TimezoneResource {
         return new Locale(stringArray[0], stringArray[1]);
     }
 }
-

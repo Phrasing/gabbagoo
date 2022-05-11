@@ -1,5 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.profile.Profile
+ *  io.trickle.task.sites.yeezy.util.rotator.ZipCodeGroup
  */
 package io.trickle.task.sites.yeezy.util.rotator;
 
@@ -11,46 +15,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ZipCodes {
-    public List<ZipCodeGroup> writeList;
     public AtomicInteger idx;
+    public List<ZipCodeGroup> writeList;
     public boolean finished = false;
     public CopyOnWriteArrayList<ZipCodeGroup> zipCodeGroups = new CopyOnWriteArrayList();
+
+    public static int lambda$get$0(int n, int n2) {
+        return ++n2 < n ? n2 : 0;
+    }
 
     public void removeBanned(ZipCodeGroup zipCodeGroup) {
         int n = this.zipCodeGroups.indexOf(zipCodeGroup);
         if (n <= -1) return;
         this.zipCodeGroups.remove(n);
-    }
-
-    public ZipCodes() {
-        this.idx = new AtomicInteger(0);
-        this.writeList = new ArrayList<ZipCodeGroup>();
-    }
-
-    public ZipCodeGroup get() {
-        try {
-            ZipCodeGroup zipCodeGroup;
-            int n = this.zipCodeGroups.size();
-            if (n == 0) {
-                return null;
-            }
-            if (n == 1) {
-                zipCodeGroup = this.zipCodeGroups.get(0);
-                return zipCodeGroup;
-            }
-            zipCodeGroup = this.zipCodeGroups.get(this.idx.getAndUpdate(arg_0 -> ZipCodes.lambda$get$0(n, arg_0)));
-            return zipCodeGroup;
-        }
-        catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
-
-    public static int lambda$get$0(int n, int n2) {
-        if (++n2 >= n) return 0;
-        int n3 = n2;
-        return n3;
     }
 
     public void finish() {
@@ -63,17 +40,33 @@ public class ZipCodes {
     public void put(String string, Profile profile) {
         ZipCodeGroup zipCodeGroup;
         if (this.finished) return;
-        Object object = this.writeList.iterator();
+        ZipCodeGroup zipCodeGroup2 = this.writeList.iterator();
         do {
-            if (!object.hasNext()) {
-                object = new ZipCodeGroup(string, this);
-                ((ZipCodeGroup)object).add(profile);
-                this.writeList.add((ZipCodeGroup)object);
+            if (!zipCodeGroup2.hasNext()) {
+                zipCodeGroup2 = new ZipCodeGroup(string, this);
+                zipCodeGroup2.add(profile);
+                this.writeList.add(zipCodeGroup2);
                 return;
             }
-            zipCodeGroup = object.next();
+            zipCodeGroup = zipCodeGroup2.next();
         } while (!zipCodeGroup.zipCode.equals(string));
         zipCodeGroup.add(profile);
     }
-}
 
+    public ZipCodes() {
+        this.idx = new AtomicInteger(0);
+        this.writeList = new ArrayList<ZipCodeGroup>();
+    }
+
+    public ZipCodeGroup get() {
+        try {
+            int n = this.zipCodeGroups.size();
+            if (n != 0) return n == 1 ? this.zipCodeGroups.get(0) : this.zipCodeGroups.get(this.idx.getAndUpdate(arg_0 -> ZipCodes.lambda$get$0(n, arg_0)));
+            return null;
+        }
+        catch (Throwable throwable) {
+            throwable.printStackTrace();
+            return null;
+        }
+    }
+}

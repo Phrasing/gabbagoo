@@ -1,13 +1,13 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.hibbett;
 
 public interface HibbettConstants {
-    public static final String IOS_APP_VERSION;
-    public static final String IOS_USER_AGENT;
     public static final String USER_AGENT;
     public static final String API_KEY;
+    public static final String IOS_APP_VERSION;
+    public static final String IOS_USER_AGENT;
     public static final String APP_VERSION;
 
     static {
@@ -18,4 +18,3 @@ public interface HibbettConstants {
         IOS_USER_AGENT = null;
     }
 }
-

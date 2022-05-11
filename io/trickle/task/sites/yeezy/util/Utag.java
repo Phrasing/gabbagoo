@@ -1,27 +1,77 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.akamai.sensor.Bmak
+ *  io.trickle.task.sites.yeezy.YeezyAPI
+ *  io.trickle.util.Utils
  */
 package io.trickle.task.sites.yeezy.util;
 
 import io.trickle.task.antibot.impl.akamai.sensor.Bmak;
 import io.trickle.task.sites.yeezy.YeezyAPI;
+import io.trickle.util.Utils;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utag {
+    public long ses_id = -1L;
+    public String userAgent;
+    public long exp;
+    public String documentUrl;
+    public String sku;
+    public int updateCookieCounter = 0;
+    public long st;
+    public Bmak bmak;
+    public String v_id;
     public static int session_timeout = 1800000;
     public String productName;
-    public int updateCookieCounter = 0;
-    public long ses_id = -1L;
-    public long st;
-    public String v_id;
-    public String documentUrl;
-    public long exp;
-    public String userAgent;
-    public Bmak bmak;
-    public String sku;
+
+    public String vi(long l) {
+        if (this.bmak != null && this.v_id == null) {
+            Object object = this.pad("" + l, 12);
+            String string = "" + ThreadLocalRandom.current().nextDouble();
+            object = (String)object + this.pad(string.substring(2), 16);
+            object = (String)object + this.pad("" + this.bmak.getDevice().getPluginLength(), 2);
+            object = (String)object + this.pad("" + this.bmak.getDevice().getUserAgent().length(), 3);
+            object = (String)object + this.pad("" + this.documentUrl.length(), 4);
+            object = (String)object + this.pad("" + this.bmak.getDevice().getUserAgent().replace("Mozilla/", "").length(), 3);
+            this.v_id = object = (String)object + this.pad("" + (this.bmak.getDevice().getScreenWidth() + this.bmak.getDevice().getScreenHeight() + this.bmak.getDevice().getColorDepth()), 5);
+        } else {
+            if (this.userAgent == null) return this.v_id;
+            if (this.v_id != null) return this.v_id;
+            Object object = this.pad("" + l, 12);
+            String string = "" + Utils.smartNextDouble();
+            object = (String)object + this.pad(string.substring(2), 16);
+            object = (String)object + this.pad("3", 2);
+            object = (String)object + this.pad("" + this.userAgent.length(), 3);
+            object = (String)object + this.pad("" + this.documentUrl.length(), 4);
+            object = (String)object + this.pad("" + this.userAgent.length(), 3);
+            this.v_id = object = (String)object + this.pad("" + ((int)Math.floor(Math.random() * Double.longBitsToDouble(4655459775352406016L)) + 800 + (int)Math.floor(Math.random() * Double.longBitsToDouble(4650608730050658304L)) + 600 - 24 - 1), 5);
+        }
+        return this.v_id;
+    }
+
+    public String getPrevPage() {
+        if (this.documentUrl.contains("product")) return this.getEncodedProductName();
+        if (this.documentUrl.contains("archive")) {
+            return this.getEncodedProductName();
+        }
+        if (this.documentUrl.equals(YeezyAPI.QUEUE_URL)) {
+            return this.getEncodedWR();
+        }
+        if (this.documentUrl.contains("/delivery")) {
+            return this.getEncodedShipping();
+        }
+        if (!this.documentUrl.contains("/payment")) return "HOME";
+        return this.getEncodedProcessing();
+    }
+
+    public void setName(String string) {
+        this.productName = URLEncoder.encode(string, StandardCharsets.UTF_8).replace("+", "%20");
+    }
 
     public Utag(String string, String string2) {
         this.bmak = null;
@@ -30,19 +80,19 @@ public class Utag {
         this.sku = string2;
     }
 
-    public String getEncodedWR() {
-        return "WAITING%20ROOM%7C" + this.productName + "%7C" + this.productName + "%20(" + this.sku + ")";
+    public String getEncodedProcessing() {
+        return "CHECKOUT%7CPAYMENT";
     }
 
-    public void setName(String string) {
-        this.productName = URLEncoder.encode(string, StandardCharsets.UTF_8).replace("+", "%20");
-    }
-
-    public Utag(Bmak bmak, String string) {
-        this.bmak = bmak;
-        this.userAgent = null;
-        this.documentUrl = "https://www.yeezysupply.com/";
-        this.sku = string;
+    public String genUtagMain() {
+        this.vi(Instant.now().toEpochMilli());
+        if (this.ses_id == -1L) {
+            this.ses_id = Instant.now().toEpochMilli();
+        }
+        this.st = Instant.now().toEpochMilli() + 1800000L;
+        this.exp = Instant.now().toEpochMilli() + (long)ThreadLocalRandom.current().nextInt(470, 480) + 3600000L;
+        ++this.updateCookieCounter;
+        return "v_id:" + this.v_id + "$_se:" + this.updateCookieCounter + "$_ss:" + (this.updateCookieCounter == 1 ? 1 : 0) + "$_st:" + this.st + "$ses_id:" + this.ses_id + "%3Bexp-session$_pn:" + this.updateCookieCounter + "%3Bexp-session$_prevpage:" + this.getPrevPage() + "%3Bexp-" + this.exp;
     }
 
     public String pad(String object, int n) {
@@ -57,66 +107,31 @@ public class Utag {
         return (String)object2 + (String)object;
     }
 
-    public String vi(long l) {
-        if (this.bmak != null && this.v_id == null) {
-            Object object = this.pad("" + l, 12);
-            String string = "" + ThreadLocalRandom.current().nextDouble();
-            object = (String)object + this.pad(string.substring(2), 16);
-            object = (String)object + this.pad("" + this.bmak.getDevice().getPluginLength(), 2);
-            object = (String)object + this.pad("" + this.bmak.getDevice().getUserAgent().length(), 3);
-            object = (String)object + this.pad("" + this.documentUrl.length(), 4);
-            object = (String)object + this.pad("" + this.bmak.getDevice().getUserAgent().replace("Mozilla/", "").length(), 3);
-            this.v_id = object = (String)object + this.pad("" + (this.bmak.getDevice().getScreenWidth() + this.bmak.getDevice().getScreenHeight() + this.bmak.getDevice().getColorDepth()), 5);
-            return this.v_id;
-        }
-        if (this.userAgent == null) return this.v_id;
-        if (this.v_id != null) return this.v_id;
-        Object object = this.pad("" + l, 12);
-        String string = "" + ThreadLocalRandom.current().nextDouble();
-        object = (String)object + this.pad(string.substring(2), 16);
-        object = (String)object + this.pad("3", 2);
-        object = (String)object + this.pad("" + this.userAgent.length(), 3);
-        object = (String)object + this.pad("" + this.documentUrl.length(), 4);
-        object = (String)object + this.pad("" + this.userAgent.length(), 3);
-        this.v_id = object = (String)object + this.pad("" + ((int)Math.floor(Math.random() * Double.longBitsToDouble(4655459775352406016L)) + 800 + (int)Math.floor(Math.random() * Double.longBitsToDouble(4650608730050658304L)) + 600 + 24), 5);
-        return this.v_id;
-    }
-
-    public String getEncodedProcessing() {
-        return "CHECKOUT%7CPAYMENT";
+    public String getEncodedShipping() {
+        return "CHECKOUT%7CSHIPPING";
     }
 
     public static int H() {
         return (int)Math.ceil((double)Instant.now().toEpochMilli() / Double.longBitsToDouble(4725570615333879808L));
     }
 
-    public String getEncodedShipping() {
-        return "CHECKOUT%7CSHIPPING";
-    }
-
     public String getEncodedProductName() {
         return "PRODUCT%7C" + this.productName + "%20(" + this.sku + ")";
     }
 
-    public String genUtagMain() {
-        int n;
-        this.vi(Instant.now().toEpochMilli());
-        if (this.ses_id == -1L) {
-            this.ses_id = Instant.now().toEpochMilli();
-        }
-        this.st = Instant.now().toEpochMilli() + 1800000L;
-        this.exp = Instant.now().toEpochMilli() + (long)ThreadLocalRandom.current().nextInt(470, 480) + 3600000L;
-        ++this.updateCookieCounter;
-        if (this.updateCookieCounter == 1) {
-            n = 1;
-            return "v_id:" + this.v_id + "$_se:" + this.updateCookieCounter + "$_ss:" + n + "$_st:" + this.st + "$ses_id:" + this.ses_id + "%3Bexp-session$_pn:" + this.updateCookieCounter + "%3Bexp-session$_prevpage:" + this.getPrevPage() + "%3Bexp-" + this.exp;
-        }
-        n = 0;
-        return "v_id:" + this.v_id + "$_se:" + this.updateCookieCounter + "$_ss:" + n + "$_st:" + this.st + "$ses_id:" + this.ses_id + "%3Bexp-session$_pn:" + this.updateCookieCounter + "%3Bexp-session$_prevpage:" + this.getPrevPage() + "%3Bexp-" + this.exp;
+    public String getEncodedWR() {
+        return "WAITING%20ROOM%7C" + this.productName + "%7C" + this.productName + "%20(" + this.sku + ")";
     }
 
     public void updateDocumentUrl(String string) {
         this.documentUrl = string;
+    }
+
+    public Utag(Bmak bmak, String string) {
+        this.bmak = bmak;
+        this.userAgent = null;
+        this.documentUrl = "https://www.yeezysupply.com/";
+        this.sku = string;
     }
 
     public static String r() {
@@ -149,20 +164,4 @@ public class Utag {
         }
         return (String)object + (String)object2;
     }
-
-    public String getPrevPage() {
-        if (this.documentUrl.contains("product")) return this.getEncodedProductName();
-        if (this.documentUrl.contains("archive")) {
-            return this.getEncodedProductName();
-        }
-        if (this.documentUrl.equals(YeezyAPI.QUEUE_URL)) {
-            return this.getEncodedWR();
-        }
-        if (this.documentUrl.contains("/delivery")) {
-            return this.getEncodedShipping();
-        }
-        if (!this.documentUrl.contains("/payment")) return "HOME";
-        return this.getEncodedProcessing();
-    }
 }
-

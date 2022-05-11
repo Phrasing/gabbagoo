@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.antibot.impl.px.tools;
 
@@ -22,6 +22,17 @@ public class Deobfuscator {
     public static Pattern S_STRINGS;
     public static Pattern B64_STRINGS;
 
+    public static String readJsFile(String string) {
+        String string2 = null;
+        try (FileInputStream fileInputStream = new FileInputStream(string);){
+            string2 = new String(((InputStream)fileInputStream).readAllBytes());
+        }
+        catch (IOException iOException) {
+            // empty catch block
+        }
+        return string2;
+    }
+
     public static String n(String string) {
         StringBuilder stringBuilder = new StringBuilder();
         String string2 = new String(Base64.getDecoder().decode(string), StandardCharsets.UTF_8);
@@ -32,6 +43,34 @@ public class Deobfuscator {
             ++n;
         }
         return "\"" + stringBuilder + "\"";
+    }
+
+    public static void main(String[] stringArray) {
+        System.out.println(Deobfuscator.n("Kg1lA04"));
+        String string = Deobfuscator.readJsFile("rawCaptcha.js");
+    }
+
+    public static void outputJsFile(String string) {
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter((OutputStream)new FileOutputStream("rdeobbed.js"), StandardCharsets.UTF_8));
+            writer.write(string);
+        }
+        catch (IOException iOException) {
+        }
+        finally {
+            try {
+                writer.close();
+            }
+            catch (Exception exception) {}
+        }
+    }
+
+    static {
+        S_STRINGS = Pattern.compile("[S, u, o, r, t, w, i , n, s, O, e]\\(\"(.*?)\"\\)");
+        B64_STRINGS = Pattern.compile("ut\\(\"(.*?)\"\\)");
+        V2_S_STRINGS = Pattern.compile("[e, r, n, l, f, o, t]\\(\"(.*?)\"\\)");
+        MOD_STRINGS = Pattern.compile(" \\+ r\\(\"(.*?)\"\\)");
     }
 
     public static String deobV2(String string, Pattern pattern) {
@@ -46,13 +85,6 @@ public class Deobfuscator {
             }
         }
         return string;
-    }
-
-    static {
-        S_STRINGS = Pattern.compile("[S, u, o, r, t, w, i , n, s, O, e]\\(\"(.*?)\"\\)");
-        B64_STRINGS = Pattern.compile("ut\\(\"(.*?)\"\\)");
-        V2_S_STRINGS = Pattern.compile("[e, r, n, l, f, o, t]\\(\"(.*?)\"\\)");
-        MOD_STRINGS = Pattern.compile(" \\+ r\\(\"(.*?)\"\\)");
     }
 
     public static String deBase64(String string, Pattern pattern) {
@@ -70,53 +102,6 @@ public class Deobfuscator {
         return string;
     }
 
-    public static void main(String[] stringArray) {
-        System.out.println(Deobfuscator.n("Kg1lA04"));
-        String string = Deobfuscator.readJsFile("rawCaptcha.js");
-    }
-
-    public static String readJsFile(String string) {
-        String string2 = null;
-        try (FileInputStream fileInputStream = new FileInputStream(string);){
-            string2 = new String(((InputStream)fileInputStream).readAllBytes());
-            return string2;
-        }
-        catch (IOException iOException) {
-            // empty catch block
-        }
-        return string2;
-    }
-
-    public static void outputJsFile(String string) {
-        Writer writer = null;
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter((OutputStream)new FileOutputStream("rdeobbed.js"), StandardCharsets.UTF_8));
-            writer.write(string);
-            return;
-        }
-        catch (IOException iOException) {
-            return;
-        }
-        finally {
-            try {
-                writer.close();
-            }
-            catch (Exception exception) {}
-        }
-    }
-
-    public static String t(String string) {
-        String string2 = new String(Base64.getDecoder().decode(string), StandardCharsets.UTF_8);
-        int n = Character.codePointAt(string2, 0);
-        Object object = "";
-        int n2 = 1;
-        while (n2 < string2.length()) {
-            object = (String)object + (char)(n ^ Character.codePointAt(string2, n2));
-            ++n2;
-        }
-        return object;
-    }
-
     public static String deob(String string, Pattern pattern) {
         Matcher matcher = pattern.matcher(string);
         while (matcher.find()) {
@@ -130,5 +115,16 @@ public class Deobfuscator {
         }
         return string;
     }
-}
 
+    public static String t(String string) {
+        String string2 = new String(Base64.getDecoder().decode(string), StandardCharsets.UTF_8);
+        int n = Character.codePointAt(string2, 0);
+        Object object = "";
+        int n2 = 1;
+        while (n2 < string2.length()) {
+            object = (String)object + (char)(n ^ Character.codePointAt(string2, n2));
+            ++n2;
+        }
+        return object;
+    }
+}

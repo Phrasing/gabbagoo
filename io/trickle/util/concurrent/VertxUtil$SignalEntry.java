@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.util.concurrent.ContextCompletableFuture
  */
 package io.trickle.util.concurrent;
 
@@ -7,13 +10,26 @@ import io.trickle.util.concurrent.ContextCompletableFuture;
 import java.util.Objects;
 
 public class VertxUtil$SignalEntry {
-    public String signal;
-    public ContextCompletableFuture<String> call;
     public long timerId = 0L;
+    public String signal;
+    public ContextCompletableFuture<Object> call;
 
-    public void complete(String string) {
+    public static VertxUtil$SignalEntry fromSignal(String string) {
+        return new VertxUtil$SignalEntry(string, new ContextCompletableFuture());
+    }
+
+    public void complete() {
         this.cancelTimer();
-        this.call.complete((Object)string);
+        this.call.complete(null);
+    }
+
+    public int hashCode() {
+        return Objects.hash(this.signal, this.call);
+    }
+
+    public void complete(Object object) {
+        this.cancelTimer();
+        this.call.complete(object);
     }
 
     public boolean equals(Object object) {
@@ -24,19 +40,12 @@ public class VertxUtil$SignalEntry {
             return false;
         }
         VertxUtil$SignalEntry vertxUtil$SignalEntry = (VertxUtil$SignalEntry)object;
-        if (!this.signal.equals(vertxUtil$SignalEntry.signal)) return false;
-        if (!this.call.equals(vertxUtil$SignalEntry.call)) return false;
-        return true;
-    }
-
-    public int hashCode() {
-        return Objects.hash(this.signal, this.call);
+        return this.signal.equals(vertxUtil$SignalEntry.signal) && this.call.equals(vertxUtil$SignalEntry.call);
     }
 
     public void cancelTimer() {
         try {
             this.call.getCtx().owner().cancelTimer(this.timerId);
-            return;
         }
         catch (Throwable throwable) {
             // empty catch block
@@ -47,14 +56,4 @@ public class VertxUtil$SignalEntry {
         this.signal = string;
         this.call = contextCompletableFuture;
     }
-
-    public void complete() {
-        this.cancelTimer();
-        this.call.complete(null);
-    }
-
-    public static VertxUtil$SignalEntry fromSignal(String string) {
-        return new VertxUtil$SignalEntry(string, new ContextCompletableFuture());
-    }
 }
-

@@ -1,7 +1,15 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.core.Controller
+ *  io.trickle.core.Engine
+ *  io.trickle.network.codec.packet.Packet
+ *  io.trickle.network.codec.packet.PacketReader
+ *  io.trickle.network.codec.packet.PacketType
+ *  io.trickle.network.codec.packet.handler.PacketHandler
+ *  io.trickle.task.Task
+ *  io.trickle.task.TaskController
  *  io.vertx.core.Handler
  *  io.vertx.core.Promise
  */
@@ -22,19 +30,8 @@ import java.util.List;
 
 public class StatsHandler
 implements PacketHandler {
-    @Override
-    public void handle(Packet packet) {
-        throw new RuntimeException("Not-implemented");
-    }
-
-    @Override
-    public PacketType getType() {
-        return PacketType.INT_VARIABLE_SIZED;
-    }
-
-    @Override
     public void handle(Packet packet, Handler handler) {
-        PacketReader packetReader = PacketReader.create(packet);
+        PacketReader packetReader = PacketReader.create((Packet)packet);
         int n = packetReader.readInt();
         try {
             List list = ((TaskController)Engine.get().getModule(Controller.TASK)).getTasks();
@@ -49,9 +46,15 @@ implements PacketHandler {
         }
     }
 
-    @Override
+    public PacketType getType() {
+        return PacketType.INT_VARIABLE_SIZED;
+    }
+
+    public void handle(Packet packet) {
+        throw new RuntimeException("Not-implemented");
+    }
+
     public void handle(Promise promise, Packet packet) {
         throw new RuntimeException("Not-implemented");
     }
 }
-

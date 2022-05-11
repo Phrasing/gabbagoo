@@ -1,5 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.profile.Profile
+ *  io.trickle.task.sites.yeezy.util.rotator.ZipCodes
  */
 package io.trickle.task.sites.yeezy.util.rotator;
 
@@ -23,4 +27,3 @@ public class SizeZipMap {
         zipCodes.put(profile.getZip(), profile);
     }
 }
-

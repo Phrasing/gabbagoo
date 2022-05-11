@@ -1,7 +1,15 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.core.Controller
+ *  io.trickle.core.Engine
+ *  io.trickle.core.api.LoadableAsync
+ *  io.trickle.core.api.Module
+ *  io.trickle.harvester.LoginFuture
+ *  io.trickle.harvester.LoginToken
+ *  io.trickle.harvester.TokenController
+ *  io.trickle.webclient.CookieJar
  *  io.vertx.core.Future
  *  io.vertx.core.Vertx
  *  org.apache.logging.log4j.LogManager
@@ -32,26 +40,20 @@ import org.apache.logging.log4j.Logger;
 public class LoginController
 implements Module,
 LoadableAsync {
-    public AtomicInteger solveCount;
-    public Vertx vertx;
+    public AtomicReference<ArrayBlockingQueue<LoginFuture>> waitingList = new AtomicReference();
     public static Logger logger = LogManager.getLogger(TokenController.class);
     public String LOCK_IDENTITY;
-    public AtomicReference<ArrayBlockingQueue<LoginFuture>> waitingList = new AtomicReference();
+    public AtomicInteger solveCount;
+    public Vertx vertx;
 
-    @Override
-    public Future load() {
-        return Future.succeededFuture();
+    public void terminate() {
     }
 
-    public LoginFuture pollWaitingList() {
-        this.solveCount.incrementAndGet();
-        return this.waitingList.get().take();
-    }
-
-    public LoginFuture solve(LoginToken loginToken) {
-        LoginFuture loginFuture = new LoginFuture(loginToken);
-        if (this.waitingList.get().offer(loginFuture)) return loginFuture;
-        throw new Exception("Too many tokens to solve!!!");
+    public LoginController(Vertx vertx) {
+        this.waitingList.set(new ArrayBlockingQueue(300));
+        this.vertx = vertx;
+        this.LOCK_IDENTITY = UUID.randomUUID().toString();
+        this.solveCount = new AtomicInteger(0);
     }
 
     public static CompletableFuture initBrowserLogin(String string, Iterable iterable, String string2, CookieJar cookieJar, String string3) {
@@ -74,16 +76,14 @@ LoadableAsync {
         }
     }
 
-    @Override
-    public void initialise() {
-        logger.debug("Initialised.");
+    public Future load() {
+        return Future.succeededFuture();
     }
 
-    public LoginController(Vertx vertx) {
-        this.waitingList.set(new ArrayBlockingQueue(300));
-        this.vertx = vertx;
-        this.LOCK_IDENTITY = UUID.randomUUID().toString();
-        this.solveCount = new AtomicInteger(0);
+    public LoginFuture solve(LoginToken loginToken) {
+        LoginFuture loginFuture = new LoginFuture(loginToken);
+        if (this.waitingList.get().offer(loginFuture)) return loginFuture;
+        throw new Exception("Too many tokens to solve!!!");
     }
 
     /*
@@ -121,8 +121,12 @@ lbl18:
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public void terminate() {
+    public void initialise() {
+        logger.debug("Initialised.");
+    }
+
+    public LoginFuture pollWaitingList() {
+        this.solveCount.incrementAndGet();
+        return this.waitingList.get().take();
     }
 }
-

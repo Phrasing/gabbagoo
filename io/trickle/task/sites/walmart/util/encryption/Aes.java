@@ -1,70 +1,28 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.walmart.util.encryption;
 
 import java.util.Arrays;
 
 public class Aes {
-    public int[] c;
-    public int[] n;
+    public int[][][] tables;
     public int b;
-    public int p;
+    public int[] n;
+    public int m;
+    public int f;
     public int e;
     public int[][] key;
-    public int f;
-    public int g;
+    public int[] c;
+    public int l;
+    public int[] k;
+    public int a;
     public int o;
     public int[][] j;
-    public int a;
-    public int[][][] tables;
-    public int[][] q;
-    public int l;
+    public int g;
     public int[] h;
-    public int[] k;
-    public int m;
-
-    public int[] _crypt(int[] nArray, int n) {
-        int n2;
-        int n3;
-        if (nArray.length != 4) {
-            System.err.println("Something went wrong with crypting profile.");
-        }
-        int[] nArray2 = this.key[n];
-        int n4 = nArray[0] ^ nArray2[0];
-        int n5 = nArray[n != 0 ? 3 : 1] ^ nArray2[1];
-        int n6 = nArray[2] ^ nArray2[2];
-        int n7 = nArray[n != 0 ? 1 : 3] ^ nArray2[3];
-        int n8 = nArray2.length / 4 - 2;
-        int n9 = 4;
-        int[] nArray3 = new int[]{0, 0, 0, 0};
-        int[][] nArray4 = this.tables[n];
-        int[] nArray5 = nArray4[0];
-        int[] nArray6 = nArray4[1];
-        int[] nArray7 = nArray4[2];
-        int[] nArray8 = nArray4[3];
-        int[] nArray9 = nArray4[4];
-        for (n3 = 0; n3 < n8; n9 += 4, ++n3) {
-            n2 = nArray5[n4 >>> 24] ^ nArray6[n5 >> 16 & 0xFF] ^ nArray7[n6 >> 8 & 0xFF] ^ nArray8[n7 & 0xFF] ^ nArray2[n9];
-            int n10 = nArray5[n5 >>> 24] ^ nArray6[n6 >> 16 & 0xFF] ^ nArray7[n7 >> 8 & 0xFF] ^ nArray8[n4 & 0xFF] ^ nArray2[n9 + 1];
-            int n11 = nArray5[n6 >>> 24] ^ nArray6[n7 >> 16 & 0xFF] ^ nArray7[n4 >> 8 & 0xFF] ^ nArray8[n5 & 0xFF] ^ nArray2[n9 + 2];
-            n7 = nArray5[n7 >>> 24] ^ nArray6[n4 >> 16 & 0xFF] ^ nArray7[n5 >> 8 & 0xFF] ^ nArray8[n6 & 0xFF] ^ nArray2[n9 + 3];
-            n4 = n2;
-            n5 = n10;
-            n6 = n11;
-        }
-        n3 = 0;
-        while (n3 < 4) {
-            nArray3[n != 0 ? 3 & -n3 : n3] = nArray9[n4 >>> 24] << 24 ^ nArray9[n5 >> 16 & 0xFF] << 16 ^ nArray9[n6 >> 8 & 0xFF] << 8 ^ nArray9[n7 & 0xFF] ^ nArray2[n9++];
-            n2 = n4;
-            n4 = n5;
-            n5 = n6;
-            n6 = n7;
-            n7 = n2;
-            ++n3;
-        }
-        return nArray3;
-    }
+    public int[][] q;
+    public int p;
 
     public static int lambda$cipher$0(long l) {
         return (int)l;
@@ -130,6 +88,60 @@ public class Aes {
         return this._crypt(nArray, 0);
     }
 
+    public static long[] removeElements(long[] lArray, int n) {
+        int n2 = 0;
+        int n3 = 0;
+        while (n3 < lArray.length) {
+            if (lArray[n3] != (long)n) {
+                lArray[n2++] = lArray[n3];
+            }
+            ++n3;
+        }
+        return Arrays.copyOf(lArray, n2);
+    }
+
+    public int[] _crypt(int[] nArray, int n) {
+        int n2;
+        int n3;
+        if (nArray.length != 4) {
+            System.err.println("Something went wrong with crypting profile.");
+        }
+        int[] nArray2 = this.key[n];
+        int n4 = nArray[0] ^ nArray2[0];
+        int n5 = nArray[n != 0 ? 3 : 1] ^ nArray2[1];
+        int n6 = nArray[2] ^ nArray2[2];
+        int n7 = nArray[n != 0 ? 1 : 3] ^ nArray2[3];
+        int n8 = nArray2.length / 4 - 2;
+        int n9 = 4;
+        int[] nArray3 = new int[]{0, 0, 0, 0};
+        int[][] nArray4 = this.tables[n];
+        int[] nArray5 = nArray4[0];
+        int[] nArray6 = nArray4[1];
+        int[] nArray7 = nArray4[2];
+        int[] nArray8 = nArray4[3];
+        int[] nArray9 = nArray4[4];
+        for (n3 = 0; n3 < n8; n9 += 4, ++n3) {
+            n2 = nArray5[n4 >>> 24] ^ nArray6[n5 >> 16 & 0xFF] ^ nArray7[n6 >> 8 & 0xFF] ^ nArray8[n7 & 0xFF] ^ nArray2[n9];
+            int n10 = nArray5[n5 >>> 24] ^ nArray6[n6 >> 16 & 0xFF] ^ nArray7[n7 >> 8 & 0xFF] ^ nArray8[n4 & 0xFF] ^ nArray2[n9 + 1];
+            int n11 = nArray5[n6 >>> 24] ^ nArray6[n7 >> 16 & 0xFF] ^ nArray7[n4 >> 8 & 0xFF] ^ nArray8[n5 & 0xFF] ^ nArray2[n9 + 2];
+            n7 = nArray5[n7 >>> 24] ^ nArray6[n4 >> 16 & 0xFF] ^ nArray7[n5 >> 8 & 0xFF] ^ nArray8[n6 & 0xFF] ^ nArray2[n9 + 3];
+            n4 = n2;
+            n5 = n10;
+            n6 = n11;
+        }
+        n3 = 0;
+        while (n3 < 4) {
+            nArray3[n != 0 ? 3 & -n3 : n3] = nArray9[n4 >>> 24] << 24 ^ nArray9[n5 >> 16 & 0xFF] << 16 ^ nArray9[n6 >> 8 & 0xFF] << 8 ^ nArray9[n7 & 0xFF] ^ nArray2[n9++];
+            n2 = n4;
+            n4 = n5;
+            n5 = n6;
+            n6 = n7;
+            n7 = n2;
+            ++n3;
+        }
+        return nArray3;
+    }
+
     public Aes cipher(long[] lArray) {
         int n;
         int n2;
@@ -167,17 +179,4 @@ public class Aes {
             --n2;
         }
     }
-
-    public static long[] removeElements(long[] lArray, int n) {
-        int n2 = 0;
-        int n3 = 0;
-        while (n3 < lArray.length) {
-            if (lArray[n3] != (long)n) {
-                lArray[n2++] = lArray[n3];
-            }
-            ++n3;
-        }
-        return Arrays.copyOf(lArray, n2);
-    }
 }
-

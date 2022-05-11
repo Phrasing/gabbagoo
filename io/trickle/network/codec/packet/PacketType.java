@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.network.codec.packet;
 
@@ -10,4 +10,3 @@ public enum PacketType {
     INT_VARIABLE_SIZED;
 
 }
-

@@ -1,5 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.Types
+ *  io.trickle.task.antibot.impl.px.payload.Payload
+ *  io.trickle.task.sites.Site
  */
 package io.trickle.task.antibot.impl.px.payload;
 
@@ -11,15 +16,9 @@ import java.util.Base64;
 
 public interface ExtendedPayload
 extends Payload {
-    public String desktopString();
-
-    public static String encode(String string, String string2) {
-        return new String(Base64.getEncoder().encode("".getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
-    }
+    public String getSID();
 
     public Site getSite();
-
-    public String getUserAgent();
 
     public Types getType();
 
@@ -37,11 +36,9 @@ extends Payload {
         return stringBuilder.toString();
     }
 
-    public String toString();
-
     public String getVID();
 
-    public String getSID();
+    public String desktopString();
 
     public static String encode(String string, int n) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -52,5 +49,12 @@ extends Payload {
         }
         return new String(Base64.getEncoder().encode(stringBuilder.toString().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
     }
-}
 
+    public String toString();
+
+    public String getUserAgent();
+
+    public static String encode(String string, String string2) {
+        return new String(Base64.getEncoder().encode("".getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
+    }
+}

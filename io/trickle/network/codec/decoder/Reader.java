@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  com.auth0.jwt.JWT
@@ -27,10 +27,6 @@ import org.bouncycastle.util.encoders.Base64;
 public class Reader {
     public JWTVerifier verifier;
 
-    public static void lambda$new$0() {
-        System.exit(-3);
-    }
-
     public static Optional loadKey() {
         String string = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnR3U4yTjS2h9/fYujHDz3C58QVJE2QH1\nQCoHe0n22zg703Ac8lDo47A5LIqLs2TKB0HfRnX8NDxiT4O1Y9tuTdZZd06cV6qaHXM5C5TAc02g\nuPdFgkkoq5/3OcTVD9ExOA+SNHOBEAOyndmtaOsWYd+jhaf5lD906fS5qlNScooL0zf57t/TDK/f\nBRrU4+Rs6urQxgN6NBbqVfLQvvzB0T2fpR+vWw45MKD1h8ntF8iXbnKbbKhm59uDZ4HojxPX5oOb\nvxOqG0dK9qByA5QcOfwugxv8II8THQB8Fnc7SqoJb2nuyzFqim5agg4yyl5BODX0Kq/KJ7VwRQOi\nP9IXUQIDAQAB\n-----END PUBLIC KEY-----";
         string = string.replaceAll("\\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
@@ -42,6 +38,17 @@ public class Reader {
         catch (NoSuchAlgorithmException | InvalidKeySpecException generalSecurityException) {
             return Optional.empty();
         }
+    }
+
+    public Reader() {
+        Optional optional = Reader.loadKey();
+        if (optional.isPresent()) {
+            Algorithm algorithm = Algorithm.RSA256((RSAPublicKey)((RSAPublicKey)optional.get()), null);
+            this.verifier = JWT.require((Algorithm)algorithm).withIssuer("m66").build();
+            return;
+        }
+        CompletableFuture.runAsync(Reader::lambda$new$0);
+        throw new RuntimeException("Signing key not found");
     }
 
     public byte[] read(String string) {
@@ -57,15 +64,7 @@ public class Reader {
         }
     }
 
-    public Reader() {
-        Optional optional = Reader.loadKey();
-        if (optional.isPresent()) {
-            Algorithm algorithm = Algorithm.RSA256((RSAPublicKey)((RSAPublicKey)optional.get()), null);
-            this.verifier = JWT.require((Algorithm)algorithm).withIssuer("m66").build();
-            return;
-        }
-        CompletableFuture.runAsync(Reader::lambda$new$0);
-        throw new RuntimeException("Signing key not found");
+    public static void lambda$new$0() {
+        System.exit(-3);
     }
 }
-

@@ -1,10 +1,11 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites;
 
 public enum Site {
     UNSUPPORTED_SITE,
+    AMAZON,
     WALMART,
     WALMART_CA,
     WALMART_NEW,
@@ -14,6 +15,7 @@ public enum Site {
     HIBBETT,
     BESTBUY,
     MCT,
+    CALIF,
     BAPE,
     BAPE_US,
     WINDANDSEA,
@@ -94,6 +96,7 @@ public enum Site {
     YCMC,
     XHIBITION,
     DWAYN_TEST,
+    ENERGIE334,
     CUSTOM_SHOPIFY;
 
 
@@ -170,13 +173,7 @@ public enum Site {
             return HANON;
         }
         if (string2.contains("palace")) {
-            Site site;
-            if (string2.contains("eu")) {
-                site = PALACE_EU;
-                return site;
-            }
-            site = PALACE;
-            return site;
+            return string2.contains("eu") ? PALACE_EU : PALACE;
         }
         if (string2.contains("maniere")) {
             return A_MA_MANIERE;
@@ -194,13 +191,7 @@ public enum Site {
             return CREME;
         }
         if (string2.contains("culture")) {
-            Site site;
-            if (string2.contains("au")) {
-                site = CULTURE_KINGS_AU;
-                return site;
-            }
-            site = CULTURE_KINGS;
-            return site;
+            return string2.contains("au") ? CULTURE_KINGS_AU : CULTURE_KINGS;
         }
         if (string2.contains("human")) {
             return HUMANMADE;
@@ -304,7 +295,7 @@ public enum Site {
         if (string2.contains("atmos")) {
             return ATMOS;
         }
-        if (string2.contains("capsule")) {
+        if (string2.contains("capsule") && string2.contains("toronto")) {
             return CAPSULE;
         }
         if (string2.contains("h") && string2.contains("lorenzo")) {
@@ -362,6 +353,9 @@ public enum Site {
         if (string2.contains("xhibition")) {
             return XHIBITION;
         }
+        if (string2.contains("energie3")) {
+            return ENERGIE334;
+        }
         if (string2.contains("dwayn8080")) {
             return DWAYN_TEST;
         }
@@ -369,4 +363,3 @@ public enum Site {
         return CUSTOM_SHOPIFY;
     }
 }
-

@@ -1,7 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.network.codec.packet.Packet
+ *  io.trickle.network.codec.packet.PacketType
+ *  io.trickle.network.codec.packet.handler.LoginHandler
  *  io.vertx.core.Handler
  *  io.vertx.core.Promise
  */
@@ -16,12 +19,11 @@ import io.vertx.core.Promise;
 public interface PacketHandler {
     public static final PacketHandler[] HANDLERS = new PacketHandler[]{null, new LoginHandler()};
 
+    public void handle(Packet var1, Handler var2);
+
     public void handle(Promise var1, Packet var2);
 
     public void handle(Packet var1);
 
     public PacketType getType();
-
-    public void handle(Packet var1, Handler var2);
 }
-

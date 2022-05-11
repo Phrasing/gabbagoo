@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  org.graalvm.polyglot.Context
@@ -23,24 +23,8 @@ public class Script {
     public ThreadLocal<Context> jsCtx;
     public Source source;
 
-    public static Script fromCode(String string) {
-        try {
-            return new Script(string);
-        }
-        catch (IOException iOException) {
-            System.out.println("Error loading script: " + iOException.getMessage());
-            return null;
-        }
-    }
-
     public static Context builder() {
         return Context.newBuilder((String[])new String[0]).allowHostAccess(HostAccess.ALL).allowNativeAccess(true).allowPolyglotAccess(PolyglotAccess.ALL).build();
-    }
-
-    public Value execute(String string) {
-        Context context = this.getContext();
-        Value value = context.getBindings("js").getMember(string);
-        return value.execute(new Object[0]);
     }
 
     public String call(String string, String ... stringArray) {
@@ -49,14 +33,35 @@ public class Script {
         return value.execute((Object[])stringArray).toString();
     }
 
+    public static Script fromStream(Reader reader) {
+        try {
+            return new Script(reader);
+        }
+        catch (IOException iOException) {
+            System.out.println("Error loading script: " + iOException.getMessage());
+            return null;
+        }
+    }
+
+    public Script(String string) {
+        this.source = Source.newBuilder((String)"js", (CharSequence)string, (String)"src.js").build();
+        this.jsCtx = new ThreadLocal();
+    }
+
     public Script(Reader reader) {
         this.source = Source.newBuilder((String)"js", (Reader)reader, (String)"src.js").build();
         this.jsCtx = new ThreadLocal();
     }
 
-    public static Script fromStream(Reader reader) {
+    public Value execute(String string) {
+        Context context = this.getContext();
+        Value value = context.getBindings("js").getMember(string);
+        return value.execute(new Object[0]);
+    }
+
+    public static Script fromCode(String string) {
         try {
-            return new Script(reader);
+            return new Script(string);
         }
         catch (IOException iOException) {
             System.out.println("Error loading script: " + iOException.getMessage());
@@ -72,10 +77,4 @@ public class Script {
         this.jsCtx.set(context2);
         return this.getContext();
     }
-
-    public Script(String string) {
-        this.source = Source.newBuilder((String)"js", (CharSequence)string, (String)"src.js").build();
-        this.jsCtx = new ThreadLocal();
-    }
 }
-

@@ -1,14 +1,17 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.Task
+ *  io.trickle.util.request.Headers$Pseudo
+ *  io.trickle.webclient.TaskApiClient
  *  io.vertx.ext.web.client.HttpRequest
  *  io.vertx.ext.web.codec.BodyCodec
  */
 package io.trickle.task.sites.footlocker;
 
 import io.trickle.task.Task;
-import io.trickle.util.request.Headers$Pseudo;
+import io.trickle.util.request.Headers;
 import io.trickle.webclient.TaskApiClient;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.codec.BodyCodec;
@@ -18,9 +21,13 @@ public class FootlockerAPI
 extends TaskApiClient {
     public Task task;
 
+    public FootlockerAPI(Task task) {
+        this.task = task;
+    }
+
     public HttpRequest homePage() {
         HttpRequest httpRequest = this.client.getAbs("https://www.finishline.com/").timeout(TimeUnit.SECONDS.toMillis(15L)).as(BodyCodec.string());
-        httpRequest.putHeaders(Headers$Pseudo.MASP.get());
+        httpRequest.putHeaders(Headers.Pseudo.MASP.get());
         httpRequest.putHeader("sec-ch-ua-mobile", "?0");
         httpRequest.putHeader("Upgrade-Insecure-Requests", "1");
         httpRequest.putHeader("User-Agent", "Mozilla/5.0 (compatible; Googlebot/2.1; startmebot/1.0; +https://start.me/bot)");
@@ -33,9 +40,4 @@ extends TaskApiClient {
         httpRequest.putHeader("Accept-Language", "en-US,en;q=0.9");
         return httpRequest;
     }
-
-    public FootlockerAPI(Task task) {
-        this.task = task;
-    }
 }
-

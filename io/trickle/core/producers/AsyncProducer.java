@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.vertx.core.Future
@@ -21,12 +21,11 @@ public abstract class AsyncProducer {
         this.callback.fail(throwable);
     }
 
-    public void produce(Object object) {
-        this.callback.complete(object);
-    }
-
     public void fail(String string) {
         this.callback.fail(string);
     }
-}
 
+    public void produce(Object object) {
+        this.callback.complete(object);
+    }
+}

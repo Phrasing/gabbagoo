@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
  */
 package io.trickle.task.sites.shopify.util;
 
@@ -137,11 +140,9 @@ public class PriceHandler$1 {
         }
         try {
             PriceHandler$1.$SwitchMap$io$trickle$task$sites$Site[Site.BAPE.ordinal()] = 22;
-            return;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
     }
 }
-

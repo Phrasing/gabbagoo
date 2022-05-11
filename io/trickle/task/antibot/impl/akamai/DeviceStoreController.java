@@ -1,7 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.core.api.LoadableAsync
+ *  io.trickle.core.api.Module
+ *  io.trickle.util.Storage
  *  io.vertx.core.Future
  *  io.vertx.core.Vertx
  *  io.vertx.core.buffer.Buffer
@@ -27,30 +30,14 @@ public class DeviceStoreController
 implements Module,
 LoadableAsync {
     public JsonArray akDevices;
-    public static String AK_DEVICE_PATH = "/akDevices.json";
     public Vertx vertx;
+    public static String AK_DEVICE_PATH = "/akDevices.json";
     public static Logger logger = LogManager.getLogger(DeviceStoreController.class);
-
-    @Override
-    public void terminate() {
-        logger.debug("Terminated.");
-    }
 
     public JsonArray getAkDevices() {
         return this.akDevices;
     }
 
-    @Override
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile(Storage.CONFIG_PATH + "/akDevices.json").map(Buffer::toJsonArray).compose(this::lambda$load$0);
-    }
-
-    public DeviceStoreController(Vertx vertx) {
-        this.vertx = vertx;
-    }
-
-    @Override
     public void initialise() {
         logger.debug("Initialised");
     }
@@ -64,5 +51,17 @@ LoadableAsync {
         logger.info("Loaded {} akamai devices", (Object)this.akDevices.size());
         return Future.succeededFuture();
     }
-}
 
+    public void terminate() {
+        logger.debug("Terminated.");
+    }
+
+    public Future load() {
+        FileSystem fileSystem = this.vertx.fileSystem();
+        return fileSystem.readFile(Storage.CONFIG_PATH + "/akDevices.json").map(Buffer::toJsonArray).compose(this::lambda$load$0);
+    }
+
+    public DeviceStoreController(Vertx vertx) {
+        this.vertx = vertx;
+    }
+}

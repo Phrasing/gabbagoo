@@ -1,60 +1,46 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.payload.token.Battery$BatteryHealth
+ *  io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus
  */
 package io.trickle.task.antibot.impl.px.payload.token;
 
-import io.trickle.task.antibot.impl.px.payload.token.Battery$BatteryHealth;
-import io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus;
+import io.trickle.task.antibot.impl.px.payload.token.Battery;
 import java.util.concurrent.ThreadLocalRandom;
 
+/*
+ * Exception performing whole class analysis ignored.
+ */
 public class Battery {
-    public double voltage;
     public long lastCheckTime;
-    public float voltageVector;
-    public static float MIN_VOLT;
-    public Battery$ChargingStatus chargingStatus;
-    public String batteryHealth;
-    public static float VOLT_TO_PERCENT_RATIO;
-    public int batteryPercent;
-    public float VOLT_CONVERT_RATIO = Battery.jitter(Float.intBitsToFloat(1003713950), Float.intBitsToFloat(917327619));
-    public double temperature;
-    public String chargingMethod;
-    public static float MAX_VOLT;
     public String batteryType;
+    public static float MIN_VOLT;
+    public double voltage;
+    public ChargingStatus chargingStatus;
+    public float VOLT_CONVERT_RATIO = Battery.jitter(Float.intBitsToFloat(1003713950), Float.intBitsToFloat(917327619));
+    public String batteryHealth;
+    public float voltageVector;
+    public String chargingMethod;
+    public int batteryPercent;
+    public static float VOLT_TO_PERCENT_RATIO;
+    public double temperature;
+    public static float MAX_VOLT;
 
-    public static Battery get() {
-        String string;
-        Battery$ChargingStatus battery$ChargingStatus = Battery$ChargingStatus.get();
-        Battery$BatteryHealth battery$BatteryHealth = Battery$BatteryHealth.get();
-        String string2 = battery$BatteryHealth.toString();
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            string = "Li-ion";
-            return new Battery(string2, battery$ChargingStatus, string);
-        }
-        string = "Unknown";
-        return new Battery(string2, battery$ChargingStatus, string);
+    static {
+        MAX_VOLT = Float.intBitsToFloat(1082689629);
+        VOLT_TO_PERCENT_RATIO = Float.intBitsToFloat(1003713950);
+        MIN_VOLT = Float.intBitsToFloat(1080386962);
     }
 
-    public double getTemperature() {
-        return this.temperature;
+    public static double randTemp() {
+        return ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4033000000000000L), Double.longBitsToDouble(0x4040800000000000L));
     }
 
-    public int getBatteryPercent() {
-        return this.batteryPercent;
-    }
-
-    public String getBatteryType() {
-        return this.batteryType;
-    }
-
-    public static double roundVoltage(double d) {
-        double d2 = Math.pow(Double.longBitsToDouble(0x4024000000000000L), Double.longBitsToDouble(0x4008000000000000L));
-        return (double)Math.round(d * d2) / d2;
-    }
-
-    public Battery(String string, Battery$ChargingStatus battery$ChargingStatus, String string2) {
+    public Battery(String string, ChargingStatus chargingStatus, String string2) {
         this.batteryHealth = string;
-        this.chargingStatus = battery$ChargingStatus;
+        this.chargingStatus = chargingStatus;
         this.chargingMethod = this.chargingStatus.chargingMethod();
         this.batteryType = string2;
         this.temperature = Battery.randTemp();
@@ -64,37 +50,25 @@ public class Battery {
         this.recalculate();
     }
 
-    public static double randTemp() {
-        return ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4033000000000000L), Double.longBitsToDouble(0x4040800000000000L));
-    }
-
-    public static float randVoltage() {
-        return (float)ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(4615253599725813760L), Double.longBitsToDouble(4616489834658136064L));
-    }
-
     public void recalculate() {
         long l = System.currentTimeMillis();
         float f = (float)(l - this.lastCheckTime) / Float.intBitsToFloat(1148846080) / Float.intBitsToFloat(1114636288);
         this.lastCheckTime = l;
         this.voltage = this.chargingStatus.calculate(f, this.batteryPercent, this.voltageVector, this.voltage);
         this.batteryPercent = Math.min((int)((this.voltage - Double.longBitsToDouble(4615253599725813760L)) / (double)this.VOLT_CONVERT_RATIO), 100);
-        if (this.chargingStatus.equals((Object)Battery$ChargingStatus.CHARGING) && this.batteryPercent >= 93 + ThreadLocalRandom.current().nextInt(-3, 5)) {
-            this.chargingStatus = Battery$ChargingStatus.DISCHARGING;
+        if (this.chargingStatus.equals((Object)ChargingStatus.CHARGING) && this.batteryPercent >= 93 + ThreadLocalRandom.current().nextInt(-3, 5)) {
+            this.chargingStatus = ChargingStatus.DISCHARGING;
             this.updateValuesAfterStatusChange();
-        } else if (this.chargingStatus.equals((Object)Battery$ChargingStatus.DISCHARGING) && this.batteryPercent <= 5 + ThreadLocalRandom.current().nextInt(-4, 8)) {
-            this.chargingStatus = Battery$ChargingStatus.CHARGING;
+        } else if (this.chargingStatus.equals((Object)ChargingStatus.DISCHARGING) && this.batteryPercent <= 5 + ThreadLocalRandom.current().nextInt(-4, 8)) {
+            this.chargingStatus = ChargingStatus.CHARGING;
             this.updateValuesAfterStatusChange();
         }
         if (!ThreadLocalRandom.current().nextBoolean()) return;
-        if (this.temperature >= Double.longBitsToDouble(0x4040800000000000L)) {
-            this.temperature -= ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4014000000000000L));
-            return;
-        }
-        if (this.temperature <= Double.longBitsToDouble(0x4033000000000000L)) {
-            this.temperature += ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4014000000000000L));
-            return;
-        }
-        this.temperature += ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(-4616189618054758400L), Double.longBitsToDouble(0x3FF0000000000000L));
+        this.temperature = this.temperature >= Double.longBitsToDouble(0x4040800000000000L) ? (this.temperature -= ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4014000000000000L))) : (this.temperature <= Double.longBitsToDouble(0x4033000000000000L) ? (this.temperature += ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(0x4014000000000000L))) : (this.temperature += ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(-4616189618054758400L), Double.longBitsToDouble(0x3FF0000000000000L))));
+    }
+
+    public String getBatteryHealth() {
+        return this.batteryHealth;
     }
 
     public static double roundTemperature(double d) {
@@ -102,25 +76,44 @@ public class Battery {
         return (double)Math.round(d * d2) / d2;
     }
 
-    public String getChargingMethod() {
-        return this.chargingMethod;
+    public static float randVoltage() {
+        return (float)ThreadLocalRandom.current().nextDouble(Double.longBitsToDouble(4615253599725813760L), Double.longBitsToDouble(4616489834658136064L));
     }
 
-    public String getBatteryHealth() {
-        return this.batteryHealth;
+    public String getBatteryType() {
+        return this.batteryType;
+    }
+
+    public double getTemperature() {
+        return this.temperature;
+    }
+
+    public void updateValuesAfterStatusChange() {
+        this.voltageVector = this.chargingStatus.changeVector();
+        this.chargingMethod = this.chargingStatus.chargingMethod();
     }
 
     public String getChargingStatus() {
         return this.chargingStatus.toString();
     }
 
-    public double getVoltage() {
-        return this.voltage;
+    public String toString() {
+        return "batteryPercent=" + this.batteryPercent + "%, voltage=" + this.voltage + ", method=" + this.chargingStatus;
     }
 
-    public void updateValuesAfterStatusChange() {
-        this.voltageVector = this.chargingStatus.changeVector();
-        this.chargingMethod = this.chargingStatus.chargingMethod();
+    public static double roundVoltage(double d) {
+        double d2 = Math.pow(Double.longBitsToDouble(0x4024000000000000L), Double.longBitsToDouble(0x4008000000000000L));
+        return (double)Math.round(d * d2) / d2;
+    }
+
+    public static Battery get() {
+        ChargingStatus chargingStatus = ChargingStatus.get();
+        BatteryHealth batteryHealth = BatteryHealth.get();
+        return new Battery(batteryHealth.toString(), chargingStatus, ThreadLocalRandom.current().nextBoolean() ? "Li-ion" : "Unknown");
+    }
+
+    public int getBatteryPercent() {
+        return this.batteryPercent;
     }
 
     public static float jitter(float f, float f2) {
@@ -129,14 +122,11 @@ public class Battery {
         return f + f3;
     }
 
-    static {
-        MAX_VOLT = Float.intBitsToFloat(1082689629);
-        VOLT_TO_PERCENT_RATIO = Float.intBitsToFloat(1003713950);
-        MIN_VOLT = Float.intBitsToFloat(1080386962);
+    public double getVoltage() {
+        return this.voltage;
     }
 
-    public String toString() {
-        return "batteryPercent=" + this.batteryPercent + "%, voltage=" + this.voltage + ", method=" + this.chargingStatus;
+    public String getChargingMethod() {
+        return this.chargingMethod;
     }
 }
-

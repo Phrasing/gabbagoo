@@ -1,11 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.core.api;
 
 public interface Module {
-    public void terminate();
-
     public void initialise();
-}
 
+    public void terminate();
+}

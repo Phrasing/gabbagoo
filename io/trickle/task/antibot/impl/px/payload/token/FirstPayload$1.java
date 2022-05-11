@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
  */
 package io.trickle.task.antibot.impl.px.payload.token;
 
@@ -17,11 +20,9 @@ public class FirstPayload$1 {
         }
         try {
             FirstPayload$1.$SwitchMap$io$trickle$task$sites$Site[Site.HIBBETT.ordinal()] = 2;
-            return;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
     }
 }
-

@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.walmart.util.encryption.Aes
  */
 package io.trickle.task.sites.walmart.util.encryption;
 
@@ -9,14 +12,20 @@ public class FFX {
     public Aes aesObject;
     public static String[] alphabet = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
-    public void bnMultiply(int[] nArray, int n, int n2) {
-        int n3 = 0;
-        int n4 = nArray.length - 1;
-        while (n4 >= 0) {
-            int n5 = nArray[n4] * n2 + n3;
-            nArray[n4] = n5 % n;
-            n3 = (n5 - nArray[n4]) / n;
-            --n4;
+    public int precompb(int n, int n2) {
+        int n3 = (int)Math.ceil((double)n2 / Double.longBitsToDouble(0x4000000000000000L));
+        int n4 = 0;
+        int n5 = 1;
+        while (true) {
+            if (n3 <= 0) {
+                if (n5 <= 1) return n4;
+                ++n4;
+                return n4;
+            }
+            --n3;
+            if ((n5 *= n) < 256) continue;
+            n5 /= 256;
+            ++n4;
         }
     }
 
@@ -32,40 +41,6 @@ public class FFX {
             ++n5;
         }
         return nArray2;
-    }
-
-    public int[] digitToVal(String string, int n, int n2) {
-        int[] nArray = new int[n];
-        if (n2 == 256) {
-            int n3 = 0;
-            while (n3 < n) {
-                nArray[n3] = Character.codePointAt(string, n3);
-                ++n3;
-            }
-            return nArray;
-        }
-        int n4 = 0;
-        while (n4 < n) {
-            int n5 = Integer.parseInt(String.valueOf(string.charAt(n4)), n2);
-            if (n5 >= n2) {
-                return null;
-            }
-            nArray[n4] = n5;
-            ++n4;
-        }
-        return nArray;
-    }
-
-    public int[] precompF(Aes aes, int n, String string, int n2) {
-        int n3 = 4;
-        int[] nArray = new int[n3];
-        int n4 = string.length();
-        int n5 = 10;
-        nArray[0] = 0x1020100 | n2 >> 16 & 0xFF;
-        nArray[1] = (n2 >> 8 & 0xFF) << 24 | (n2 & 0xFF) << 16 | n5 << 8 | (int)Math.floor(n / 2) & 0xFF;
-        nArray[2] = n;
-        nArray[3] = n4;
-        return aes.encrypt(nArray);
     }
 
     public FFX(Aes aes) {
@@ -109,6 +84,69 @@ public class FFX {
         return this.convertRadix(nArray7, 2 * n8, 65536, n3, n4);
     }
 
+    public String valToDigit(int[] nArray, int n) {
+        Object object = "";
+        if (n == 256) {
+            int n2 = 0;
+            while (n2 < nArray.length) {
+                object = (String)object + Character.toString(nArray[n2]);
+                ++n2;
+            }
+            return object;
+        }
+        int n3 = 0;
+        while (n3 < nArray.length) {
+            object = (String)object + alphabet[nArray[n3]];
+            ++n3;
+        }
+        return object;
+    }
+
+    public void bnMultiply(int[] nArray, int n, int n2) {
+        int n3 = 0;
+        int n4 = nArray.length - 1;
+        while (n4 >= 0) {
+            int n5 = nArray[n4] * n2 + n3;
+            nArray[n4] = n5 % n;
+            n3 = (n5 - nArray[n4]) / n;
+            --n4;
+        }
+    }
+
+    public int[] precompF(Aes aes, int n, String string, int n2) {
+        int n3 = 4;
+        int[] nArray = new int[n3];
+        int n4 = string.length();
+        int n5 = 10;
+        nArray[0] = 0x1020100 | n2 >> 16 & 0xFF;
+        nArray[1] = (n2 >> 8 & 0xFF) << 24 | (n2 & 0xFF) << 16 | n5 << 8 | (int)Math.floor(n / 2) & 0xFF;
+        nArray[2] = n;
+        nArray[3] = n4;
+        return aes.encrypt(nArray);
+    }
+
+    public int[] digitToVal(String string, int n, int n2) {
+        int[] nArray = new int[n];
+        if (n2 == 256) {
+            int n3 = 0;
+            while (n3 < n) {
+                nArray[n3] = Character.codePointAt(string, n3);
+                ++n3;
+            }
+            return nArray;
+        }
+        int n4 = 0;
+        while (n4 < n) {
+            int n5 = Integer.parseInt(String.valueOf(string.charAt(n4)), n2);
+            if (n5 >= n2) {
+                return null;
+            }
+            nArray[n4] = n5;
+            ++n4;
+        }
+        return nArray;
+    }
+
     public int[] cbcmacq(int[] nArray, int[] nArray2, int n, Aes aes) {
         int n2;
         int n3 = 4;
@@ -125,18 +163,6 @@ public class FFX {
             n2 += n3;
         }
         return nArray3;
-    }
-
-    public void bnAdd(int[] nArray, int n, int n2) {
-        int n3 = nArray.length - 1;
-        int n4 = n2;
-        while (n3 >= 0) {
-            if (n4 <= 0) return;
-            int n5 = nArray[n3] + n4;
-            nArray[n3] = n5 % n;
-            n4 = (n5 - nArray[n3]) / n;
-            --n3;
-        }
     }
 
     public String encryptWithCipher(String string, String string2, Aes aes, int n) {
@@ -184,39 +210,15 @@ public class FFX {
         return this.valToDigit(nArray2, n) + this.valToDigit(nArray3, n);
     }
 
-    public String valToDigit(int[] nArray, int n) {
-        Object object = "";
-        if (n == 256) {
-            int n2 = 0;
-            while (n2 < nArray.length) {
-                object = (String)object + Character.toString(nArray[n2]);
-                ++n2;
-            }
-            return object;
-        }
-        int n3 = 0;
-        while (n3 < nArray.length) {
-            object = (String)object + alphabet[nArray[n3]];
-            ++n3;
-        }
-        return object;
-    }
-
-    public int precompb(int n, int n2) {
-        int n3 = (int)Math.ceil((double)n2 / Double.longBitsToDouble(0x4000000000000000L));
-        int n4 = 0;
-        int n5 = 1;
-        while (true) {
-            if (n3 <= 0) {
-                if (n5 <= 1) return n4;
-                ++n4;
-                return n4;
-            }
+    public void bnAdd(int[] nArray, int n, int n2) {
+        int n3 = nArray.length - 1;
+        int n4 = n2;
+        while (n3 >= 0) {
+            if (n4 <= 0) return;
+            int n5 = nArray[n3] + n4;
+            nArray[n3] = n5 % n;
+            n4 = (n5 - nArray[n3]) / n;
             --n3;
-            if ((n5 *= n) < 256) continue;
-            n5 /= 256;
-            ++n4;
         }
     }
 }
-

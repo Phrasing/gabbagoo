@@ -1,5 +1,11 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.Task
+ *  io.trickle.task.sites.yeezy.util.rotator.SizeZipMap
+ *  io.trickle.task.sites.yeezy.util.rotator.ZipCodeGroup
+ *  io.trickle.task.sites.yeezy.util.rotator.ZipCodes
  */
 package io.trickle.task.sites.yeezy.util.rotator;
 
@@ -14,17 +20,8 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ProfileRotator {
-    public boolean finished = false;
     public HashMap<String, SizeZipMap> keywordToSize = new HashMap();
-
-    public Optional get(String string, String string2) {
-        try {
-            return Optional.ofNullable(this.keywordToSize.get(string).getZipsOfSize(string2).get());
-        }
-        catch (Throwable throwable) {
-            return Optional.empty();
-        }
-    }
+    public boolean finished = false;
 
     public void put(Task task) {
         SizeZipMap sizeZipMap = this.keywordToSize.get(task.getKeywords()[0]);
@@ -35,16 +32,25 @@ public class ProfileRotator {
         sizeZipMap.put(task.getSize(), task.getProfile());
     }
 
+    public Optional get(String string, String string2) {
+        try {
+            return Optional.ofNullable(this.keywordToSize.get(string).getZipsOfSize(string2).get());
+        }
+        catch (Throwable throwable) {
+            return Optional.empty();
+        }
+    }
+
     public synchronized void finish() {
         if (this.finished) return;
         this.finished = true;
         Iterator<SizeZipMap> iterator = this.keywordToSize.values().iterator();
         block0: while (iterator.hasNext()) {
             SizeZipMap sizeZipMap = iterator.next();
-            Iterator<ZipCodes> iterator2 = sizeZipMap.sizeToZip.values().iterator();
+            Iterator iterator2 = sizeZipMap.sizeToZip.values().iterator();
             while (true) {
                 if (!iterator2.hasNext()) continue block0;
-                ZipCodes zipCodes = iterator2.next();
+                ZipCodes zipCodes = (ZipCodes)iterator2.next();
                 for (ZipCodeGroup zipCodeGroup : zipCodes.writeList) {
                     zipCodeGroup.finish();
                 }
@@ -73,4 +79,3 @@ public class ProfileRotator {
         return Optional.empty();
     }
 }
-

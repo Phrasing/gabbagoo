@@ -1,15 +1,20 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.yeezy.util.CodeScreen$1
+ *  io.trickle.util.concurrent.ContextCompletableFuture
  */
 package io.trickle.task.sites.yeezy.util;
 
-import io.trickle.task.sites.yeezy.util.CodeScreen$1;
+import io.trickle.task.sites.yeezy.util.CodeScreen;
 import io.trickle.util.concurrent.ContextCompletableFuture;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.concurrent.CompletableFuture;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -22,45 +27,36 @@ import javax.swing.SwingUtilities;
 public class CodeScreen
 extends JPanel
 implements ActionListener {
-    public CompletableFuture<String> result;
-    public static String SKIP = "skip";
     public static String OK = "ok";
+    public CompletableFuture<String> result;
     public JTextField inputField;
     public JFrame controllingFrame;
+    public static String SKIP = "skip";
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String string = actionEvent.getActionCommand();
-        if (!"ok".equals(string)) {
+        if ("ok".equals(string)) {
+            String string2 = this.inputField.getText();
+            if (string2 != null && !string2.isBlank()) {
+                this.result.complete(string2);
+                this.controllingFrame.dispatchEvent(new WindowEvent(this.controllingFrame, 201));
+            }
+            this.inputField.selectAll();
+            this.resetFocus();
+        } else {
             if (!"skip".equals(string)) return;
             this.result.complete("~SKIP~SKIP~");
             this.controllingFrame.dispatchEvent(new WindowEvent(this.controllingFrame, 201));
-            return;
         }
-        String string2 = this.inputField.getText();
-        if (string2 != null && !string2.isBlank()) {
-            this.result.complete(string2);
-            this.controllingFrame.dispatchEvent(new WindowEvent(this.controllingFrame, 201));
-        }
-        this.inputField.selectAll();
-        this.resetFocus();
+    }
+
+    public static void lambda$request$0(int n, String string, CompletableFuture completableFuture) {
+        CodeScreen.createAndShow(n, string, completableFuture);
     }
 
     public void resetFocus() {
         this.inputField.requestFocusInWindow();
-    }
-
-    public JComponent createButtonPanel() {
-        JPanel jPanel = new JPanel(new GridLayout(0, 1));
-        JButton jButton = new JButton("OK");
-        JButton jButton2 = new JButton("Skip");
-        jButton.setActionCommand("ok");
-        jButton2.setActionCommand("skip");
-        jButton.addActionListener(this);
-        jButton2.addActionListener(this);
-        jPanel.add(jButton);
-        jPanel.add(jButton2);
-        return jPanel;
     }
 
     public CodeScreen(JFrame jFrame, String string, CompletableFuture completableFuture) {
@@ -79,13 +75,17 @@ implements ActionListener {
         this.add(jComponent);
     }
 
+    public void close() {
+        this.controllingFrame.dispatchEvent(new WindowEvent(this.controllingFrame, 201));
+    }
+
     public static CodeScreen createAndShow(int n, String string, CompletableFuture completableFuture) {
         JFrame jFrame = new JFrame(String.format("TASK-%d || Phone: %s", n, string));
         jFrame.setDefaultCloseOperation(2);
         CodeScreen codeScreen = new CodeScreen(jFrame, string, completableFuture);
         codeScreen.setOpaque(true);
         jFrame.setContentPane(codeScreen);
-        jFrame.addWindowListener(new CodeScreen$1(codeScreen));
+        jFrame.addWindowListener((WindowListener)new 1(codeScreen));
         jFrame.pack();
         jFrame.setResizable(false);
         jFrame.setLocationRelativeTo(null);
@@ -93,18 +93,22 @@ implements ActionListener {
         return codeScreen;
     }
 
-    public void close() {
-        this.controllingFrame.dispatchEvent(new WindowEvent(this.controllingFrame, 201));
-    }
-
-    public static void lambda$request$0(int n, String string, CompletableFuture completableFuture) {
-        CodeScreen.createAndShow(n, string, completableFuture);
+    public JComponent createButtonPanel() {
+        JPanel jPanel = new JPanel(new GridLayout(0, 1));
+        JButton jButton = new JButton("OK");
+        JButton jButton2 = new JButton("Skip");
+        jButton.setActionCommand("ok");
+        jButton2.setActionCommand("skip");
+        jButton.addActionListener(this);
+        jButton2.addActionListener(this);
+        jPanel.add(jButton);
+        jPanel.add(jButton2);
+        return jPanel;
     }
 
     public static CompletableFuture request(int n, String string) {
         ContextCompletableFuture contextCompletableFuture = new ContextCompletableFuture();
-        SwingUtilities.invokeLater(() -> CodeScreen.lambda$request$0(n, string, contextCompletableFuture));
+        SwingUtilities.invokeLater(() -> CodeScreen.lambda$request$0(n, string, (CompletableFuture)contextCompletableFuture));
         return contextCompletableFuture;
     }
 }
-

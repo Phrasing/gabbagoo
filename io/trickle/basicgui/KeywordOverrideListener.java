@@ -1,5 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.core.Controller
+ *  io.trickle.core.Engine
+ *  io.trickle.task.TaskController
  */
 package io.trickle.basicgui;
 
@@ -22,14 +27,6 @@ KeyListener {
     }
 
     @Override
-    public void keyReleased(KeyEvent keyEvent) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
-    }
-
-    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String string = this.keywordField.getText();
         if (string.isBlank()) return;
@@ -38,7 +35,14 @@ KeyListener {
     }
 
     @Override
+    public void keyReleased(KeyEvent keyEvent) {
+    }
+
+    @Override
     public void keyTyped(KeyEvent keyEvent) {
     }
-}
 
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+    }
+}

@@ -1,7 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.network.codec.packet.Packet
+ *  io.trickle.network.codec.packet.PacketType
  *  io.vertx.core.Handler
  *  io.vertx.core.buffer.Buffer
  */
@@ -15,14 +17,6 @@ import io.vertx.core.buffer.Buffer;
 public class PacketEncoder
 implements Handler {
     public Handler<Buffer> bufferHandler;
-
-    public PacketEncoder(Handler handler) {
-        this.bufferHandler = handler;
-    }
-
-    public void handle(Object object) {
-        this.handle((Packet)object);
-    }
 
     public void handle(Packet packet) {
         PacketType packetType = packet.getType();
@@ -39,11 +33,17 @@ implements Handler {
             }
             buffer.appendBuffer(packet.getPayload());
             this.bufferHandler.handle((Object)buffer);
-            return;
         }
         catch (Throwable throwable) {
             throwable.printStackTrace();
         }
     }
-}
 
+    public void handle(Object object) {
+        this.handle((Packet)object);
+    }
+
+    public PacketEncoder(Handler handler) {
+        this.bufferHandler = handler;
+    }
+}

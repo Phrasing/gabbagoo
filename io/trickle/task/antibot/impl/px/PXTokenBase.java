@@ -1,5 +1,11 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.core.Controller
+ *  io.trickle.core.actor.TaskActor
+ *  io.trickle.task.antibot.impl.AntiBotServiceBase
+ *  io.trickle.webclient.ClientType
  */
 package io.trickle.task.antibot.impl.px;
 
@@ -11,19 +17,11 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class PXTokenBase
 extends AntiBotServiceBase {
-    public abstract String getSid();
-
-    public abstract boolean isTokenCaptcha();
-
-    public abstract CompletableFuture reInit();
-
-    public abstract CompletableFuture solveCaptcha(String var1, String var2);
-
     public PXTokenBase(TaskActor taskActor, ClientType clientType, Controller controller) {
         super(taskActor, clientType, controller);
     }
 
-    public abstract CompletableFuture awaitInit();
+    public abstract CompletableFuture reInit();
 
     public abstract String getVid();
 
@@ -31,8 +29,15 @@ extends AntiBotServiceBase {
         super(taskActor);
     }
 
+    public abstract boolean isTokenCaptcha();
+
+    public abstract CompletableFuture solveCaptcha(String var1, String var2);
+
     public PXTokenBase(TaskActor taskActor, ClientType clientType) {
         super(taskActor, clientType);
     }
-}
 
+    public abstract CompletableFuture awaitInit();
+
+    public abstract String getSid();
+}

@@ -1,11 +1,11 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.walmart.usa.handling;
 
 public interface Errors {
-    public static final String CHECKOUT_EXPIRED;
     public static final String BAD_SESSION;
+    public static final String CHECKOUT_EXPIRED;
     public static final String BAD_CART;
 
     static {
@@ -14,4 +14,3 @@ public interface Errors {
         BAD_SESSION = "Method Not Allowed";
     }
 }
-

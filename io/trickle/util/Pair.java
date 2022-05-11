@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.util;
 
@@ -15,4 +15,3 @@ public class Pair {
         this.second = object2;
     }
 }
-

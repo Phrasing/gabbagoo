@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.harvester.pooled.SharedHarvester
  *  io.vertx.core.Vertx
  *  io.vertx.core.shareddata.Lock
  *  org.apache.logging.log4j.LogManager
@@ -25,82 +26,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractSharedHarvesterController {
-    public static Logger logger = LogManager.getLogger(AbstractSharedHarvesterController.class);
+    public AtomicInteger counter;
     public String identity;
+    public static Logger logger = LogManager.getLogger(AbstractSharedHarvesterController.class);
     public List<SharedHarvester> harvesters = new ArrayList<SharedHarvester>();
-    public AtomicInteger counter = new AtomicInteger(0);
-
-    public abstract CompletableFuture initialise();
 
     public String allocate() {
-        String string;
         int n = this.harvesters.size();
-        if (n == 1) {
-            string = this.harvesters.get(0).id();
-            return string;
-        }
-        string = this.harvesters.get(this.counter.getAndUpdate(arg_0 -> AbstractSharedHarvesterController.lambda$allocate$0(n, arg_0))).id();
-        return string;
+        if (n != 0) return n == 1 ? this.harvesters.get(0).id() : this.harvesters.get(this.counter.getAndUpdate(arg_0 -> AbstractSharedHarvesterController.lambda$allocate$0(n, arg_0))).id();
+        throw new Exception("No harvesters available. Did you configure the harvester count correctly?");
     }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$start(AbstractSharedHarvesterController var0, CompletableFuture var1_1, Lock var2_3, int var3_5, Object var4_7) {
-        switch (var3_5) {
-            case 0: {
-                try {
-                    v0 = Vertx.currentContext().owner().sharedData().getLocalLockWithTimeout(var0.identity, TimeUnit.HOURS.toMillis(1L)).toCompletionStage().toCompletableFuture();
-                    if (!v0.isDone()) {
-                        var4_7 = v0;
-                        return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$start(io.trickle.harvester.pooled.AbstractSharedHarvesterController java.util.concurrent.CompletableFuture io.vertx.core.shareddata.Lock int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((AbstractSharedHarvesterController)var0, var4_7, null, (int)1));
-                    }
-lbl8:
-                    // 3 sources
-
-                    while (true) {
-                        var1_1 = (Lock)v0.join();
-                        try {
-                            AbstractSharedHarvesterController.logger.info("Waiting to start!");
-                            v1 = var0.initialise();
-                            if (!v1.isDone()) {
-                                var4_7 = v1;
-                                return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$start(io.trickle.harvester.pooled.AbstractSharedHarvesterController java.util.concurrent.CompletableFuture io.vertx.core.shareddata.Lock int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((AbstractSharedHarvesterController)var0, var4_7, var1_1, (int)2));
-                            }
-                            ** GOTO lbl32
-                        }
-                        catch (Throwable var2_4) {
-                            AbstractSharedHarvesterController.logger.error("Start error on harvester controller {}", (Object)var2_4.getMessage());
-                            return CompletableFuture.completedFuture(true);
-                        }
-                        finally {
-                            var1_1.release();
-                        }
-                        break;
-                    }
-                }
-                catch (Throwable var1_2) {
-                    AbstractSharedHarvesterController.logger.error("Lock error on harvester controller {}", (Object)var1_2.getMessage());
-                }
-                return CompletableFuture.completedFuture(true);
-            }
-            case 1: {
-                v0 = var1_1;
-                ** continue;
-            }
-            case 2: {
-                v1 = var1_1;
-                var1_1 = var2_3;
-lbl32:
-                // 2 sources
-
-                v1.join();
-                AbstractSharedHarvesterController.logger.info("Started!");
-                return CompletableFuture.completedFuture(true);
-            }
-        }
-        throw new IllegalArgumentException();
-    }
+    public abstract Optional shouldSwap(String var1);
 
     public CompletableFuture start() {
         try {
@@ -119,11 +56,9 @@ lbl32:
                 }
                 completableFuture3.join();
                 logger.info("Started!");
-                return CompletableFuture.completedFuture(true);
             }
             catch (Throwable throwable) {
                 logger.error("Start error on harvester controller {}", (Object)throwable.getMessage());
-                return CompletableFuture.completedFuture(true);
             }
             finally {
                 lock.release();
@@ -135,16 +70,77 @@ lbl32:
         return CompletableFuture.completedFuture(true);
     }
 
-    public abstract Optional shouldSwap(String var1);
+    public abstract CompletableFuture initialise();
+
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$start(AbstractSharedHarvesterController var0, CompletableFuture var1_1, Lock var2_3, int var3_5, Object var4_7) {
+        switch (var3_5) {
+            case 0: {
+                v0 = Vertx.currentContext().owner().sharedData().getLocalLockWithTimeout(var0.identity, TimeUnit.HOURS.toMillis(1L)).toCompletionStage().toCompletableFuture();
+                if (!v0.isDone()) {
+                    var4_7 = v0;
+                    return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$start(io.trickle.harvester.pooled.AbstractSharedHarvesterController java.util.concurrent.CompletableFuture io.vertx.core.shareddata.Lock int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((AbstractSharedHarvesterController)var0, var4_7, null, (int)1));
+                }
+lbl8:
+                // 3 sources
+
+                while (true) {
+                    var1_1 = (Lock)v0.join();
+                    try {
+                        AbstractSharedHarvesterController.logger.info("Waiting to start!");
+                        v1 = var0.initialise();
+                        if (!v1.isDone()) {
+                            var4_7 = v1;
+                            return var4_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$start(io.trickle.harvester.pooled.AbstractSharedHarvesterController java.util.concurrent.CompletableFuture io.vertx.core.shareddata.Lock int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((AbstractSharedHarvesterController)var0, var4_7, var1_1, (int)2));
+                        }
+lbl16:
+                        // 3 sources
+
+                        while (true) {
+                            v1.join();
+                            AbstractSharedHarvesterController.logger.info("Started!");
+                            ** GOTO lbl29
+                            break;
+                        }
+                    }
+                    catch (Throwable var2_4) {
+                        AbstractSharedHarvesterController.logger.error("Start error on harvester controller {}", (Object)var2_4.getMessage());
+                        ** GOTO lbl29
+                    }
+                    finally {
+                        var1_1.release();
+                    }
+                    break;
+                }
+            }
+            catch (Throwable var1_2) {
+                AbstractSharedHarvesterController.logger.error("Lock error on harvester controller {}", (Object)var1_2.getMessage());
+            }
+lbl29:
+            // 3 sources
+
+            return CompletableFuture.completedFuture(true);
+            case 1: {
+                v0 = var1_1;
+                ** continue;
+            }
+            case 2: {
+                v1 = var1_1;
+                var1_1 = var2_3;
+                ** continue;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
 
     public AbstractSharedHarvesterController() {
+        this.counter = new AtomicInteger(0);
         this.identity = "HARVESTER_MANAGER_SHARED_LOCK_" + UUID.randomUUID();
     }
 
     public static int lambda$allocate$0(int n, int n2) {
-        if (++n2 >= n) return 0;
-        int n3 = n2;
-        return n3;
+        return ++n2 < n ? n2 : 0;
     }
 }
-

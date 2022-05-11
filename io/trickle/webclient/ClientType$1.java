@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.webclient.ClientType
  *  io.vertx.core.http.HttpVersion
  *  io.vertx.ext.web.client.WebClientOptions
  */
@@ -13,7 +14,10 @@ import io.vertx.ext.web.client.WebClientOptions;
 
 public class ClientType$1
 extends ClientType {
-    @Override
+    public ClientType$1() {
+        super(string, n);
+    }
+
     public WebClientOptions options() {
         WebClientOptions webClientOptions = new WebClientOptions();
         webClientOptions.setProtocolVersion(HttpVersion.HTTP_2);
@@ -21,4 +25,3 @@ extends ClientType {
         return webClientOptions;
     }
 }
-

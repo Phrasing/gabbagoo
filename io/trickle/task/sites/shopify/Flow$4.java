@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
  */
 package io.trickle.task.sites.shopify;
 
@@ -17,11 +20,9 @@ public class Flow$4 {
         }
         try {
             Flow$4.$SwitchMap$io$trickle$task$sites$Site[Site.MCT.ordinal()] = 2;
-            return;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
     }
 }
-

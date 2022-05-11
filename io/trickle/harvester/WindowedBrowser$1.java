@@ -1,8 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  com.teamdev.jxbrowser.engine.Engine
+ *  io.trickle.harvester.WindowedBrowser
  */
 package io.trickle.harvester;
 
@@ -26,4 +27,3 @@ extends WindowAdapter {
         CompletableFuture.runAsync(() -> ((Engine)this.this$0.browserEngine).close());
     }
 }
-

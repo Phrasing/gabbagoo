@@ -1,7 +1,14 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.payload.Payload
+ *  io.trickle.task.antibot.impl.px.payload.token.Battery
+ *  io.trickle.task.antibot.impl.px.payload.token.Devices$Device
+ *  io.trickle.task.antibot.impl.px.payload.token.FirstPayload$1
+ *  io.trickle.task.antibot.impl.px.payload.token.InitPayload
+ *  io.trickle.task.antibot.impl.px.payload.token.SecondPayload
+ *  io.trickle.task.sites.Site
  *  io.vertx.core.MultiMap
  *  io.vertx.core.json.JsonArray
  *  io.vertx.core.json.JsonObject
@@ -10,8 +17,8 @@ package io.trickle.task.antibot.impl.px.payload.token;
 
 import io.trickle.task.antibot.impl.px.payload.Payload;
 import io.trickle.task.antibot.impl.px.payload.token.Battery;
-import io.trickle.task.antibot.impl.px.payload.token.Devices$Device;
-import io.trickle.task.antibot.impl.px.payload.token.FirstPayload$1;
+import io.trickle.task.antibot.impl.px.payload.token.Devices;
+import io.trickle.task.antibot.impl.px.payload.token.FirstPayload;
 import io.trickle.task.antibot.impl.px.payload.token.InitPayload;
 import io.trickle.task.antibot.impl.px.payload.token.SecondPayload;
 import io.trickle.task.sites.Site;
@@ -29,57 +36,131 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class FirstPayload
 implements Payload {
-    public int PX92;
-    public boolean PX332;
-    public String PX320;
-    public String PX421;
-    public String PX318;
-    public Battery PX415;
-    public String PX327;
-    public boolean PX337;
-    public int PX351;
-    public String PX344;
-    public String PX317;
-    public long f20430a;
-    public long f20432b;
-    public boolean PX316;
-    public boolean PX334;
     public long PX349;
-    public boolean PX336;
-    public String PX442;
-    public String PX343;
-    public JsonArray PX347;
-    public String t;
-    public Battery PX420;
-    public String PX326;
-    public Battery PX418;
-    public Battery PX419;
-    public String PX322;
-    public int PX345;
-    public String PX328;
-    public String PX319;
-    public Battery PX413;
-    public String PX330;
-    public String SID_HEADER;
-    public int PX350;
-    public String f20431a = null;
-    public boolean PX333;
-    public String VID_HEADER;
-    public Devices$Device device;
-    public long PX323;
-    public String UUIDV4_HEADER = UUID.randomUUID().toString();
-    public String PX339;
-    public Battery PX416;
-    public boolean PX331;
-    public Site SITE;
-    public boolean PX335;
     public int PX91;
-    public static char[] f18573a = "0123456789ABCDEF".toCharArray();
+    public boolean PX332;
+    public boolean PX336;
+    public String PX421;
+    public int PX350;
+    public String PX339;
+    public String SID_HEADER;
+    public boolean PX316;
     public Battery PX414;
+    public String UUIDV4_HEADER = UUID.randomUUID().toString();
+    public boolean PX337;
+    public Battery PX419;
+    public String VID_HEADER;
+    public Battery PX418;
+    public Devices.Device device;
+    public String PX442;
+    public String PX344;
+    public int PX92;
+    public JsonArray PX347;
+    public String PX330;
+    public long PX323;
+    public String PX328;
+    public String PX318;
+    public int PX351;
+    public boolean PX333;
+    public String f20431a = null;
+    public String PX322;
+    public String PX320;
+    public boolean PX335;
+    public Battery PX416;
+    public String PX319;
+    public Site SITE;
+    public String PX343;
+    public boolean PX331;
+    public int PX345;
+    public Battery PX420;
+    public static char[] f18573a = "0123456789ABCDEF".toCharArray();
+    public Battery PX413;
+    public boolean PX334;
+    public long f20430a = Long.MIN_VALUE;
+    public String PX317;
+    public String t;
+    public String PX326;
+    public String PX327;
+    public long f20432b;
+    public Battery PX415;
 
-    public FirstPayload(Devices$Device devices$Device, String string, String string2, int n, long l, Site site) {
-        this.f20430a = Long.MIN_VALUE;
-        this.device = devices$Device;
+    public void initUUIDSettings() {
+        long l;
+        new AtomicLong(Long.MIN_VALUE);
+        this.f20432b = Long.MIN_VALUE;
+        String string = null;
+        if (string != null) {
+            l = Long.parseLong(string, 16) | this.f20432b;
+        } else {
+            long l2;
+            long l3;
+            long l4;
+            byte[] byArray = this.m30012b();
+            this.f20432b = l4 = this.f20432b | (long)(byArray[0] << 24) & 0xFF000000L;
+            this.f20432b = l3 = l4 | (long)(byArray[1] << 16 & 0xFF0000);
+            this.f20432b = l2 = l3 | (long)(byArray[2] << 8 & 0xFF00);
+            l = l2 | (long)(byArray[3] & 0xFF);
+        }
+        this.f20432b = l;
+        this.f20432b |= (long)(ThreadLocalRandom.current().nextDouble() * Double.longBitsToDouble(4670232263827390464L)) << 48;
+    }
+
+    public void nextBytes(byte[] byArray) {
+        int n = 0;
+        int n2 = byArray.length;
+        block0: while (n < n2) {
+            int n3 = ThreadLocalRandom.current().nextInt();
+            int n4 = Math.min(n2 - n, 4);
+            while (true) {
+                if (n4-- <= 0) continue block0;
+                byArray[n++] = (byte)n3;
+                n3 >>= 8;
+            }
+            break;
+        }
+        return;
+    }
+
+    public FirstPayload(Devices.Device device, Site site) {
+        this(device, null, null, 1, 1L, site);
+    }
+
+    public FirstPayload(SecondPayload secondPayload, int n, long l, Site site) {
+        this(secondPayload.device, secondPayload.VID_HEADER, secondPayload.SID_HEADER, n, l, site);
+    }
+
+    public MultiMap asForm() {
+        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
+        if (this.VID_HEADER != null) {
+            multiMap.set("vid", this.VID_HEADER);
+        }
+        multiMap.set("ftag", "22");
+        multiMap.set("payload", this.getPayload());
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+            case 2: {
+                multiMap.set("appId", "PX9Qx3Rve4");
+                this.UUIDV4_HEADER = this.genTimeBasedUUID().toString();
+                break;
+            }
+            case 1: {
+                multiMap.set("appId", "PXUArm9B04");
+                break;
+            }
+        }
+        multiMap.set("tag", "mobile");
+        multiMap.set("uuid", this.UUIDV4_HEADER);
+        if (this.SID_HEADER == null) return multiMap;
+        multiMap.set("sid", this.SID_HEADER);
+        return multiMap;
+    }
+
+    public UUID genTimeBasedUUID() {
+        long l = System.currentTimeMillis() * 10000L + 122192928000000000L;
+        return new UUID(FirstPayload.m30010d(this.m30009c(l)), this.m30011a());
+    }
+
+    public FirstPayload(Devices.Device device, String string, String string2, int n, long l, Site site) {
+        this.device = device;
         this.VID_HEADER = string;
         this.SID_HEADER = string2;
         this.PX349 = l;
@@ -96,7 +177,7 @@ implements Payload {
         this.PX320 = this.device.getDeviceName();
         this.PX323 = Instant.now().getEpochSecond();
         this.initUUIDSettings();
-        switch (FirstPayload$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
             case 1: {
                 this.PX326 = UUID.randomUUID().toString();
                 this.PX327 = UUID.randomUUID().toString().split("-")[0].toUpperCase();
@@ -140,76 +221,12 @@ implements Payload {
         this.PX350 = ThreadLocalRandom.current().nextInt(1, 5);
     }
 
-    public long m30009c(long l) {
-        long l2;
-        long l3 = this.f20430a;
-        if (l > l3) {
-            this.f20430a = l;
-            return l;
-        }
-        this.f20430a = l2 = l3 + 1L;
-        return l2;
+    public String getPayload() {
+        return Base64.getEncoder().encodeToString(this.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     public long m30011a() {
         return this.f20432b;
-    }
-
-    public void initUUIDSettings() {
-        long l;
-        new AtomicLong(Long.MIN_VALUE);
-        this.f20432b = Long.MIN_VALUE;
-        String string = null;
-        if (string != null) {
-            l = Long.parseLong(string, 16) | this.f20432b;
-        } else {
-            long l2;
-            long l3;
-            long l4;
-            byte[] byArray = this.m30012b();
-            this.f20432b = l4 = this.f20432b | (long)(byArray[0] << 24) & 0xFF000000L;
-            this.f20432b = l3 = l4 | (long)(byArray[1] << 16 & 0xFF0000);
-            this.f20432b = l2 = l3 | (long)(byArray[2] << 8 & 0xFF00);
-            l = l2 | (long)(byArray[3] & 0xFF);
-        }
-        this.f20432b = l;
-        this.f20432b |= (long)(ThreadLocalRandom.current().nextDouble() * Double.longBitsToDouble(4670232263827390464L)) << 48;
-    }
-
-    public byte[] m30012b() {
-        byte[] byArray = new byte[4];
-        this.nextBytes(byArray);
-        return byArray;
-    }
-
-    @Override
-    public MultiMap asForm() {
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        if (this.VID_HEADER != null) {
-            multiMap.set("vid", this.VID_HEADER);
-        }
-        multiMap.set("ftag", "22");
-        multiMap.set("payload", this.getPayload());
-        switch (FirstPayload$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
-            case 2: {
-                multiMap.set("appId", "PX9Qx3Rve4");
-                this.UUIDV4_HEADER = this.genTimeBasedUUID().toString();
-                break;
-            }
-            case 1: {
-                multiMap.set("appId", "PXUArm9B04");
-                break;
-            }
-        }
-        multiMap.set("tag", "mobile");
-        multiMap.set("uuid", this.UUIDV4_HEADER);
-        if (this.SID_HEADER == null) return multiMap;
-        multiMap.set("sid", this.SID_HEADER);
-        return multiMap;
-    }
-
-    public String getPayload() {
-        return Base64.getEncoder().encodeToString(this.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     public static long m30010d(long l) {
@@ -248,7 +265,7 @@ implements Payload {
         jsonObject.put("PX442", (Object)this.PX442);
         jsonObject.put("PX339", (Object)this.PX339);
         jsonObject.put("PX322", (Object)this.PX322);
-        switch (FirstPayload$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
             case 2: {
                 jsonObject.put("PX340", (Object)"v1.13.2");
                 jsonObject.put("PX341", (Object)"Hibbett | City Gear");
@@ -272,16 +289,12 @@ implements Payload {
         jsonObject.put("PX415", (Object)this.PX415.getBatteryPercent());
         jsonObject.put("PX416", (Object)this.PX416.getChargingMethod());
         jsonObject.put("PX419", (Object)this.PX419.getBatteryType());
-        jsonObject.put("PX418", (Object)Battery.roundTemperature(this.PX418.getTemperature()));
-        jsonObject.put("PX420", (Object)Battery.roundVoltage(this.PX420.getVoltage()));
+        jsonObject.put("PX418", (Object)Battery.roundTemperature((double)this.PX418.getTemperature()));
+        jsonObject.put("PX420", (Object)Battery.roundVoltage((double)this.PX420.getVoltage()));
         JsonObject jsonObject2 = new JsonObject();
         jsonObject2.put("t", (Object)this.t);
         jsonObject2.put("d", (Object)jsonObject);
         return new JsonArray().add((Object)jsonObject2).encode();
-    }
-
-    public FirstPayload(Devices$Device devices$Device, Site site) {
-        this(devices$Device, null, null, 1, 1L, site);
     }
 
     public static String m4818a(byte[] byArray) {
@@ -298,8 +311,15 @@ implements Payload {
         return new String(cArray);
     }
 
-    public FirstPayload(SecondPayload secondPayload, int n, long l, Site site) {
-        this(secondPayload.device, secondPayload.VID_HEADER, secondPayload.SID_HEADER, n, l, site);
+    public long m30009c(long l) {
+        long l2;
+        long l3 = this.f20430a;
+        if (l > l3) {
+            this.f20430a = l;
+            return l;
+        }
+        this.f20430a = l2 = l3 + 1L;
+        return l2;
     }
 
     public static String m4817a(String string) {
@@ -315,29 +335,13 @@ implements Payload {
         }
     }
 
-    public void nextBytes(byte[] byArray) {
-        int n = 0;
-        int n2 = byArray.length;
-        block0: while (n < n2) {
-            int n3 = ThreadLocalRandom.current().nextInt();
-            int n4 = Math.min(n2 - n, 4);
-            while (true) {
-                if (n4-- <= 0) continue block0;
-                byArray[n++] = (byte)n3;
-                n3 >>= 8;
-            }
-            break;
-        }
-        return;
+    public byte[] m30012b() {
+        byte[] byArray = new byte[4];
+        this.nextBytes(byArray);
+        return byArray;
     }
 
     public FirstPayload(InitPayload initPayload, Site site) {
         this(initPayload.device, site);
     }
-
-    public UUID genTimeBasedUUID() {
-        long l = System.currentTimeMillis() * 10000L + 122192928000000000L;
-        return new UUID(FirstPayload.m30010d(this.m30009c(l)), this.m30011a());
-    }
 }
-

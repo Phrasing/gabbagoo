@@ -1,19 +1,24 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.payload.token.Devices
+ *  io.trickle.task.antibot.impl.px.payload.token.Devices$Device
+ *  io.trickle.task.antibot.impl.px.payload.token.Devices$DeviceImpl
  */
 package io.trickle.task.antibot.impl.px.payload.token;
 
 import io.trickle.task.antibot.impl.px.payload.token.Devices;
-import io.trickle.task.antibot.impl.px.payload.token.Devices$Device;
-import io.trickle.task.antibot.impl.px.payload.token.Devices$DeviceImpl;
 
 public class Devices$17
 extends Devices {
-    @Override
-    public Devices$Device get() {
-        Devices$DeviceImpl devices$DeviceImpl = new Devices$DeviceImpl(1080, 2400, "4.14.190-perf-20962855-abA725FXXU1AUB4", "SM-A725F", "samsung", 30);
-        devices$DeviceImpl.disableEthernet();
-        return devices$DeviceImpl;
+    public Devices$17() {
+        super(string, n);
+    }
+
+    public Devices.Device get() {
+        Devices.DeviceImpl deviceImpl = new Devices.DeviceImpl(1080, 2400, "4.14.190-perf-20962855-abA725FXXU1AUB4", "SM-A725F", "samsung", 30);
+        deviceImpl.disableEthernet();
+        return deviceImpl;
     }
 }
-

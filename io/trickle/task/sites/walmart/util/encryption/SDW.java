@@ -1,5 +1,10 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.walmart.util.encryption.Aes
+ *  io.trickle.task.sites.walmart.util.encryption.CMAC
+ *  io.trickle.task.sites.walmart.util.encryption.Encryptor
  */
 package io.trickle.task.sites.walmart.util.encryption;
 
@@ -10,6 +15,10 @@ import io.trickle.task.sites.walmart.util.encryption.Encryptor;
 public class SDW {
     public Aes aes;
     public static String HEX = "0123456789abcdef";
+
+    public SDW(Aes aes) {
+        this.aes = aes;
+    }
 
     public String reformat(String string, String string2) {
         Object object = "";
@@ -27,13 +36,9 @@ public class SDW {
         return object;
     }
 
-    public SDW(Aes aes) {
-        this.aes = aes;
-    }
-
     public String integrity(String string, String string2, String string3) {
         String string4 = Character.toString(0) + Character.toString(string2.length()) + string2 + Character.toString(0) + Character.toString(string3.length()) + string3;
-        long[] lArray = Encryptor.hexToWords(string);
+        long[] lArray = Encryptor.hexToWords((String)string);
         lArray[3] = lArray[3] ^ 1L;
         Aes aes = this.aes.cipher(lArray);
         CMAC cMAC = new CMAC();
@@ -54,15 +59,7 @@ public class SDW {
         int n3 = this.luhn(string);
         n3 = n3 < n2 ? (n3 += 10 - n2) : (n3 -= n2);
         if (n3 == 0) return string;
-        if ((string.length() - n) % 2 != 0) {
-            n3 = 10 - n3;
-            return string.substring(0, n) + n3 + string.substring(n + 1);
-        }
-        if (n3 % 2 == 0) {
-            n3 = 5 - n3 / 2;
-            return string.substring(0, n) + n3 + string.substring(n + 1);
-        }
-        n3 = (9 - n3) / 2 + 5;
+        n3 = (string.length() - n) % 2 != 0 ? 10 - n3 : (n3 % 2 == 0 ? 5 - n3 / 2 : (9 - n3) / 2 + 5);
         return string.substring(0, n) + n3 + string.substring(n + 1);
     }
 
@@ -80,4 +77,3 @@ public class SDW {
         return n2 % 10;
     }
 }
-

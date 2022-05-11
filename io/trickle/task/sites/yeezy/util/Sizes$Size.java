@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.yeezy.util;
 
@@ -32,21 +32,16 @@ public enum Sizes$Size {
 
     public String text;
 
+    public String toString() {
+        return this.text;
+    }
+
     /*
      * WARNING - Possible parameter corruption
      * WARNING - void declaration
      */
     public Sizes$Size() {
         void var3_1;
-        if (var3_1.contains("_")) {
-            this.text = var3_1;
-            return;
-        }
-        this.text = "_" + (String)var3_1;
-    }
-
-    public String toString() {
-        return this.text;
+        this.text = var3_1.contains("_") ? var3_1 : "_" + (String)var3_1;
     }
 }
-

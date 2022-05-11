@@ -1,7 +1,13 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.core.Controller
+ *  io.trickle.core.Engine
+ *  io.trickle.core.api.LoadableAsync
+ *  io.trickle.core.api.Module
+ *  io.trickle.harvester.CaptchaToken
+ *  io.trickle.harvester.SolveFuture
  *  io.vertx.core.Future
  *  org.apache.logging.log4j.LogManager
  *  org.apache.logging.log4j.Logger
@@ -14,8 +20,6 @@ import io.trickle.core.api.LoadableAsync;
 import io.trickle.core.api.Module;
 import io.trickle.harvester.CaptchaToken;
 import io.trickle.harvester.SolveFuture;
-import io.trickle.webclient.CookieJar;
-import io.trickle.webclient.RealClient;
 import io.vertx.core.Future;
 import java.lang.invoke.LambdaMetafactory;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -29,47 +33,20 @@ import org.apache.logging.log4j.Logger;
 public class TokenController
 implements Module,
 LoadableAsync {
-    public static Logger logger = LogManager.getLogger(TokenController.class);
-    public AtomicInteger solveCount;
     public AtomicReference<ArrayBlockingQueue<SolveFuture>> waitingList = new AtomicReference();
+    public AtomicInteger solveCount;
+    public static Logger logger = LogManager.getLogger(TokenController.class);
 
     public TokenController() {
         this.waitingList.set(new ArrayBlockingQueue(1500));
         this.solveCount = new AtomicInteger(0);
     }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$solveCaptcha(String var0, int var1_1, Iterable var2_2, String var3_3, CookieJar var4_4, RealClient var5_5, CaptchaToken var6_6, SolveFuture var7_8, SolveFuture var8_9, int var9_10, Object var10_11) {
-        switch (var9_10) {
-            case 0: {
-                try {
-                    TokenController.logger.info("Captcha needs solving");
-                    var6_6 = new CaptchaToken(var0, (boolean)var1_1, var2_2, var3_3, var4_4, null, var5_5);
-                    var7_8 = ((TokenController)Engine.get().getModule(Controller.TOKEN)).solve(var6_6);
-                    v0 = var7_8;
-                    if (!v0.toCompletableFuture().isDone()) {
-                        var8_9 = v0;
-                        return var8_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(java.lang.String int java.lang.Iterable java.lang.String io.trickle.webclient.CookieJar io.trickle.webclient.RealClient io.trickle.harvester.CaptchaToken io.trickle.harvester.SolveFuture io.trickle.harvester.SolveFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((String)var0, (int)var1_1, (Iterable)var2_2, (String)var3_3, (CookieJar)var4_4, (RealClient)var5_5, (CaptchaToken)var6_6, (SolveFuture)var7_8, (SolveFuture)var8_9, (int)1)).toCompletableFuture();
-                    }
-                    ** GOTO lbl17
-                }
-                catch (Throwable var6_7) {
-                    TokenController.logger.error("HARVEST ERR: {}", (Object)var6_7.getMessage());
-                    return CompletableFuture.completedFuture(null);
-                }
-            }
-            case 1: {
-                v0 = var8_9;
-lbl17:
-                // 2 sources
+    public void initialise() {
+        logger.debug("Initialised.");
+    }
 
-                v0.toCompletableFuture().join();
-                return CompletableFuture.completedFuture(var6_6.getToken());
-            }
-        }
-        throw new IllegalArgumentException();
+    public void terminate() {
     }
 
     public SolveFuture solve(CaptchaToken captchaToken) {
@@ -83,23 +60,18 @@ lbl17:
         return this.waitingList.get().take();
     }
 
-    @Override
-    public void initialise() {
-        logger.debug("Initialised.");
-    }
-
-    public static CompletableFuture solveCaptcha(String string, boolean bl, Iterable iterable, String string2, CookieJar cookieJar, RealClient realClient) {
+    public static CompletableFuture solveBasicCaptcha(String string) {
         try {
             SolveFuture solveFuture;
             logger.info("Captcha needs solving");
-            CaptchaToken captchaToken = new CaptchaToken(string, bl, iterable, string2, cookieJar, null, realClient);
+            CaptchaToken captchaToken = new CaptchaToken(string);
             SolveFuture solveFuture2 = solveFuture = ((TokenController)Engine.get().getModule(Controller.TOKEN)).solve(captchaToken);
             if (!solveFuture2.toCompletableFuture().isDone()) {
                 SolveFuture solveFuture3 = solveFuture2;
-                return solveFuture3.exceptionally(Function.identity()).thenCompose(arg_0 -> TokenController.async$solveCaptcha(string, (int)(bl ? 1 : 0), iterable, string2, cookieJar, realClient, captchaToken, solveFuture, solveFuture3, 1, arg_0)).toCompletableFuture();
+                return solveFuture3.exceptionally(Function.identity()).thenCompose(arg_0 -> TokenController.async$solveBasicCaptcha(string, captchaToken, solveFuture, solveFuture3, 1, arg_0)).toCompletableFuture();
             }
             solveFuture2.toCompletableFuture().join();
-            return CompletableFuture.completedFuture(captchaToken.getToken());
+            return CompletableFuture.completedFuture(captchaToken);
         }
         catch (Throwable throwable) {
             logger.error("HARVEST ERR: {}", (Object)throwable.getMessage());
@@ -107,13 +79,41 @@ lbl17:
         }
     }
 
-    @Override
     public Future load() {
         return Future.succeededFuture();
     }
 
-    @Override
-    public void terminate() {
+    /*
+     * Unable to fully structure code
+     */
+    public static CompletableFuture async$solveBasicCaptcha(String var0, CaptchaToken var1_1, SolveFuture var2_3, SolveFuture var3_4, int var4_5, Object var5_6) {
+        switch (var4_5) {
+            case 0: {
+                try {
+                    TokenController.logger.info("Captcha needs solving");
+                    var1_1 = new CaptchaToken(var0);
+                    var2_3 = ((TokenController)Engine.get().getModule(Controller.TOKEN)).solve(var1_1);
+                    v0 = var2_3;
+                    if (!v0.toCompletableFuture().isDone()) {
+                        var3_4 = v0;
+                        return var3_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveBasicCaptcha(java.lang.String io.trickle.harvester.CaptchaToken io.trickle.harvester.SolveFuture io.trickle.harvester.SolveFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((String)var0, (CaptchaToken)var1_1, (SolveFuture)var2_3, (SolveFuture)var3_4, (int)1)).toCompletableFuture();
+                    }
+                    ** GOTO lbl17
+                }
+                catch (Throwable var1_2) {
+                    TokenController.logger.error("HARVEST ERR: {}", (Object)var1_2.getMessage());
+                    return CompletableFuture.completedFuture(null);
+                }
+            }
+            case 1: {
+                v0 = var3_4;
+lbl17:
+                // 2 sources
+
+                v0.toCompletableFuture().join();
+                return CompletableFuture.completedFuture(var1_1);
+            }
+        }
+        throw new IllegalArgumentException();
     }
 }
-

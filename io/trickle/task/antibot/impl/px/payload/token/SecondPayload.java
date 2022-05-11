@@ -1,7 +1,13 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.payload.Payload
+ *  io.trickle.task.antibot.impl.px.payload.token.Battery
+ *  io.trickle.task.antibot.impl.px.payload.token.Devices$Device
+ *  io.trickle.task.antibot.impl.px.payload.token.FirstPayload
+ *  io.trickle.task.antibot.impl.px.payload.token.SecondPayload$1
+ *  io.trickle.task.sites.Site
  *  io.vertx.core.MultiMap
  *  io.vertx.core.json.JsonArray
  *  io.vertx.core.json.JsonObject
@@ -12,9 +18,9 @@ package io.trickle.task.antibot.impl.px.payload.token;
 
 import io.trickle.task.antibot.impl.px.payload.Payload;
 import io.trickle.task.antibot.impl.px.payload.token.Battery;
-import io.trickle.task.antibot.impl.px.payload.token.Devices$Device;
+import io.trickle.task.antibot.impl.px.payload.token.Devices;
 import io.trickle.task.antibot.impl.px.payload.token.FirstPayload;
-import io.trickle.task.antibot.impl.px.payload.token.SecondPayload$1;
+import io.trickle.task.antibot.impl.px.payload.token.SecondPayload;
 import io.trickle.task.sites.Site;
 import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonArray;
@@ -28,40 +34,40 @@ import org.apache.logging.log4j.Logger;
 
 public class SecondPayload
 implements Payload {
-    public String SID_HEADER;
-    public Devices.Device device;
-    public Battery PX415;
-    public Battery PX420;
-    public String PX257;
-    public String VID_HEADER;
-    public long PX349;
-    public int sdkInitCount;
-    public String PX344;
-    public int PX204;
-    public String PX322;
     public String PX320;
-    public static Logger logger = LogManager.getLogger(SecondPayload.class);
-    public Battery PX414;
-    public Site SITE;
-    public String PX339;
-    public String PX256;
-    public String[] responseValues;
-    public Battery PX413;
-    public Battery PX419;
-    public Battery PX416;
-    public Battery PX418;
-    public long PX259;
-    public String t;
-    public String UUIDV4_HEADER;
-    public String PX343;
     public JsonArray PX347;
+    public String PX257;
+    public int PX204;
+    public Battery PX418;
+    public String PX256;
+    public Battery PX414;
+    public String PX344;
+    public static Logger logger = LogManager.getLogger(SecondPayload.class);
+    public Battery PX419;
+    public long PX349;
+    public Battery PX415;
+    public String[] responseValues;
+    public String PX343;
+    public Battery PX420;
+    public String PX339;
+    public String UUIDV4_HEADER;
+    public Devices.Device device;
+    public Battery PX416;
+    public String t;
+    public String PX322;
+    public String VID_HEADER;
+    public Site SITE;
+    public int sdkInitCount;
+    public long PX259;
+    public String SID_HEADER;
+    public Battery PX413;
 
     public MultiMap asKeepAliveForm() {
         MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
         multiMap.set("vid", this.VID_HEADER);
         multiMap.set("ftag", "22");
         multiMap.set("payload", this.getKeepAlivePayload());
-        switch (SecondPayload$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
             case 1: {
                 multiMap.set("appId", "PX9Qx3Rve4");
                 break;
@@ -77,23 +83,57 @@ implements Payload {
         return multiMap;
     }
 
-    public String getKeepAlivePayload() {
-        return Base64.getEncoder().encodeToString(this.toStringFollowUpRequests().getBytes(StandardCharsets.UTF_8));
-    }
-
     public int m4765a(int n, int n2, int n3, int n4, int n5, int n6) {
         int n7 = SecondPayload.m4764a(n, n2, n4, n6);
         int n8 = SecondPayload.m4764a(n7, n3, n5, n6);
         return n8 ^ this.m4767d();
     }
 
-    public void updatePX349(long l) {
-        this.PX349 = l;
+    public long parseAppc2Timestamp() {
+        return Long.parseLong(this.responseValues[1]);
     }
 
-    public int m4766a(byte[] byArray) {
-        if (byArray.length >= 4) return ByteBuffer.wrap(byArray).getInt();
-        return 0;
+    public String getKeepAlivePayload() {
+        return Base64.getEncoder().encodeToString(this.toStringFollowUpRequests().getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String toStringFollowUpRequests() {
+        JsonObject jsonObject = new JsonObject();
+        JsonObject jsonObject2 = new JsonObject();
+        this.PX413.recalculate();
+        jsonObject2.put("PX349", (Object)this.PX349);
+        jsonObject2.put("PX204", (Object)(++this.PX204));
+        jsonObject2.put("PX339", (Object)this.PX339);
+        jsonObject2.put("PX322", (Object)this.PX322);
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+            case 1: {
+                jsonObject2.put("PX340", (Object)"v1.13.2");
+                jsonObject2.put("PX341", (Object)"Hibbett | City Gear");
+                jsonObject2.put("PX342", (Object)"4.15.0");
+                jsonObject2.put("PX348", (Object)"com.hibbett.android");
+                break;
+            }
+            case 2: {
+                jsonObject2.put("PX340", (Object)"v1.8.0");
+                jsonObject2.put("PX341", (Object)"Walmart");
+                jsonObject2.put("PX342", (Object)"21.12");
+                jsonObject2.put("PX348", (Object)"com.walmart.android");
+                break;
+            }
+        }
+        jsonObject2.put("PX343", (Object)this.PX343);
+        jsonObject2.put("PX344", (Object)this.PX344);
+        jsonObject2.put("PX347", (Object)this.PX347);
+        jsonObject2.put("PX413", (Object)this.PX413.getBatteryHealth());
+        jsonObject2.put("PX414", (Object)this.PX414.getChargingStatus());
+        jsonObject2.put("PX415", (Object)this.PX415.getBatteryPercent());
+        jsonObject2.put("PX416", (Object)this.PX416.getChargingMethod());
+        jsonObject2.put("PX419", (Object)this.PX419.getBatteryType());
+        jsonObject2.put("PX418", (Object)Battery.roundTemperature((double)this.PX418.getTemperature()));
+        jsonObject2.put("PX420", (Object)Battery.roundVoltage((double)this.PX420.getVoltage()));
+        jsonObject.put("t", (Object)"PX325");
+        jsonObject.put("d", (Object)jsonObject2);
+        return new JsonArray().add((Object)jsonObject).encode();
     }
 
     public String toString() {
@@ -106,7 +146,7 @@ implements Payload {
         jsonObject2.put("PX257", (Object)this.PX257);
         jsonObject2.put("PX339", (Object)this.PX339);
         jsonObject2.put("PX322", (Object)this.PX322);
-        switch (SecondPayload$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
             case 1: {
                 jsonObject2.put("PX340", (Object)"v1.13.2");
                 jsonObject2.put("PX341", (Object)"Hibbett | City Gear");
@@ -130,28 +170,33 @@ implements Payload {
         jsonObject2.put("PX415", (Object)this.PX415.getBatteryPercent());
         jsonObject2.put("PX416", (Object)this.PX416.getChargingMethod());
         jsonObject2.put("PX419", (Object)this.PX419.getBatteryType());
-        jsonObject2.put("PX418", (Object)Battery.roundTemperature(this.PX418.getTemperature()));
-        jsonObject2.put("PX420", (Object)Battery.roundVoltage(this.PX420.getVoltage()));
+        jsonObject2.put("PX418", (Object)Battery.roundTemperature((double)this.PX418.getTemperature()));
+        jsonObject2.put("PX420", (Object)Battery.roundVoltage((double)this.PX420.getVoltage()));
         jsonObject.put("t", (Object)this.t);
         jsonObject.put("d", (Object)jsonObject2);
         return new JsonArray().add((Object)jsonObject).encode();
+    }
+
+    public String parseAppc2PX256() {
+        return this.responseValues[2];
     }
 
     public String getPayload() {
         return Base64.getEncoder().encodeToString(this.toString().getBytes(StandardCharsets.UTF_8));
     }
 
-    public long parseAppc2Timestamp() {
-        return Long.parseLong(this.responseValues[1]);
+    public int m4767d() {
+        byte[] byArray = new byte[4];
+        byArray = this.PX320.getBytes(StandardCharsets.UTF_8);
+        return this.m4766a(byArray);
     }
 
-    @Override
     public MultiMap asForm() {
         MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
         multiMap.set("vid", this.VID_HEADER);
         multiMap.set("ftag", "22");
         multiMap.set("payload", this.getPayload());
-        switch (SecondPayload$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
+        switch (1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
             case 1: {
                 multiMap.set("appId", "PX9Qx3Rve4");
                 break;
@@ -167,43 +212,8 @@ implements Payload {
         return multiMap;
     }
 
-    public String toStringFollowUpRequests() {
-        JsonObject jsonObject = new JsonObject();
-        JsonObject jsonObject2 = new JsonObject();
-        this.PX413.recalculate();
-        jsonObject2.put("PX349", (Object)this.PX349);
-        jsonObject2.put("PX204", (Object)(++this.PX204));
-        jsonObject2.put("PX339", (Object)this.PX339);
-        jsonObject2.put("PX322", (Object)this.PX322);
-        switch (SecondPayload$1.$SwitchMap$io$trickle$task$sites$Site[this.SITE.ordinal()]) {
-            case 1: {
-                jsonObject2.put("PX340", (Object)"v1.13.2");
-                jsonObject2.put("PX341", (Object)"Hibbett | City Gear");
-                jsonObject2.put("PX342", (Object)"4.15.0");
-                jsonObject2.put("PX348", (Object)"com.hibbett.android");
-                break;
-            }
-            case 2: {
-                jsonObject2.put("PX340", (Object)"v1.8.0");
-                jsonObject2.put("PX341", (Object)"Walmart");
-                jsonObject2.put("PX342", (Object)"21.12");
-                jsonObject2.put("PX348", (Object)"com.walmart.android");
-                break;
-            }
-        }
-        jsonObject2.put("PX343", (Object)this.PX343);
-        jsonObject2.put("PX344", (Object)this.PX344);
-        jsonObject2.put("PX347", (Object)this.PX347);
-        jsonObject2.put("PX413", (Object)this.PX413.getBatteryHealth());
-        jsonObject2.put("PX414", (Object)this.PX414.getChargingStatus());
-        jsonObject2.put("PX415", (Object)this.PX415.getBatteryPercent());
-        jsonObject2.put("PX416", (Object)this.PX416.getChargingMethod());
-        jsonObject2.put("PX419", (Object)this.PX419.getBatteryType());
-        jsonObject2.put("PX418", (Object)Battery.roundTemperature(this.PX418.getTemperature()));
-        jsonObject2.put("PX420", (Object)Battery.roundVoltage(this.PX420.getVoltage()));
-        jsonObject.put("t", (Object)"PX325");
-        jsonObject.put("d", (Object)jsonObject2);
-        return new JsonArray().add((Object)jsonObject).encode();
+    public void updatePX349(long l) {
+        this.PX349 = l;
     }
 
     public SecondPayload(FirstPayload firstPayload, JsonObject jsonObject, long l, Site site) {
@@ -246,14 +256,9 @@ implements Payload {
         this.PX420 = firstPayload.PX420;
     }
 
-    public int m4767d() {
-        byte[] byArray = new byte[4];
-        byArray = this.PX320.getBytes(StandardCharsets.UTF_8);
-        return this.m4766a(byArray);
-    }
-
-    public String parseAppc2PX256() {
-        return this.responseValues[2];
+    public int m4766a(byte[] byArray) {
+        if (byArray.length >= 4) return ByteBuffer.wrap(byArray).getInt();
+        return 0;
     }
 
     public static int m4764a(int n, int n2, int n3, int n4) {
@@ -297,4 +302,3 @@ implements Payload {
         return -1;
     }
 }
-

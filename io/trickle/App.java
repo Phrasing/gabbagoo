@@ -1,9 +1,16 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.basicgui.BasicGUI
+ *  io.trickle.core.Engine
+ *  io.trickle.core.VertxSingleton
+ *  io.trickle.util.CommandLineHandler
+ *  io.trickle.util.ScriptEngineHelper
+ *  io.trickle.util.Utils
  *  io.vertx.core.AsyncResult
  *  org.apache.logging.log4j.LogManager
+ *  org.bouncycastle.jce.provider.BouncyCastleProvider
  *  org.conscrypt.Conscrypt
  */
 package io.trickle;
@@ -15,6 +22,7 @@ import io.trickle.util.CommandLineHandler;
 import io.trickle.util.ScriptEngineHelper;
 import io.trickle.util.Utils;
 import io.vertx.core.AsyncResult;
+import java.security.Provider;
 import java.security.Security;
 import java.util.Locale;
 import java.util.Scanner;
@@ -22,46 +30,16 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.logging.log4j.LogManager;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.conscrypt.Conscrypt;
 
 public class App {
+    public static int MINOR;
     public static BasicGUI gui;
+    public static int MAJOR;
     public static int PATCH;
     public static String SESSION_HASH;
-    public static int MINOR;
     public static Engine engine;
-    public static int MAJOR;
-
-    static {
-        PATCH = 248;
-        MAJOR = 1;
-        MINOR = 0;
-        engine = Engine.get();
-        gui = null;
-        SESSION_HASH = UUID.randomUUID().toString();
-        System.setProperty("vertx.disableHttpHeadersValidation", "true");
-        System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
-        Conscrypt.setUseEngineSocketByDefault((boolean)false);
-        Security.insertProviderAt(Conscrypt.newProvider(), 1);
-        Conscrypt.setUseEngineSocketByDefault((boolean)false);
-        System.err.close();
-        System.setErr(System.out);
-    }
-
-    public static void lambda$init$0(Throwable throwable) {
-    }
-
-    public static void lambda$waitForExit$2(AsyncResult asyncResult) {
-        if (asyncResult.succeeded()) {
-            System.out.println("Stopped engine!");
-            return;
-        }
-        if (asyncResult.cause() != null) {
-            asyncResult.cause().printStackTrace();
-            return;
-        }
-        System.out.println("Failed to close");
-    }
 
     public static void init() {
         try {
@@ -74,20 +52,10 @@ public class App {
                 // empty catch block
             }
             CommandLineHandler.greet();
-            return;
         }
         catch (Throwable throwable) {
             System.exit(1);
         }
-    }
-
-    public static void main(String[] stringArray) {
-        System.out.printf("Starting Trickle v%d.%d.%d%n", 1, 0, 248);
-        App.initRichPresence();
-        ScriptEngineHelper.test();
-        Utils.ensureBrotli();
-        App.init();
-        App.waitForExit();
     }
 
     public static void lambda$init$1() {
@@ -96,13 +64,6 @@ public class App {
         VertxSingleton.INSTANCE.get().close().onFailure(App::lambda$init$0);
         LogManager.shutdown();
         System.gc();
-    }
-
-    public static void initGui() {
-        if (gui != null) {
-            if (!gui.isClosed()) return;
-        }
-        gui = new BasicGUI();
     }
 
     public static void initRichPresence() {
@@ -135,5 +96,48 @@ public class App {
             catch (Throwable throwable) {}
         }
     }
-}
 
+    public static void main(String[] stringArray) {
+        System.out.printf("Starting Trickle v%d.%d.%d%n", 1, 0, 278);
+        App.initRichPresence();
+        ScriptEngineHelper.test();
+        Utils.ensureBrotli();
+        App.init();
+        App.waitForExit();
+    }
+
+    static {
+        PATCH = 278;
+        MAJOR = 1;
+        MINOR = 0;
+        engine = Engine.get();
+        gui = null;
+        SESSION_HASH = UUID.randomUUID().toString();
+        System.setProperty("vertx.disableHttpHeadersValidation", "true");
+        System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
+        Security.addProvider((Provider)new BouncyCastleProvider());
+        System.err.close();
+        System.setErr(System.out);
+    }
+
+    public static void lambda$waitForExit$2(AsyncResult asyncResult) {
+        if (asyncResult.succeeded()) {
+            System.out.println("Stopped engine!");
+        } else if (asyncResult.cause() != null) {
+            asyncResult.cause().printStackTrace();
+        } else {
+            System.out.println("Failed to close");
+        }
+    }
+
+    public static void initGui() {
+        if (gui != null) {
+            if (!gui.isClosed()) return;
+        }
+        gui = new BasicGUI();
+    }
+
+    public static void lambda$init$0(Throwable throwable) {
+    }
+}

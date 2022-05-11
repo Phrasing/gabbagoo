@@ -1,44 +1,120 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.akamai.pixel.Devices$Device
  *  io.vertx.core.json.JsonObject
  */
 package io.trickle.task.antibot.impl.akamai.pixel;
 
-import io.trickle.task.antibot.impl.akamai.pixel.Devices$Device;
+import io.trickle.task.antibot.impl.akamai.pixel.Devices;
 import io.vertx.core.json.JsonObject;
 
 public class Devices$DeviceImpl
-implements Devices$Device {
-    public boolean sp;
-    public int b;
-    public String lt;
-    public String ps;
-    public JsonObject sr;
-    public boolean fc;
-    public JsonObject timing;
+implements Devices.Device {
     public String fh;
     public String nap;
-    public JsonObject nav;
-    public double jsv;
-    public boolean ap;
+    public String cv;
+    public boolean fc;
     public boolean ieps;
     public JsonObject bt;
-    public String zh;
-    public boolean av;
-    public boolean fp;
-    public String cv;
     public String bp;
+    public int b;
+    public JsonObject sr;
+    public String zh;
+    public boolean fp;
+    public JsonObject timing;
     public String fonts;
-    public String br;
-    public int c;
+    public boolean av;
+    public JsonObject nav;
+    public String ps;
+    public String lt;
+    public double jsv;
     public JsonObject crc;
+    public boolean sp;
+    public String br;
     public JsonObject dp;
+    public boolean ap;
+    public int c;
 
-    @Override
-    public boolean isFc() {
-        return this.fc;
+    public String getLt() {
+        return this.lt;
+    }
+
+    public int getB() {
+        return this.b;
+    }
+
+    public boolean isAv() {
+        return this.av;
+    }
+
+    public JsonObject getNav() {
+        return this.nav;
+    }
+
+    public boolean isSp() {
+        return this.sp;
+    }
+
+    public String getFonts() {
+        return this.fonts;
+    }
+
+    public String getFh() {
+        return this.fh;
+    }
+
+    public String getBr() {
+        return this.br;
+    }
+
+    public String getZh() {
+        return this.zh;
+    }
+
+    public JsonObject getSr() {
+        return this.sr;
+    }
+
+    public String getBp() {
+        return this.bp;
+    }
+
+    public int getC() {
+        return this.c;
+    }
+
+    public JsonObject getBt() {
+        return this.bt;
+    }
+
+    public JsonObject getCrc() {
+        return this.crc;
+    }
+
+    public boolean isAp() {
+        return this.ap;
+    }
+
+    public boolean isFp() {
+        return this.fp;
+    }
+
+    public double getJsv() {
+        return this.jsv;
+    }
+
+    public JsonObject getTiming() {
+        return this.timing;
+    }
+
+    public JsonObject getDp() {
+        return this.dp;
+    }
+
+    public String getCv() {
+        return this.cv;
     }
 
     public Devices$DeviceImpl(boolean bl, JsonObject jsonObject, String string, String string2, JsonObject jsonObject2, String string3, JsonObject jsonObject3, JsonObject jsonObject4, String string4, String string5, String string6, boolean bl2, boolean bl3, String string7, boolean bl4, boolean bl5, int n, int n2, String string8, double d, JsonObject jsonObject5, JsonObject jsonObject6, String string9, boolean bl6) {
@@ -68,119 +144,19 @@ implements Devices$Device {
         this.fc = bl6;
     }
 
-    @Override
-    public boolean isAp() {
-        return this.ap;
-    }
-
-    @Override
-    public String getCv() {
-        return this.cv;
-    }
-
-    @Override
-    public String getBr() {
-        return this.br;
-    }
-
-    @Override
-    public int getB() {
-        return this.b;
-    }
-
-    @Override
-    public String getLt() {
-        return this.lt;
-    }
-
-    @Override
-    public int getC() {
-        return this.c;
-    }
-
-    @Override
-    public boolean isIeps() {
-        return this.ieps;
-    }
-
-    @Override
-    public String getNap() {
-        return this.nap;
-    }
-
-    @Override
-    public boolean isSp() {
-        return this.sp;
-    }
-
-    @Override
-    public JsonObject getTiming() {
-        return this.timing;
-    }
-
-    @Override
-    public String getZh() {
-        return this.zh;
-    }
-
-    @Override
-    public JsonObject getNav() {
-        return this.nav;
-    }
-
-    @Override
-    public String getFonts() {
-        return this.fonts;
-    }
-
-    @Override
-    public double getJsv() {
-        return this.jsv;
-    }
-
-    @Override
-    public String getBp() {
-        return this.bp;
-    }
-
-    @Override
-    public boolean isAv() {
-        return this.av;
-    }
-
-    @Override
-    public String getFh() {
-        return this.fh;
-    }
-
-    @Override
-    public boolean isFp() {
-        return this.fp;
-    }
-
-    @Override
-    public JsonObject getCrc() {
-        return this.crc;
-    }
-
-    @Override
-    public JsonObject getDp() {
-        return this.dp;
-    }
-
-    @Override
-    public JsonObject getBt() {
-        return this.bt;
-    }
-
-    @Override
     public String getPs() {
         return this.ps;
     }
 
-    @Override
-    public JsonObject getSr() {
-        return this.sr;
+    public String getNap() {
+        return this.nap;
+    }
+
+    public boolean isFc() {
+        return this.fc;
+    }
+
+    public boolean isIeps() {
+        return this.ieps;
     }
 }
-

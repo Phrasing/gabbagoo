@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.antibot.impl.px.payload.captcha.util;
 
@@ -10,10 +10,6 @@ public class Timer {
     public Stack<Integer> performanceList;
     public long creationTime = Instant.now().toEpochMilli();
 
-    public int currentPerformance() {
-        return this.performanceList.peek();
-    }
-
     public int performanceChange() {
         int n = this.performanceList.pop();
         int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
@@ -21,9 +17,16 @@ public class Timer {
         return n - n2;
     }
 
-    public int performanceNow(int n) {
-        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
-        return this.performanceList.push(n2 + n);
+    public Timer() {
+        this.performanceList = new Stack();
+    }
+
+    public int currentPerformance() {
+        return this.performanceList.peek();
+    }
+
+    public long gennedTimestamp() {
+        return this.creationTime + (long)this.totalChange();
     }
 
     public int totalChange() {
@@ -32,12 +35,8 @@ public class Timer {
         return n2 - n;
     }
 
-    public Timer() {
-        this.performanceList = new Stack();
-    }
-
-    public long gennedTimestamp() {
-        return this.creationTime + (long)this.totalChange();
+    public int performanceNow(int n) {
+        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
+        return this.performanceList.push(n2 + n);
     }
 }
-

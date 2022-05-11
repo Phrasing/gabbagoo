@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  javax.mail.BodyPart
@@ -17,11 +17,14 @@ import org.jsoup.Jsoup;
 public class MessageUtils {
     public static String getTextFromMessage(Message message) {
         String string = "";
-        if (message.isMimeType("text/plain")) return message.getContent().toString();
-        if (message.getContentType().toLowerCase().contains("text")) return message.getContent().toString();
-        if (!message.isMimeType("multipart/*")) return string;
-        MimeMultipart mimeMultipart = (MimeMultipart)message.getContent();
-        return MessageUtils.getTextFromMimeMultipart(mimeMultipart);
+        if (message.isMimeType("text/plain") || message.getContentType().toLowerCase().contains("text")) {
+            string = message.getContent().toString();
+        } else {
+            if (!message.isMimeType("multipart/*")) return string;
+            MimeMultipart mimeMultipart = (MimeMultipart)message.getContent();
+            string = MessageUtils.getTextFromMimeMultipart(mimeMultipart);
+        }
+        return string;
     }
 
     public static String getTextFromMimeMultipart(MimeMultipart mimeMultipart) {
@@ -45,4 +48,3 @@ public class MessageUtils {
         return stringBuilder.toString();
     }
 }
-

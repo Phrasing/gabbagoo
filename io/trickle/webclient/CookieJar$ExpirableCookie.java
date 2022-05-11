@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.netty.handler.codec.http.cookie.Cookie
@@ -13,12 +13,8 @@ implements Comparable {
     public Cookie wrappedCookie;
     public long expiryTime;
 
-    public int compareTo(Cookie cookie) {
-        return this.wrappedCookie.compareTo((Object)cookie);
-    }
-
-    public String toString() {
-        return "ExpirableCookie{expiryTime=" + this.expiryTime + ", wrappedCookie=" + this.wrappedCookie + "}";
+    public int compareTo(Object object) {
+        return this.compareTo((Cookie)object);
     }
 
     public void setExpiry(long l) {
@@ -26,24 +22,28 @@ implements Comparable {
         this.expiryTime = CookieJar$ExpirableCookie.getEpoch() + l;
     }
 
+    public String toString() {
+        return "ExpirableCookie{expiryTime=" + this.expiryTime + ", wrappedCookie=" + this.wrappedCookie + "}";
+    }
+
+    public int compareTo(Cookie cookie) {
+        return this.wrappedCookie.compareTo((Object)cookie);
+    }
+
     public static long getEpoch() {
         return System.currentTimeMillis() / 1000L;
     }
 
     public boolean shouldExpire() {
-        if (this.expiryTime == 0L) {
-            return false;
-        }
-        if (CookieJar$ExpirableCookie.getEpoch() < this.expiryTime) return false;
-        return true;
+        if (this.expiryTime != 0L) return CookieJar$ExpirableCookie.getEpoch() >= this.expiryTime;
+        return false;
     }
 
     public CookieJar$ExpirableCookie(Cookie cookie) {
         this.wrappedCookie = cookie;
     }
 
-    public int compareTo(Object object) {
-        return this.compareTo((Cookie)object);
+    public Cookie getWrappedCookie() {
+        return this.wrappedCookie;
     }
 }
-

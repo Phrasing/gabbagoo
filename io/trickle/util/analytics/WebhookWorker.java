@@ -1,7 +1,11 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.util.Storage
+ *  io.trickle.util.analytics.Analytics
+ *  io.trickle.util.analytics.EmbedContainer
+ *  io.trickle.util.analytics.webhook.WebhookUtils
  *  io.vertx.core.AbstractVerticle
  *  io.vertx.core.AsyncResult
  *  io.vertx.core.CompositeFuture
@@ -35,102 +39,16 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class WebhookWorker
 extends AbstractVerticle {
-    public long timerId;
-    public long NEXT_FETCH = 500L;
-    public Promise<Void> continuation;
-    public long LOOP_TIME = 10000L;
     public WebClient client;
-    public List<Map.Entry<Integer, JsonObject>> messageQueue = new ArrayList<Map.Entry<Integer, JsonObject>>();
     public Iterator<Map.Entry<Integer, JsonObject>> iterator;
-
-    public void lambda$sendWebhook$6(String string, Map.Entry entry, Promise promise, AsyncResult asyncResult) {
-        if (!asyncResult.succeeded()) return;
-        HttpResponse httpResponse = (HttpResponse)asyncResult.result();
-        if (httpResponse.statusCode() != 429) {
-            promise.tryComplete();
-            return;
-        }
-        try {
-            JsonObject jsonObject = httpResponse.bodyAsJsonObject();
-            if (!jsonObject.containsKey("retry_after")) return;
-            int n = jsonObject.getInteger("retry_after", Integer.valueOf(1000)) + 5;
-            this.vertx.setTimer((long)n, arg_0 -> this.lambda$sendWebhook$5(string, entry, promise, arg_0));
-            return;
-        }
-        catch (Exception exception) {
-            promise.tryFail((Throwable)exception);
-            return;
-        }
-    }
-
-    public void fireNext() {
-        this.vertx.setTimer(500L, this::lambda$fireNext$7);
-    }
-
-    public void lambda$scheduleNextLater$1(Long l) {
-        this.process();
-    }
-
-    public void scheduleNextLater() {
-        this.continuation = Promise.promise();
-        this.continuation.future().onComplete(this::lambda$scheduleNextLater$2);
-    }
-
-    public void lambda$fireNext$7(Long l) {
-        this.trampoline();
-    }
-
-    public void handle(Map.Entry entry) {
-        String string = (Integer)entry.getKey() != 3 ? ((Integer)entry.getKey() == 1 ? "https://webhooks.aycd.io/webhooks/api/v1/send/14890/aa27307c-00f8-4e74-a10f-626f63998187" : "https://webhooks.aycd.io/webhooks/api/v1/send/14892/e4919db9-f1c9-4f94-b796-71b93acfc116") : "https://webhooks.aycd.io/webhooks/api/v1/send/10414/b8c8e7d7-321c-4a80-acec-2c9c85acec8a";
-        CompositeFuture compositeFuture = CompositeFuture.all((Future)this.sendWebhook(string, entry), (Future)this.sendWebhook("https://webhooks.tidalmarket.com/e55301de-9d9c-11ec-82d2-42010aa80013/e55302b0-9d9c-11ec-82d2-42010aa80013/redirect", entry), (Future)this.handleUserWebhook(entry));
-        compositeFuture.onComplete(this::lambda$handle$3);
-    }
-
-    public Future sendWebhook(String string, Map.Entry entry) {
-        Promise promise = Promise.promise();
-        this.client.postAbs(string).timeout(10000L).sendJson(entry.getValue()).onComplete(arg_0 -> this.lambda$sendWebhook$6(string, entry, promise, arg_0));
-        return promise.future();
-    }
-
-    public void writeToQueue(ConcurrentLinkedDeque concurrentLinkedDeque) {
-        if (concurrentLinkedDeque.isEmpty()) return;
-        int n = 0;
-        while (!concurrentLinkedDeque.isEmpty()) {
-            if (n >= 3) return;
-            ++n;
-            EmbedContainer embedContainer = (EmbedContainer)concurrentLinkedDeque.poll();
-            if (embedContainer == null) continue;
-            JsonObject jsonObject = WebhookUtils.buildWebhook(embedContainer.webhook);
-            if (embedContainer.isMeta) {
-                this.messageQueue.add(Map.entry(3, jsonObject));
-                continue;
-            }
-            this.messageQueue.add(Map.entry(embedContainer.isSuccess ? 1 : 0, jsonObject));
-        }
-    }
-
-    public void stop() {
-        this.vertx.cancelTimer(this.timerId);
-        if (this.client != null) {
-            this.client.close();
-        }
-        super.stop();
-    }
-
-    public static void lambda$sendWebhook$4(Promise promise, AsyncResult asyncResult) {
-        if (asyncResult.succeeded()) {
-            promise.tryComplete();
-            return;
-        }
-        promise.tryFail(asyncResult.cause());
-    }
+    public Promise<Void> continuation;
+    public long NEXT_FETCH = 500L;
+    public long timerId;
+    public List<Map.Entry<Integer, JsonObject>> messageQueue = new ArrayList<Map.Entry<Integer, JsonObject>>();
+    public long LOOP_TIME = 10000L;
 
     public void lambda$sendWebhook$5(String string, Map.Entry entry, Promise promise, Long l) {
         this.sendWebhook(string, entry).onComplete(arg_0 -> WebhookWorker.lambda$sendWebhook$4(promise, arg_0));
-    }
-
-    public void lambda$start$0(Long l) {
-        this.process();
     }
 
     public void process() {
@@ -141,16 +59,47 @@ extends AbstractVerticle {
     }
 
     public void trampoline() {
-        if (!this.iterator.hasNext()) {
+        if (this.iterator.hasNext()) {
+            Map.Entry<Integer, JsonObject> entry = this.iterator.next();
+            if (entry != null) {
+                this.handle(entry);
+            }
+            this.iterator.remove();
+        } else {
             this.iterator = null;
             this.continuation.tryComplete();
-            return;
         }
-        Map.Entry<Integer, JsonObject> entry = this.iterator.next();
-        if (entry != null) {
-            this.handle(entry);
+    }
+
+    public void scheduleNextLater() {
+        this.continuation = Promise.promise();
+        this.continuation.future().onComplete(this::lambda$scheduleNextLater$2);
+    }
+
+    public void stop() {
+        this.vertx.cancelTimer(this.timerId);
+        if (this.client != null) {
+            this.client.close();
         }
-        this.iterator.remove();
+        super.stop();
+    }
+
+    public void lambda$scheduleNextLater$1(Long l) {
+        this.process();
+    }
+
+    public void handle(Map.Entry entry) {
+        String string = (Integer)entry.getKey() != 3 ? ((Integer)entry.getKey() == 1 ? "https://webhooks.aycd.io/webhooks/api/v1/send/14890/aa27307c-00f8-4e74-a10f-626f63998187" : "https://webhooks.aycd.io/webhooks/api/v1/send/14892/e4919db9-f1c9-4f94-b796-71b93acfc116") : "https://webhooks.aycd.io/webhooks/api/v1/send/10414/b8c8e7d7-321c-4a80-acec-2c9c85acec8a";
+        CompositeFuture compositeFuture = CompositeFuture.all((Future)this.sendWebhook(string, entry), (Future)this.sendWebhook("https://webhooks.tidalmarket.com/e55301de-9d9c-11ec-82d2-42010aa80013/e55302b0-9d9c-11ec-82d2-42010aa80013/redirect", entry), (Future)this.handleUserWebhook(entry));
+        compositeFuture.onComplete(this::lambda$handle$3);
+    }
+
+    public static void lambda$sendWebhook$4(Promise promise, AsyncResult asyncResult) {
+        if (asyncResult.succeeded()) {
+            promise.tryComplete();
+        } else {
+            promise.tryFail(asyncResult.cause());
+        }
     }
 
     public Future handleUserWebhook(Map.Entry entry) {
@@ -164,8 +113,36 @@ extends AbstractVerticle {
         this.vertx.setTimer(10000L, this::lambda$scheduleNextLater$1);
     }
 
-    public void lambda$handle$3(AsyncResult asyncResult) {
-        this.fireNext();
+    public void lambda$sendWebhook$6(String string, Map.Entry entry, Promise promise, AsyncResult asyncResult) {
+        if (!asyncResult.succeeded()) return;
+        HttpResponse httpResponse = (HttpResponse)asyncResult.result();
+        if (httpResponse.statusCode() == 429) {
+            try {
+                JsonObject jsonObject = httpResponse.bodyAsJsonObject();
+                if (!jsonObject.containsKey("retry_after")) return;
+                int n = jsonObject.getInteger("retry_after", Integer.valueOf(1000)) + 5;
+                this.vertx.setTimer((long)n, arg_0 -> this.lambda$sendWebhook$5(string, entry, promise, arg_0));
+            }
+            catch (Exception exception) {
+                promise.tryFail((Throwable)exception);
+            }
+        } else {
+            promise.tryComplete();
+        }
+    }
+
+    public void lambda$start$0(Long l) {
+        this.process();
+    }
+
+    public void lambda$fireNext$7(Long l) {
+        this.trampoline();
+    }
+
+    public Future sendWebhook(String string, Map.Entry entry) {
+        Promise promise = Promise.promise();
+        this.client.postAbs(string).timeout(10000L).sendJson(entry.getValue()).onComplete(arg_0 -> this.lambda$sendWebhook$6(string, entry, promise, arg_0));
+        return promise.future();
     }
 
     public void start() {
@@ -173,5 +150,29 @@ extends AbstractVerticle {
         this.client = WebClient.create((Vertx)this.vertx);
         this.timerId = this.vertx.setTimer(10000L, this::lambda$start$0);
     }
-}
 
+    public void lambda$handle$3(AsyncResult asyncResult) {
+        this.fireNext();
+    }
+
+    public void fireNext() {
+        this.vertx.setTimer(500L, this::lambda$fireNext$7);
+    }
+
+    public void writeToQueue(ConcurrentLinkedDeque concurrentLinkedDeque) {
+        if (concurrentLinkedDeque.isEmpty()) return;
+        int n = 0;
+        while (!concurrentLinkedDeque.isEmpty()) {
+            if (n >= 3) return;
+            ++n;
+            EmbedContainer embedContainer = (EmbedContainer)concurrentLinkedDeque.poll();
+            if (embedContainer == null) continue;
+            JsonObject jsonObject = WebhookUtils.buildWebhook((JsonObject[])new JsonObject[]{embedContainer.webhook});
+            if (embedContainer.isMeta) {
+                this.messageQueue.add(Map.entry(3, jsonObject));
+                continue;
+            }
+            this.messageQueue.add(Map.entry(embedContainer.isSuccess ? 1 : 0, jsonObject));
+        }
+    }
+}

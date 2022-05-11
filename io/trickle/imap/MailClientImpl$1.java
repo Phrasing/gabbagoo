@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.imap.MailClientImpl
  *  javax.mail.Message
  *  javax.mail.MessagingException
  *  javax.mail.search.SearchTerm
@@ -17,6 +18,10 @@ public class MailClientImpl$1
 extends SearchTerm {
     public MailClientImpl this$0;
 
+    public MailClientImpl$1(MailClientImpl mailClientImpl) {
+        this.this$0 = mailClientImpl;
+    }
+
     public boolean match(Message message) {
         try {
             return message.getSentDate().after(this.this$0.openTime);
@@ -25,9 +30,4 @@ extends SearchTerm {
             return false;
         }
     }
-
-    public MailClientImpl$1(MailClientImpl mailClientImpl) {
-        this.this$0 = mailClientImpl;
-    }
 }
-

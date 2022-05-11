@@ -1,44 +1,28 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
+ *  io.trickle.task.sites.shopify.Flow$1
+ *  io.trickle.task.sites.shopify.Flow$2
+ *  io.trickle.task.sites.shopify.Flow$3
+ *  io.trickle.task.sites.shopify.Flow$4
+ *  io.trickle.task.sites.shopify.Flow$Actions
  */
 package io.trickle.task.sites.shopify;
 
 import io.trickle.task.sites.Site;
-import io.trickle.task.sites.shopify.Flow$1;
-import io.trickle.task.sites.shopify.Flow$2;
-import io.trickle.task.sites.shopify.Flow$3;
-import io.trickle.task.sites.shopify.Flow$4;
-import io.trickle.task.sites.shopify.Flow$Actions;
+import io.trickle.task.sites.shopify.Flow;
 
 public class Flow
 extends Enum {
     public static /* enum */ Flow KITH;
     public static Flow[] $VALUES;
-    public static /* enum */ Flow MCT;
     public static /* enum */ Flow CUSTOM;
-
-    public static Flow[] values() {
-        return (Flow[])$VALUES.clone();
-    }
-
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public Flow() {
-        void var2_-1;
-        void var1_-1;
-    }
-
-    static {
-        CUSTOM = new Flow$1();
-        KITH = new Flow$2();
-        MCT = new Flow$3();
-        $VALUES = new Flow[]{CUSTOM, KITH, MCT};
-    }
+    public static /* enum */ Flow MCT;
 
     public static Flow getFlow(Site site) {
-        switch (Flow$4.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
+        switch (4.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
             case 1: {
                 return KITH;
             }
@@ -53,8 +37,27 @@ extends Enum {
         return Enum.valueOf(Flow.class, string);
     }
 
-    public Flow$Actions get() {
+    /*
+     * WARNING - Possible parameter corruption
+     * WARNING - void declaration
+     */
+    public Flow() {
+        void var2_-1;
+        void var1_-1;
+    }
+
+    static {
+        CUSTOM = new 1("CUSTOM", 0);
+        KITH = new 2("KITH", 1);
+        MCT = new 3("MCT", 2);
+        $VALUES = new Flow[]{CUSTOM, KITH, MCT};
+    }
+
+    public Actions get() {
         return null;
     }
-}
 
+    public static Flow[] values() {
+        return (Flow[])$VALUES.clone();
+    }
+}

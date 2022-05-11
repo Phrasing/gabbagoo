@@ -1,28 +1,34 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.account.AccountController
  *  net.openhft.hashing.LongHashFunction
  */
 package io.trickle.account;
 
 import io.trickle.account.AccountController;
-import io.trickle.task.sites.Site;
 import net.openhft.hashing.LongHashFunction;
 
 public class Account {
-    public String sessionString;
     public String cacheKey;
+    public String sessionString;
     public String user;
+    public String site;
     public String pass;
-    public Site site;
 
-    public void setSite(Site site) {
-        this.site = site;
+    public String sessionCacheKey() {
+        if (this.cacheKey != null) return this.cacheKey;
+        this.cacheKey = String.valueOf(LongHashFunction.wy_3().hashChars(this.getUser() + this.getSite()));
+        return this.cacheKey;
     }
 
-    public String getSessionString() {
-        return this.sessionString;
+    public String toString() {
+        return this.user + ":" + this.pass;
+    }
+
+    public String getPass() {
+        return this.pass;
     }
 
     public String lookupSession() {
@@ -35,16 +41,20 @@ public class Account {
         }
     }
 
-    public String toString() {
-        return this.user + ":" + this.pass;
+    public void setSite(String string) {
+        this.site = string;
     }
 
-    public static Account fromString(String string) {
-        return Account.fromArray(string.split(":"));
+    public String getSessionString() {
+        return this.sessionString;
     }
 
-    public String getPass() {
-        return this.pass;
+    public String getSite() {
+        return this.site;
+    }
+
+    public String getUser() {
+        return this.user;
     }
 
     public Account(String string, String string2) {
@@ -52,15 +62,10 @@ public class Account {
         this.pass = string2;
     }
 
-    public Account(String string, String string2, Site site) {
+    public Account(String string, String string2, String string3) {
         this.user = string;
         this.pass = string2;
-        this.site = site;
-    }
-
-    public String getSite() {
-        if (this.site != null) return this.site.name();
-        return "";
+        this.site = string3;
     }
 
     public static Account fromArray(String[] stringArray) {
@@ -68,18 +73,11 @@ public class Account {
         return new Account(stringArray[0], stringArray[1]);
     }
 
-    public String getUser() {
-        return this.user;
+    public static Account fromString(String string) {
+        return Account.fromArray(string.split(":"));
     }
 
     public void setSessionString(String string) {
         this.sessionString = string;
     }
-
-    public String sessionCacheKey() {
-        if (this.cacheKey != null) return this.cacheKey;
-        this.cacheKey = String.valueOf(LongHashFunction.wy_3().hashChars(this.getUser() + this.getSite()));
-        return this.cacheKey;
-    }
 }
-

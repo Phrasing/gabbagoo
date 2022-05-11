@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.walmart.canada;
 
@@ -9,4 +9,3 @@ public enum PaymentInstance$State {
     NO_STOCK;
 
 }
-

@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.walmart.util.encryption.Aes
  */
 package io.trickle.task.sites.walmart.util.encryption;
 
@@ -9,8 +12,7 @@ public class CMAC {
     public static int const_Rb = 135;
 
     public boolean msbNotZero(int n) {
-        if ((n | Integer.MAX_VALUE) == Integer.MAX_VALUE) return false;
-        return true;
+        return (n | Integer.MAX_VALUE) != Integer.MAX_VALUE;
     }
 
     public void leftShift(int[] nArray) {
@@ -51,4 +53,3 @@ public class CMAC {
         return aes.encrypt(nArray);
     }
 }
-

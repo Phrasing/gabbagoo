@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  com.fuzzy.aycd.autosolve.AbstractAutoSolveManager
@@ -22,7 +22,15 @@ extends AbstractAutoSolveManager {
     public void onStatusChanged(AutoSolveStatus autoSolveStatus) {
     }
 
+    public AutoSolve(String string) {
+        super(string);
+    }
+
     public void onCaptchaTokenRequestCancelled(CaptchaTokenRequest captchaTokenRequest) {
+    }
+
+    public AutoSolve(OkHttpClient.Builder builder, String string) {
+        super(builder, string);
     }
 
     public void onCaptchaTokenReceived(CaptchaToken captchaToken) {
@@ -31,13 +39,4 @@ extends AbstractAutoSolveManager {
     public Logger getLogger() {
         return super.getLogger();
     }
-
-    public AutoSolve(OkHttpClient.Builder builder, String string) {
-        super(builder, string);
-    }
-
-    public AutoSolve(String string) {
-        super(string);
-    }
 }
-

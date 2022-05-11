@@ -1,225 +1,189 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.akamai.Devices$Device
  *  io.vertx.core.json.JsonObject
  */
 package io.trickle.task.antibot.impl.akamai;
 
-import io.trickle.task.antibot.impl.akamai.Devices$Device;
+import io.trickle.task.antibot.impl.akamai.Devices;
 import io.vertx.core.json.JsonObject;
 
 public class Devices$DeviceImpl
-implements Devices$Device {
-    public String canvasFP1;
-    public int documentMode;
-    public int online;
-    public int innerWidth;
-    public String deviceMotion;
-    public String product;
+implements Devices.Device {
+    public int HTMLElement;
+    public int screenHeight;
+    public int colorDepth;
+    public int screenWidth;
+    public int mozInnerScreen;
+    public int pixelDepth;
     public int chrome;
     public String deviceOrientation;
-    public int outerWidth;
-    public int HTMLElement;
-    public int screenAvailWidth;
-    public String touchEvent;
-    public int screenWidth;
-    public int rtcPeerConnection;
-    public boolean localStorage;
-    public boolean brave;
-    public int pluginLength;
-    public int fileReader;
-    public String language;
-    public String productSub;
-    public boolean cookieEnabled;
-    public int forEach;
-    public int timezoneOffset;
-    public boolean webRTC;
     public int activeXObject;
-    public long navigatorFasSettings;
-    public String sed;
-    public boolean indexedDB;
-    public int screenAvailHeight;
-    public int colorDepth;
-    public boolean javaEnabled;
-    public String canvasFP2;
-    public int innerHeight;
-    public boolean sessionStorage;
-    public int opera;
     public JsonObject windowPerms;
-    public int pixelDepth;
-    public int screenHeight;
-    public String useragent;
-    public int battery;
-    public int vibrate;
-    public int mozInnerScreen;
-    public int doNotTrack;
+    public String productSub;
+    public String canvasFP2;
+    public boolean webRTC;
+    public int documentMode;
+    public boolean localStorage;
+    public int screenAvailHeight;
+    public boolean brave;
+    public String product;
+    public String sed;
+    public int online;
     public int installTrigger;
+    public int opera;
+    public String touchEvent;
+    public int pluginLength;
+    public int timezoneOffset;
+    public int vibrate;
+    public long navigatorFasSettings;
+    public int forEach;
+    public String useragent;
+    public int outerWidth;
+    public int fileReader;
+    public boolean sessionStorage;
+    public int doNotTrack;
+    public boolean indexedDB;
+    public int screenAvailWidth;
+    public int innerWidth;
+    public int battery;
     public String pluginInfo;
+    public int innerHeight;
+    public boolean javaEnabled;
+    public String language;
+    public String deviceMotion;
+    public String canvasFP1;
+    public boolean cookieEnabled;
+    public int rtcPeerConnection;
 
-    @Override
-    public boolean webrtcKey() {
-        return this.webRTC;
-    }
-
-    @Override
-    public boolean isJavaEnabled() {
-        return this.javaEnabled;
-    }
-
-    @Override
-    public int hasRTCPeerConnection() {
-        return this.rtcPeerConnection;
-    }
-
-    @Override
-    public int hasBattery() {
-        return this.battery;
-    }
-
-    @Override
-    public int getInnerWidth() {
-        return this.innerWidth;
-    }
-
-    @Override
-    public int getScreenAvailWidth() {
-        return this.screenAvailWidth;
-    }
-
-    @Override
-    public int hasForEach() {
-        return this.forEach;
-    }
-
-    @Override
-    public String getProductSub() {
-        return this.productSub;
-    }
-
-    @Override
-    public String getProduct() {
-        return this.product;
-    }
-
-    @Override
-    public int getScreenHeight() {
-        return this.screenHeight;
-    }
-
-    @Override
-    public int hasMozInnerScreen() {
-        return this.mozInnerScreen;
-    }
-
-    @Override
-    public String getCanvas1() {
-        return this.canvasFP1;
-    }
-
-    @Override
-    public String getTouchEvent() {
-        return this.touchEvent;
-    }
-
-    @Override
-    public int getOuterWidth() {
-        return this.outerWidth;
-    }
-
-    @Override
-    public int hasActiveXObject() {
-        return this.activeXObject;
-    }
-
-    @Override
-    public int getColorDepth() {
-        return this.colorDepth;
-    }
-
-    @Override
-    public boolean isBrave() {
-        return this.brave;
-    }
-
-    @Override
-    public String getCanvas2() {
-        return this.canvasFP2;
-    }
-
-    @Override
-    public int isOnline() {
-        return this.online;
-    }
-
-    @Override
-    public String getDeviceMotion() {
-        return this.deviceMotion;
-    }
-
-    @Override
-    public int isChrome() {
-        return this.chrome;
-    }
-
-    @Override
-    public int getPluginLength() {
-        return this.pluginLength;
-    }
-
-    @Override
-    public int getDoNotTrack() {
-        return this.doNotTrack;
-    }
-
-    @Override
-    public int isOpera() {
-        return this.opera;
-    }
-
-    @Override
-    public int getScreenAvailHeight() {
-        return this.screenAvailHeight;
-    }
-
-    @Override
     public String getSed() {
         return this.sed;
     }
 
-    @Override
+    public int getColorDepth() {
+        return this.colorDepth;
+    }
+
+    public int hasBattery() {
+        return this.battery;
+    }
+
+    public int hasInstallTrigger() {
+        return this.installTrigger;
+    }
+
+    public boolean isCookieEnabled() {
+        return this.cookieEnabled;
+    }
+
     public int getScreenWidth() {
         return this.screenWidth;
     }
 
-    @Override
-    public String getPluginInfo() {
-        return this.pluginInfo;
+    public int hasRTCPeerConnection() {
+        return this.rtcPeerConnection;
     }
 
-    @Override
-    public boolean indexedDBKey() {
-        return this.indexedDB;
+    public int hasFileReader() {
+        return this.fileReader;
     }
 
-    @Override
-    public int getDocumentMode() {
-        return this.documentMode;
-    }
-
-    @Override
-    public int hasVibrate() {
-        return this.vibrate;
-    }
-
-    @Override
     public String getUserAgent() {
         return this.useragent;
     }
 
-    @Override
+    public String getProduct() {
+        return this.product;
+    }
+
+    public int hasVibrate() {
+        return this.vibrate;
+    }
+
+    public boolean webrtcKey() {
+        return this.webRTC;
+    }
+
+    public int isOpera() {
+        return this.opera;
+    }
+
+    public int hasForEach() {
+        return this.forEach;
+    }
+
+    public boolean isJavaEnabled() {
+        return this.javaEnabled;
+    }
+
+    public String getDeviceMotion() {
+        return this.deviceMotion;
+    }
+
+    public int getScreenAvailHeight() {
+        return this.screenAvailHeight;
+    }
+
+    public boolean sessionStorageKey() {
+        return this.sessionStorage;
+    }
+
     public JsonObject getWindowPerms() {
         return this.windowPerms;
+    }
+
+    public int isOnline() {
+        return this.online;
+    }
+
+    public String getCanvas1() {
+        return this.canvasFP1;
+    }
+
+    public int getInnerHeight() {
+        return this.innerHeight;
+    }
+
+    public int getOuterWidth() {
+        return this.outerWidth;
+    }
+
+    public int getTimezoneOffset() {
+        return this.timezoneOffset;
+    }
+
+    public long getNavigatorFasSettings() {
+        return this.navigatorFasSettings;
+    }
+
+    public int getPluginLength() {
+        return this.pluginLength;
+    }
+
+    public String getCanvas2() {
+        return this.canvasFP2;
+    }
+
+    public int hasHTMLElement() {
+        return this.HTMLElement;
+    }
+
+    public boolean isBrave() {
+        return this.brave;
+    }
+
+    public boolean localStorageKey() {
+        return this.localStorage;
+    }
+
+    public int getPixelDepth() {
+        return this.pixelDepth;
+    }
+
+    public String getDeviceOrientation() {
+        return this.deviceOrientation;
     }
 
     public Devices$DeviceImpl(int n, int n2, int n3, int n4, int n5, int n6, int n7, String string, String string2, String string3, boolean bl, int n8, int n9, int n10, int n11, int n12, int n13, int n14, int n15, int n16, int n17, int n18, int n19, int n20, int n21, String string4, String string5, String string6, String string7, long l, String string8, int n22, int n23, boolean bl2, boolean bl3, int n24, String string9, String string10, String string11, boolean bl4, boolean bl5, boolean bl6, int n25, boolean bl7, String string12) {
@@ -270,64 +234,55 @@ implements Devices$Device {
         this.windowPerms = new JsonObject(string12);
     }
 
-    @Override
-    public int getPixelDepth() {
-        return this.pixelDepth;
+    public int getInnerWidth() {
+        return this.innerWidth;
     }
 
-    @Override
-    public int hasHTMLElement() {
-        return this.HTMLElement;
+    public int getDoNotTrack() {
+        return this.doNotTrack;
     }
 
-    @Override
-    public long getNavigatorFasSettings() {
-        return this.navigatorFasSettings;
+    public int getScreenAvailWidth() {
+        return this.screenAvailWidth;
     }
 
-    @Override
-    public boolean isCookieEnabled() {
-        return this.cookieEnabled;
+    public int hasActiveXObject() {
+        return this.activeXObject;
     }
 
-    @Override
+    public int getScreenHeight() {
+        return this.screenHeight;
+    }
+
+    public int hasMozInnerScreen() {
+        return this.mozInnerScreen;
+    }
+
+    public String getProductSub() {
+        return this.productSub;
+    }
+
+    public int isChrome() {
+        return this.chrome;
+    }
+
+    public String getPluginInfo() {
+        return this.pluginInfo;
+    }
+
+    public boolean indexedDBKey() {
+        return this.indexedDB;
+    }
+
+    public int getDocumentMode() {
+        return this.documentMode;
+    }
+
     public String getLanguage() {
         return this.language;
     }
 
-    @Override
-    public String getDeviceOrientation() {
-        return this.deviceOrientation;
-    }
-
-    @Override
-    public boolean sessionStorageKey() {
-        return this.sessionStorage;
-    }
-
-    @Override
-    public int getTimezoneOffset() {
-        return this.timezoneOffset;
-    }
-
-    @Override
-    public boolean localStorageKey() {
-        return this.localStorage;
-    }
-
-    @Override
-    public int getInnerHeight() {
-        return this.innerHeight;
-    }
-
-    @Override
-    public int hasFileReader() {
-        return this.fileReader;
-    }
-
-    @Override
-    public int hasInstallTrigger() {
-        return this.installTrigger;
+    public String getTouchEvent() {
+        return this.touchEvent;
     }
 }
-

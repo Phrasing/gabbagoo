@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.yeezy.util.CodeScreen
  */
 package io.trickle.task.sites.yeezy.util;
 
@@ -20,4 +23,3 @@ extends WindowAdapter {
         this.val$newContentPane.resetFocus();
     }
 }
-

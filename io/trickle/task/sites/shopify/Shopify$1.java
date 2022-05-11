@@ -1,5 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
+ *  io.trickle.task.sites.shopify.util.REDIRECT_STATUS
  */
 package io.trickle.task.sites.shopify;
 
@@ -49,13 +53,19 @@ public class Shopify$1 {
             // empty catch block
         }
         try {
-            Shopify$1.$SwitchMap$io$trickle$task$sites$Site[Site.DSM_JP_ESHOP.ordinal()] = 7;
+            Shopify$1.$SwitchMap$io$trickle$task$sites$Site[Site.CALIF.ordinal()] = 7;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
         try {
-            Shopify$1.$SwitchMap$io$trickle$task$sites$Site[Site.MCT.ordinal()] = 8;
+            Shopify$1.$SwitchMap$io$trickle$task$sites$Site[Site.DSM_JP_ESHOP.ordinal()] = 8;
+        }
+        catch (NoSuchFieldError noSuchFieldError) {
+            // empty catch block
+        }
+        try {
+            Shopify$1.$SwitchMap$io$trickle$task$sites$Site[Site.MCT.ordinal()] = 9;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
@@ -117,11 +127,9 @@ public class Shopify$1 {
         }
         try {
             Shopify$1.$SwitchMap$io$trickle$task$sites$shopify$util$REDIRECT_STATUS[REDIRECT_STATUS.CART.ordinal()] = 10;
-            return;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
     }
 }
-

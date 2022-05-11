@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  com.aayushatharva.brotli4j.Brotli4jLoader
@@ -8,6 +8,17 @@
  *  com.aayushatharva.brotli4j.decoder.DirectDecompress
  *  com.aayushatharva.brotli4j.encoder.Encoder
  *  com.fuzzy.aycd.autosolve.model.AutoSolveAccount
+ *  io.trickle.App
+ *  io.trickle.account.AccountController
+ *  io.trickle.core.Controller
+ *  io.trickle.core.Engine
+ *  io.trickle.core.VertxSingleton
+ *  io.trickle.proxy.ProxyController
+ *  io.trickle.task.TaskController
+ *  io.trickle.task.sites.yeezy.util.CodeScreen
+ *  io.trickle.util.ScriptEngineHelper
+ *  io.trickle.util.Storage
+ *  io.trickle.util.Utils
  *  io.vertx.ext.web.client.HttpResponse
  *  io.vertx.ext.web.codec.BodyCodec
  */
@@ -38,52 +49,45 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public class CommandLineHandler {
-    public static void lambda$waitMenu$1(HttpResponse httpResponse) {
-        System.out.println((String)httpResponse.body());
+    public static void greet() {
+        Engine engine = Engine.get();
+        int n = ((ProxyController)engine.getModule(Controller.PROXY)).loadedProxies();
+        int n2 = ((AccountController)engine.getModule(Controller.ACCOUNT)).loadedAccounts();
+        int n3 = ((TaskController)engine.getModule(Controller.TASK)).profileCount();
+        int n4 = ((TaskController)engine.getModule(Controller.TASK)).countTasks();
+        System.out.printf("%s - %s%n", Utils.centerString((int)7, (String)"TASKS"), Utils.centerStringBraced((int)7, (String)String.valueOf(n4)));
+        System.out.printf("%s - %s%n", Utils.centerString((int)7, (String)"PROXY"), Utils.centerStringBraced((int)7, (String)String.valueOf(n)));
+        System.out.printf("%s - %s%n", Utils.centerString((int)7, (String)"ACCOUNT"), Utils.centerStringBraced((int)7, (String)String.valueOf(n2)));
+        System.out.printf("%s - %s%n", Utils.centerString((int)7, (String)"PROFILE"), Utils.centerStringBraced((int)7, (String)String.valueOf(n3)));
+        System.out.printf("%s - %s%n", Utils.centerString((int)7, (String)"WEBHOOK"), Utils.centerStringBraced((int)7, (String)(Storage.DISCORD_WEBHOOK.isEmpty() ? "NOT_SET" : "SET")));
+        System.out.printf("%s - %s%n", Utils.centerString((int)7, (String)"HARVESTERS"), Utils.centerStringBraced((int)7, (String)String.valueOf(Storage.HARVESTER_COUNT_YS)));
+        CommandLineHandler.waitMenu();
     }
 
-    public static void stopTasks() {
-        CompletableFuture.runAsync(CommandLineHandler::lambda$stopTasks$4);
+    public static void start() {
+        System.out.println("Starting tasks...");
+        CommandLineHandler.startTasks();
     }
 
-    public static void lambda$stopTasks$4() {
-        ((TaskController)Engine.get().getModule(Controller.TASK)).stopTasks();
-    }
-
-    public static void requestKey() {
-        if (!Storage.ACCESS_KEY.isEmpty()) return;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your key: ");
-        CommandLineHandler.handleScan(scanner);
-    }
-
-    public static void askForAutoSolveCreds(Scanner scanner) {
-        boolean bl = true;
+    public static void handleScan(Scanner scanner) {
         while (scanner.hasNext()) {
-            System.out.println("???");
-            String string = bl ? "Enter your API_KEY" : "Enter your ACCESS_TOKEN";
-            System.out.println(string);
-            String string2 = scanner.next().trim();
-            if (!string2.isBlank()) {
-                if (bl) {
-                    Storage.setAycdApiKey(string2);
-                    System.out.println("API_KEY set: " + string2);
-                    bl = false;
-                    continue;
+            try {
+                String string = scanner.next().trim();
+                if (!string.isEmpty()) {
+                    Storage.setAccessKey((String)string);
+                    break;
                 }
-                Storage.setAycdAccessToken(string2);
-                System.out.println("ACCESS_TOKEN set: " + string2);
-                AutoSolveAccount autoSolveAccount = AutoSolveAccount.of((String)Storage.AYCD_ACCESS_TOKEN, (String)Storage.AYCD_API_KEY);
-                if (autoSolveAccount.isValid()) {
-                    System.out.println("Valid");
-                    return;
-                }
-                System.out.println("Credentials Invalid. Try again:");
-                bl = true;
-                continue;
             }
-            System.out.println(string);
+            catch (Exception exception) {
+                // empty catch block
+            }
+            System.out.println("Please enter your access key to proceed:");
         }
+        return;
+    }
+
+    public static String lambda$setupAutoSolve$2(AtomicBoolean atomicBoolean) {
+        return atomicBoolean.get() ? "Enter your API_KEY:" : "Enter your ACCESS_TOKEN:";
     }
 
     public static void checkWebhook() {
@@ -95,114 +99,20 @@ public class CommandLineHandler {
             String string3 = scanner.next().toLowerCase();
             if (string3.contains("y")) {
                 CommandLineHandler.askForWebhook();
-                return;
+                break;
             }
-            if (string3.contains("n")) {
-                return;
-            }
+            if (string3.contains("n")) return;
             System.out.println(string2);
         }
+        return;
     }
 
-    public static void stop() {
-        CommandLineHandler.stopTasks();
-        System.exit(1);
+    public static void lambda$waitMenu$1(HttpResponse httpResponse) {
+        System.out.println((String)httpResponse.body());
     }
 
     public static void lambda$waitMenu$0(String string) {
         System.out.println("received: " + string);
-    }
-
-    public static void handleScan(Scanner scanner) {
-        while (scanner.hasNext()) {
-            try {
-                String string = scanner.next().trim();
-                if (!string.isEmpty()) {
-                    Storage.setAccessKey(string);
-                    return;
-                }
-            }
-            catch (Exception exception) {
-                // empty catch block
-            }
-            System.out.println("Please enter your access key to proceed:");
-        }
-    }
-
-    public static void setupAutoSolve() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("AutoSolve Settings");
-        System.out.println("API_KEY " + (Storage.AYCD_API_KEY.isBlank() ? "None" : Storage.AYCD_API_KEY));
-        System.out.println("ACCESS_TOKEN " + (Storage.AYCD_ACCESS_TOKEN.isBlank() ? "None" : Storage.AYCD_ACCESS_TOKEN));
-        AtomicBoolean atomicBoolean = new AtomicBoolean(true);
-        Supplier<String> supplier = () -> CommandLineHandler.lambda$setupAutoSolve$2(atomicBoolean);
-        System.out.println(supplier.get());
-        while (scanner.hasNext()) {
-            try {
-                String string = scanner.next().trim();
-                if (atomicBoolean.get()) {
-                    Storage.setAycdApiKey(string);
-                    System.out.println("API_KEY set: " + string);
-                    atomicBoolean.set(false);
-                } else {
-                    Storage.setAycdAccessToken(string);
-                    System.out.println("ACCESS_TOKEN set: " + string);
-                    AutoSolveAccount autoSolveAccount = AutoSolveAccount.of((String)Storage.AYCD_ACCESS_TOKEN, (String)Storage.AYCD_API_KEY);
-                    if (autoSolveAccount.isValid()) {
-                        return;
-                    }
-                    System.out.println("Credentials Invalid. Try again:");
-                    atomicBoolean.set(true);
-                }
-            }
-            catch (Throwable throwable) {
-                // empty catch block
-            }
-            System.out.println(supplier.get());
-        }
-    }
-
-    public static void greet() {
-        Engine engine = Engine.get();
-        int n = ((ProxyController)engine.getModule(Controller.PROXY)).loadedProxies();
-        int n2 = ((AccountController)engine.getModule(Controller.ACCOUNT)).loadedProxies();
-        int n3 = ((TaskController)engine.getModule(Controller.TASK)).profileCount();
-        int n4 = ((TaskController)engine.getModule(Controller.TASK)).countTasks();
-        System.out.printf("%s - %s%n", Utils.centerString(7, "TASKS"), Utils.centerStringBraced(7, String.valueOf(n4)));
-        System.out.printf("%s - %s%n", Utils.centerString(7, "PROXY"), Utils.centerStringBraced(7, String.valueOf(n)));
-        System.out.printf("%s - %s%n", Utils.centerString(7, "ACCOUNT"), Utils.centerStringBraced(7, String.valueOf(n2)));
-        System.out.printf("%s - %s%n", Utils.centerString(7, "PROFILE"), Utils.centerStringBraced(7, String.valueOf(n3)));
-        System.out.printf("%s - %s%n", Utils.centerString(7, "WEBHOOK"), Utils.centerStringBraced(7, Storage.DISCORD_WEBHOOK.isEmpty() ? "NOT_SET" : "SET"));
-        System.out.printf("%s - %s%n", Utils.centerString(7, "HARVESTERS"), Utils.centerStringBraced(7, String.valueOf(Storage.HARVESTER_COUNT_YS)));
-        CommandLineHandler.waitMenu();
-    }
-
-    public static void askForWebhook() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter the webhook uri: ");
-        while (scanner.hasNext()) {
-            String string = scanner.next().trim();
-            if (string.contains("discord") || string.contains("webhooks.aycd") || string.contains("webhooks.tidalmarket.com") || string.contains("api.soleware.io/webhooks")) {
-                Storage.setDiscordWebhook(string);
-                System.out.printf("Discord webhook set: '%s'%n", string);
-                return;
-            }
-            System.out.println("Enter the webhook uri: ");
-        }
-    }
-
-    public static void lambda$startTasks$3() {
-        ((TaskController)Engine.get().getModule(Controller.TASK)).startTasks();
-    }
-
-    public static void start() {
-        System.out.println("Starting tasks...");
-        CommandLineHandler.startTasks();
-    }
-
-    public static String lambda$setupAutoSolve$2(AtomicBoolean atomicBoolean) {
-        if (!atomicBoolean.get()) return "Enter your ACCESS_TOKEN:";
-        return "Enter your API_KEY:";
     }
 
     public static void waitForStart() {
@@ -222,25 +132,112 @@ public class CommandLineHandler {
         }
     }
 
+    public static void requestKey() {
+        if (!Storage.ACCESS_KEY.isEmpty()) return;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your key: ");
+        CommandLineHandler.handleScan(scanner);
+    }
+
     public static void askForHarvesterCount() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the desired harvester count (current: " + Storage.HARVESTER_COUNT_YS + "): ");
         while (scanner.hasNext()) {
-            String string = scanner.next().trim();
-            try {
-                int n = Integer.parseInt(string);
-                if (n >= 0) {
-                    Storage.setHarvesterCountYs(n);
+            block4: {
+                String string = scanner.next().trim();
+                try {
+                    int n = Integer.parseInt(string);
+                    if (n < 0) {
+                        System.out.println("Harvester count should be at least 0");
+                        break block4;
+                    }
+                    Storage.setHarvesterCountYs((int)n);
                     System.out.printf("Harvester count set: '%s'%n", string);
-                    return;
+                    break;
                 }
-                System.out.println("Harvester count should be at least 0");
-            }
-            catch (Throwable throwable) {
-                System.out.println("Please enter a valid number!");
+                catch (Throwable throwable) {
+                    System.out.println("Please enter a valid number!");
+                }
             }
             System.out.println("Enter the desired harvester count (current: " + Storage.HARVESTER_COUNT_YS + "): ");
         }
+        return;
+    }
+
+    public static void askForAutoSolveCreds(Scanner scanner) {
+        boolean bl = true;
+        while (scanner.hasNext()) {
+            System.out.println("???");
+            String string = bl ? "Enter your API_KEY" : "Enter your ACCESS_TOKEN";
+            System.out.println(string);
+            String string2 = scanner.next().trim();
+            if (!string2.isBlank()) {
+                if (bl) {
+                    Storage.setAycdApiKey((String)string2);
+                    System.out.println("API_KEY set: " + string2);
+                    bl = false;
+                    continue;
+                }
+                Storage.setAycdAccessToken((String)string2);
+                System.out.println("ACCESS_TOKEN set: " + string2);
+                AutoSolveAccount autoSolveAccount = AutoSolveAccount.of((String)Storage.AYCD_ACCESS_TOKEN, (String)Storage.AYCD_API_KEY);
+                if (autoSolveAccount.isValid()) {
+                    System.out.println("Valid");
+                    return;
+                }
+                System.out.println("Credentials Invalid. Try again:");
+                bl = true;
+                continue;
+            }
+            System.out.println(string);
+        }
+    }
+
+    public static void stopTasks() {
+        CompletableFuture.runAsync(CommandLineHandler::lambda$stopTasks$4);
+    }
+
+    public static void startTasks() {
+        CompletableFuture.runAsync(CommandLineHandler::lambda$startTasks$3);
+    }
+
+    public static void setupAutoSolve() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("AutoSolve Settings");
+        System.out.println("API_KEY " + (Storage.AYCD_API_KEY.isBlank() ? "None" : Storage.AYCD_API_KEY));
+        System.out.println("ACCESS_TOKEN " + (Storage.AYCD_ACCESS_TOKEN.isBlank() ? "None" : Storage.AYCD_ACCESS_TOKEN));
+        AtomicBoolean atomicBoolean = new AtomicBoolean(true);
+        Supplier<String> supplier = () -> CommandLineHandler.lambda$setupAutoSolve$2(atomicBoolean);
+        System.out.println(supplier.get());
+        while (scanner.hasNext()) {
+            try {
+                String string = scanner.next().trim();
+                if (atomicBoolean.get()) {
+                    Storage.setAycdApiKey((String)string);
+                    System.out.println("API_KEY set: " + string);
+                    atomicBoolean.set(false);
+                } else {
+                    Storage.setAycdAccessToken((String)string);
+                    System.out.println("ACCESS_TOKEN set: " + string);
+                    AutoSolveAccount autoSolveAccount = AutoSolveAccount.of((String)Storage.AYCD_ACCESS_TOKEN, (String)Storage.AYCD_API_KEY);
+                    if (autoSolveAccount.isValid()) return;
+                    System.out.println("Credentials Invalid. Try again:");
+                    atomicBoolean.set(true);
+                }
+            }
+            catch (Throwable throwable) {
+                // empty catch block
+            }
+            System.out.println(supplier.get());
+        }
+    }
+
+    public static void lambda$stopTasks$4() {
+        ((TaskController)Engine.get().getModule(Controller.TASK)).stopTasks();
+    }
+
+    public static void lambda$startTasks$3() {
+        ((TaskController)Engine.get().getModule(Controller.TASK)).startTasks();
     }
 
     public static void waitMenu() {
@@ -295,7 +292,7 @@ public class CommandLineHandler {
                     case 1337: {
                         int n2 = 0;
                         while (n2 < 10) {
-                            CodeScreen.request(1337, "test-test-test").thenAccept(CommandLineHandler::lambda$waitMenu$0);
+                            CodeScreen.request((int)1337, (String)"test-test-test").thenAccept(CommandLineHandler::lambda$waitMenu$0);
                             ++n2;
                         }
                         return;
@@ -303,7 +300,7 @@ public class CommandLineHandler {
                     case 420420: {
                         Object object;
                         try {
-                            object = ScriptEngineHelper.calculateTime("c62913f82818e7f8d800486099230cdfbbaa3a2b849f9f72d5644351ebb20a267934cab127cc2f2a123eead2f0056c4aebd46e4773d85cbb53a214cba4dc612c\udb40\udd38\udb40\udd33\udb40\udd39");
+                            object = ScriptEngineHelper.calculateTime((String)"c62913f82818e7f8d800486099230cdfbbaa3a2b849f9f72d5644351ebb20a267934cab127cc2f2a123eead2f0056c4aebd46e4773d85cbb53a214cba4dc612c\udb40\udd38\udb40\udd33\udb40\udd39");
                             System.out.println((String)object);
                         }
                         catch (Throwable throwable) {
@@ -323,8 +320,22 @@ public class CommandLineHandler {
         }
     }
 
-    public static void startTasks() {
-        CompletableFuture.runAsync(CommandLineHandler::lambda$startTasks$3);
+    public static void stop() {
+        CommandLineHandler.stopTasks();
+        System.exit(1);
+    }
+
+    public static void askForWebhook() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the webhook uri: ");
+        while (scanner.hasNext()) {
+            String string = scanner.next().trim();
+            if (string.contains("discord") || string.contains("webhooks.aycd") || string.contains("webhooks.tidalmarket.com") || string.contains("api.soleware.io/webhooks")) {
+                Storage.setDiscordWebhook((String)string);
+                System.out.printf("Discord webhook set: '%s'%n", string);
+                return;
+            }
+            System.out.println("Enter the webhook uri: ");
+        }
     }
 }
-

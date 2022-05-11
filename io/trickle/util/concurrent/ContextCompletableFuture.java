@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.vertx.core.Context
@@ -18,32 +18,6 @@ extends CompletableFuture
 implements CompletionStage {
     public Context ctx;
 
-    public void lambda$complete$0(Object object, Void void_) {
-        super.complete(object);
-    }
-
-    public int hashCode() {
-        return Objects.hash(this.ctx);
-    }
-
-    public boolean complete(Object object) {
-        try {
-            this.ctx.runOnContext(arg_0 -> this.lambda$complete$0(object, arg_0));
-            return true;
-        }
-        catch (Exception exception) {
-            return false;
-        }
-    }
-
-    public ContextCompletableFuture(Context context) {
-        this.ctx = context;
-    }
-
-    public Context getCtx() {
-        return this.ctx;
-    }
-
     public boolean equals(Object object) {
         if (this == object) {
             return true;
@@ -55,8 +29,33 @@ implements CompletionStage {
         return Objects.equals(this.ctx, contextCompletableFuture.ctx);
     }
 
+    public Context getCtx() {
+        return this.ctx;
+    }
+
+    public void lambda$complete$0(Object object, Void void_) {
+        super.complete(object);
+    }
+
     public ContextCompletableFuture() {
         this.ctx = Vertx.currentContext();
     }
-}
 
+    public int hashCode() {
+        return Objects.hash(this.ctx);
+    }
+
+    public ContextCompletableFuture(Context context) {
+        this.ctx = context;
+    }
+
+    public boolean complete(Object object) {
+        try {
+            this.ctx.runOnContext(arg_0 -> this.lambda$complete$0(object, arg_0));
+        }
+        catch (Exception exception) {
+            return false;
+        }
+        return true;
+    }
+}

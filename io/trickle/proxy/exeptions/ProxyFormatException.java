@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.proxy.exeptions;
 
@@ -9,4 +9,3 @@ extends Exception {
         super("Invalid Proxy String array format. Must be of length 2 or 4");
     }
 }
-

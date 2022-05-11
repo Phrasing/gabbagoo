@@ -1,5 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
+ *  io.trickle.util.analytics.webhook.Metric
  */
 package io.trickle.util.analytics.webhook;
 
@@ -7,19 +11,24 @@ import io.trickle.task.sites.Site;
 import io.trickle.util.analytics.webhook.Metric;
 
 public class Metric$Builder {
-    public String mode;
     public String sku;
-    public String product;
-    public String email;
-    public String site;
     public String delays;
+    public String mode;
+    public String email;
+    public String account = "none";
+    public String product;
+    public String site;
+    public String sizeQty;
     public String proxy;
     public String orderNo;
-    public String sizeQty;
-    public String account = "none";
 
-    public Metric$Builder setSizeQty(String string) {
-        this.sizeQty = string;
+    public Metric$Builder setAccount(String string) {
+        this.account = string;
+        return this;
+    }
+
+    public Metric$Builder setProxy(String string) {
+        this.proxy = string;
         return this;
     }
 
@@ -28,17 +37,13 @@ public class Metric$Builder {
         return this;
     }
 
-    public Metric$Builder setOrderNumber(String string) {
-        if (string != null && !string.isEmpty()) {
-            this.orderNo = string;
-            return this;
-        }
-        this.orderNo = "NOT_FOUND";
+    public Metric$Builder setSite(String string) {
+        this.site = string;
         return this;
     }
 
-    public Metric$Builder setDelays(String string) {
-        this.delays = string;
+    public Metric$Builder setSizeQty(String string) {
+        this.sizeQty = string;
         return this;
     }
 
@@ -52,6 +57,21 @@ public class Metric$Builder {
         return this;
     }
 
+    public Metric$Builder setSite(Site site) {
+        this.site = site.toString();
+        return this;
+    }
+
+    public Metric$Builder setDelays(String string) {
+        this.delays = string;
+        return this;
+    }
+
+    public Metric$Builder setOrderNumber(String string) {
+        this.orderNo = string == null || string.isEmpty() ? "NOT_FOUND" : string;
+        return this;
+    }
+
     public Metric$Builder setSku(String string) {
         this.sku = string;
         return this;
@@ -60,25 +80,4 @@ public class Metric$Builder {
     public Metric build() {
         return new Metric(this.product, this.sku, this.sizeQty, this.delays, this.mode, this.proxy, this.email, this.site, this.account, this.orderNo);
     }
-
-    public Metric$Builder setSite(Site site) {
-        this.site = site.toString();
-        return this;
-    }
-
-    public Metric$Builder setSite(String string) {
-        this.site = string;
-        return this;
-    }
-
-    public Metric$Builder setProxy(String string) {
-        this.proxy = string;
-        return this;
-    }
-
-    public Metric$Builder setAccount(String string) {
-        this.account = string;
-        return this;
-    }
 }
-

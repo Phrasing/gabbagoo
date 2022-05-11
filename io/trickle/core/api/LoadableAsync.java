@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.vertx.core.Future
@@ -11,4 +11,3 @@ import io.vertx.core.Future;
 public interface LoadableAsync {
     public Future load();
 }
-

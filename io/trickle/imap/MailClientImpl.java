@@ -1,7 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.imap.MailClient
+ *  io.trickle.imap.MailClientImpl$1
  *  io.vertx.core.Context
  *  io.vertx.core.Future
  *  io.vertx.core.Promise
@@ -16,7 +18,7 @@
 package io.trickle.imap;
 
 import io.trickle.imap.MailClient;
-import io.trickle.imap.MailClientImpl$1;
+import io.trickle.imap.MailClientImpl;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -36,11 +38,11 @@ import javax.mail.search.SearchTerm;
 public class MailClientImpl
 implements MailClient {
     public Session session;
-    public Folder inbox;
-    public static Properties mailProperties = new Properties();
-    public Store store;
-    public Vertx vertx;
     public Date openTime;
+    public Vertx vertx;
+    public static Properties mailProperties = new Properties();
+    public Folder inbox;
+    public Store store;
 
     public void _close() {
         if (this.inbox != null && this.inbox.isOpen()) {
@@ -49,31 +51,6 @@ implements MailClient {
         if (this.store == null) return;
         if (!this.store.isConnected()) return;
         this.store.close();
-    }
-
-    public void lambda$readInbox$0(SearchTerm searchTerm, Promise promise) {
-        try {
-            Message[] messageArray = this._readInbox(searchTerm);
-            promise.tryComplete((Object)messageArray);
-            return;
-        }
-        catch (MessagingException messagingException) {
-            promise.tryFail((Throwable)messagingException);
-        }
-    }
-
-    public Message[] _readInbox(SearchTerm searchTerm) {
-        return this.getInbox().search(Objects.requireNonNullElseGet(searchTerm, this::getDefault), this.getReversedMessages());
-    }
-
-    public SearchTerm getDefault() {
-        return new MailClientImpl$1(this);
-    }
-
-    @Override
-    public Future readInbox(SearchTerm searchTerm) {
-        Context context = this.vertx.getOrCreateContext();
-        return context.executeBlocking(arg_0 -> this.lambda$readInbox$0(searchTerm, arg_0));
     }
 
     static {
@@ -85,56 +62,27 @@ implements MailClient {
         context.executeBlocking(this::lambda$close$2);
     }
 
-    public void lambda$close$2(Promise promise) {
+    public Future readInbox(SearchTerm searchTerm) {
+        Context context = this.vertx.getOrCreateContext();
+        return context.executeBlocking(arg_0 -> this.lambda$readInbox$0(searchTerm, arg_0));
+    }
+
+    public SearchTerm getDefault() {
+        return new 1(this);
+    }
+
+    public void lambda$readInbox$0(SearchTerm searchTerm, Promise promise) {
         try {
-            this._close();
-        }
-        catch (MessagingException messagingException) {
-            // empty catch block
-        }
-        promise.tryComplete();
-    }
-
-    @Override
-    public CompletableFuture connectFut(String string, String string2) {
-        return this.connect(string, string2).toCompletionStage().toCompletableFuture();
-    }
-
-    public void _connect(String string, String string2) {
-        if (this.store == null) {
-            this.store = this.session.getStore("imaps");
-        }
-        if (this.store.isConnected()) return;
-        this.store.connect("imap.gmail.com", string, string2);
-    }
-
-    public MailClientImpl(Vertx vertx) {
-        this.vertx = vertx;
-        this.session = Session.getDefaultInstance((Properties)mailProperties, null);
-    }
-
-    public void lambda$connect$1(String string, String string2, Promise promise) {
-        try {
-            this._connect(string, string2);
-            promise.tryComplete();
-            return;
+            Message[] messageArray = this._readInbox(searchTerm);
+            promise.tryComplete((Object)messageArray);
         }
         catch (MessagingException messagingException) {
             promise.tryFail((Throwable)messagingException);
         }
     }
 
-    @Override
-    public CompletableFuture readInboxFuture(SearchTerm searchTerm) {
-        return this.readInbox(searchTerm).toCompletionStage().toCompletableFuture();
-    }
-
-    @Override
-    public Future connect(String string, String string2) {
-        Objects.requireNonNull(string, "Email can not be null");
-        Objects.requireNonNull(string2, "Password can not be null");
-        Context context = this.vertx.getOrCreateContext();
-        return context.executeBlocking(arg_0 -> this.lambda$connect$1(string, string2, arg_0));
+    public Message[] _readInbox(SearchTerm searchTerm) {
+        return this.getInbox().search(Objects.requireNonNullElseGet(searchTerm, this::getDefault), this.getReversedMessages());
     }
 
     public Folder getInbox() {
@@ -145,6 +93,27 @@ implements MailClient {
         this.inbox.open(1);
         this.openTime = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L));
         return this.inbox;
+    }
+
+    public Future connect(String string, String string2) {
+        Objects.requireNonNull(string, "Email can not be null");
+        Objects.requireNonNull(string2, "Password can not be null");
+        Context context = this.vertx.getOrCreateContext();
+        return context.executeBlocking(arg_0 -> this.lambda$connect$1(string, string2, arg_0));
+    }
+
+    public void lambda$connect$1(String string, String string2, Promise promise) {
+        try {
+            this._connect(string, string2);
+            promise.tryComplete();
+        }
+        catch (MessagingException messagingException) {
+            promise.tryFail((Throwable)messagingException);
+        }
+    }
+
+    public CompletableFuture connectFut(String string, String string2) {
+        return this.connect(string, string2).toCompletionStage().toCompletableFuture();
     }
 
     public Message[] getReversedMessages() {
@@ -159,5 +128,31 @@ implements MailClient {
         }
         return messageArray;
     }
-}
 
+    public void lambda$close$2(Promise promise) {
+        try {
+            this._close();
+        }
+        catch (MessagingException messagingException) {
+            // empty catch block
+        }
+        promise.tryComplete();
+    }
+
+    public void _connect(String string, String string2) {
+        if (this.store == null) {
+            this.store = this.session.getStore("imaps");
+        }
+        if (this.store.isConnected()) return;
+        this.store.connect("imap.gmail.com", string, string2);
+    }
+
+    public CompletableFuture readInboxFuture(SearchTerm searchTerm) {
+        return this.readInbox(searchTerm).toCompletionStage().toCompletableFuture();
+    }
+
+    public MailClientImpl(Vertx vertx) {
+        this.vertx = vertx;
+        this.session = Session.getDefaultInstance((Properties)mailProperties, null);
+    }
+}

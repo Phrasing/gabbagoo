@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.antibot.impl.akamai.pixel;
 
@@ -9,11 +9,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface Pixel {
-    public static final Pattern AKAM_PATTERN;
+    public static final Pattern BAZA_PATTERN;
     public static final Pattern T_PATTERN;
     public static final Pattern G_INDEX;
+    public static final Pattern AKAM_PATTERN;
     public static final Pattern HEX_ARRAY;
-    public static final Pattern BAZA_PATTERN;
+
+    public CompletableFuture getPixelReqForm(String var1, String var2, String var3);
+
+    static {
+        HEX_ARRAY = Pattern.compile("=\\[(\".*\\\\x.*?)\\];");
+        G_INDEX = Pattern.compile("g=_\\[([0-9]*?)]");
+        T_PATTERN = Pattern.compile("t=([0-z]*)");
+        BAZA_PATTERN = Pattern.compile("baz[A-z]*=?\"([0-9]*?)\"");
+        AKAM_PATTERN = Pattern.compile("(https://www.yeezysupply.com/akam.*?)\"");
+    }
 
     public static String[] parseAkam(String string) {
         Matcher matcher = AKAM_PATTERN.matcher(string);
@@ -29,7 +39,28 @@ public interface Pixel {
         }
     }
 
-    public CompletableFuture getPixelReqString(String var1, String var2, String var3);
+    public static String[] parseHexArray(String string) {
+        Matcher matcher = HEX_ARRAY.matcher(string);
+        if (!matcher.find()) throw new Exception("No HEX ARR");
+        String[] stringArray = matcher.group(1).split(",");
+        return Pixel.decodeArray(stringArray);
+    }
+
+    public static int parseGIndex(String string) {
+        Matcher matcher = G_INDEX.matcher(string);
+        if (!matcher.find()) throw new Exception("No G INDEX");
+        return Integer.parseInt(matcher.group(1));
+    }
+
+    public static String parseTValue(String string) {
+        Matcher matcher;
+        String string2 = string.split("\\?")[1];
+        if ((string2 = string2.substring(string2.indexOf("=") + 1)).contains("&")) {
+            string2 = string2.split("&")[0];
+        }
+        if (!(matcher = T_PATTERN.matcher(string2 = new String(Base64.getDecoder().decode(string2)))).find()) throw new Exception("No T val");
+        return matcher.group(1);
+    }
 
     public static String decodeHexString(String string) {
         string = string.replace("\\x", "").replace("\"", "");
@@ -43,10 +74,12 @@ public interface Pixel {
         return stringBuilder.toString();
     }
 
-    public static int parseGIndex(String string) {
-        Matcher matcher = G_INDEX.matcher(string);
-        if (!matcher.find()) throw new Exception("No G INDEX");
-        return Integer.parseInt(matcher.group(1));
+    public CompletableFuture getPixelReqString(String var1, String var2, String var3);
+
+    public static String parseBaza(String string) {
+        Matcher matcher = BAZA_PATTERN.matcher(string);
+        if (!matcher.find()) throw new Exception("No BAZA");
+        return matcher.group(1);
     }
 
     public static String[] decodeArray(String[] stringArray) {
@@ -57,38 +90,4 @@ public interface Pixel {
         }
         return stringArray;
     }
-
-    public static String[] parseHexArray(String string) {
-        Matcher matcher = HEX_ARRAY.matcher(string);
-        if (!matcher.find()) throw new Exception("No HEX ARR");
-        String[] stringArray = matcher.group(1).split(",");
-        return Pixel.decodeArray(stringArray);
-    }
-
-    public static String parseTValue(String string) {
-        Matcher matcher;
-        String string2 = string.split("\\?")[1];
-        if ((string2 = string2.substring(string2.indexOf("=") + 1)).contains("&")) {
-            string2 = string2.split("&")[0];
-        }
-        if (!(matcher = T_PATTERN.matcher(string2 = new String(Base64.getDecoder().decode(string2)))).find()) throw new Exception("No T val");
-        return matcher.group(1);
-    }
-
-    static {
-        HEX_ARRAY = Pattern.compile("=\\[(\".*\\\\x.*?)\\];");
-        G_INDEX = Pattern.compile("g=_\\[([0-9]*?)]");
-        T_PATTERN = Pattern.compile("t=([0-z]*)");
-        BAZA_PATTERN = Pattern.compile("baz[A-z]*=?\"([0-9]*?)\"");
-        AKAM_PATTERN = Pattern.compile("(https://www.yeezysupply.com/akam.*?)\"");
-    }
-
-    public static String parseBaza(String string) {
-        Matcher matcher = BAZA_PATTERN.matcher(string);
-        if (!matcher.find()) throw new Exception("No BAZA");
-        return matcher.group(1);
-    }
-
-    public CompletableFuture getPixelReqForm(String var1, String var2, String var3);
 }
-

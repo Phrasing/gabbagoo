@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.shopify.util;
 
@@ -48,4 +48,3 @@ public enum REDIRECT_STATUS {
         return HOMEPAGE;
     }
 }
-

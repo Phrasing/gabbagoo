@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.util.Utils
  */
 package io.trickle.task.sites.walmart.graphql;
 
@@ -11,7 +14,6 @@ public class Util {
     public static Pattern MOBILE_MSG_PATTERN = Pattern.compile("\"errors\":.*?\"code\":\"(.*?)\"");
 
     public static String parseErrorMessage(String string) {
-        return Utils.quickParseFirst(string, ERROR_MSG_PATTERN, MOBILE_MSG_PATTERN);
+        return Utils.quickParseFirst((String)string, (Pattern[])new Pattern[]{ERROR_MSG_PATTERN, MOBILE_MSG_PATTERN});
     }
 }
-

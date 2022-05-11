@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  javax.mail.Message
@@ -28,4 +28,3 @@ extends SearchTerm {
         return false;
     }
 }
-

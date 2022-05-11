@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.util.Utils
  *  io.vertx.core.json.JsonObject
  */
 package io.trickle.task.sites.walmart.graphql;
@@ -14,19 +15,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class WalmartNewAPIMobile$CacheGen {
     public static char[] cArr2 = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-
-    public static String hash(String string) {
-        byte[] byArray = string.getBytes(StandardCharsets.UTF_8);
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            messageDigest.update(byArray, 0, byArray.length);
-            return WalmartNewAPIMobile$CacheGen.mo17628e(messageDigest.digest());
-        }
-        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-            noSuchAlgorithmException.printStackTrace();
-            return Utils.secureHexstring(16);
-        }
-    }
 
     public static String hashForm(JsonObject jsonObject, String string) {
         JsonObject jsonObject2 = new JsonObject();
@@ -53,5 +41,17 @@ public class WalmartNewAPIMobile$CacheGen {
         }
         return new String(cArray);
     }
-}
 
+    public static String hash(String string) {
+        byte[] byArray = string.getBytes(StandardCharsets.UTF_8);
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(byArray, 0, byArray.length);
+            return WalmartNewAPIMobile$CacheGen.mo17628e(messageDigest.digest());
+        }
+        catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+            noSuchAlgorithmException.printStackTrace();
+            return Utils.secureHexstring((int)16);
+        }
+    }
+}

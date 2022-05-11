@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.webclient.ClientType
  *  io.vertx.core.http.Http2Settings
  *  io.vertx.core.http.HttpVersion
  *  io.vertx.core.net.ConscryptSSLEngineOptions
@@ -23,7 +24,6 @@ import java.util.List;
 
 public class ClientType$6
 extends ClientType {
-    @Override
     public List ciphers() {
         ArrayList<String> arrayList = new ArrayList<String>();
         arrayList.add("TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256");
@@ -42,13 +42,6 @@ extends ClientType {
         return arrayList;
     }
 
-    public List ciphersRandomised() {
-        List list = this.ciphers();
-        Collections.shuffle(list);
-        return list;
-    }
-
-    @Override
     public WebClientOptions options() {
         WebClientOptions webClientOptions = new WebClientOptions();
         webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions().setAttributeFluent(ConscryptSSLEngineOptions.Attribute.GREASE, false).setAttributeFluent(ConscryptSSLEngineOptions.Attribute.SESSION_TICKET, true)).addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
@@ -56,9 +49,17 @@ extends ClientType {
         return webClientOptions;
     }
 
-    @Override
+    public List ciphersRandomised() {
+        List list = this.ciphers();
+        Collections.shuffle(list);
+        return list;
+    }
+
+    public ClientType$6() {
+        super(string, n);
+    }
+
     public int getWindowUpdate() {
         return 0xFF0001;
     }
 }
-

@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
  */
 package io.trickle.harvester;
 
@@ -29,11 +32,9 @@ public class Sitekeys$1 {
         }
         try {
             Sitekeys$1.$SwitchMap$io$trickle$task$sites$Site[Site.FINISHLINE.ordinal()] = 4;
-            return;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
     }
 }
-

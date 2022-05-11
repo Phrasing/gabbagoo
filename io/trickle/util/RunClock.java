@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.util;
 
@@ -7,9 +7,13 @@ import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
 
 public class RunClock {
-    public long finishTime;
     public long timeTillRun;
     public boolean stopped;
+    public long finishTime;
+
+    public long getTimeTillRun() {
+        return this.timeTillRun;
+    }
 
     public RunClock() {
         LocalTime localTime = LocalTime.now();
@@ -19,11 +23,6 @@ public class RunClock {
         this.finishTime = 0L;
     }
 
-    public void start() {
-        this.finishTime = System.currentTimeMillis() + 300000L;
-        this.stopped = false;
-    }
-
     public boolean isStopped() {
         if (this.stopped) return this.stopped;
         if (System.currentTimeMillis() < this.finishTime) return this.stopped;
@@ -31,12 +30,12 @@ public class RunClock {
         return this.stopped;
     }
 
+    public void start() {
+        this.finishTime = System.currentTimeMillis() + 300000L;
+        this.stopped = false;
+    }
+
     public static RunClock create() {
         return new RunClock();
     }
-
-    public long getTimeTillRun() {
-        return this.timeTillRun;
-    }
 }
-

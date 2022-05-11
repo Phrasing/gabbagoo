@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.network.codec.packet.PacketType
  *  io.vertx.core.buffer.Buffer
  */
 package io.trickle.network.codec.packet;
@@ -11,8 +12,8 @@ import io.vertx.core.buffer.Buffer;
 
 public class Packet {
     public Buffer payload;
-    public byte opcode;
     public PacketType type;
+    public byte opcode;
 
     public boolean equals(Object object) {
         if (this == object) {
@@ -33,12 +34,8 @@ public class Packet {
         return this.type;
     }
 
-    public int getSize() {
-        return this.payload.length();
-    }
-
-    public byte getOpcode() {
-        return this.opcode;
+    public Buffer getPayload() {
+        return this.payload;
     }
 
     public Packet(byte by, PacketType packetType, Buffer buffer) {
@@ -47,14 +44,18 @@ public class Packet {
         this.payload = buffer;
     }
 
-    public Buffer getPayload() {
-        return this.payload;
+    public byte getOpcode() {
+        return this.opcode;
     }
 
     public int hashCode() {
         int n = this.opcode;
         n = 31 * n + this.type.hashCode();
-        return 31 * n + this.payload.hashCode();
+        n = 31 * n + this.payload.hashCode();
+        return n;
+    }
+
+    public int getSize() {
+        return this.payload.length();
     }
 }
-

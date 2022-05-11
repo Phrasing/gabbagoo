@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.shopify.util;
 
@@ -12,14 +12,6 @@ public class ShippingRateSupplier
 implements Supplier {
     public String rate;
 
-    public Object get() {
-        return this.get();
-    }
-
-    public ShippingRateSupplier(String string) {
-        this.rate = string;
-    }
-
     public String get() {
         return this.rate;
     }
@@ -27,5 +19,12 @@ implements Supplier {
     public void updateRate(String string) {
         this.rate = string;
     }
-}
 
+    public Object get() {
+        return this.get();
+    }
+
+    public ShippingRateSupplier(String string) {
+        this.rate = string;
+    }
+}

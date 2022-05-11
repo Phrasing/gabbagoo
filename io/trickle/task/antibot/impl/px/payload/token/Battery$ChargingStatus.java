@@ -1,25 +1,40 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus$1
+ *  io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus$2
+ *  io.trickle.util.Utils
  */
 package io.trickle.task.antibot.impl.px.payload.token;
 
-import io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus$1;
-import io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus$2;
+import io.trickle.task.antibot.impl.px.payload.token.Battery$ChargingStatus;
 import io.trickle.util.Utils;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Battery$ChargingStatus
 extends Enum {
-    public static /* enum */ Battery$ChargingStatus DISCHARGING;
     public static Battery$ChargingStatus[] $VALUES;
     public static /* enum */ Battery$ChargingStatus CHARGING;
+    public static /* enum */ Battery$ChargingStatus DISCHARGING;
 
     public float calculate(float f, int n, float f2, double d) {
         return (float)d;
     }
 
-    public static Battery$ChargingStatus valueOf(String string) {
-        return Enum.valueOf(Battery$ChargingStatus.class, string);
+    public String chargingMethod() {
+        if (!this.equals((Object)CHARGING)) return "None";
+        return ThreadLocalRandom.current().nextBoolean() ? "AC" : "USB";
+    }
+
+    public static Battery$ChargingStatus[] values() {
+        return (Battery$ChargingStatus[])$VALUES.clone();
+    }
+
+    static {
+        CHARGING = new 1("CHARGING", 0);
+        DISCHARGING = new 2("DISCHARGING", 1);
+        $VALUES = new Battery$ChargingStatus[]{CHARGING, DISCHARGING};
     }
 
     /*
@@ -31,32 +46,19 @@ extends Enum {
         void var1_-1;
     }
 
-    public String chargingMethod() {
-        if (!this.equals((Object)CHARGING)) return "None";
-        if (!ThreadLocalRandom.current().nextBoolean()) return "USB";
-        return "AC";
+    public static Battery$ChargingStatus valueOf(String string) {
+        return Enum.valueOf(Battery$ChargingStatus.class, string);
     }
 
-    static {
-        CHARGING = new Battery$ChargingStatus$1();
-        DISCHARGING = new Battery$ChargingStatus$2();
-        $VALUES = new Battery$ChargingStatus[]{CHARGING, DISCHARGING};
-    }
-
-    public static Battery$ChargingStatus[] values() {
-        return (Battery$ChargingStatus[])$VALUES.clone();
-    }
-
-    public float changeVector() {
-        return Float.intBitsToFloat(1065353216);
+    public static Battery$ChargingStatus get() {
+        return (Battery$ChargingStatus)((Object)Utils.randomFrom((Object[])Battery$ChargingStatus.values()));
     }
 
     public String toString() {
         return this.name().toLowerCase();
     }
 
-    public static Battery$ChargingStatus get() {
-        return (Battery$ChargingStatus)((Object)Utils.randomFrom((Object[])Battery$ChargingStatus.values()));
+    public float changeVector() {
+        return Float.intBitsToFloat(1065353216);
     }
 }
-

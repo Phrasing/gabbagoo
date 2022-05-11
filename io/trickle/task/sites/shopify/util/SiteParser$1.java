@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.sites.Site
  */
 package io.trickle.task.sites.shopify.util;
 
@@ -490,12 +493,16 @@ public class SiteParser$1 {
             // empty catch block
         }
         try {
-            SiteParser$1.$SwitchMap$io$trickle$task$sites$Site[Site.DWAYN_TEST.ordinal()] = 81;
-            return;
+            SiteParser$1.$SwitchMap$io$trickle$task$sites$Site[Site.ENERGIE334.ordinal()] = 81;
+        }
+        catch (NoSuchFieldError noSuchFieldError) {
+            // empty catch block
+        }
+        try {
+            SiteParser$1.$SwitchMap$io$trickle$task$sites$Site[Site.DWAYN_TEST.ordinal()] = 82;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
     }
 }
-

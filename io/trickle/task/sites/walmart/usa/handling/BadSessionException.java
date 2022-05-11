@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  */
 package io.trickle.task.sites.walmart.usa.handling;
 
@@ -9,4 +9,3 @@ extends Exception {
         super("Bad session");
     }
 }
-

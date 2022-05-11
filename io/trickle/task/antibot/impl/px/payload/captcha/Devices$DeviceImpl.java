@@ -1,67 +1,63 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.payload.captcha.Devices$Device
+ *  io.trickle.task.antibot.impl.px.payload.captcha.util.DeviceHeaderParsers
  *  io.vertx.core.json.JsonArray
  *  io.vertx.core.json.JsonObject
  */
 package io.trickle.task.antibot.impl.px.payload.captcha;
 
-import io.trickle.task.antibot.impl.px.payload.captcha.Devices$Device;
+import io.trickle.task.antibot.impl.px.payload.captcha.Devices;
 import io.trickle.task.antibot.impl.px.payload.captcha.util.DeviceHeaderParsers;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 public class Devices$DeviceImpl
-implements Devices$Device {
+implements Devices.Device {
     public int outerWidth;
-    public String acceptLanguage;
-    public int width;
-    public String appCodeName;
-    public int screenX;
-    public String acceptEncoding;
-    public String appName;
-    public JsonObject mongoDocument;
-    public String platform;
-    public int screenY;
-    public String secUA;
-    public int innerHeight;
-    public String appVersion;
     public int scrollbarWidth;
-    public int availWidth;
-    public int height;
-    public String productSub;
-    public String product;
-    public int outerHeight;
-    public int availHeight;
     public int innerWidth;
+    public int innerHeight;
+    public String appCodeName;
     public String secUAMobile;
     public String useragent;
+    public int height;
+    public JsonObject mongoDocument;
+    public String productSub;
+    public int outerHeight;
+    public String appVersion;
+    public String acceptLanguage;
+    public String product;
+    public int availWidth;
+    public int width;
+    public String appName;
+    public String secUA;
+    public String acceptEncoding;
+    public int screenY;
+    public int screenX;
+    public int availHeight;
+    public String platform;
 
-    public String getSecUA() {
-        return this.secUA;
-    }
-
-    public Number getNumber(String string) {
-        return this.mongoDocument.getNumber(string);
-    }
-
-    @Override
-    public String getAppName() {
-        return this.appName;
+    public String getUserAgent() {
+        return this.useragent;
     }
 
     public Boolean getBool(String string) {
         return this.mongoDocument.getBoolean(string);
     }
 
-    public String getAcceptEncoding() {
-        return this.acceptEncoding;
+    public String getAcceptLanguage() {
+        return this.acceptLanguage == null ? DeviceHeaderParsers.getAcceptLanguage((JsonArray)this.getArr("PX313")) : this.acceptLanguage;
     }
 
-    @Override
-    public int getInnerWidth() {
-        return this.innerWidth;
+    public int getAvailHeight() {
+        return this.availHeight;
+    }
+
+    public String getProductSub() {
+        return this.productSub;
     }
 
     public Devices$DeviceImpl(int n, int n2, int n3, int n4, int n5, int n6, String string, String string2, String string3, String string4, String string5, String string6, String string7) {
@@ -80,85 +76,60 @@ implements Devices$Device {
         this.appCodeName = string7;
     }
 
-    @Override
-    public String getPlatform() {
-        return this.platform;
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
-    }
-
-    @Override
-    public int getWidth() {
-        return this.width;
-    }
-
-    @Override
-    public String getAppVersion() {
-        return this.appVersion;
-    }
-
-    @Override
-    public String getAppCodeName() {
-        return this.appCodeName;
-    }
-
-    public String getAcceptLanguage() {
-        String string;
-        if (this.acceptLanguage == null) {
-            string = DeviceHeaderParsers.getAcceptLanguage(this.getArr("PX313"));
-            return string;
-        }
-        string = this.acceptLanguage;
-        return string;
-    }
-
-    @Override
-    public int getAvailWidth() {
-        return this.availWidth;
-    }
-
-    @Override
     public String getProduct() {
         return this.product;
     }
 
-    public int getScrollbarWidth() {
-        return this.scrollbarWidth;
+    public Number getNumber(String string) {
+        return this.mongoDocument.getNumber(string);
     }
 
-    public String getSecUAMobile() {
-        return this.secUAMobile;
-    }
-
-    public String getString(String string) {
-        return this.mongoDocument.getString(string);
-    }
-
-    @Override
-    public int getAvailHeight() {
-        return this.availHeight;
-    }
-
-    @Override
-    public String getUserAgent() {
-        return this.useragent;
+    public int getInnerHeight() {
+        return this.innerHeight;
     }
 
     public JsonArray getArr(String string) {
         return this.mongoDocument.getJsonArray(string);
     }
 
-    @Override
-    public String getProductSub() {
-        return this.productSub;
+    public String getAppName() {
+        return this.appName;
     }
 
-    @Override
-    public int getInnerHeight() {
-        return this.innerHeight;
+    public int getAvailWidth() {
+        return this.availWidth;
+    }
+
+    public String getString(String string) {
+        return this.mongoDocument.getString(string);
+    }
+
+    public String getPlatform() {
+        return this.platform;
+    }
+
+    public String getSecUA() {
+        return this.secUA;
+    }
+
+    public String getAppVersion() {
+        return this.appVersion;
+    }
+
+    public int getHeight() {
+        return this.height;
+    }
+
+    public String getAppCodeName() {
+        return this.appCodeName;
+    }
+
+    public String getAcceptEncoding() {
+        return this.acceptEncoding;
+    }
+
+    public int getScrollbarWidth() {
+        return this.scrollbarWidth;
     }
 
     public Devices$DeviceImpl(JsonObject jsonObject) {
@@ -194,5 +165,16 @@ implements Devices$Device {
         this.appCodeName = jsonObject.getString("PX66");
         this.scrollbarWidth = jsonObject.getInteger("scrollbarWidth") == null ? 0 : jsonObject.getInteger("scrollbarWidth");
     }
-}
 
+    public int getWidth() {
+        return this.width;
+    }
+
+    public String getSecUAMobile() {
+        return this.secUAMobile;
+    }
+
+    public int getInnerWidth() {
+        return this.innerWidth;
+    }
+}

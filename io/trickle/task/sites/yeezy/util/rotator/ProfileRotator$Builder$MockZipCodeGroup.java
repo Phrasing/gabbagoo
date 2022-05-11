@@ -1,5 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.profile.Profile
  */
 package io.trickle.task.sites.yeezy.util.rotator;
 
@@ -8,12 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProfileRotator$Builder$MockZipCodeGroup {
-    public String zipCode;
     public List<Profile> profiles;
+    public String zipCode;
 
     public ProfileRotator$Builder$MockZipCodeGroup(String string) {
         this.zipCode = string;
         this.profiles = new ArrayList<Profile>();
     }
 }
-

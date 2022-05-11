@@ -1,5 +1,9 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.Types
+ *  io.trickle.task.sites.Site
  */
 package io.trickle.task.antibot.impl.px.payload.captcha;
 
@@ -33,11 +37,9 @@ public class PXCaptcha$1 {
         }
         try {
             PXCaptcha$1.$SwitchMap$io$trickle$task$sites$Site[Site.WALMART.ordinal()] = 2;
-            return;
         }
         catch (NoSuchFieldError noSuchFieldError) {
             // empty catch block
         }
     }
 }
-

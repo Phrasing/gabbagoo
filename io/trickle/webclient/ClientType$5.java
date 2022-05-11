@@ -1,7 +1,8 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.webclient.ClientType
  *  io.vertx.core.http.Http2Settings
  *  io.vertx.core.http.HttpVersion
  *  io.vertx.core.net.ConscryptSSLEngineOptions
@@ -22,7 +23,23 @@ import java.util.List;
 
 public class ClientType$5
 extends ClientType {
-    @Override
+    public ClientType$5() {
+        super(string, n);
+    }
+
+    public List ciphersRandomised() {
+        List list = this.ciphers();
+        Collections.shuffle(list);
+        return list;
+    }
+
+    public WebClientOptions options() {
+        WebClientOptions webClientOptions = new WebClientOptions();
+        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions()).addEnabledSecureTransportProtocol("TLSv1.3").addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
+        super.baseOptions(webClientOptions);
+        return webClientOptions;
+    }
+
     public List ciphers() {
         ArrayList<String> arrayList = new ArrayList<String>();
         arrayList.add("TLS_AES_128_GCM_SHA256");
@@ -43,23 +60,7 @@ extends ClientType {
         return arrayList;
     }
 
-    @Override
     public int getWindowUpdate() {
         return 0xFF0001;
     }
-
-    public List ciphersRandomised() {
-        List list = this.ciphers();
-        Collections.shuffle(list);
-        return list;
-    }
-
-    @Override
-    public WebClientOptions options() {
-        WebClientOptions webClientOptions = new WebClientOptions();
-        webClientOptions.setInitialSettings(new Http2Settings().setInitialWindowSize(0x1000000)).setProtocolVersion(HttpVersion.HTTP_2).setSslEngineOptions((SSLEngineOptions)new ConscryptSSLEngineOptions()).addEnabledSecureTransportProtocol("TLSv1.3").addEnabledSecureTransportProtocol("TLSv1.2").addEnabledSecureTransportProtocol("TLSv1.1").addEnabledSecureTransportProtocol("TLSv1.0").getEnabledCipherSuites().addAll(this.ciphers());
-        super.baseOptions(webClientOptions);
-        return webClientOptions;
-    }
 }
-

@@ -1,39 +1,49 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.px.payload.token.Battery
+ *  io.trickle.task.antibot.impl.px.payload.token.Devices$Device
  *  io.vertx.core.json.JsonObject
  */
 package io.trickle.task.antibot.impl.px.payload.token;
 
 import io.trickle.task.antibot.impl.px.payload.token.Battery;
-import io.trickle.task.antibot.impl.px.payload.token.Devices$Device;
+import io.trickle.task.antibot.impl.px.payload.token.Devices;
 import io.vertx.core.json.JsonObject;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Devices$DeviceImpl
-implements Devices$Device {
+implements Devices.Device {
     public boolean gyroscope = true;
-    public String brand;
-    public int apiLevel;
-    public boolean touchscreen = true;
-    public boolean nfc = true;
-    public String deviceName;
-    public String operatingSystem;
-    public String[] carriers = new String[]{"T-Mobile", "Sprint", "AT&T"};
-    public int width;
-    public boolean gps = true;
-    public String carrier;
-    public boolean accelerometer = true;
-    public Battery battery;
-    public boolean ethernet = true;
-    public boolean wifi = true;
     public static Pattern API_LEVEL_PATTERN = Pattern.compile("\\(([0-9]*)?\\)");
+    public int apiLevel;
+    public String brand;
     public String connectionType;
-    public String cellular;
+    public String[] carriers = new String[]{"T-Mobile", "Sprint", "AT&T"};
+    public String deviceName;
+    public boolean gps = true;
+    public boolean touchscreen = true;
+    public boolean wifi = true;
+    public int width;
+    public String carrier;
+    public String operatingSystem;
+    public boolean accelerometer = true;
     public int height;
+    public Battery battery;
+    public boolean nfc = true;
+    public boolean ethernet = true;
+    public String cellular;
+
+    public String getCellular() {
+        return this.cellular;
+    }
+
+    public String getBrand() {
+        return this.brand;
+    }
 
     public Devices$DeviceImpl(int n, int n2, String string, String string2, String string3, int n3) {
         this.width = n;
@@ -46,6 +56,83 @@ implements Devices$Device {
         this.carrier = this.randomCarrier();
         this.apiLevel = n3;
         this.battery = Battery.get();
+    }
+
+    public int getApiLevel() {
+        return this.apiLevel;
+    }
+
+    public void disableAccelerometer() {
+        this.accelerometer = false;
+    }
+
+    public String randomCellular() {
+        return "Unknown";
+    }
+
+    public int getHeight() {
+        return this.height;
+    }
+
+    public String getOperatingSystem() {
+        return this.operatingSystem;
+    }
+
+    public String randomCarrier() {
+        if (!this.cellular.equals("4G")) return this.carriers[ThreadLocalRandom.current().nextInt(0, this.carriers.length)];
+        return this.carriers[ThreadLocalRandom.current().nextInt(1, this.carriers.length)];
+    }
+
+    public boolean isGps() {
+        return this.gps;
+    }
+
+    public boolean isEthernet() {
+        return this.ethernet;
+    }
+
+    public void disableEthernet() {
+        this.ethernet = false;
+    }
+
+    public boolean isAccelerometer() {
+        return this.accelerometer;
+    }
+
+    public void disableGyroscope() {
+        this.gyroscope = false;
+    }
+
+    public boolean isGyroscope() {
+        return this.gyroscope;
+    }
+
+    public int getWidth() {
+        return this.width;
+    }
+
+    public String getConnectionType() {
+        return this.connectionType;
+    }
+
+    public String getCarrier() {
+        return this.carrier;
+    }
+
+    public String randomConnectionType() {
+        return "wifi";
+    }
+
+    public void disableNFC() {
+        this.nfc = false;
+    }
+
+    public void disableWIFI() {
+        this.wifi = false;
+    }
+
+    public boolean isNfc() {
+        return this.nfc;
     }
 
     public Devices$DeviceImpl(JsonObject jsonObject) {
@@ -65,130 +152,27 @@ implements Devices$Device {
         this.disableEthernet();
     }
 
-    public String randomCellular() {
-        return "Unknown";
-    }
-
-    public String randomCarrier() {
-        if (!this.cellular.equals("4G")) return this.carriers[ThreadLocalRandom.current().nextInt(0, this.carriers.length)];
-        return this.carriers[ThreadLocalRandom.current().nextInt(1, this.carriers.length)];
-    }
-
-    @Override
-    public int getApiLevel() {
-        return this.apiLevel;
-    }
-
-    @Override
-    public int getWidth() {
-        return this.width;
-    }
-
-    @Override
-    public boolean isGps() {
-        return this.gps;
-    }
-
-    public void disableEthernet() {
-        this.ethernet = false;
-    }
-
-    @Override
-    public Battery getBattery() {
-        return this.battery;
-    }
-
-    public void disableAccelerometer() {
-        this.accelerometer = false;
-    }
-
-    @Override
-    public String getOperatingSystem() {
-        return this.operatingSystem;
-    }
-
-    public String randomConnectionType() {
-        return "wifi";
-    }
-
-    @Override
-    public String getCellular() {
-        return this.cellular;
-    }
-
-    @Override
-    public boolean isWifi() {
-        return this.wifi;
-    }
-
-    @Override
-    public int getHeight() {
-        return this.height;
-    }
-
-    @Override
-    public String getConnectionType() {
-        return this.connectionType;
-    }
-
-    @Override
-    public String getCarrier() {
-        return this.carrier;
-    }
-
-    public void disableNFC() {
-        this.nfc = false;
-    }
-
-    @Override
-    public boolean isGyroscope() {
-        return this.gyroscope;
-    }
-
-    public void disableGyroscope() {
-        this.gyroscope = false;
-    }
-
     public void disableGPS() {
         this.gps = false;
     }
 
-    public void disableWIFI() {
-        this.wifi = false;
+    public Battery getBattery() {
+        return this.battery;
     }
 
-    @Override
-    public boolean isEthernet() {
-        return this.ethernet;
+    public boolean isWifi() {
+        return this.wifi;
     }
 
-    @Override
-    public String getBrand() {
-        return this.brand;
-    }
-
-    @Override
-    public String getDeviceName() {
-        return this.deviceName;
+    public boolean isTouchscreen() {
+        return this.touchscreen;
     }
 
     public void disableTouchscreen() {
         this.touchscreen = false;
     }
 
-    @Override
-    public boolean isTouchscreen() {
-        return this.touchscreen;
-    }
-
-    @Override
-    public boolean isAccelerometer() {
-        return this.accelerometer;
-    }
-
-    @Override
-    public boolean isNfc() {
-        return this.nfc;
+    public String getDeviceName() {
+        return this.deviceName;
     }
 }
-

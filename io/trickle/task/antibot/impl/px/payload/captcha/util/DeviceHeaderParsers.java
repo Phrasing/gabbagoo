@@ -1,5 +1,5 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
  *  io.vertx.core.json.JsonArray
@@ -11,8 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DeviceHeaderParsers {
-    public String[] SEPERATORS = new String[]{"\\", "\"", ";", " "};
     public static Pattern CHROME_VERSION_PATTERN = Pattern.compile("\\sChrome/([0-9][0-9])");
+    public String[] SEPERATORS = new String[]{"\\", "\"", ";", " "};
 
     public static String getSecUA(String string) {
         Matcher matcher = CHROME_VERSION_PATTERN.matcher(string);
@@ -27,4 +27,3 @@ public class DeviceHeaderParsers {
         return jsonArray.toString().replace("[", "").replace("]", "").replace("\"", "") + ";q=0.9";
     }
 }
-

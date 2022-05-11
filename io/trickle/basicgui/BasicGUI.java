@@ -1,10 +1,18 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.basicgui.AIOverrideListener
+ *  io.trickle.basicgui.BasicGUI$1
+ *  io.trickle.basicgui.DelayOverrideListener
+ *  io.trickle.basicgui.KeywordOverrideListener
+ *  io.trickle.basicgui.LinkOverrideListener
+ *  io.trickle.basicgui.PasswordOverrideListener
  */
 package io.trickle.basicgui;
 
 import io.trickle.basicgui.AIOverrideListener;
-import io.trickle.basicgui.BasicGUI$1;
+import io.trickle.basicgui.BasicGUI;
 import io.trickle.basicgui.DelayOverrideListener;
 import io.trickle.basicgui.KeywordOverrideListener;
 import io.trickle.basicgui.LinkOverrideListener;
@@ -16,6 +24,9 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.TextField;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -34,9 +45,9 @@ public class BasicGUI {
         JCheckBox jCheckBox = new JCheckBox("OFF");
         JCheckBox jCheckBox2 = new JCheckBox("Auto");
         DelayOverrideListener delayOverrideListener = new DelayOverrideListener(textField, jCheckBox);
-        textField.addKeyListener(delayOverrideListener);
-        jCheckBox.addActionListener(delayOverrideListener);
-        jCheckBox2.addActionListener(new AIOverrideListener(jCheckBox2));
+        textField.addKeyListener((KeyListener)delayOverrideListener);
+        jCheckBox.addActionListener((ActionListener)delayOverrideListener);
+        jCheckBox2.addActionListener((ActionListener)new AIOverrideListener(jCheckBox2));
         jPanel.add(label);
         jPanel.add(textField);
         jPanel.add(jCheckBox);
@@ -45,7 +56,7 @@ public class BasicGUI {
         Label label2 = new Label("Link       ");
         TextField textField2 = new TextField(40);
         LinkOverrideListener linkOverrideListener = new LinkOverrideListener();
-        textField2.addKeyListener(linkOverrideListener);
+        textField2.addKeyListener((KeyListener)linkOverrideListener);
         jPanel2.add(label2);
         jPanel2.add(textField2);
         JPanel jPanel3 = new JPanel(new FlowLayout(3, 5, 2));
@@ -53,7 +64,7 @@ public class BasicGUI {
         TextField textField3 = new TextField(40);
         JButton jButton = new JButton("Change");
         KeywordOverrideListener keywordOverrideListener = new KeywordOverrideListener(textField3);
-        jButton.addActionListener(keywordOverrideListener);
+        jButton.addActionListener((ActionListener)keywordOverrideListener);
         jPanel3.add(label3);
         jPanel3.add(textField3);
         jPanel3.add(jButton);
@@ -62,7 +73,7 @@ public class BasicGUI {
         TextField textField4 = new TextField(40);
         JButton jButton2 = new JButton("Change");
         PasswordOverrideListener passwordOverrideListener = new PasswordOverrideListener(textField4);
-        jButton2.addActionListener(passwordOverrideListener);
+        jButton2.addActionListener((ActionListener)passwordOverrideListener);
         jPanel4.add(label4);
         jPanel4.add(textField4);
         jPanel4.add(jButton2);
@@ -77,9 +88,8 @@ public class BasicGUI {
         int n = (int)((dimension.getWidth() - (double)frame.getWidth()) / Double.longBitsToDouble(0x4000000000000000L));
         int n2 = (int)((dimension.getHeight() - (double)(frame.getHeight() * 2)) / Double.longBitsToDouble(0x4000000000000000L));
         frame.setLocation(n, n2);
-        frame.addWindowListener(new BasicGUI$1(this, frame));
+        frame.addWindowListener((WindowListener)new 1(this, frame));
         frame.setVisible(true);
-        frame.setResizable(false);
+        frame.setResizable(true);
     }
 }
-

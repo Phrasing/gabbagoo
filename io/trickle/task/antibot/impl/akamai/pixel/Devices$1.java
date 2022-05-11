@@ -1,16 +1,22 @@
 /*
- * Decompiled with CFR 0.151.
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  io.trickle.task.antibot.impl.akamai.pixel.Devices
+ *  io.trickle.task.antibot.impl.akamai.pixel.Devices$Device
  */
 package io.trickle.task.antibot.impl.akamai.pixel;
 
 import io.trickle.task.antibot.impl.akamai.pixel.Devices;
-import io.trickle.task.antibot.impl.akamai.pixel.Devices$Device;
 
 public class Devices$1
 extends Devices {
-    @Override
-    public Devices$Device get() {
-        return null;
+    public Devices.Device get() {
+        Devices.Device device = null;
+        return device;
+    }
+
+    public Devices$1() {
+        super(string, n);
     }
 }
-
