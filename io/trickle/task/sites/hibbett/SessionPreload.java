@@ -483,8 +483,8 @@ public class SessionPreload {
    }
 
    public static CompletableFuture async$fetch(SessionPreload var0, CompletableFuture var1, JsonArray var2, String var3, String var4, int var5, List var6, String var7, String var8, String var9, String var10, String var11, Iterator var12, Integer var13, int var14, Object var15) {
-      CompletableFuture var10000;
       JsonArray var16;
+      CompletableFuture var10000;
       String var17;
       int var18;
       Object var19;

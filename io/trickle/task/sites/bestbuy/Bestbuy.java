@@ -180,51 +180,58 @@ public class Bestbuy extends TaskActor {
       CompletableFuture var10000;
       Message[] var6;
       CompletableFuture var8;
-      label60: {
-         switch (var4) {
-            case 0:
-               if (var0.imapClient == null) {
-                  var0.imapClient = MailClient.create(VertxSingleton.INSTANCE.get());
-               }
+      switch (var4) {
+         case 0:
+            if (var0.imapClient == null) {
+               var0.imapClient = MailClient.create(VertxSingleton.INSTANCE.get());
+            }
 
-               var10000 = var0.imapClient.connectFut(var1.getUser(), var1.getPass());
-               if (!var10000.isDone()) {
-                  var8 = var10000;
-                  return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
-               }
-               break;
-            case 1:
-               var10000 = var2;
-               break;
-            case 2:
-               var6 = (Message[])var2.join();
-               break label60;
-            case 3:
-               var2.join();
-               var10000 = var0.imapClient.readInboxFuture(Login.SEARCH_TERM);
-               if (!var10000.isDone()) {
-                  var8 = var10000;
-                  return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
-               }
+            var10000 = var0.imapClient.connectFut(var1.getUser(), var1.getPass());
+            if (!var10000.isDone()) {
+               var8 = var10000;
+               return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
+            }
 
-               var6 = (Message[])var10000.join();
-               break label60;
-            case 4:
-               var6 = (Message[])var2.join();
-               break label60;
-            default:
-               throw new IllegalArgumentException();
-         }
+            var10000.join();
+            var10000 = var0.imapClient.readInboxFuture(Login.SEARCH_TERM);
+            if (!var10000.isDone()) {
+               var8 = var10000;
+               return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
+            }
 
-         var10000.join();
-         var10000 = var0.imapClient.readInboxFuture(Login.SEARCH_TERM);
-         if (!var10000.isDone()) {
-            var8 = var10000;
-            return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
-         }
+            var6 = (Message[])var10000.join();
+            break;
+         case 1:
+            var2.join();
+            var10000 = var0.imapClient.readInboxFuture(Login.SEARCH_TERM);
+            if (!var10000.isDone()) {
+               var8 = var10000;
+               return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
+            }
+
+            var6 = (Message[])var10000.join();
+            break;
+         case 2:
+            var6 = (Message[])var2.join();
+            break;
+         case 3:
+            var2.join();
+            var10000 = var0.imapClient.readInboxFuture(Login.SEARCH_TERM);
+            if (!var10000.isDone()) {
+               var8 = var10000;
+               return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
+            }
+
+            var6 = (Message[])var10000.join();
+            break;
+         case 4:
+            var6 = (Message[])var2.join();
+            break;
+         default:
+            throw new IllegalArgumentException();
       }
 
-      for(var6 = (Message[])var10000.join(); var6.length == 0; var6 = (Message[])var10000.join()) {
+      while(var6.length == 0) {
          var0.logger.error("Waiting for email to arrive... [{}]", var1.getUser());
          var10000 = VertxUtil.randomSleep((long)var0.task.getRetryDelay());
          if (!var10000.isDone()) {
@@ -238,6 +245,8 @@ public class Bestbuy extends TaskActor {
             var8 = var10000;
             return var8.exceptionally(Function.identity()).thenCompose(Bestbuy::async$getLoginVerificationCode);
          }
+
+         var6 = (Message[])var10000.join();
       }
 
       String var7 = MessageUtils.getTextFromMessage(var6[var6.length - 1]);
@@ -1697,8 +1706,8 @@ public class Bestbuy extends TaskActor {
             label117: {
                label118: {
                   label119: {
-                     label120: {
-                        label90: {
+                     label92: {
+                        label120: {
                            label89: {
                               label88: {
                                  String var10001;
@@ -1741,7 +1750,7 @@ public class Bestbuy extends TaskActor {
                                        var16 = var10003;
                                        var15 = var2;
                                        var14 = var10001;
-                                       break label90;
+                                       break label120;
                                     case 5:
                                        var10000 = var4;
                                        var10001 = var3;
@@ -1754,7 +1763,7 @@ public class Bestbuy extends TaskActor {
                                        var16 = var10003;
                                        var15 = var2;
                                        var14 = var10001;
-                                       break label120;
+                                       break label92;
                                     case 6:
                                        var10000 = var4;
                                        var10001 = var3;

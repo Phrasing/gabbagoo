@@ -141,6 +141,7 @@ public class SocketClient extends AbstractVerticle {
    }
 
    public void socketLog(int var1, JsonObject var2) {
+      this.socketLog(var1, var2.encode());
    }
 
    public void reconnect() {
@@ -213,6 +214,7 @@ public class SocketClient extends AbstractVerticle {
    }
 
    public void socketLog(int var1, Buffer var2) {
+      this.socketLog(var1, var2.toString());
    }
 
    public void lambda$reconnect$4(Void var1) {

@@ -692,8 +692,8 @@ public class WalmartNewAPI extends API {
          int var21;
          label130: {
             WalmartNewAPI var10000;
-            CompletableFuture var10001;
             JsonObject var17;
+            CompletableFuture var10001;
             String var18;
             CompletableFuture var24;
             label131: {

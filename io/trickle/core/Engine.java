@@ -152,6 +152,8 @@ public class Engine implements Module {
 
    public void terminate() {
       this.terminateModules();
+      this.client.disconnect();
+      this.vertx.undeploy(this.client.deploymentID());
    }
 
    public void lambda$initialise$5(AsyncResult var1) {
@@ -196,7 +198,7 @@ public class Engine implements Module {
    }
 
    public void initialise() {
-      CompletableFuture.runAsync(this::lambda$initialise$4);
+      this.vertx.deployVerticle(this.client).onSuccess(this::lambda$initialise$6).onFailure(Engine::lambda$initialise$7);
    }
 
    public void install(Controller var1, Module var2) {

@@ -2044,8 +2044,8 @@ public class ShopifySafe extends Shopify {
                         String var16;
                         JsonArray var10001;
                         CompletableFuture var17;
-                        Logger var18;
                         String var10002;
+                        Logger var18;
                         Logger var19;
                         CompletableFuture var20;
                         String var10004;

@@ -1061,26 +1061,26 @@ public class WalmartAPIDesktop extends API {
 
    public static CompletableFuture async$handleBadResponse(WalmartAPIDesktop var0, int var1, HttpResponse var2, CompletableFuture var3, JsonObject var4, String var5, String var6, WalmartAPIDesktop var7, int var8, Matcher var9, String var10, int var11, Object var12) {
       CompletableFuture var27;
-      label141: {
+      label136: {
          WalmartAPIDesktop var10000;
          CompletableFuture var10001;
          int var23;
-         label123: {
+         label119: {
             JsonObject var19;
             String var20;
             CompletableFuture var26;
-            label150: {
-               label120: {
+            label145: {
+               label116: {
                   Throwable var30;
-                  label119: {
+                  label115: {
                      int var24;
                      boolean var29;
-                     label143: {
-                        label115: {
+                     label138: {
+                        label112: {
                            String var18;
                            Matcher var21;
                            String var10003;
-                           label102:
+                           label101:
                            switch (var11) {
                               case 0:
                                  CompletableFuture var25;
@@ -1093,12 +1093,12 @@ public class WalmartAPIDesktop extends API {
                                                 var25 = var27;
                                                 return var25.exceptionally(Function.identity()).thenCompose(WalmartAPIDesktop::async$handleBadResponse);
                                              }
-                                             break label115;
+                                             break label112;
                                           }
                                        } catch (Throwable var17) {
                                           var30 = var17;
                                           var29 = false;
-                                          break label119;
+                                          break label115;
                                        }
 
                                        try {
@@ -1117,11 +1117,11 @@ public class WalmartAPIDesktop extends API {
                                              var26 = var10001;
                                              return var26.exceptionally(Function.identity()).thenCompose(WalmartAPIDesktop::async$handleBadResponse);
                                           }
-                                          break label102;
+                                          break label101;
                                        } catch (Throwable var16) {
                                           var30 = var16;
                                           var29 = false;
-                                          break label119;
+                                          break label115;
                                        }
                                     case 412:
                                        if (!var0.task.getMode().contains("skip") && var2 != null) {
@@ -1134,7 +1134,7 @@ public class WalmartAPIDesktop extends API {
                                              var26 = var10001;
                                              return var26.exceptionally(Function.identity()).thenCompose(WalmartAPIDesktop::async$handleBadResponse);
                                           }
-                                          break label150;
+                                          break label145;
                                        }
 
                                        var27 = var0.generatePX(true);
@@ -1142,15 +1142,15 @@ public class WalmartAPIDesktop extends API {
                                           var25 = var27;
                                           return var25.exceptionally(Function.identity()).thenCompose(WalmartAPIDesktop::async$handleBadResponse);
                                        }
-                                       break label141;
+                                       break label136;
                                     case 444:
-                                       break label120;
+                                       break label116;
                                     default:
                                        return CompletableFuture.completedFuture(true);
                                  }
                               case 1:
                                  var27 = var3;
-                                 break label141;
+                                 break label136;
                               case 2:
                                  var10000 = var7;
                                  var10001 = var3;
@@ -1159,15 +1159,15 @@ public class WalmartAPIDesktop extends API {
                                  var5 = var6;
                                  var20 = var10003;
                                  var19 = var28;
-                                 break label150;
+                                 break label145;
                               case 3:
                                  var10000 = var7;
                                  var10001 = var3;
                                  var23 = var8;
-                                 break label123;
+                                 break label119;
                               case 4:
                                  var27 = var3;
-                                 break label115;
+                                 break label112;
                               case 5:
                                  var10000 = var7;
                                  var10001 = var3;
@@ -1182,7 +1182,7 @@ public class WalmartAPIDesktop extends API {
                                  var10000 = var7;
                                  var10001 = var3;
                                  var24 = var8;
-                                 break label143;
+                                 break label138;
                               default:
                                  throw new IllegalArgumentException();
                            }
@@ -1195,11 +1195,11 @@ public class WalmartAPIDesktop extends API {
                                  var26 = var10001;
                                  return var26.exceptionally(Function.identity()).thenCompose(WalmartAPIDesktop::async$handleBadResponse);
                               }
-                              break label143;
+                              break label138;
                            } catch (Throwable var15) {
                               var30 = var15;
                               var29 = false;
-                              break label119;
+                              break label115;
                            }
                         }
 
@@ -1209,7 +1209,7 @@ public class WalmartAPIDesktop extends API {
                         } catch (Throwable var14) {
                            var30 = var14;
                            var29 = false;
-                           break label119;
+                           break label115;
                         }
                      }
 
