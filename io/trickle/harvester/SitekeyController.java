@@ -1,19 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.api.LoadableAsync
- *  io.trickle.core.api.Module
- *  io.trickle.util.Storage
- *  io.vertx.core.AsyncResult
- *  io.vertx.core.Future
- *  io.vertx.core.Vertx
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.file.FileSystem
- *  io.vertx.core.json.JsonObject
- *  org.apache.logging.log4j.LogManager
- *  org.apache.logging.log4j.Logger
- */
 package io.trickle.harvester;
 
 import io.trickle.core.api.LoadableAsync;
@@ -28,61 +12,55 @@ import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SitekeyController
-implements Module,
-LoadableAsync {
-    public JsonObject SITEKEY_STORAGE;
-    public static Logger logger;
-    public static String SITEKEY_PATH;
-    public Vertx vertx;
+public class SitekeyController implements Module, LoadableAsync {
+   public JsonObject SITEKEY_STORAGE;
+   public static Logger logger = LogManager.getLogger(SitekeyController.class);
+   public static String SITEKEY_PATH = "/sitekeys.json";
+   public Vertx vertx;
 
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile(Storage.CONFIG_PATH + "/sitekeys.json").otherwise(SitekeyController::lambda$load$0).map(Buffer::toString).map(this::parseFile).compose(this::lambda$load$1);
-    }
+   public Future load() {
+      FileSystem var1 = this.vertx.fileSystem();
+      return var1.readFile(Storage.CONFIG_PATH + "/sitekeys.json").otherwise(SitekeyController::lambda$load$0).map(Buffer::toString).map(this::parseFile).compose(this::lambda$load$1);
+   }
 
-    public Future lambda$load$1(JsonObject jsonObject) {
-        logger.debug("Loaded sitekeys");
-        this.SITEKEY_STORAGE = jsonObject;
-        return Future.succeededFuture();
-    }
+   public Future lambda$load$1(JsonObject var1) {
+      logger.debug("Loaded sitekeys");
+      this.SITEKEY_STORAGE = var1;
+      return Future.succeededFuture();
+   }
 
-    static {
-        SITEKEY_PATH = "/sitekeys.json";
-        logger = LogManager.getLogger(SitekeyController.class);
-    }
+   public static Buffer lambda$load$0(Throwable var0) {
+      logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", "/sitekeys.json".replace("/", ""));
+      return Buffer.buffer("{}");
+   }
 
-    public static Buffer lambda$load$0(Throwable throwable) {
-        logger.warn("Failed to find '{}' (Required for Shopify!). Proceeding without...", (Object)"/sitekeys.json".replace("/", ""));
-        return Buffer.buffer((String)"{}");
-    }
+   public void terminate() {
+      FileSystem var1 = this.vertx.fileSystem();
+      var1.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
+   }
 
-    public void terminate() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        fileSystem.writeFile("/sitekeys.json", this.SITEKEY_STORAGE.toBuffer(), SitekeyController::lambda$terminate$2);
-    }
+   public JsonObject parseFile(String var1) {
+      return new JsonObject(var1);
+   }
 
-    public JsonObject parseFile(String string) {
-        return new JsonObject(string);
-    }
+   public static void lambda$terminate$2(AsyncResult var0) {
+      if (var0.succeeded()) {
+         logger.debug("Updated sitekeys.json");
+      } else {
+         logger.error("Unable to update sitekeys.json");
+      }
 
-    public static void lambda$terminate$2(AsyncResult asyncResult) {
-        if (asyncResult.succeeded()) {
-            logger.debug("Updated sitekeys.json");
-        } else {
-            logger.error("Unable to update sitekeys.json");
-        }
-    }
+   }
 
-    public void initialise() {
-        logger.debug("Initialised.");
-    }
+   public void initialise() {
+      logger.debug("Initialised.");
+   }
 
-    public SitekeyController(Vertx vertx) {
-        this.vertx = vertx;
-    }
+   public SitekeyController(Vertx var1) {
+      this.vertx = var1;
+   }
 
-    public JsonObject getSitekeys() {
-        return this.SITEKEY_STORAGE;
-    }
+   public JsonObject getSitekeys() {
+      return this.SITEKEY_STORAGE;
+   }
 }

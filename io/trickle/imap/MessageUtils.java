@@ -1,12 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  javax.mail.BodyPart
- *  javax.mail.Message
- *  javax.mail.internet.MimeMultipart
- *  org.jsoup.Jsoup
- */
 package io.trickle.imap;
 
 import javax.mail.BodyPart;
@@ -15,36 +6,39 @@ import javax.mail.internet.MimeMultipart;
 import org.jsoup.Jsoup;
 
 public class MessageUtils {
-    public static String getTextFromMessage(Message message) {
-        String string = "";
-        if (message.isMimeType("text/plain") || message.getContentType().toLowerCase().contains("text")) {
-            string = message.getContent().toString();
-        } else {
-            if (!message.isMimeType("multipart/*")) return string;
-            MimeMultipart mimeMultipart = (MimeMultipart)message.getContent();
-            string = MessageUtils.getTextFromMimeMultipart(mimeMultipart);
-        }
-        return string;
-    }
+   public static String getTextFromMessage(Message var0) {
+      String var1 = "";
+      if (!var0.isMimeType("text/plain") && !var0.getContentType().toLowerCase().contains("text")) {
+         if (var0.isMimeType("multipart/*")) {
+            MimeMultipart var2 = (MimeMultipart)var0.getContent();
+            var1 = getTextFromMimeMultipart(var2);
+         }
+      } else {
+         var1 = var0.getContent().toString();
+      }
 
-    public static String getTextFromMimeMultipart(MimeMultipart mimeMultipart) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int n = mimeMultipart.getCount();
-        int n2 = 0;
-        while (n2 < n) {
-            BodyPart bodyPart = mimeMultipart.getBodyPart(n2);
-            if (bodyPart.isMimeType("text/plain")) {
-                stringBuilder.append("\n").append(bodyPart.getContent());
-                return stringBuilder.toString();
-            }
-            if (bodyPart.isMimeType("text/html")) {
-                String string = (String)bodyPart.getContent();
-                stringBuilder.append("\n").append(Jsoup.parse((String)string).text());
-            } else if (bodyPart.getContent() instanceof MimeMultipart) {
-                stringBuilder.append(MessageUtils.getTextFromMimeMultipart((MimeMultipart)bodyPart.getContent()));
-            }
-            ++n2;
-        }
-        return stringBuilder.toString();
-    }
+      return var1;
+   }
+
+   public static String getTextFromMimeMultipart(MimeMultipart var0) {
+      StringBuilder var1 = new StringBuilder();
+      int var2 = var0.getCount();
+
+      for(int var3 = 0; var3 < var2; ++var3) {
+         BodyPart var4 = var0.getBodyPart(var3);
+         if (var4.isMimeType("text/plain")) {
+            var1.append("\n").append(var4.getContent());
+            break;
+         }
+
+         if (var4.isMimeType("text/html")) {
+            String var5 = (String)var4.getContent();
+            var1.append("\n").append(Jsoup.parse(var5).text());
+         } else if (var4.getContent() instanceof MimeMultipart) {
+            var1.append(getTextFromMimeMultipart((MimeMultipart)var4.getContent()));
+         }
+      }
+
+      return var1.toString();
+   }
 }

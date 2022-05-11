@@ -1,29 +1,22 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.profile.Profile
- *  io.trickle.task.sites.yeezy.util.rotator.ZipCodes
- */
 package io.trickle.task.sites.yeezy.util.rotator;
 
 import io.trickle.profile.Profile;
-import io.trickle.task.sites.yeezy.util.rotator.ZipCodes;
 import java.util.HashMap;
 
 public class SizeZipMap {
-    public HashMap<String, ZipCodes> sizeToZip = new HashMap();
+   public HashMap sizeToZip = new HashMap();
 
-    public ZipCodes getZipsOfSize(String string) {
-        return this.sizeToZip.get(string);
-    }
+   public ZipCodes getZipsOfSize(String var1) {
+      return (ZipCodes)this.sizeToZip.get(var1);
+   }
 
-    public void put(String string, Profile profile) {
-        ZipCodes zipCodes = this.sizeToZip.get(string);
-        if (zipCodes == null) {
-            zipCodes = new ZipCodes();
-            this.sizeToZip.put(string, zipCodes);
-        }
-        zipCodes.put(profile.getZip(), profile);
-    }
+   public void put(String var1, Profile var2) {
+      ZipCodes var3 = (ZipCodes)this.sizeToZip.get(var1);
+      if (var3 == null) {
+         var3 = new ZipCodes();
+         this.sizeToZip.put(var1, var3);
+      }
+
+      var3.put(var2.getZip(), var2);
+   }
 }

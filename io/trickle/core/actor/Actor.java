@@ -1,10 +1,7 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.core.actor;
 
 import java.util.concurrent.CompletableFuture;
 
 public interface Actor {
-    public CompletableFuture run();
+   CompletableFuture run();
 }

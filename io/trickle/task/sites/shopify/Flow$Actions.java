@@ -1,14 +1,11 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.sites.shopify;
 
 import java.util.Map;
 
 public interface Flow$Actions {
-    public boolean needsPrice();
+   boolean needsPrice();
 
-    public Map requiredCookies();
+   Map requiredCookies();
 
-    public boolean needsAuthTokens();
+   boolean needsAuthTokens();
 }

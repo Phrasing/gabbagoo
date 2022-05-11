@@ -1,173 +1,165 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.antibot.impl.akamai.pixel.Devices
- *  io.trickle.task.antibot.impl.akamai.pixel.Devices$Device
- *  io.trickle.task.antibot.impl.akamai.pixel.Pixel
- *  io.vertx.core.MultiMap
- *  io.vertx.core.json.JsonObject
- */
 package io.trickle.task.antibot.impl.akamai.pixel;
 
-import io.trickle.task.antibot.impl.akamai.pixel.Devices;
-import io.trickle.task.antibot.impl.akamai.pixel.Pixel;
 import io.vertx.core.MultiMap;
 import io.vertx.core.json.JsonObject;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class TrickleAPI
-implements Pixel {
-    public Devices.Device device;
+public class TrickleAPI implements Pixel {
+   public Devices$Device device;
 
-    public JsonObject getSR() {
-        return this.device.getSr();
-    }
+   public JsonObject getSR() {
+      return this.device.getSr();
+   }
 
-    public String getBR() {
-        return this.device.getBr();
-    }
+   public String getBR() {
+      return this.device.getBr();
+   }
 
-    public String getBT() {
-        if (this.device.getBt() != null) return this.device.getBt().toString();
-        return "0";
-    }
+   public String getBT() {
+      return this.device.getBt() == null ? "0" : this.device.getBt().toString();
+   }
 
-    public JsonObject getCRC() {
-        return this.device.getCrc();
-    }
+   public JsonObject getCRC() {
+      return this.device.getCrc();
+   }
 
-    public JsonObject getDP() {
-        return this.device.getDp();
-    }
+   public JsonObject getDP() {
+      return this.device.getDp();
+   }
 
-    public double getJSV() {
-        return this.device.getJsv();
-    }
+   public double getJSV() {
+      return this.device.getJsv();
+   }
 
-    public String getCV() {
-        return this.device.getCv();
-    }
+   public String getCV() {
+      return this.device.getCv();
+   }
 
-    public boolean getSP() {
-        return this.device.isSp();
-    }
+   public boolean getSP() {
+      return this.device.isSp();
+   }
 
-    public boolean getIEPS() {
-        return this.device.isIeps();
-    }
+   public boolean getIEPS() {
+      return this.device.isIeps();
+   }
 
-    public String getFontHash() {
-        return this.device.getFh();
-    }
+   public String getFontHash() {
+      return this.device.getFh();
+   }
 
-    public boolean getAP() {
-        return this.device.isAp();
-    }
+   public boolean getAP() {
+      return this.device.isAp();
+   }
 
-    public String getPS() {
-        return this.device.getPs();
-    }
+   public String getPS() {
+      return this.device.getPs();
+   }
 
-    public String getTiming() {
-        int n = 37 + ThreadLocalRandom.current().nextInt(-3, 4);
-        int n2 = 270 + ThreadLocalRandom.current().nextInt(-5, 5);
-        int n3 = 392 + ThreadLocalRandom.current().nextInt(-5, 6);
-        int n4 = 510 + ThreadLocalRandom.current().nextInt(-5, 5);
-        int n5 = 616 + ThreadLocalRandom.current().nextInt(-5, 6);
-        int n6 = ThreadLocalRandom.current().nextInt(9, 12);
-        return "{\"1\":" + n + ",\"2\":" + n2 + ",\"3\":" + n3 + ",\"4\":" + n4 + ",\"5\":" + n5 + ",\"profile\":{\"bp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"sr\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"dp\":0,\"lt\":0,\"ps\":" + ThreadLocalRandom.current().nextInt(0, 2) + ",\"cv\":" + ThreadLocalRandom.current().nextInt(22, 24) + ",\"fp\":0,\"sp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"br\":0,\"ieps\":0,\"av\":0,\"z1\":" + ThreadLocalRandom.current().nextInt(10, 11) + ",\"jsv\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nav\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nap\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"crc\":0,\"z2\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"z3\":1,\"z4\":0,\"z5\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"fonts\":" + n6 + "},\"main\":" + ThreadLocalRandom.current().nextInt(101, 104) + ",\"compute\":" + n + ",\"send\":" + (n5 + n6) + "}";
-    }
+   public String getTiming() {
+      int var1 = 37 + ThreadLocalRandom.current().nextInt(-3, 4);
+      int var2 = 270 + ThreadLocalRandom.current().nextInt(-5, 5);
+      int var3 = 392 + ThreadLocalRandom.current().nextInt(-5, 6);
+      int var4 = 510 + ThreadLocalRandom.current().nextInt(-5, 5);
+      int var5 = 616 + ThreadLocalRandom.current().nextInt(-5, 6);
+      int var6 = ThreadLocalRandom.current().nextInt(9, 12);
+      return "{\"1\":" + var1 + ",\"2\":" + var2 + ",\"3\":" + var3 + ",\"4\":" + var4 + ",\"5\":" + var5 + ",\"profile\":{\"bp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"sr\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"dp\":0,\"lt\":0,\"ps\":" + ThreadLocalRandom.current().nextInt(0, 2) + ",\"cv\":" + ThreadLocalRandom.current().nextInt(22, 24) + ",\"fp\":0,\"sp\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"br\":0,\"ieps\":0,\"av\":0,\"z1\":" + ThreadLocalRandom.current().nextInt(10, 11) + ",\"jsv\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nav\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"nap\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"crc\":0,\"z2\":" + ThreadLocalRandom.current().nextInt(1, 2) + ",\"z3\":1,\"z4\":0,\"z5\":" + ThreadLocalRandom.current().nextInt(0, 1) + ",\"fonts\":" + var6 + "},\"main\":" + ThreadLocalRandom.current().nextInt(101, 104) + ",\"compute\":" + var1 + ",\"send\":" + (var5 + var6) + "}";
+   }
 
-    public boolean getFC() {
-        return this.device.isFc();
-    }
+   public boolean getFC() {
+      return this.device.isFc();
+   }
 
-    public String getNap() {
-        return this.device.getNap();
-    }
+   public String getNap() {
+      return this.device.getNap();
+   }
 
-    public TrickleAPI(JsonObject jsonObject) {
-        this.device = Devices.genFromJson((JsonObject)jsonObject);
-    }
+   public TrickleAPI(JsonObject var1) {
+      this.device = Devices.genFromJson(var1);
+   }
 
-    public CompletableFuture getPixelReqString(String string, String string2, String string3) {
-        return CompletableFuture.failedFuture(new Exception("Unsupported method"));
-    }
+   public CompletableFuture getPixelReqString(String var1, String var2, String var3) {
+      return CompletableFuture.failedFuture(new Exception("Unsupported method"));
+   }
 
-    public String getZ(String string) {
-        return "{\"a\":" + string + ",\"b\":" + this.device.getB() + ",\"c\":" + this.device.getC() + "}";
-    }
+   public String getZ(String var1) {
+      return "{\"a\":" + var1 + ",\"b\":" + this.device.getB() + ",\"c\":" + this.device.getC() + "}";
+   }
 
-    public boolean getAV() {
-        return this.device.isAv();
-    }
+   public boolean getAV() {
+      return this.device.isAv();
+   }
 
-    public CompletableFuture getPixelReqForm(String string, String string2, String string3) {
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        try {
-            multiMap.set("ap", String.valueOf(this.getAP()));
-            multiMap.set("bt", this.getBT());
-            multiMap.set("fonts", this.getFonts());
-            multiMap.set("fh", this.getFontHash());
-            multiMap.set("timing", this.getTiming());
-            multiMap.set("bp", this.getBP());
-            multiMap.set("sr", this.getSR().toString());
-            multiMap.set("dp", this.getDP().toString());
-            multiMap.set("lt", this.getLT());
-            multiMap.set("ps", this.getPS());
-            multiMap.set("cv", this.getCV());
-            multiMap.set("fp", String.valueOf(this.getFP()));
-            multiMap.set("sp", String.valueOf(this.getSP()));
-            multiMap.set("br", this.getBR());
-            multiMap.set("ieps", String.valueOf(this.getIEPS()));
-            multiMap.set("av", String.valueOf(this.getAV()));
-            multiMap.set("z", this.getZ(string));
-            multiMap.set("zh", this.getZH());
-            multiMap.set("jsv", "" + this.getJSV());
-            multiMap.set("nav", this.getNav().toString());
-            multiMap.set("crc", this.getCRC().toString());
-            multiMap.set("t", string2);
-            multiMap.set("u", string3);
-            multiMap.set("nap", this.getNap());
-            multiMap.set("fc", String.valueOf(this.getFC()));
-        }
-        catch (Throwable throwable) {
-            System.out.println("Error building FW: " + throwable.getMessage());
-        }
-        return CompletableFuture.completedFuture(multiMap);
-    }
+   public CompletableFuture getPixelReqForm(String var1, String var2, String var3) {
+      MultiMap var4 = MultiMap.caseInsensitiveMultiMap();
 
-    public boolean getFP() {
-        return this.device.isFp();
-    }
+      try {
+         var4.set("ap", String.valueOf(this.getAP()));
+         var4.set("bt", this.getBT());
+         var4.set("fonts", this.getFonts());
+         var4.set("fh", this.getFontHash());
+         var4.set("timing", this.getTiming());
+         var4.set("bp", this.getBP());
+         var4.set("sr", this.getSR().toString());
+         var4.set("dp", this.getDP().toString());
+         var4.set("lt", this.getLT());
+         var4.set("ps", this.getPS());
+         var4.set("cv", this.getCV());
+         var4.set("fp", String.valueOf(this.getFP()));
+         var4.set("sp", String.valueOf(this.getSP()));
+         var4.set("br", this.getBR());
+         var4.set("ieps", String.valueOf(this.getIEPS()));
+         var4.set("av", String.valueOf(this.getAV()));
+         var4.set("z", this.getZ(var1));
+         var4.set("zh", this.getZH());
+         var4.set("jsv", "" + this.getJSV());
+         var4.set("nav", this.getNav().toString());
+         var4.set("crc", this.getCRC().toString());
+         var4.set("t", var2);
+         var4.set("u", var3);
+         var4.set("nap", this.getNap());
+         var4.set("fc", String.valueOf(this.getFC()));
+      } catch (Throwable var6) {
+         System.out.println("Error building FW: " + var6.getMessage());
+      }
 
-    public String getFonts() {
-        return this.device.getFonts();
-    }
+      return CompletableFuture.completedFuture(var4);
+   }
 
-    public String getLT() {
-        String string = this.device.getLt();
-        if (string.contains("-")) {
-            string = this.device.getLt().split("-")[1];
-            return Instant.now().toEpochMilli() + "-" + string;
-        }
-        if (!string.contains("\\+")) return "" + Instant.now().toEpochMilli();
-        string = this.device.getLt().split("\\+")[1];
-        return Instant.now().toEpochMilli() + "+" + string;
-    }
+   public boolean getFP() {
+      return this.device.isFp();
+   }
 
-    public JsonObject getNav() {
-        return this.device.getNav();
-    }
+   public String getFonts() {
+      return this.device.getFonts();
+   }
 
-    public String getBP() {
-        return this.device.getBp();
-    }
+   public String getLT() {
+      String var1 = this.device.getLt();
+      long var10000;
+      if (var1.contains("-")) {
+         var1 = this.device.getLt().split("-")[1];
+         var10000 = Instant.now().toEpochMilli();
+         return "" + var10000 + "-" + var1;
+      } else if (var1.contains("\\+")) {
+         var1 = this.device.getLt().split("\\+")[1];
+         var10000 = Instant.now().toEpochMilli();
+         return "" + var10000 + "+" + var1;
+      } else {
+         return "" + Instant.now().toEpochMilli();
+      }
+   }
 
-    public String getZH() {
-        return this.device.getZh();
-    }
+   public JsonObject getNav() {
+      return this.device.getNav();
+   }
+
+   public String getBP() {
+      return this.device.getBp();
+   }
+
+   public String getZH() {
+      return this.device.getZh();
+   }
 }

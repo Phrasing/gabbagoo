@@ -1,31 +1,24 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.vertx.core.Future
- *  io.vertx.core.Promise
- */
 package io.trickle.core.producers;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
 public abstract class AsyncProducer {
-    public Promise<T> callback = Promise.promise();
+   public Promise callback = Promise.promise();
 
-    public Future getProduct() {
-        return this.callback.future();
-    }
+   public Future getProduct() {
+      return this.callback.future();
+   }
 
-    public void fail(Throwable throwable) {
-        this.callback.fail(throwable);
-    }
+   public void fail(Throwable var1) {
+      this.callback.fail(var1);
+   }
 
-    public void fail(String string) {
-        this.callback.fail(string);
-    }
+   public void fail(String var1) {
+      this.callback.fail(var1);
+   }
 
-    public void produce(Object object) {
-        this.callback.complete(object);
-    }
+   public void produce(Object var1) {
+      this.callback.complete(var1);
+   }
 }

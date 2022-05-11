@@ -1,38 +1,12 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.account.Account
- *  io.trickle.profile.Profile
- *  io.trickle.task.Task
- *  io.trickle.task.antibot.impl.px.PerimeterX
- *  io.trickle.task.sites.walmart.usa.API
- *  io.trickle.task.sites.walmart.usa.WalmartConstants
- *  io.trickle.task.sites.walmart.util.PaymentToken
- *  io.trickle.util.Utils
- *  io.trickle.util.request.Headers$Pseudo
- *  io.trickle.webclient.ClientType
- *  io.trickle.webclient.CookieJar
- *  io.trickle.webclient.RealClient
- *  io.trickle.webclient.RealClientFactory
- *  io.vertx.core.Vertx
- *  io.vertx.core.json.JsonArray
- *  io.vertx.core.json.JsonObject
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- *  io.vertx.ext.web.codec.BodyCodec
- */
 package io.trickle.task.sites.walmart.usa;
 
 import io.trickle.account.Account;
 import io.trickle.profile.Profile;
 import io.trickle.task.Task;
 import io.trickle.task.antibot.impl.px.PerimeterX;
-import io.trickle.task.sites.walmart.usa.API;
-import io.trickle.task.sites.walmart.usa.WalmartConstants;
 import io.trickle.task.sites.walmart.util.PaymentToken;
 import io.trickle.util.Utils;
-import io.trickle.util.request.Headers;
+import io.trickle.util.request.Headers$Pseudo;
 import io.trickle.webclient.ClientType;
 import io.trickle.webclient.CookieJar;
 import io.trickle.webclient.RealClient;
@@ -43,7 +17,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.codec.BodyCodec;
-import java.lang.invoke.LambdaMetafactory;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -54,1099 +27,1138 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class WalmartAPI
-extends API {
-    public static int EXCEPTION_RETRY_DELAY;
-    public boolean ios;
-    public Task task;
-    public String crossSite;
-    public static DateTimeFormatter GMT_CHROME_RFC1123;
-    public boolean loggedIn;
-    public String dateOfPrevReq;
-    public static String BYPASS_PREFIX;
-    public PerimeterX<String, Boolean> pxAPI = null;
-    public static String DID;
-    public String searchQuery;
-    public static String PX_TOKEN;
+public class WalmartAPI extends API {
+   public static int EXCEPTION_RETRY_DELAY = 12000;
+   public boolean ios;
+   public Task task;
+   public String crossSite;
+   public static DateTimeFormatter GMT_CHROME_RFC1123;
+   public boolean loggedIn;
+   public String dateOfPrevReq;
+   public static String BYPASS_PREFIX = "";
+   public PerimeterX pxAPI = null;
+   public static String DID = UUID.randomUUID().toString();
+   public String searchQuery;
+   public static String PX_TOKEN = "3";
 
-    public HttpRequest terraFirma(String string, boolean bl) {
-        String string2 = "https://www.walmart.com/terra-firma/graphql?v=2&options=timing%2Cnonnull%2Cerrors%2Ccontext&id=FullProductHolidaysRoute-" + (this.ios ? "ios" : "android");
-        if (bl) {
-            string2 = "https://www.walmart.com/terra-firma/graphql?options=timing,nonnull,context&v=2&id=FullProductRoute-" + (this.ios ? "ios" : "android");
-        }
-        HttpRequest httpRequest = this.client.postAbs(string2).as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("wm_ul_plus", "0");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("wm_consumer.id", UUID.randomUUID().toString());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("wm_site_mode", "0");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("itemid", string);
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("wm_ul_plus", "0");
-            httpRequest.putHeader("wm_consumer.id", UUID.randomUUID().toString());
-            httpRequest.putHeader("wm_site_mode", "0");
-            httpRequest.putHeader("itemid", string);
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest terraFirma(String var1, boolean var2) {
+      String var3 = "https://www.walmart.com/terra-firma/graphql?v=2&options=timing%2Cnonnull%2Cerrors%2Ccontext&id=FullProductHolidaysRoute-" + (this.ios ? "ios" : "android");
+      if (var2) {
+         var3 = "https://www.walmart.com/terra-firma/graphql?options=timing,nonnull,context&v=2&id=FullProductRoute-" + (this.ios ? "ios" : "android");
+      }
 
-    public JsonObject loginForm() {
-        try {
-            Account account = WalmartAPI.rotateAccount();
-            if (account == null) {
-                return null;
-            }
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.put("email", (Object)account.getUser());
-            jsonObject.put("password", (Object)account.getPass());
-            return jsonObject;
-        }
-        catch (Throwable throwable) {
+      HttpRequest var4 = this.client.postAbs(var3).as(BodyCodec.buffer());
+      if (this.ios) {
+         var4.putHeaders(Headers$Pseudo.MSPA.get());
+         var4.putHeader("content-type", "application/json");
+         var4.putHeader("wm_ul_plus", "0");
+         var4.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var4.putHeader("wm_consumer.id", UUID.randomUUID().toString());
+         var4.putHeader("accept", "*/*");
+         var4.putHeader("mobile-app-version", "21.18.3");
+         var4.putHeader("wm_site_mode", "0");
+         var4.putHeader("accept-language", "en-us");
+         var4.putHeader("accept-encoding", "gzip, deflate, br");
+         var4.putHeader("mobile-platform", "ios");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+         var4.putHeader("itemid", var1);
+         var4.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var4.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var4.putHeader("cookie", "DEFAULT_VALUE");
+      } else {
+         var4.putHeaders(Headers$Pseudo.MPAS.get());
+         var4.putHeader("wm_ul_plus", "0");
+         var4.putHeader("wm_consumer.id", UUID.randomUUID().toString());
+         var4.putHeader("wm_site_mode", "0");
+         var4.putHeader("itemid", var1);
+         var4.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+         var4.putHeader("did", DID);
+         var4.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var4.putHeader("content-type", "application/json; charset=utf-8");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+         var4.putHeader("accept-encoding", "gzip");
+         var4.putHeader("cookie", "DEFAULT_VALUE");
+      }
+
+      return var4;
+   }
+
+   public JsonObject loginForm() {
+      try {
+         Account var1 = rotateAccount();
+         if (var1 == null) {
             return null;
-        }
-    }
+         } else {
+            JsonObject var2 = new JsonObject();
+            var2.put("email", var1.getUser());
+            var2.put("password", var1.getPass());
+            return var2;
+         }
+      } catch (Throwable var3) {
+         return null;
+      }
+   }
 
-    public CompletableFuture handleBadResponse(int n, HttpResponse httpResponse) {
-        switch (n) {
-            case 412: {
-                try {
-                    if (!this.task.getMode().contains("skip")) {
-                        JsonObject jsonObject = httpResponse.bodyAsJsonObject();
-                        String string = jsonObject.getString("uuid");
-                        String string2 = this.pxAPI.getVid();
-                        return this.pxAPI.solveCaptcha(string2, string, "https://www.perimeterx.com/");
-                    }
-                    CompletableFuture completableFuture = this.generatePX(false);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> WalmartAPI.async$handleBadResponse(this, n, httpResponse, completableFuture2, 1, arg_0));
-                    }
-                    completableFuture.join();
-                    return CompletableFuture.completedFuture(false);
-                }
-                catch (Throwable throwable) {
-                    return this.pxAPI.solveCaptcha(this.pxAPI.getVid(), null, "https://www.perimeterx.com/");
-                }
+   public CompletableFuture handleBadResponse(int var1, HttpResponse var2) {
+      switch (var1) {
+         case 412:
+            try {
+               if (this.task.getMode().contains("skip")) {
+                  CompletableFuture var10000 = this.generatePX(false);
+                  if (!var10000.isDone()) {
+                     CompletableFuture var6 = var10000;
+                     return var6.exceptionally(Function.identity()).thenCompose(WalmartAPI::async$handleBadResponse);
+                  }
+
+                  var10000.join();
+                  return CompletableFuture.completedFuture(false);
+               }
+
+               JsonObject var3 = var2.bodyAsJsonObject();
+               String var4 = var3.getString("uuid");
+               String var5 = this.pxAPI.getVid();
+               return this.pxAPI.solveCaptcha(var5, var4, "https://www.perimeterx.com/");
+            } catch (Throwable var7) {
+               return this.pxAPI.solveCaptcha(this.pxAPI.getVid(), (String)null, "https://www.perimeterx.com/");
             }
-            case 444: {
-                if (!super.rotateProxy()) return CompletableFuture.completedFuture(true);
-                this.pxAPI.restartClient(this.client);
-                break;
+         case 444:
+            if (super.rotateProxy()) {
+               this.pxAPI.restartClient(super.client);
             }
-        }
-        return CompletableFuture.completedFuture(true);
-    }
+         default:
+            return CompletableFuture.completedFuture(true);
+      }
+   }
 
-    public HttpRequest getCartV3(String string) {
-        return this.getCartMobile("https://www.walmart.com/api/v3/cart/" + string);
-    }
+   public HttpRequest getCartV3(String var1) {
+      return this.getCartMobile("https://www.walmart.com/api/v3/cart/" + var1);
+   }
 
-    public JsonObject getAtcForm(String string, int n) {
-        return new JsonObject().put("offerId", (Object)string).put("quantity", (Object)n);
-    }
+   public JsonObject getAtcForm(String var1, int var2) {
+      return (new JsonObject()).put("offerId", var1).put("quantity", var2);
+   }
 
-    public JsonObject getProcessingForm() {
-        return new JsonObject();
-    }
+   public JsonObject getProcessingForm() {
+      return new JsonObject();
+   }
 
-    public boolean isLoggedIn() {
-        return this.loggedIn;
-    }
+   public boolean isLoggedIn() {
+      return this.loggedIn;
+   }
 
-    public JsonObject getPaymentForm(PaymentToken paymentToken) {
-        JsonObject jsonObject = new JsonObject().put("payments", (Object)new JsonArray());
-        JsonObject jsonObject2 = new JsonObject();
-        Profile profile = this.task.getProfile();
-        jsonObject2.put("addressLineOne", (Object)profile.getAddress1());
-        jsonObject2.put("addressLineTwo", (Object)profile.getAddress2());
-        jsonObject2.put("cardType", (Object)profile.getPaymentMethod().get());
-        jsonObject2.put("city", (Object)profile.getCity());
-        jsonObject2.put("encryptedCvv", (Object)paymentToken.getEncryptedCvv());
-        jsonObject2.put("encryptedPan", (Object)paymentToken.getEncryptedPan());
-        jsonObject2.put("expiryMonth", (Object)profile.getExpiryMonth());
-        if (profile.getExpiryYear().length() > 2) {
-            jsonObject2.put("expiryYear", (Object)profile.getExpiryYear());
-        } else {
-            jsonObject2.put("expiryYear", (Object)("20" + profile.getExpiryYear()));
-        }
-        jsonObject2.put("firstName", (Object)profile.getFirstName());
-        jsonObject2.put("integrityCheck", (Object)paymentToken.getIntegrityCheck());
-        jsonObject2.put("keyId", (Object)paymentToken.getKeyId());
-        jsonObject2.put("lastName", (Object)profile.getLastName());
-        jsonObject2.put("paymentType", (Object)"CREDITCARD");
-        jsonObject2.put("phase", (Object)paymentToken.getPhase());
-        jsonObject2.put("phone", (Object)profile.getPhone());
-        jsonObject2.put("piHash", (Object)paymentToken.getPiHash());
-        jsonObject2.put("postalCode", (Object)profile.getZip());
-        jsonObject2.put("state", (Object)profile.getState().toUpperCase());
-        jsonObject2.put("email", (Object)profile.getEmail());
-        jsonObject.getJsonArray("payments").add((Object)jsonObject2);
-        jsonObject.put("cvvInSession", (Object)true);
-        return jsonObject;
-    }
+   public JsonObject getPaymentForm(PaymentToken var1) {
+      JsonObject var2 = (new JsonObject()).put("payments", new JsonArray());
+      JsonObject var3 = new JsonObject();
+      Profile var4 = this.task.getProfile();
+      var3.put("addressLineOne", var4.getAddress1());
+      var3.put("addressLineTwo", var4.getAddress2());
+      var3.put("cardType", var4.getPaymentMethod().get());
+      var3.put("city", var4.getCity());
+      var3.put("encryptedCvv", var1.getEncryptedCvv());
+      var3.put("encryptedPan", var1.getEncryptedPan());
+      var3.put("expiryMonth", var4.getExpiryMonth());
+      if (var4.getExpiryYear().length() > 2) {
+         var3.put("expiryYear", var4.getExpiryYear());
+      } else {
+         var3.put("expiryYear", "20" + var4.getExpiryYear());
+      }
 
-    public void setAPI(PerimeterX perimeterX) {
-        this.pxAPI = perimeterX;
-    }
+      var3.put("firstName", var4.getFirstName());
+      var3.put("integrityCheck", var1.getIntegrityCheck());
+      var3.put("keyId", var1.getKeyId());
+      var3.put("lastName", var4.getLastName());
+      var3.put("paymentType", "CREDITCARD");
+      var3.put("phase", var1.getPhase());
+      var3.put("phone", var4.getPhone());
+      var3.put("piHash", var1.getPiHash());
+      var3.put("postalCode", var4.getZip());
+      var3.put("state", var4.getState().toUpperCase());
+      var3.put("email", var4.getEmail());
+      var2.getJsonArray("payments").add(var3);
+      var2.put("cvvInSession", true);
+      return var2;
+   }
 
-    public HttpRequest getPCID(PaymentToken paymentToken) {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("vid", paymentToken.getVid().toUpperCase());
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("sid", paymentToken.getSid().toUpperCase());
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("sid", paymentToken.getSid());
-            httpRequest.putHeader("vid", paymentToken.getVid());
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_WEB_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public void setAPI(PerimeterX var1) {
+      this.pxAPI = var1;
+   }
 
-    public HttpRequest mobileAtcAffiliate() {
-        return this.atcAffiliate("https://affil.walmart.com/cart/addToCart?items=" + this.task.getKeywords()[0] + "|" + this.task.getSize());
-    }
+   public HttpRequest getPCID(PaymentToken var1) {
+      HttpRequest var2 = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract").as(BodyCodec.buffer());
+      if (this.ios) {
+         var2.putHeaders(Headers$Pseudo.MSPA.get());
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("x-px-ab", "2");
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
+         var2.putHeader("wm_vertical_id", "0");
+         var2.putHeader("mobile-app-version", "21.18.3");
+         var2.putHeader("vid", var1.getVid().toUpperCase());
+         var2.putHeader("wm_cvv_in_session", "true");
+         var2.putHeader("accept-language", "en-us");
+         var2.putHeader("inkiru_precedence", "false");
+         var2.putHeader("sid", var1.getSid().toUpperCase());
+         var2.putHeader("mobile-platform", "ios");
+         var2.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var2.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("accept-encoding", "gzip, deflate, br");
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+      } else {
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
+         var2.putHeader("wm_vertical_id", "0");
+         var2.putHeader("inkiru_precedence", "false");
+         var2.putHeader("wm_cvv_in_session", "true");
+         var2.putHeader("x-px-ab", "2");
+         var2.putHeader("sid", var1.getSid());
+         var2.putHeader("vid", var1.getVid());
+         var2.putHeader("user-agent", WalmartConstants.ANDROID_OLD_WEB_UA);
+         var2.putHeader("did", DID);
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("accept-encoding", "gzip");
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+      }
 
-    public HttpRequest submitBilling() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com//api/checkout-customer/:CID/credit-card").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "application/json");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-px-ab", "2");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("Accept", "application/json");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Content-Type", "application/json");
-            httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+      return var2;
+   }
 
-    public HttpRequest addToCart(String string) {
-        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest mobileAtcAffiliate() {
+      String var10001 = this.task.getKeywords()[0];
+      return this.atcAffiliate("https://affil.walmart.com/cart/addToCart?items=" + var10001 + "|" + this.task.getSize());
+   }
 
-    public HttpRequest homepage() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.walmart.com/").as(BodyCodec.buffer());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_WEB_UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("referer", "https://www.google.com/");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-us");
-        return httpRequest;
-    }
+   public HttpRequest submitBilling() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com//api/checkout-customer/:CID/credit-card").as(BodyCodec.buffer());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "application/json");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+         var1.putHeader("x-px-ab", "2");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("Accept", "application/json");
+         var1.putHeader("x-px-ab", "2");
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("Content-Type", "application/json");
+         var1.putHeader("Content-Length", "DEFAULT_VALUE");
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
 
-    public PerimeterX getPxAPI() {
-        return this.pxAPI;
-    }
+      return var1;
+   }
 
-    public HttpRequest terraFirma(boolean bl) {
-        if (!this.task.getMode().toLowerCase().contains("desktop")) return this.terraFirma("152481472", bl);
-        return this.terraFirmaDesktop("152481472");
-    }
+   public HttpRequest addToCart(String var1) {
+      HttpRequest var2 = super.client.postAbs(var1).as(BodyCodec.buffer());
+      if (this.ios) {
+         var2.putHeaders(Headers$Pseudo.MSPA.get());
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("accept", "*/*");
+         var2.putHeader("mobile-app-version", "21.18.3");
+         var2.putHeader("accept-language", "en-us");
+         var2.putHeader("accept-encoding", "gzip, deflate, br");
+         var2.putHeader("mobile-platform", "ios");
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var2.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+      } else {
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+         var2.putHeader("did", DID);
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("content-type", "application/json; charset=utf-8");
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("accept-encoding", "gzip");
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+      }
 
-    public JsonObject getProcessingForm(PaymentToken paymentToken) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("paymentType", (Object)"CREDITCARD");
-        jsonObject.put("encryptedCvv", (Object)paymentToken.getEncryptedCvv());
-        jsonObject.put("encryptedPan", (Object)paymentToken.getEncryptedPan());
-        jsonObject.put("integrityCheck", (Object)paymentToken.getIntegrityCheck());
-        jsonObject.put("keyId", (Object)paymentToken.getKeyId());
-        jsonObject.put("phase", (Object)paymentToken.getPhase());
-        JsonObject jsonObject2 = new JsonObject();
-        jsonObject2.put("cvvInSession", (Object)true);
-        jsonObject2.put("voltagePayments", (Object)new JsonArray().add((Object)jsonObject));
-        return jsonObject2;
-    }
+      return var2;
+   }
 
-    public HttpRequest putCartAndroid(String string) {
-        HttpRequest httpRequest = this.client.putAbs("https://www.walmart.com/api/v3/cart/" + string).timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.buffer());
-        httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-        httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
-        httpRequest.putHeader("did", DID);
-        httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-        httpRequest.putHeader("Content-Type", "application/json; charset=utf-8");
-        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        httpRequest.putHeader("Accept-Encoding", "gzip");
-        httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
+   public HttpRequest homepage() {
+      HttpRequest var1 = this.client.getAbs("https://www.walmart.com/").as(BodyCodec.buffer());
+      var1.putHeader("upgrade-insecure-requests", "1");
+      var1.putHeader("user-agent", WalmartConstants.ANDROID_OLD_WEB_UA);
+      var1.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+      var1.putHeader("referer", "https://www.google.com/");
+      var1.putHeader("accept-encoding", "gzip, deflate, br");
+      var1.putHeader("accept-language", "en-us");
+      return var1;
+   }
 
-    public HttpRequest atcAffiliate() {
-        if (!ThreadLocalRandom.current().nextBoolean()) return this.desktopAtcAffiliate();
-        return this.mobileAtcAffiliate();
-    }
+   public PerimeterX getPxAPI() {
+      return this.pxAPI;
+   }
 
-    public Task getTask() {
-        return this.task;
-    }
+   public HttpRequest terraFirma(boolean var1) {
+      return this.task.getMode().toLowerCase().contains("desktop") ? this.terraFirmaDesktop("152481472") : this.terraFirma("152481472", var1);
+   }
 
-    public void setLoggedIn(boolean bl) {
-        this.loggedIn = bl;
-    }
+   public JsonObject getProcessingForm(PaymentToken var1) {
+      JsonObject var2 = new JsonObject();
+      var2.put("paymentType", "CREDITCARD");
+      var2.put("encryptedCvv", var1.getEncryptedCvv());
+      var2.put("encryptedPan", var1.getEncryptedPan());
+      var2.put("integrityCheck", var1.getIntegrityCheck());
+      var2.put("keyId", var1.getKeyId());
+      var2.put("phase", var1.getPhase());
+      JsonObject var3 = new JsonObject();
+      var3.put("cvvInSession", true);
+      var3.put("voltagePayments", (new JsonArray()).add(var2));
+      return var3;
+   }
 
-    public HttpRequest getCartMobile(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest putCartAndroid(String var1) {
+      HttpRequest var2 = this.client.putAbs("https://www.walmart.com/api/v3/cart/" + var1).timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.buffer());
+      var2.putHeaders(Headers$Pseudo.MPAS.get());
+      var2.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
+      var2.putHeader("did", DID);
+      var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+      var2.putHeader("Content-Type", "application/json; charset=utf-8");
+      var2.putHeader("Content-Length", "DEFAULT_VALUE");
+      var2.putHeader("Accept-Encoding", "gzip");
+      var2.putHeader("Cookie", "DEFAULT_VALUE");
+      return var2;
+   }
 
-    public JsonObject getShippingForm(JsonObject jsonObject) {
-        String string = jsonObject.getJsonArray("items").getJsonObject(0).getString("id");
-        JsonObject jsonObject2 = new JsonObject().put("changedFields", (Object)new JsonArray());
-        Profile profile = this.task.getProfile();
-        jsonObject2.put("addressLineOne", (Object)profile.getAddress1());
-        jsonObject2.put("addressLineTwo", (Object)profile.getAddress2());
-        jsonObject2.put("addressType", (Object)"RESIDENTIAL");
-        jsonObject2.put("city", (Object)profile.getCity());
-        jsonObject2.put("firstName", (Object)profile.getFirstName());
-        jsonObject2.put("lastName", (Object)profile.getLastName());
-        jsonObject2.put("phone", (Object)profile.getPhone());
-        jsonObject2.put("postalCode", (Object)profile.getZip());
-        jsonObject2.put("countryCode", (Object)"USA");
-        jsonObject2.put("marketingEmailPref", (Object)false);
-        jsonObject2.put("preferenceId", (Object)string);
-        jsonObject2.put("state", (Object)profile.getState());
-        jsonObject2.put("email", (Object)profile.getEmail());
-        return jsonObject2;
-    }
+   public HttpRequest atcAffiliate() {
+      return ThreadLocalRandom.current().nextBoolean() ? this.mobileAtcAffiliate() : this.desktopAtcAffiliate();
+   }
 
-    public CompletableFuture generatePX(boolean bl) {
-        try {
-            if (!bl) return this.pxAPI.solve();
+   public Task getTask() {
+      return this.task;
+   }
+
+   public void setLoggedIn(boolean var1) {
+      this.loggedIn = var1;
+   }
+
+   public HttpRequest getCartMobile(String var1) {
+      HttpRequest var2 = this.client.getAbs(var1).timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.buffer());
+      if (this.ios) {
+         var2.putHeaders(Headers$Pseudo.MSPA.get());
+         var2.putHeader("accept", "*/*");
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var2.putHeader("mobile-app-version", "21.18.3");
+         var2.putHeader("mobile-platform", "ios");
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+         var2.putHeader("accept-language", "en-us");
+         var2.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var2.putHeader("accept-encoding", "gzip, deflate, br");
+      } else {
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
+         var2.putHeader("did", DID);
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("Accept-Encoding", "gzip");
+         var2.putHeader("Cookie", "DEFAULT_VALUE");
+      }
+
+      return var2;
+   }
+
+   public JsonObject getShippingForm(JsonObject var1) {
+      String var2 = var1.getJsonArray("items").getJsonObject(0).getString("id");
+      JsonObject var3 = (new JsonObject()).put("changedFields", new JsonArray());
+      Profile var4 = this.task.getProfile();
+      var3.put("addressLineOne", var4.getAddress1());
+      var3.put("addressLineTwo", var4.getAddress2());
+      var3.put("addressType", "RESIDENTIAL");
+      var3.put("city", var4.getCity());
+      var3.put("firstName", var4.getFirstName());
+      var3.put("lastName", var4.getLastName());
+      var3.put("phone", var4.getPhone());
+      var3.put("postalCode", var4.getZip());
+      var3.put("countryCode", "USA");
+      var3.put("marketingEmailPref", false);
+      var3.put("preferenceId", var2);
+      var3.put("state", var4.getState());
+      var3.put("email", var4.getEmail());
+      return var3;
+   }
+
+   public CompletableFuture generatePX(boolean var1) {
+      try {
+         if (var1) {
             this.pxAPI.reset();
-            return this.pxAPI.solve();
-        }
-        catch (Exception exception) {
-            System.out.println("Error generating mobile session: " + exception.getMessage());
-            return CompletableFuture.completedFuture(false);
-        }
-    }
+         }
 
-    public HttpRequest login() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/account/electrode/api/identity/password").as(BodyCodec.buffer());
-        httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-        httpRequest.putHeader("x-wm-auth", "null");
-        httpRequest.putHeader("x-wm-cid", "null");
-        httpRequest.putHeader("x-wm-spid", "null");
-        httpRequest.putHeader("x-wm-xpa", "GNsCQ|PPWSy");
-        httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-        httpRequest.putHeader("did", DID);
-        httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-        httpRequest.putHeader("content-type", "text/plain;charset=UTF-8");
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("accept-encoding", "gzip");
-        return httpRequest;
-    }
+         return this.pxAPI.solve();
+      } catch (Exception var3) {
+         System.out.println("Error generating mobile session: " + var3.getMessage());
+         return CompletableFuture.completedFuture(false);
+      }
+   }
 
-    public JsonObject accountCreateForm() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("email", (Object)(this.task.getProfile().getEmail().split("@")[0] + "+" + ThreadLocalRandom.current().nextInt(999999) + "@" + this.task.getProfile().getEmail().split("@")[1]));
-        jsonObject.put("emailAccepted", (Object)false);
-        jsonObject.put("firstName", (Object)this.task.getProfile().getFirstName());
-        jsonObject.put("lastName", (Object)this.task.getProfile().getLastName());
-        jsonObject.put("password", (Object)Utils.generateStrongString());
-        return jsonObject;
-    }
+   public HttpRequest login() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com/account/electrode/api/identity/password").as(BodyCodec.buffer());
+      var1.putHeaders(Headers$Pseudo.MPAS.get());
+      var1.putHeader("x-wm-auth", "null");
+      var1.putHeader("x-wm-cid", "null");
+      var1.putHeader("x-wm-spid", "null");
+      var1.putHeader("x-wm-xpa", "GNsCQ|PPWSy");
+      var1.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+      var1.putHeader("did", DID);
+      var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+      var1.putHeader("content-type", "text/plain;charset=UTF-8");
+      var1.putHeader("content-length", "DEFAULT_VALUE");
+      var1.putHeader("accept-encoding", "gzip");
+      return var1;
+   }
 
-    public HttpRequest createAccount() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/account/electrode/api/identity/sign-up").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-px-ab", "2");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-wm-auth", "null");
-            httpRequest.putHeader("x-wm-cid", "null");
-            httpRequest.putHeader("x-wm-spid", "null");
-            httpRequest.putHeader("x-wm-xpa", "null");
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("content-type", "text/plain;charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        }
-        return httpRequest;
-    }
+   public JsonObject accountCreateForm() {
+      JsonObject var1 = new JsonObject();
+      String var10002 = this.task.getProfile().getEmail().split("@")[0];
+      var1.put("email", var10002 + "+" + ThreadLocalRandom.current().nextInt(999999) + "@" + this.task.getProfile().getEmail().split("@")[1]);
+      var1.put("emailAccepted", false);
+      var1.put("firstName", this.task.getProfile().getFirstName());
+      var1.put("lastName", this.task.getProfile().getLastName());
+      var1.put("password", Utils.generateStrongString());
+      return var1;
+   }
 
-    public HttpRequest updateCheck() {
-        HttpRequest httpRequest = this.client.getAbs("https://ota.walmart.com/v0.1/public/codepush/update_check?deployment_key=rULtKsvrPnyMXbxEHQnxoRPJJWnTOxlUbjxIOSAt&app_version=21.5.5&client_unique_id=99155d91e8fc6bf5").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("accept", "application/json");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("x-codepush-plugin-name", "react-native-code-push");
-            httpRequest.putHeader("x-codepush-sdk-version", "^3.1.0");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-codepush-plugin-version", "6.2.1");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest createAccount() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com/account/electrode/api/identity/sign-up").as(BodyCodec.buffer());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+         var1.putHeader("x-px-ab", "2");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("x-wm-auth", "null");
+         var1.putHeader("x-wm-cid", "null");
+         var1.putHeader("x-wm-spid", "null");
+         var1.putHeader("x-wm-xpa", "null");
+         var1.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("content-type", "text/plain;charset=UTF-8");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("accept-encoding", "gzip");
+      }
 
-    public HttpRequest savedCart() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/api/v3/saved/:CRT/items").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("credentials", "include");
-            httpRequest.putHeader("omitcsrfjwt", "true");
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("credentials", "include");
-            httpRequest.putHeader("omitcsrfjwt", "true");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+      return var1;
+   }
 
-    public HttpRequest submitPayment() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/payment").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-px-ab", "2");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Content-Type", "application/json");
-            httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest updateCheck() {
+      HttpRequest var1 = this.client.getAbs("https://ota.walmart.com/v0.1/public/codepush/update_check?deployment_key=rULtKsvrPnyMXbxEHQnxoRPJJWnTOxlUbjxIOSAt&app_version=21.5.5&client_unique_id=99155d91e8fc6bf5").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("accept", "application/json");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("x-codepush-plugin-name", "react-native-code-push");
+         var1.putHeader("x-codepush-sdk-version", "^3.1.0");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+         var1.putHeader("x-codepush-plugin-version", "6.2.1");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$handleBadResponse(WalmartAPI var0, int var1_1, HttpResponse var2_2, CompletableFuture var3_3, int var4_5, Object var5_7) {
-        switch (var4_5) {
-            case 0: {
-                switch (var1_1) {
-                    case 412: {
-                        try {
-                            if (!var0.task.getMode().contains("skip")) {
-                                var3_3 = var2_2.bodyAsJsonObject();
-                                var4_6 = var3_3.getString("uuid");
-                                var5_7 = var0.pxAPI.getVid();
-                                return var0.pxAPI.solveCaptcha((String)var5_7, var4_6, "https://www.perimeterx.com/");
-                            }
-                            v0 = var0.generatePX(false);
-                            if (!v0.isDone()) {
-                                var6_8 = v0;
-                                return var6_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleBadResponse(io.trickle.task.sites.walmart.usa.WalmartAPI int io.vertx.ext.web.client.HttpResponse java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartAPI)var0, (int)var1_1, (HttpResponse)var2_2, (CompletableFuture)var6_8, (int)1));
-                            }
-                            ** GOTO lbl25
+      return var1;
+   }
+
+   public HttpRequest savedCart() {
+      HttpRequest var1 = super.client.postAbs("https://www.walmart.com/api/v3/saved/:CRT/items").as(BodyCodec.buffer());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "*/*");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("credentials", "include");
+         var1.putHeader("omitcsrfjwt", "true");
+         var1.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("content-type", "application/json; charset=utf-8");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("credentials", "include");
+         var1.putHeader("omitcsrfjwt", "true");
+         var1.putHeader("accept-encoding", "gzip");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+      }
+
+      return var1;
+   }
+
+   public HttpRequest submitPayment() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/payment").as(BodyCodec.buffer());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
+         var1.putHeader("wm_vertical_id", "0");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("wm_cvv_in_session", "true");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("inkiru_precedence", "false");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+         var1.putHeader("x-px-ab", "2");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+         var1.putHeader("wm_vertical_id", "0");
+         var1.putHeader("inkiru_precedence", "false");
+         var1.putHeader("wm_cvv_in_session", "true");
+         var1.putHeader("x-px-ab", "2");
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("Content-Type", "application/json");
+         var1.putHeader("Content-Length", "DEFAULT_VALUE");
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
+
+      return var1;
+   }
+
+   public static CompletableFuture async$handleBadResponse(WalmartAPI var0, int var1, HttpResponse var2, CompletableFuture var3, int var4, Object var5) {
+      CompletableFuture var10000;
+      boolean var10001;
+      label45:
+      switch (var4) {
+         case 0:
+            switch (var1) {
+               case 412:
+                  try {
+                     if (var0.task.getMode().contains("skip")) {
+                        var10000 = var0.generatePX(false);
+                        if (!var10000.isDone()) {
+                           CompletableFuture var6 = var10000;
+                           return var6.exceptionally(Function.identity()).thenCompose(WalmartAPI::async$handleBadResponse);
                         }
-                        catch (Throwable var3_4) {
-                            return var0.pxAPI.solveCaptcha(var0.pxAPI.getVid(), null, "https://www.perimeterx.com/");
-                        }
-                    }
-                    case 444: {
-                        if (super.rotateProxy() == false) return CompletableFuture.completedFuture(true);
-                        var0.pxAPI.restartClient(var0.client);
-                        break;
-                    }
-                }
-                return CompletableFuture.completedFuture(true);
+                        break label45;
+                     }
+                  } catch (Throwable var9) {
+                     var10001 = false;
+                     return var0.pxAPI.solveCaptcha(var0.pxAPI.getVid(), (String)null, "https://www.perimeterx.com/");
+                  }
+
+                  try {
+                     JsonObject var10 = var2.bodyAsJsonObject();
+                     String var11 = var10.getString("uuid");
+                     String var12 = var0.pxAPI.getVid();
+                     return var0.pxAPI.solveCaptcha(var12, var11, "https://www.perimeterx.com/");
+                  } catch (Throwable var8) {
+                     var10001 = false;
+                     return var0.pxAPI.solveCaptcha(var0.pxAPI.getVid(), (String)null, "https://www.perimeterx.com/");
+                  }
+               case 444:
+                  if (var0.rotateProxy()) {
+                     var0.pxAPI.restartClient(var0.client);
+                  }
+               default:
+                  return CompletableFuture.completedFuture(true);
             }
-            case 1: {
-                v0 = var3_3;
-lbl25:
-                // 2 sources
+         case 1:
+            var10000 = var3;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
 
-                v0.join();
-                return CompletableFuture.completedFuture(false);
+      try {
+         var10000.join();
+         return CompletableFuture.completedFuture(false);
+      } catch (Throwable var7) {
+         var10001 = false;
+         return var0.pxAPI.solveCaptcha(var0.pxAPI.getVid(), (String)null, "https://www.perimeterx.com/");
+      }
+   }
+
+   public HttpRequest terraFirmaDesktop(String var1) {
+      HttpRequest var2 = this.client.getAbs("https://www.walmart.com/terra-firma/item/" + var1).as(BodyCodec.buffer());
+      var2.putHeaders(Headers$Pseudo.MPAS.get());
+      var2.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"");
+      var2.putHeader("sec-ch-ua-mobile", "?0");
+      var2.putHeader("upgrade-insecure-requests", "1");
+      var2.putHeader("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
+      var2.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+      var2.putHeader("service-worker-navigation-preload", "true");
+      var2.putHeader("sec-fetch-site", "none");
+      var2.putHeader("sec-fetch-mode", "navigate");
+      var2.putHeader("sec-fetch-user", "?1");
+      var2.putHeader("sec-fetch-dest", "document");
+      var2.putHeader("accept-encoding", "gzip, deflate, br");
+      var2.putHeader("accept-language", "en-US,en;q=0.9");
+      var2.putHeader("cookie", "DEFAULT_VALUE");
+      return var2;
+   }
+
+   public HttpRequest desktopAtc() {
+      double var1 = ThreadLocalRandom.current().nextDouble();
+      String var3;
+      if (var1 < Double.longBitsToDouble(4598175219545276416L)) {
+         var3 = "https://www.walmart.com/api/v3/cart/guest/:CID/items";
+      } else if (var1 < Double.longBitsToDouble(4602678819172646912L)) {
+         var3 = "https://www.walmart.com/api/v3/cart/guest/:CRT/items";
+      } else if (var1 < Double.longBitsToDouble(4604930618986332160L)) {
+         var3 = "https://www.walmart.com/api/v3/cart/:CRT/items";
+      } else {
+         var3 = "https://www.walmart.com/api/v3/cart/:CID/items";
+      }
+
+      return this.addToCart(var3);
+   }
+
+   public HttpRequest processPayment(PaymentToken var1) {
+      HttpRequest var2 = this.client.putAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/order").as(BodyCodec.buffer());
+      if (this.ios) {
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("mobile-app-version", "21.18.3");
+         var2.putHeader("inkiru_precedence", "false");
+         var2.putHeader("mobile-platform", "ios");
+         var2.putHeader("vid", var1.getVid().toUpperCase());
+         var2.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var2.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
+         var2.putHeader("sid", var1.getSid().toUpperCase());
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("x-px-ab", "2");
+         var2.putHeader("x-o-segment", "blue");
+         var2.putHeader("accept-language", "en-us");
+         var2.putHeader("wm_cvv_in_session", "true");
+         var2.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("accept-encoding", "gzip, deflate, br");
+         var2.putHeader("wm_vertical_id", "0");
+      } else {
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+         var2.putHeader("wm_vertical_id", "0");
+         var2.putHeader("inkiru_precedence", "false");
+         var2.putHeader("wm_cvv_in_session", "true");
+         var2.putHeader("x-o-segment", "blue");
+         var2.putHeader("x-px-ab", "2");
+         var2.putHeader("sid", var1.getSid());
+         var2.putHeader("vid", var1.getVid());
+         var2.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
+         var2.putHeader("did", DID);
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("Content-Type", "application/json");
+         var2.putHeader("Content-Length", "DEFAULT_VALUE");
+         var2.putHeader("Accept-Encoding", "gzip");
+         var2.putHeader("Cookie", "DEFAULT_VALUE");
+      }
+
+      return var2;
+   }
+
+   public JsonObject accountLoginForm(Account var1) {
+      JsonObject var2 = new JsonObject();
+      var2.put("email", var1.getUser());
+      var2.put("password", var1.getPass());
+      return var2;
+   }
+
+   public HttpRequest selectShipping() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/fulfillment").as(BodyCodec.buffer());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
+         var1.putHeader("wm_vertical_id", "0");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("wm_cvv_in_session", "true");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("inkiru_precedence", "false");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+         var1.putHeader("x-px-ab", "2");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+         var1.putHeader("wm_vertical_id", "0");
+         var1.putHeader("inkiru_precedence", "false");
+         var1.putHeader("wm_cvv_in_session", "true");
+         var1.putHeader("x-px-ab", "2");
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("Content-Type", "application/json");
+         var1.putHeader("Content-Length", "DEFAULT_VALUE");
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
+
+      return var1;
+   }
+
+   public JsonObject getShippingRateForm(JsonObject var1) {
+      String var2 = var1.getJsonArray("items").getJsonObject(0).getString("id");
+      JsonArray var3 = var1.getJsonArray("items");
+      String var4 = var3.getJsonObject(0).getJsonObject("fulfillmentSelection").getString("shipMethod");
+      JsonObject var5 = (new JsonObject()).put("fulfillmentOption", "S2H").put("itemIds", (new JsonArray()).add(var2)).put("shipMethod", var4);
+      JsonArray var6 = (new JsonArray()).add(var5);
+      return (new JsonObject()).put("groups", var6);
+   }
+
+   public HttpRequest midasScan() {
+      String var10001 = this.ios ? "iPhone" : "android";
+      HttpRequest var1 = this.client.getAbs("https://www.walmart.com/midas/srv/v3/hl/item/506574645?type=product&pageType=item&platform=app&module=wpa&mloc=middle&min=2&max=20&placementId=480x212_B-C-OG_TI_2-20_PDP-m-app-" + var10001 + "&pageId=506574645&taxonomy=0%3A4171%3A4191%3A9807313%3A6249075%3A1619679&keyword=20%20PANINI%20PLAYBOOK%20FOOTBALL%20HANGER%20BOX%20(%2030%20cards%20per%20box)&zipCode=" + this.getTask().getProfile().getZip() + "&isZipLocated=false").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "*/*");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("wm_site_mode", "0");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("wm_site_mode", "0");
+         var1.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept-encoding", "gzip");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+      }
+
+      return var1;
+   }
+
+   public HttpRequest loginAccount() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com/account/electrode/api/identity/password").as(BodyCodec.buffer());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "text/plain;charset=UTF-8");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("x-wm-auth", "null");
+         var1.putHeader("accept", "*/*");
+         var1.putHeader("x-wm-xpa", "null");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("x-wm-cid", "");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("x-wm-spid", "");
+         var1.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("x-wm-auth", "null");
+         var1.putHeader("x-wm-cid", "null");
+         var1.putHeader("x-wm-spid", "null");
+         var1.putHeader("x-wm-xpa", "null");
+         var1.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("content-type", "text/plain;charset=UTF-8");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("accept-encoding", "gzip");
+      }
+
+      return var1;
+   }
+
+   public HttpRequest affilCrossSite(String var1) {
+      this.getCookies().removeAnyMatch("CRT");
+      this.getCookies().removeAnyMatch("cart-item-count");
+      this.getCookies().removeAnyMatch("hasCRT");
+      HttpRequest var2 = this.client.getAbs("https://affil.walmart.com/cart/" + var1 + "?items=" + this.task.getKeywords()[0] + "|" + this.task.getSize()).as(BodyCodec.none());
+      var2.putHeader("upgrade-insecure-requests", "1");
+      var2.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+      var2.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+      if (this.crossSite != null) {
+         var2.putHeader("referer", "https://" + this.crossSite + "/");
+         if (this.crossSite.equals("t.co")) {
+            var2.headers().remove("sec-fetch-user");
+         }
+      }
+
+      var2.putHeader("accept-encoding", "gzip");
+      var2.putHeader("cookie", "DEFAULT_VALUE");
+      if (this.dateOfPrevReq != null) {
+         var2.putHeader("if-modified-since", this.dateOfPrevReq);
+      }
+
+      this.dateOfPrevReq = GMT_CHROME_RFC1123.format(ZonedDateTime.now(ZoneOffset.UTC));
+      return var2;
+   }
+
+   public HttpRequest putLocation() {
+      HttpRequest var1 = this.client.putAbs("https://www.walmart.com/account/api/location?skipCache=true").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
+      var1.putHeaders(Headers$Pseudo.MPAS.get());
+      var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
+      var1.putHeader("did", DID);
+      var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+      var1.putHeader("Content-Type", "application/json; charset=utf-8");
+      var1.putHeader("Content-Length", "DEFAULT_VALUE");
+      var1.putHeader("Accept-Encoding", "gzip");
+      var1.putHeader("Cookie", "DEFAULT_VALUE");
+      return var1;
+   }
+
+   static {
+      GMT_CHROME_RFC1123 = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.ENGLISH);
+   }
+
+   public HttpRequest presoSearch() {
+      HttpRequest var1 = this.client.getAbs("https://www.walmart.com/preso/search?prg=mWeb&wpm=0&assetProtocol=secure&query=panini&page=1&spelling=true&preciseSearch=true&vertical_whitelist=home%2Cfanatics%2Cfashion&pref_store=5880%2C2015%2C5936%2C5969%2C5227&zipcode=22124&applyDealsRedirect=true").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "*/*");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("wm_site_mode", "0");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("access_key", "532c28d5412dd75bf975fb951c740a30");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("cid", "");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("access_key", "532c28d5412dd75bf975fb951c740a30");
+         var1.putHeader("cid", "");
+         ThreadLocalRandom var10002 = ThreadLocalRandom.current();
+         var1.putHeader("client-ip", "192.168.0." + var10002.nextInt(1, 255));
+         var1.putHeader("wm_site_mode", "0");
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
+
+      return var1;
+   }
+
+   public HttpRequest atcAffiliate(String var1) {
+      HttpRequest var2 = super.client.getAbs(var1).as(BodyCodec.none());
+      var2.putHeader("Pragma", "no-cache");
+      var2.putHeader("Cache-Control", "no-cache");
+      var2.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"88\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"88\"");
+      var2.putHeader("sec-ch-ua-mobile", "?0");
+      var2.putHeader("Upgrade-Insecure-Requests", "1");
+      var2.putHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36");
+      var2.putHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+      var2.putHeader("Sec-Fetch-Site", "none");
+      var2.putHeader("Sec-Fetch-Mode", "navigate");
+      var2.putHeader("Sec-Fetch-User", "?1");
+      var2.putHeader("Sec-Fetch-Dest", "document");
+      var2.putHeader("Accept-Encoding", "gzip, deflate, br");
+      var2.putHeader("Accept-Language", "en-US,en;q=0.9");
+      if (this.dateOfPrevReq != null) {
+         var2.putHeader("if-modified-since", this.dateOfPrevReq);
+      }
+
+      this.dateOfPrevReq = GMT_CHROME_RFC1123.format(ZonedDateTime.now(ZoneOffset.UTC));
+      return var2;
+   }
+
+   public CookieJar cookieStore() {
+      return this.getWebClient().cookieStore();
+   }
+
+   public JsonObject PCIDForm() {
+      Profile var1 = this.task.getProfile();
+      return (new JsonObject()).put("city", var1.getCity()).put("crt:CRT", "").put("customerId:CID", "").put("customerType:type", "").put("isZipLocated", true).put("postalCode", var1.getZip()).put("state", var1.getState()).put("storeList", new JsonArray());
+   }
+
+   public HttpRequest getCartV2(String var1) {
+      return this.getCartMobile("https://www.walmart.com/api/v2/cart/" + var1);
+   }
+
+   public HttpRequest getCart() {
+      return this.getCartMobile("https://api.mobile.walmart.com/v1/cart/items");
+   }
+
+   public HttpRequest submitShipping() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/shipping-address").as(BodyCodec.buffer());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+         var1.putHeader("x-px-ab", "2");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
+         var1.putHeader("wm_vertical_id", "0");
+         var1.putHeader("inkiru_precedence", "false");
+         var1.putHeader("wm_cvv_in_session", "true");
+         var1.putHeader("x-px-ab", "2");
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("Content-Type", "application/json");
+         var1.putHeader("Content-Length", "DEFAULT_VALUE");
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
+
+      return var1;
+   }
+
+   public void swapClient() {
+      try {
+         RealClient var1 = RealClientFactory.fromOther(Vertx.currentContext().owner(), super.client, this.client.type());
+         super.client.close();
+         super.client = var1;
+      } catch (Throwable var2) {
+      }
+
+   }
+
+   public static CompletableFuture async$initialisePX(WalmartAPI var0, CompletableFuture var1, int var2, Object var3) {
+      CompletableFuture var10000;
+      switch (var2) {
+         case 0:
+            var10000 = var0.pxAPI.initialise();
+            if (!var10000.isDone()) {
+               var1 = var10000;
+               return var1.exceptionally(Function.identity()).thenCompose(WalmartAPI::async$initialisePX);
             }
-        }
-        throw new IllegalArgumentException();
-    }
+            break;
+         case 1:
+            var10000 = var1;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
 
-    public HttpRequest terraFirmaDesktop(String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://www.walmart.com/terra-firma/item/" + string).as(BodyCodec.buffer());
-        httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"89\", \"Chromium\";v=\"89\", \";Not A Brand\";v=\"99\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36");
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("service-worker-navigation-preload", "true");
-        httpRequest.putHeader("sec-fetch-site", "none");
-        httpRequest.putHeader("sec-fetch-mode", "navigate");
-        httpRequest.putHeader("sec-fetch-user", "?1");
-        httpRequest.putHeader("sec-fetch-dest", "document");
-        httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        httpRequest.putHeader("accept-language", "en-US,en;q=0.9");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
+      return (Boolean)var10000.join() ? CompletableFuture.completedFuture(true) : CompletableFuture.completedFuture(false);
+   }
 
-    public HttpRequest desktopAtc() {
-        double d = ThreadLocalRandom.current().nextDouble();
-        String string = d < Double.longBitsToDouble(4598175219545276416L) ? "https://www.walmart.com/api/v3/cart/guest/:CID/items" : (d < Double.longBitsToDouble(4602678819172646912L) ? "https://www.walmart.com/api/v3/cart/guest/:CRT/items" : (d < Double.longBitsToDouble(4604930618986332160L) ? "https://www.walmart.com/api/v3/cart/:CRT/items" : "https://www.walmart.com/api/v3/cart/:CID/items"));
-        return this.addToCart(string);
-    }
+   public JsonObject atcForm() {
+      return this.getAtcForm(this.task.getKeywords()[0], Integer.parseInt(this.task.getSize()));
+   }
 
-    public HttpRequest processPayment(PaymentToken paymentToken) {
-        HttpRequest httpRequest = this.client.putAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/order").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("vid", paymentToken.getVid().toUpperCase());
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
-            httpRequest.putHeader("sid", paymentToken.getSid().toUpperCase());
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("x-o-segment", "blue");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("wm_vertical_id", "0");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("x-o-segment", "blue");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("sid", paymentToken.getSid());
-            httpRequest.putHeader("vid", paymentToken.getVid());
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Content-Type", "application/json");
-            httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest mobileAtc() {
+      return this.task.getMode().contains("other") ? this.addToCart("https://www.walmart.com/api/v1/cart/items") : this.addToCart("https://api.mobile.walmart.com/v1/cart/items");
+   }
 
-    public JsonObject accountLoginForm(Account account) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("email", (Object)account.getUser());
-        jsonObject.put("password", (Object)account.getPass());
-        return jsonObject;
-    }
+   public HttpRequest putCart() {
+      return this.putCartAndroid("476e4599-389d-458a-94dd-c18c583686d0");
+   }
 
-    public HttpRequest selectShipping() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/fulfillment").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-px-ab", "2");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Content-Type", "application/json");
-            httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest getLocation() {
+      HttpRequest var1 = this.client.postAbs("https://www.walmart.com/account/api/location?skipCache=true").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("accept", "*/*");
+         var1.putHeader("app-source-event", "");
+         var1.putHeader("x-o-platform", "ios");
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+         var1.putHeader("x-o-platform-version", "21.18.3");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("Content-Type", "application/json; charset=utf-8");
+         var1.putHeader("Content-Length", "DEFAULT_VALUE");
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
 
-    public JsonObject getShippingRateForm(JsonObject jsonObject) {
-        String string = jsonObject.getJsonArray("items").getJsonObject(0).getString("id");
-        JsonArray jsonArray = jsonObject.getJsonArray("items");
-        String string2 = jsonArray.getJsonObject(0).getJsonObject("fulfillmentSelection").getString("shipMethod");
-        JsonObject jsonObject2 = new JsonObject().put("fulfillmentOption", (Object)"S2H").put("itemIds", (Object)new JsonArray().add((Object)string)).put("shipMethod", (Object)string2);
-        JsonArray jsonArray2 = new JsonArray().add((Object)jsonObject2);
-        return new JsonObject().put("groups", (Object)jsonArray2);
-    }
+      return var1;
+   }
 
-    public HttpRequest midasScan() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.walmart.com/midas/srv/v3/hl/item/506574645?type=product&pageType=item&platform=app&module=wpa&mloc=middle&min=2&max=20&placementId=480x212_B-C-OG_TI_2-20_PDP-m-app-" + (this.ios ? "iPhone" : "android") + "&pageId=506574645&taxonomy=0%3A4171%3A4191%3A9807313%3A6249075%3A1619679&keyword=20%20PANINI%20PLAYBOOK%20FOOTBALL%20HANGER%20BOX%20(%2030%20cards%20per%20box)&zipCode=" + this.getTask().getProfile().getZip() + "&isZipLocated=false").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("wm_site_mode", "0");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("wm_site_mode", "0");
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest getCheckoutPage() {
+      HttpRequest var1 = this.client.getAbs("https://www.walmart.com/checkout/").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
+      if (this.ios) {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("accept", "*/*");
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var1.putHeader("mobile-app-version", "21.18.3");
+         var1.putHeader("mobile-platform", "ios");
+         var1.putHeader("cookie", "DEFAULT_VALUE");
+         var1.putHeader("accept-language", "en-us");
+         var1.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var1.putHeader("accept-encoding", "gzip, deflate, br");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
+         var1.putHeader("did", DID);
+         var1.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var1.putHeader("Accept-Encoding", "gzip");
+         var1.putHeader("Cookie", "DEFAULT_VALUE");
+      }
 
-    public HttpRequest loginAccount() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/account/electrode/api/identity/password").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "text/plain;charset=UTF-8");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("x-wm-auth", "null");
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("x-wm-xpa", "null");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("x-wm-cid", "");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("x-wm-spid", "");
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-wm-auth", "null");
-            httpRequest.putHeader("x-wm-cid", "null");
-            httpRequest.putHeader("x-wm-spid", "null");
-            httpRequest.putHeader("x-wm-xpa", "null");
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("content-type", "text/plain;charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        }
-        return httpRequest;
-    }
+      return var1;
+   }
 
-    public HttpRequest affilCrossSite(String string) {
-        this.getCookies().removeAnyMatch("CRT");
-        this.getCookies().removeAnyMatch("cart-item-count");
-        this.getCookies().removeAnyMatch("hasCRT");
-        HttpRequest httpRequest = this.client.getAbs("https://affil.walmart.com/cart/" + string + "?items=" + this.task.getKeywords()[0] + "|" + this.task.getSize()).as(BodyCodec.none());
-        httpRequest.putHeader("upgrade-insecure-requests", "1");
-        httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-        httpRequest.putHeader("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        if (this.crossSite != null) {
-            httpRequest.putHeader("referer", "https://" + this.crossSite + "/");
-            if (this.crossSite.equals("t.co")) {
-                httpRequest.headers().remove("sec-fetch-user");
-            }
-        }
-        httpRequest.putHeader("accept-encoding", "gzip");
-        httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        if (this.dateOfPrevReq != null) {
-            httpRequest.putHeader("if-modified-since", this.dateOfPrevReq);
-        }
-        this.dateOfPrevReq = GMT_CHROME_RFC1123.format(ZonedDateTime.now(ZoneOffset.UTC));
-        return httpRequest;
-    }
+   public WalmartAPI(Task var1) {
+      super(ClientType.WALMART_PIXEL_3);
+      this.task = var1;
+      if (this.task.getMode().contains("desktop")) {
+         this.ios = false;
+      } else {
+         this.ios = var1.getMode().contains("2");
+      }
 
-    public HttpRequest putLocation() {
-        HttpRequest httpRequest = this.client.putAbs("https://www.walmart.com/account/api/location?skipCache=true").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
-        httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-        httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
-        httpRequest.putHeader("did", DID);
-        httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-        httpRequest.putHeader("Content-Type", "application/json; charset=utf-8");
-        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        httpRequest.putHeader("Accept-Encoding", "gzip");
-        httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        return httpRequest;
-    }
+      this.crossSite = crossSiteList[ThreadLocalRandom.current().nextInt(crossSiteList.length)];
+      this.searchQuery = searchQueries[ThreadLocalRandom.current().nextInt(searchQueries.length)];
+      this.loggedIn = false;
+   }
 
-    static {
-        PX_TOKEN = "3";
-        BYPASS_PREFIX = "";
-        EXCEPTION_RETRY_DELAY = 12000;
-        DID = UUID.randomUUID().toString();
-        GMT_CHROME_RFC1123 = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.ENGLISH);
-    }
+   public void close() {
+      if (this.pxAPI != null) {
+         this.pxAPI.close();
+      }
 
-    public HttpRequest presoSearch() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.walmart.com/preso/search?prg=mWeb&wpm=0&assetProtocol=secure&query=panini&page=1&spelling=true&preciseSearch=true&vertical_whitelist=home%2Cfanatics%2Cfashion&pref_store=5880%2C2015%2C5936%2C5969%2C5227&zipcode=22124&applyDealsRedirect=true").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("wm_site_mode", "0");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("access_key", "532c28d5412dd75bf975fb951c740a30");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("cid", "");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("access_key", "532c28d5412dd75bf975fb951c740a30");
-            httpRequest.putHeader("cid", "");
-            httpRequest.putHeader("client-ip", "192.168.0." + ThreadLocalRandom.current().nextInt(1, 255));
-            httpRequest.putHeader("wm_site_mode", "0");
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+      super.close();
+   }
 
-    public HttpRequest atcAffiliate(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.none());
-        httpRequest.putHeader("Pragma", "no-cache");
-        httpRequest.putHeader("Cache-Control", "no-cache");
-        httpRequest.putHeader("sec-ch-ua", "\"Google Chrome\";v=\"88\", \" Not;A Brand\";v=\"99\", \"Chromium\";v=\"88\"");
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("Upgrade-Insecure-Requests", "1");
-        httpRequest.putHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36");
-        httpRequest.putHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        httpRequest.putHeader("Sec-Fetch-Site", "none");
-        httpRequest.putHeader("Sec-Fetch-Mode", "navigate");
-        httpRequest.putHeader("Sec-Fetch-User", "?1");
-        httpRequest.putHeader("Sec-Fetch-Dest", "document");
-        httpRequest.putHeader("Accept-Encoding", "gzip, deflate, br");
-        httpRequest.putHeader("Accept-Language", "en-US,en;q=0.9");
-        if (this.dateOfPrevReq != null) {
-            httpRequest.putHeader("if-modified-since", this.dateOfPrevReq);
-        }
-        this.dateOfPrevReq = GMT_CHROME_RFC1123.format(ZonedDateTime.now(ZoneOffset.UTC));
-        return httpRequest;
-    }
+   public HttpRequest transferCart(String var1) {
+      HttpRequest var2 = super.client.postAbs("https://www.walmart.com/api//saved/:CID/items/" + var1 + "/transfer").as(BodyCodec.buffer());
+      if (this.ios) {
+         var2.putHeaders(Headers$Pseudo.MSPA.get());
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("accept", "*/*");
+         var2.putHeader("mobile-app-version", "21.18.3");
+         var2.putHeader("accept-language", "en-us");
+         var2.putHeader("accept-encoding", "gzip, deflate, br");
+         var2.putHeader("mobile-platform", "ios");
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("did", DID.replace("-", "").concat("00000000"));
+         var2.putHeader("credentials", "include");
+         var2.putHeader("omitcsrfjwt", "true");
+         var2.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+      } else {
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
+         var2.putHeader("did", DID);
+         var2.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
+         var2.putHeader("content-type", "application/json; charset=utf-8");
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("credentials", "include");
+         var2.putHeader("omitcsrfjwt", "true");
+         var2.putHeader("accept-encoding", "gzip");
+         var2.putHeader("cookie", "DEFAULT_VALUE");
+      }
 
-    public CookieJar cookieStore() {
-        return this.getWebClient().cookieStore();
-    }
+      return var2;
+   }
 
-    public JsonObject PCIDForm() {
-        Profile profile = this.task.getProfile();
-        return new JsonObject().put("city", (Object)profile.getCity()).put("crt:CRT", (Object)"").put("customerId:CID", (Object)"").put("customerType:type", (Object)"").put("isZipLocated", (Object)true).put("postalCode", (Object)profile.getZip()).put("state", (Object)profile.getState()).put("storeList", (Object)new JsonArray());
-    }
+   public JsonObject getBillingForm(PaymentToken var1) {
+      JsonObject var2 = new JsonObject();
+      Profile var3 = this.task.getProfile();
+      var2.put("addressLineOne", var3.getAddress1());
+      var2.put("addressLineTwo", var3.getAddress2());
+      var2.put("cardType", var3.getPaymentMethod().get());
+      var2.put("city", var3.getCity());
+      var2.put("encryptedCvv", var1.getEncryptedCvv());
+      var2.put("encryptedPan", var1.getEncryptedPan());
+      var2.put("expiryMonth", var3.getExpiryMonth());
+      var2.put("expiryYear", var3.getExpiryYear());
+      var2.put("firstName", var3.getFirstName());
+      var2.put("integrityCheck", var1.getIntegrityCheck());
+      var2.put("keyId", var1.getKeyId());
+      var2.put("lastName", var3.getLastName());
+      var2.put("phase", var1.getPhase());
+      var2.put("phone", var3.getPhone());
+      var2.put("postalCode", var3.getZip());
+      var2.put("state", var3.getState().toUpperCase());
+      var2.put("isGuest", true);
+      return var2;
+   }
 
-    public HttpRequest getCartV2(String string) {
-        return this.getCartMobile("https://www.walmart.com/api/v2/cart/" + string);
-    }
+   public CompletableFuture initialisePX() {
+      CompletableFuture var10000 = this.pxAPI.initialise();
+      if (!var10000.isDone()) {
+         CompletableFuture var1 = var10000;
+         return var1.exceptionally(Function.identity()).thenCompose(WalmartAPI::async$initialisePX);
+      } else {
+         return (Boolean)var10000.join() ? CompletableFuture.completedFuture(true) : CompletableFuture.completedFuture(false);
+      }
+   }
 
-    public HttpRequest getCart() {
-        return this.getCartMobile("https://api.mobile.walmart.com/v1/cart/items");
-    }
+   public HttpRequest desktopAtcAffiliate() {
+      String var10001 = this.task.getKeywords()[0];
+      return this.atcAffiliate("https://affil.walmart.com/cart/buynow?items=" + var10001 + "|" + this.task.getSize());
+   }
 
-    public HttpRequest submitShipping() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/api/checkout/v3/contract/:PCID/shipping-address").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 Walmart WMTAPP v21.18.3");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("x-px-ab", "2");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("Accept", "application/json, text/javascript, */*; q=0.01");
-            httpRequest.putHeader("wm_vertical_id", "0");
-            httpRequest.putHeader("inkiru_precedence", "false");
-            httpRequest.putHeader("wm_cvv_in_session", "true");
-            httpRequest.putHeader("x-px-ab", "2");
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_WEB_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Content-Type", "application/json");
-            httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+   public HttpRequest addToCart() {
+      return this.mobileAtc();
+   }
 
-    public void swapClient() {
-        try {
-            RealClient realClient = RealClientFactory.fromOther((Vertx)Vertx.currentContext().owner(), (RealClient)this.client, (ClientType)this.client.type());
-            this.client.close();
-            this.client = realClient;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$initialisePX(WalmartAPI var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
-        switch (var2_2) {
-            case 0: {
-                v0 = var0.pxAPI.initialise();
-                if (!v0.isDone()) {
-                    var1_1 = v0;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$initialisePX(io.trickle.task.sites.walmart.usa.WalmartAPI java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((WalmartAPI)var0, (CompletableFuture)var1_1, (int)1));
-                }
-                ** GOTO lbl10
-            }
-            case 1: {
-                v0 = var1_1;
-lbl10:
-                // 2 sources
-
-                if ((Boolean)v0.join() == false) return CompletableFuture.completedFuture(false);
-                return CompletableFuture.completedFuture(true);
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public JsonObject atcForm() {
-        return this.getAtcForm(this.task.getKeywords()[0], Integer.parseInt(this.task.getSize()));
-    }
-
-    public HttpRequest mobileAtc() {
-        if (!this.task.getMode().contains("other")) return this.addToCart("https://api.mobile.walmart.com/v1/cart/items");
-        return this.addToCart("https://www.walmart.com/api/v1/cart/items");
-    }
-
-    public HttpRequest putCart() {
-        return this.putCartAndroid("476e4599-389d-458a-94dd-c18c583686d0");
-    }
-
-    public HttpRequest getLocation() {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/account/api/location?skipCache=true").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("app-source-event", "");
-            httpRequest.putHeader("x-o-platform", "ios");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("x-o-platform-version", "21.18.3");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("Content-Type", "application/json; charset=utf-8");
-            httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
-
-    public HttpRequest getCheckoutPage() {
-        HttpRequest httpRequest = this.client.getAbs("https://www.walmart.com/checkout/").timeout(TimeUnit.SECONDS.toMillis(10L)).as(BodyCodec.none());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("User-Agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("Accept-Encoding", "gzip");
-            httpRequest.putHeader("Cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
-
-    public WalmartAPI(Task task) {
-        super(ClientType.WALMART_PIXEL_3);
-        this.task = task;
-        this.ios = this.task.getMode().contains("desktop") ? false : task.getMode().contains("2");
-        this.crossSite = crossSiteList[ThreadLocalRandom.current().nextInt(crossSiteList.length)];
-        this.searchQuery = searchQueries[ThreadLocalRandom.current().nextInt(searchQueries.length)];
-        this.loggedIn = false;
-    }
-
-    public void close() {
-        if (this.pxAPI != null) {
-            this.pxAPI.close();
-        }
-        super.close();
-    }
-
-    public HttpRequest transferCart(String string) {
-        HttpRequest httpRequest = this.client.postAbs("https://www.walmart.com/api//saved/:CID/items/" + string + "/transfer").as(BodyCodec.buffer());
-        if (this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("mobile-app-version", "21.18.3");
-            httpRequest.putHeader("accept-language", "en-us");
-            httpRequest.putHeader("accept-encoding", "gzip, deflate, br");
-            httpRequest.putHeader("mobile-platform", "ios");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("did", DID.replace("-", "").concat("00000000"));
-            httpRequest.putHeader("credentials", "include");
-            httpRequest.putHeader("omitcsrfjwt", "true");
-            httpRequest.putHeader("user-agent", "Walmart/2107091553 CFNetwork/1128.0.1 Darwin/19.6.0");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("user-agent", WalmartConstants.ANDROID_OLD_UA);
-            httpRequest.putHeader("did", DID);
-            httpRequest.putHeader("x-px-authorization", this.pxAPI.tokenValue() == null ? "3" : (String)this.pxAPI.tokenValue());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("credentials", "include");
-            httpRequest.putHeader("omitcsrfjwt", "true");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("cookie", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
-
-    public JsonObject getBillingForm(PaymentToken paymentToken) {
-        JsonObject jsonObject = new JsonObject();
-        Profile profile = this.task.getProfile();
-        jsonObject.put("addressLineOne", (Object)profile.getAddress1());
-        jsonObject.put("addressLineTwo", (Object)profile.getAddress2());
-        jsonObject.put("cardType", (Object)profile.getPaymentMethod().get());
-        jsonObject.put("city", (Object)profile.getCity());
-        jsonObject.put("encryptedCvv", (Object)paymentToken.getEncryptedCvv());
-        jsonObject.put("encryptedPan", (Object)paymentToken.getEncryptedPan());
-        jsonObject.put("expiryMonth", (Object)profile.getExpiryMonth());
-        jsonObject.put("expiryYear", (Object)profile.getExpiryYear());
-        jsonObject.put("firstName", (Object)profile.getFirstName());
-        jsonObject.put("integrityCheck", (Object)paymentToken.getIntegrityCheck());
-        jsonObject.put("keyId", (Object)paymentToken.getKeyId());
-        jsonObject.put("lastName", (Object)profile.getLastName());
-        jsonObject.put("phase", (Object)paymentToken.getPhase());
-        jsonObject.put("phone", (Object)profile.getPhone());
-        jsonObject.put("postalCode", (Object)profile.getZip());
-        jsonObject.put("state", (Object)profile.getState().toUpperCase());
-        jsonObject.put("isGuest", (Object)true);
-        return jsonObject;
-    }
-
-    public CompletableFuture initialisePX() {
-        CompletableFuture completableFuture = this.pxAPI.initialise();
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> WalmartAPI.async$initialisePX(this, completableFuture2, 1, arg_0));
-        }
-        if ((Boolean)completableFuture.join() == false) return CompletableFuture.completedFuture(false);
-        return CompletableFuture.completedFuture(true);
-    }
-
-    public HttpRequest desktopAtcAffiliate() {
-        return this.atcAffiliate("https://affil.walmart.com/cart/buynow?items=" + this.task.getKeywords()[0] + "|" + this.task.getSize());
-    }
-
-    public HttpRequest addToCart() {
-        return this.mobileAtc();
-    }
-
-    public HttpRequest otherAtc() {
-        return this.addToCart("https://www.walmart.com/api/v2/cart/guest/:CID/items");
-    }
+   public HttpRequest otherAtc() {
+      return this.addToCart("https://www.walmart.com/api/v2/cart/guest/:CID/items");
+   }
 }

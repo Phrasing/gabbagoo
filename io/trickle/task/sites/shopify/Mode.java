@@ -1,12 +1,10 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.sites.shopify;
 
 public enum Mode {
-    FAST,
-    NORMAL,
-    HUMAN,
-    HYBRID;
+   NORMAL,
+   FAST,
+   HYBRID,
+   HUMAN;
 
+   public static Mode[] $VALUES = new Mode[]{FAST, NORMAL, HUMAN, HYBRID};
 }

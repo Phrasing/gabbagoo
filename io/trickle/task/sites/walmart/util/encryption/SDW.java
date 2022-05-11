@@ -1,79 +1,91 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.sites.walmart.util.encryption.Aes
- *  io.trickle.task.sites.walmart.util.encryption.CMAC
- *  io.trickle.task.sites.walmart.util.encryption.Encryptor
- */
 package io.trickle.task.sites.walmart.util.encryption;
 
-import io.trickle.task.sites.walmart.util.encryption.Aes;
-import io.trickle.task.sites.walmart.util.encryption.CMAC;
-import io.trickle.task.sites.walmart.util.encryption.Encryptor;
-
 public class SDW {
-    public Aes aes;
-    public static String HEX = "0123456789abcdef";
+   public Aes aes;
+   public static String HEX = "0123456789abcdef";
 
-    public SDW(Aes aes) {
-        this.aes = aes;
-    }
+   public SDW(Aes var1) {
+      this.aes = var1;
+   }
 
-    public String reformat(String string, String string2) {
-        Object object = "";
-        int n = 0;
-        int n2 = 0;
-        while (n2 < string2.length()) {
-            if (n < string.length() && Encryptor.base10.indexOf(string2.charAt(n2)) >= 0) {
-                object = (String)object + string.charAt(n);
-                ++n;
-            } else {
-                object = (String)object + string2.charAt(n2);
-            }
-            ++n2;
-        }
-        return object;
-    }
+   public String reformat(String var1, String var2) {
+      String var3 = "";
+      int var4 = 0;
 
-    public String integrity(String string, String string2, String string3) {
-        String string4 = Character.toString(0) + Character.toString(string2.length()) + string2 + Character.toString(0) + Character.toString(string3.length()) + string3;
-        long[] lArray = Encryptor.hexToWords((String)string);
-        lArray[3] = lArray[3] ^ 1L;
-        Aes aes = this.aes.cipher(lArray);
-        CMAC cMAC = new CMAC();
-        int[] nArray = cMAC.compute(aes, string4);
-        return this.wordToHex(nArray[0]) + this.wordToHex(nArray[1]);
-    }
+      for(int var5 = 0; var5 < var2.length(); ++var5) {
+         if (var4 < var1.length() && Encryptor.base10.indexOf(var2.charAt(var5)) >= 0) {
+            var3 = var3 + var1.charAt(var4);
+            ++var4;
+         } else {
+            var3 = var3 + var2.charAt(var5);
+         }
+      }
 
-    public String wordToHex(int n) {
-        int n2 = 32;
-        Object object = "";
-        while (n2 > 0) {
-            object = (String)object + "0123456789abcdef".charAt(n >>> (n2 -= 4) & 0xF);
-        }
-        return object;
-    }
+      return var3;
+   }
 
-    public String fixluhn(String string, int n, int n2) {
-        int n3 = this.luhn(string);
-        n3 = n3 < n2 ? (n3 += 10 - n2) : (n3 -= n2);
-        if (n3 == 0) return string;
-        n3 = (string.length() - n) % 2 != 0 ? 10 - n3 : (n3 % 2 == 0 ? 5 - n3 / 2 : (9 - n3) / 2 + 5);
-        return string.substring(0, n) + n3 + string.substring(n + 1);
-    }
+   public String integrity(String var1, String var2, String var3) {
+      String var4 = Character.toString(0) + Character.toString(var2.length()) + var2 + Character.toString(0) + Character.toString(var3.length()) + var3;
+      long[] var5 = Encryptor.hexToWords(var1);
+      var5[3] ^= 1L;
+      Aes var6 = this.aes.cipher(var5);
+      CMAC var7 = new CMAC();
+      int[] var8 = var7.compute(var6, var4);
+      String var10000 = this.wordToHex(var8[0]);
+      return var10000 + this.wordToHex(var8[1]);
+   }
 
-    public int luhn(String string) {
-        int n;
-        int n2 = 0;
-        for (n = string.length() - 1; n >= 0; n2 += Integer.parseInt(String.valueOf(string.charAt(n)), 10), n -= 2) {
-        }
-        n = string.length() - 2;
-        while (n >= 0) {
-            int n3 = 2 * Integer.parseInt(String.valueOf(string.charAt(n)), 10);
-            n2 = n3 < 10 ? (n2 += n3) : (n2 += n3 - 9);
-            n -= 2;
-        }
-        return n2 % 10;
-    }
+   public String wordToHex(int var1) {
+      int var2 = 32;
+
+      String var3;
+      for(var3 = ""; var2 > 0; var3 = var3 + "0123456789abcdef".charAt(var1 >>> var2 & 15)) {
+         var2 -= 4;
+      }
+
+      return var3;
+   }
+
+   public String fixluhn(String var1, int var2, int var3) {
+      int var4 = this.luhn(var1);
+      if (var4 < var3) {
+         var4 += 10 - var3;
+      } else {
+         var4 -= var3;
+      }
+
+      if (var4 != 0) {
+         if ((var1.length() - var2) % 2 != 0) {
+            var4 = 10 - var4;
+         } else if (var4 % 2 == 0) {
+            var4 = 5 - var4 / 2;
+         } else {
+            var4 = (9 - var4) / 2 + 5;
+         }
+
+         return var1.substring(0, var2) + var4 + var1.substring(var2 + 1);
+      } else {
+         return var1;
+      }
+   }
+
+   public int luhn(String var1) {
+      int var2 = var1.length() - 1;
+
+      int var3;
+      for(var3 = 0; var2 >= 0; var2 -= 2) {
+         var3 += Integer.parseInt(String.valueOf(var1.charAt(var2)), 10);
+      }
+
+      for(var2 = var1.length() - 2; var2 >= 0; var2 -= 2) {
+         int var4 = 2 * Integer.parseInt(String.valueOf(var1.charAt(var2)), 10);
+         if (var4 < 10) {
+            var3 += var4;
+         } else {
+            var3 += var4 - 9;
+         }
+      }
+
+      return var3 % 10;
+   }
 }

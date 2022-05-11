@@ -1,22 +1,5 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.basicgui.AIOverrideListener
- *  io.trickle.basicgui.BasicGUI$1
- *  io.trickle.basicgui.DelayOverrideListener
- *  io.trickle.basicgui.KeywordOverrideListener
- *  io.trickle.basicgui.LinkOverrideListener
- *  io.trickle.basicgui.PasswordOverrideListener
- */
 package io.trickle.basicgui;
 
-import io.trickle.basicgui.AIOverrideListener;
-import io.trickle.basicgui.BasicGUI;
-import io.trickle.basicgui.DelayOverrideListener;
-import io.trickle.basicgui.KeywordOverrideListener;
-import io.trickle.basicgui.LinkOverrideListener;
-import io.trickle.basicgui.PasswordOverrideListener;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
@@ -24,72 +7,69 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.TextField;
 import java.awt.Toolkit;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 public class BasicGUI {
-    public boolean closed = false;
+   public boolean closed = false;
 
-    public boolean isClosed() {
-        return this.closed;
-    }
+   public boolean isClosed() {
+      return this.closed;
+   }
 
-    public BasicGUI() {
-        JPanel jPanel = new JPanel(new FlowLayout(3, 5, 2));
-        Label label = new Label("Delay     ");
-        TextField textField = new TextField(10);
-        JCheckBox jCheckBox = new JCheckBox("OFF");
-        JCheckBox jCheckBox2 = new JCheckBox("Auto");
-        DelayOverrideListener delayOverrideListener = new DelayOverrideListener(textField, jCheckBox);
-        textField.addKeyListener((KeyListener)delayOverrideListener);
-        jCheckBox.addActionListener((ActionListener)delayOverrideListener);
-        jCheckBox2.addActionListener((ActionListener)new AIOverrideListener(jCheckBox2));
-        jPanel.add(label);
-        jPanel.add(textField);
-        jPanel.add(jCheckBox);
-        jPanel.add(jCheckBox2);
-        JPanel jPanel2 = new JPanel(new FlowLayout(3, 5, 2));
-        Label label2 = new Label("Link       ");
-        TextField textField2 = new TextField(40);
-        LinkOverrideListener linkOverrideListener = new LinkOverrideListener();
-        textField2.addKeyListener((KeyListener)linkOverrideListener);
-        jPanel2.add(label2);
-        jPanel2.add(textField2);
-        JPanel jPanel3 = new JPanel(new FlowLayout(3, 5, 2));
-        Label label3 = new Label("Keyword ");
-        TextField textField3 = new TextField(40);
-        JButton jButton = new JButton("Change");
-        KeywordOverrideListener keywordOverrideListener = new KeywordOverrideListener(textField3);
-        jButton.addActionListener((ActionListener)keywordOverrideListener);
-        jPanel3.add(label3);
-        jPanel3.add(textField3);
-        jPanel3.add(jButton);
-        JPanel jPanel4 = new JPanel(new FlowLayout(3, 5, 2));
-        Label label4 = new Label("Password");
-        TextField textField4 = new TextField(40);
-        JButton jButton2 = new JButton("Change");
-        PasswordOverrideListener passwordOverrideListener = new PasswordOverrideListener(textField4);
-        jButton2.addActionListener((ActionListener)passwordOverrideListener);
-        jPanel4.add(label4);
-        jPanel4.add(textField4);
-        jPanel4.add(jButton2);
-        Frame frame = new Frame("Bot Manager");
-        frame.setLayout(new GridLayout(0, 1));
-        frame.add(jPanel);
-        frame.add(jPanel2);
-        frame.add(jPanel3);
-        frame.add(jPanel4);
-        frame.setSize(500, 250);
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        int n = (int)((dimension.getWidth() - (double)frame.getWidth()) / Double.longBitsToDouble(0x4000000000000000L));
-        int n2 = (int)((dimension.getHeight() - (double)(frame.getHeight() * 2)) / Double.longBitsToDouble(0x4000000000000000L));
-        frame.setLocation(n, n2);
-        frame.addWindowListener((WindowListener)new 1(this, frame));
-        frame.setVisible(true);
-        frame.setResizable(true);
-    }
+   public BasicGUI() {
+      JPanel var1 = new JPanel(new FlowLayout(3, 5, 2));
+      Label var2 = new Label("Delay     ");
+      TextField var3 = new TextField(10);
+      JCheckBox var4 = new JCheckBox("OFF");
+      JCheckBox var5 = new JCheckBox("Auto");
+      DelayOverrideListener var6 = new DelayOverrideListener(var3, var4);
+      var3.addKeyListener(var6);
+      var4.addActionListener(var6);
+      var5.addActionListener(new AIOverrideListener(var5));
+      var1.add(var2);
+      var1.add(var3);
+      var1.add(var4);
+      var1.add(var5);
+      JPanel var7 = new JPanel(new FlowLayout(3, 5, 2));
+      Label var8 = new Label("Link       ");
+      TextField var9 = new TextField(40);
+      LinkOverrideListener var10 = new LinkOverrideListener();
+      var9.addKeyListener(var10);
+      var7.add(var8);
+      var7.add(var9);
+      JPanel var11 = new JPanel(new FlowLayout(3, 5, 2));
+      Label var12 = new Label("Keyword ");
+      TextField var13 = new TextField(40);
+      JButton var14 = new JButton("Change");
+      KeywordOverrideListener var15 = new KeywordOverrideListener(var13);
+      var14.addActionListener(var15);
+      var11.add(var12);
+      var11.add(var13);
+      var11.add(var14);
+      JPanel var16 = new JPanel(new FlowLayout(3, 5, 2));
+      Label var17 = new Label("Password");
+      TextField var18 = new TextField(40);
+      JButton var19 = new JButton("Change");
+      PasswordOverrideListener var20 = new PasswordOverrideListener(var18);
+      var19.addActionListener(var20);
+      var16.add(var17);
+      var16.add(var18);
+      var16.add(var19);
+      Frame var21 = new Frame("Bot Manager");
+      var21.setLayout(new GridLayout(0, 1));
+      var21.add(var1);
+      var21.add(var7);
+      var21.add(var11);
+      var21.add(var16);
+      var21.setSize(500, 250);
+      Dimension var22 = Toolkit.getDefaultToolkit().getScreenSize();
+      int var23 = (int)((var22.getWidth() - (double)var21.getWidth()) / Double.longBitsToDouble(4611686018427387904L));
+      int var24 = (int)((var22.getHeight() - (double)(var21.getHeight() * 2)) / Double.longBitsToDouble(4611686018427387904L));
+      var21.setLocation(var23, var24);
+      var21.addWindowListener(new BasicGUI$1(this, var21));
+      var21.setVisible(true);
+      var21.setResizable(true);
+   }
 }

@@ -1,436 +1,353 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.harvester.CaptchaToken
- *  io.trickle.task.sites.shopify.Shopify
- *  io.trickle.task.sites.shopify.ShopifyAPI
- *  io.trickle.util.Utils
- *  io.trickle.util.concurrent.VertxUtil
- *  io.trickle.util.request.Request
- *  io.vertx.core.MultiMap
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- */
 package io.trickle.task.sites.shopify;
 
 import io.trickle.harvester.CaptchaToken;
-import io.trickle.task.sites.shopify.Shopify;
-import io.trickle.task.sites.shopify.ShopifyAPI;
 import io.trickle.util.Utils;
 import io.trickle.util.concurrent.VertxUtil;
 import io.trickle.util.request.Request;
-import io.vertx.core.MultiMap;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
-import java.lang.invoke.LambdaMetafactory;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class Presolver {
-    public boolean isRunning = true;
-    public ShopifyAPI api;
-    public Shopify shopifyTask;
+   public boolean isRunning = true;
+   public ShopifyAPI api;
+   public Shopify shopifyTask;
 
-    public CompletableFuture monitorCP() {
-        int n = 0;
-        while (n++ < Integer.MAX_VALUE) {
-            if (!this.isRunning) return CompletableFuture.completedFuture(null);
-            if (!this.api.getWebClient().isActive()) return CompletableFuture.completedFuture(null);
-            try {
-                int n2;
-                HttpRequest httpRequest = this.api.checkpointPage(false);
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$monitorCP(this, n, httpRequest, completableFuture2, null, null, 0, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                String string = httpResponse.bodyAsString();
-                if (httpResponse.statusCode() == 200 && (string.contains("content_checkpoint") || this.shopifyTask.task.getMode().contains("testing"))) {
-                    VertxUtil.sendSignal((String)("CPStatus" + this.api.getSiteURL()));
-                    return CompletableFuture.completedFuture(string);
-                }
-                if (!(httpResponse.statusCode() == 200 || httpResponse.statusCode() == 302 && httpResponse.getHeader("location").contains("password"))) {
-                    this.shopifyTask.getLogger().error("Failed CPStatus: {}", (Object)httpResponse.statusCode());
-                }
-                if (this.shopifyTask.isSmart && (n2 = Utils.calculateMSLeftUntilHour()) - this.shopifyTask.task.getMonitorDelay() < 0 && n2 < 10000) {
-                    this.shopifyTask.getLogger().info("Preparing smart release");
-                    CompletableFuture completableFuture3 = VertxUtil.signalSleep((String)("CPStatus" + this.api.getSiteURL()), (long)n2);
-                    if (!completableFuture3.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture3;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$monitorCP(this, n, httpRequest, completableFuture4, httpResponse, string, n2, null, 2, arg_0));
-                    }
-                    completableFuture3.join();
-                    continue;
-                }
-                CompletableFuture completableFuture5 = VertxUtil.randomSignalSleep((String)("CPStatus" + this.api.getSiteURL()), (long)this.shopifyTask.task.getMonitorDelay());
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$monitorCP(this, n, httpRequest, completableFuture6, httpResponse, string, 0, null, 3, arg_0));
-                }
-                completableFuture5.join();
+   public CompletableFuture monitorCP() {
+      int var1 = 0;
+
+      while(var1++ < Integer.MAX_VALUE && this.isRunning && this.api.getWebClient().isActive()) {
+         CompletableFuture var6;
+         CompletableFuture var8;
+         try {
+            HttpRequest var2 = this.api.checkpointPage(false);
+            var8 = Request.send(var2);
+            if (!var8.isDone()) {
+               var6 = var8;
+               return var6.exceptionally(Function.identity()).thenCompose(Presolver::async$monitorCP);
             }
-            catch (Throwable throwable) {
-                if (!throwable.getMessage().contains("closed")) {
-                    this.shopifyTask.getLogger().error("Failed CPStatus: {}", (Object)throwable.getMessage());
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep((long)3000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$monitorCP(this, n, null, completableFuture7, null, null, 0, throwable, 4, arg_0));
-                }
-                completableFuture.join();
+
+            HttpResponse var3 = (HttpResponse)var8.join();
+            if (var3 != null) {
+               String var4 = var3.bodyAsString();
+               if (var3.statusCode() == 200 && (var4.contains("content_checkpoint") || this.shopifyTask.task.getMode().contains("testing"))) {
+                  VertxUtil.sendSignal("CPStatus" + this.api.getSiteURL());
+                  return CompletableFuture.completedFuture(var4);
+               }
+
+               if (var3.statusCode() != 200 && (var3.statusCode() != 302 || !var3.getHeader("location").contains("password"))) {
+                  this.shopifyTask.getLogger().error("Failed CPStatus: {}", var3.statusCode());
+               }
+
+               if (this.shopifyTask.isSmart) {
+                  int var5 = Utils.calculateMSLeftUntilHour();
+                  if (var5 - this.shopifyTask.task.getMonitorDelay() < 0 && var5 < 10000) {
+                     this.shopifyTask.getLogger().info("Preparing smart release");
+                     var8 = VertxUtil.signalSleep("CPStatus" + this.api.getSiteURL(), (long)var5);
+                     if (!var8.isDone()) {
+                        var6 = var8;
+                        return var6.exceptionally(Function.identity()).thenCompose(Presolver::async$monitorCP);
+                     }
+
+                     var8.join();
+                     continue;
+                  }
+               }
+
+               var8 = VertxUtil.randomSignalSleep("CPStatus" + this.api.getSiteURL(), (long)this.shopifyTask.task.getMonitorDelay());
+               if (!var8.isDone()) {
+                  var6 = var8;
+                  return var6.exceptionally(Function.identity()).thenCompose(Presolver::async$monitorCP);
+               }
+
+               var8.join();
             }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$atcAJAX(Presolver var0, String var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_5, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:850)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1055)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:942)
-         *     at org.benf.cfr.reader.Driver.doClass(Driver.java:84)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:78)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompile(CFRDecompiler.java:91)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:122)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.decompileSaveAll(ResourceDecompiling.java:262)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$decompileSaveAll$0(ResourceDecompiling.java:127)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture fetchRandItem() {
-        int n = 0;
-        while (n++ < Integer.MAX_VALUE) {
-            if (!this.isRunning) return CompletableFuture.completedFuture(null);
-            if (!this.api.getWebClient().isActive()) return CompletableFuture.completedFuture(null);
-            try {
-                HttpRequest httpRequest = this.api.productsJSON(true);
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$fetchRandItem(this, n, httpRequest, completableFuture2, null, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 200) {
-                    VertxUtil.sendSignal((String)("CPProd" + this.api.getSiteURL()));
-                    return CompletableFuture.completedFuture(httpResponse.bodyAsJsonObject().getJsonArray("products"));
-                }
-                if (httpResponse.statusCode() == 401) {
-                    this.shopifyTask.getLogger().info("Password detected. Sleeping...");
-                    CompletableFuture completableFuture3 = VertxUtil.signalSleep((String)("CPProd" + this.api.getSiteURL()), (long)this.shopifyTask.task.getMonitorDelay());
-                    if (!completableFuture3.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture3;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$fetchRandItem(this, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
-                    }
-                    completableFuture3.join();
-                } else {
-                    this.shopifyTask.getLogger().error("Failed CPProd: {}", (Object)httpResponse.statusCode());
-                }
-                CompletableFuture completableFuture5 = VertxUtil.signalSleep((String)("CPProd" + this.api.getSiteURL()), (long)this.shopifyTask.task.getMonitorDelay());
-                if (!completableFuture5.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture5;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$fetchRandItem(this, n, httpRequest, completableFuture6, httpResponse, null, 3, arg_0));
-                }
-                completableFuture5.join();
+         } catch (Throwable var7) {
+            if (!var7.getMessage().contains("closed")) {
+               this.shopifyTask.getLogger().error("Failed CPStatus: {}", var7.getMessage());
             }
-            catch (Throwable throwable) {
-                if (!throwable.getMessage().contains("closed")) {
-                    this.shopifyTask.getLogger().error("Failed CPProd: {}", (Object)throwable.getMessage());
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep((long)3000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture7 = completableFuture;
-                    return ((CompletableFuture)completableFuture7.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$fetchRandItem(this, n, null, completableFuture7, null, throwable, 4, arg_0));
-                }
-                completableFuture.join();
+
+            var8 = VertxUtil.randomSleep(3000L);
+            if (!var8.isDone()) {
+               var6 = var8;
+               return var6.exceptionally(Function.identity()).thenCompose(Presolver::async$monitorCP);
             }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
 
-    public CompletableFuture run() {
-        CompletableFuture completableFuture = this.monitorCP();
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$run(this, completableFuture2, null, null, 1, arg_0));
-        }
-        String string = (String)completableFuture.join();
-        if (!this.shopifyTask.isCPMonitorTriggered.compareAndSet(false, true)) return CompletableFuture.completedFuture(null);
-        if (!this.isRunning) return CompletableFuture.completedFuture(null);
-        if (!this.api.getWebClient().isActive()) return CompletableFuture.completedFuture(null);
-        CompletableFuture completableFuture3 = this.shopifyTask.solveCheckpointCaptcha(string);
-        if (!completableFuture3.isDone()) {
-            CompletableFuture completableFuture4 = completableFuture3;
-            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$run(this, completableFuture4, string, null, 2, arg_0));
-        }
-        CaptchaToken captchaToken = (CaptchaToken)completableFuture3.join();
-        CompletableFuture completableFuture5 = this.submitCheckpoint(captchaToken);
-        if (!completableFuture5.isDone()) {
-            CompletableFuture completableFuture6 = completableFuture5;
-            return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$run(this, completableFuture6, string, captchaToken, 3, arg_0));
-        }
-        completableFuture5.join();
-        if (this.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint") == null) {
-            this.shopifyTask.getLogger().error("CP cookie not found. Severe error");
-        } else {
-            this.api.getCookies().put("_shopify_checkpoint", this.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint"), this.api.getSiteURL());
-        }
-        return CompletableFuture.completedFuture(null);
-    }
+            var8.join();
+         }
+      }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$run(Presolver var0, CompletableFuture var1_1, String var2_2, CaptchaToken var3_3, int var4_4, Object var5_5) {
-        switch (var4_4) {
-            case 0: {
-                v0 = var0.monitorCP();
-                if (!v0.isDone()) {
-                    var3_3 = v0;
-                    return var3_3.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.shopify.Presolver java.util.concurrent.CompletableFuture java.lang.String io.trickle.harvester.CaptchaToken int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Presolver)var0, (CompletableFuture)var3_3, null, null, (int)1));
-                }
-                ** GOTO lbl10
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$atcAJAX(Presolver param0, String param1, int param2, HttpRequest param3, CompletableFuture param4, HttpResponse param5, Throwable param6, int param7, Object param8) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public CompletableFuture fetchRandItem() {
+      int var1 = 0;
+
+      while(var1++ < Integer.MAX_VALUE && this.isRunning && this.api.getWebClient().isActive()) {
+         CompletableFuture var4;
+         CompletableFuture var6;
+         try {
+            HttpRequest var2 = this.api.productsJSON(true);
+            var6 = Request.send(var2);
+            if (!var6.isDone()) {
+               var4 = var6;
+               return var4.exceptionally(Function.identity()).thenCompose(Presolver::async$fetchRandItem);
             }
-            case 1: {
-                v0 = var1_1;
-lbl10:
-                // 2 sources
 
-                var1_1 = (String)v0.join();
-                if (var0.shopifyTask.isCPMonitorTriggered.compareAndSet(false, true) == false) return CompletableFuture.completedFuture(null);
-                if (var0.isRunning == false) return CompletableFuture.completedFuture(null);
-                if (var0.api.getWebClient().isActive() == false) return CompletableFuture.completedFuture(null);
-                v1 = var0.shopifyTask.solveCheckpointCaptcha((String)var1_1);
-                if (!v1.isDone()) {
-                    var3_3 = v1;
-                    return var3_3.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.shopify.Presolver java.util.concurrent.CompletableFuture java.lang.String io.trickle.harvester.CaptchaToken int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Presolver)var0, (CompletableFuture)var3_3, (String)var1_1, null, (int)2));
-                }
-                ** GOTO lbl22
+            HttpResponse var3 = (HttpResponse)var6.join();
+            if (var3 != null) {
+               if (var3.statusCode() == 200) {
+                  VertxUtil.sendSignal("CPProd" + this.api.getSiteURL());
+                  return CompletableFuture.completedFuture(var3.bodyAsJsonObject().getJsonArray("products"));
+               }
+
+               if (var3.statusCode() == 401) {
+                  this.shopifyTask.getLogger().info("Password detected. Sleeping...");
+                  var6 = VertxUtil.signalSleep("CPProd" + this.api.getSiteURL(), (long)this.shopifyTask.task.getMonitorDelay());
+                  if (!var6.isDone()) {
+                     var4 = var6;
+                     return var4.exceptionally(Function.identity()).thenCompose(Presolver::async$fetchRandItem);
+                  }
+
+                  var6.join();
+               } else {
+                  this.shopifyTask.getLogger().error("Failed CPProd: {}", var3.statusCode());
+               }
+
+               var6 = VertxUtil.signalSleep("CPProd" + this.api.getSiteURL(), (long)this.shopifyTask.task.getMonitorDelay());
+               if (!var6.isDone()) {
+                  var4 = var6;
+                  return var4.exceptionally(Function.identity()).thenCompose(Presolver::async$fetchRandItem);
+               }
+
+               var6.join();
             }
-            case 2: {
-                v1 = var1_1;
-                var1_1 = var2_2;
-lbl22:
-                // 2 sources
-
-                if (!(v2 = var0.submitCheckpoint((CaptchaToken)(var2_2 = (CaptchaToken)v1.join()))).isDone()) {
-                    var3_3 = v2;
-                    return var3_3.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$run(io.trickle.task.sites.shopify.Presolver java.util.concurrent.CompletableFuture java.lang.String io.trickle.harvester.CaptchaToken int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((Presolver)var0, (CompletableFuture)var3_3, (String)var1_1, (CaptchaToken)var2_2, (int)3));
-                }
-                ** GOTO lbl31
+         } catch (Throwable var5) {
+            if (!var5.getMessage().contains("closed")) {
+               this.shopifyTask.getLogger().error("Failed CPProd: {}", var5.getMessage());
             }
-            case 3: {
-                v2 = var1_1;
-                v3 = var2_2;
-                var2_2 = var3_3;
-                var1_1 = v3;
-lbl31:
-                // 2 sources
 
-                v2.join();
-                if (var0.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint") == null) {
-                    var0.shopifyTask.getLogger().error("CP cookie not found. Severe error");
-                } else {
-                    var0.api.getCookies().put("_shopify_checkpoint", var0.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint"), var0.api.getSiteURL());
-                }
-                return CompletableFuture.completedFuture(null);
+            var6 = VertxUtil.randomSleep(3000L);
+            if (!var6.isDone()) {
+               var4 = var6;
+               return var4.exceptionally(Function.identity()).thenCompose(Presolver::async$fetchRandItem);
             }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public Presolver(Shopify shopify) {
-        this.api = shopify.api;
-        this.shopifyTask = shopify;
-    }
+            var6.join();
+         }
+      }
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$submitCheckpoint(Presolver var0, CaptchaToken var1_1, int var2_2, HttpRequest var3_3, CompletableFuture var4_5, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:850)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1055)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:942)
-         *     at org.benf.cfr.reader.Driver.doClass(Driver.java:84)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:78)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompile(CFRDecompiler.java:91)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:122)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.decompileSaveAll(ResourceDecompiling.java:262)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$decompileSaveAll$0(ResourceDecompiling.java:127)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
+      return CompletableFuture.completedFuture((Object)null);
+   }
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$monitorCP(Presolver var0, int var1_1, HttpRequest var2_2, CompletableFuture var3_4, HttpResponse var4_5, String var5_6, int var6_8, Throwable var7_13, int var8_14, Object var9_15) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:850)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1055)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:942)
-         *     at org.benf.cfr.reader.Driver.doClass(Driver.java:84)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:78)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompile(CFRDecompiler.java:91)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:122)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.decompileSaveAll(ResourceDecompiling.java:262)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$decompileSaveAll$0(ResourceDecompiling.java:127)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture submitCheckpoint(CaptchaToken captchaToken) {
-        this.shopifyTask.getLogger().info("Submitting checkpoint...");
-        int n = 0;
-        while (n++ < Integer.MAX_VALUE) {
-            if (!this.isRunning) return CompletableFuture.completedFuture(null);
-            if (!this.api.getWebClient().isActive()) return CompletableFuture.completedFuture(null);
-            try {
-                HttpRequest httpRequest = this.api.submitCheckpoint();
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (MultiMap)Shopify.checkpointForm((CaptchaToken)captchaToken));
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$submitCheckpoint(this, captchaToken, n, httpRequest, completableFuture2, null, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 302) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                this.shopifyTask.getLogger().warn("Retrying submitting checkpoint: status: '{}'", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = VertxUtil.sleep((long)this.shopifyTask.task.getRetryDelay());
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$submitCheckpoint(this, captchaToken, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
-                }
-                completableFuture3.join();
+   public CompletableFuture run() {
+      CompletableFuture var10000 = this.monitorCP();
+      CompletableFuture var3;
+      if (!var10000.isDone()) {
+         var3 = var10000;
+         return var3.exceptionally(Function.identity()).thenCompose(Presolver::async$run);
+      } else {
+         String var1 = (String)var10000.join();
+         if (this.shopifyTask.isCPMonitorTriggered.compareAndSet(false, true) && this.isRunning && this.api.getWebClient().isActive()) {
+            var10000 = this.shopifyTask.solveCheckpointCaptcha(var1);
+            if (!var10000.isDone()) {
+               var3 = var10000;
+               return var3.exceptionally(Function.identity()).thenCompose(Presolver::async$run);
             }
-            catch (Throwable throwable) {
-                this.shopifyTask.getLogger().error("Error with checkpoint submission: {}", (Object)throwable.getMessage());
-                CompletableFuture completableFuture = VertxUtil.randomSleep((long)3000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$submitCheckpoint(this, captchaToken, n, null, completableFuture5, null, throwable, 3, arg_0));
-                }
-                completableFuture.join();
-            }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
 
-    public void close() {
-        this.isRunning = false;
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$fetchRandItem(Presolver var0, int var1_1, HttpRequest var2_2, CompletableFuture var3_4, HttpResponse var4_5, Throwable var5_6, int var6_7, Object var7_8) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [8[CATCHBLOCK]], but top level block is 13[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:850)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1055)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:942)
-         *     at org.benf.cfr.reader.Driver.doClass(Driver.java:84)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:78)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompile(CFRDecompiler.java:91)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:122)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.decompileSaveAll(ResourceDecompiling.java:262)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$decompileSaveAll$0(ResourceDecompiling.java:127)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture atcAJAX(String string) {
-        int n = 0;
-        while (n++ < Integer.MAX_VALUE) {
-            if (!this.isRunning) return CompletableFuture.completedFuture(null);
-            if (!this.api.getWebClient().isActive()) return CompletableFuture.completedFuture(null);
-            try {
-                HttpRequest httpRequest = this.api.atcAJAX(string);
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$atcAJAX(this, string, n, httpRequest, completableFuture2, null, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 200) {
-                    VertxUtil.sendSignal((String)("CPCart" + this.api.getSiteURL()));
-                    return CompletableFuture.completedFuture(null);
-                }
-                this.shopifyTask.getLogger().error("Failed CPCart: {}", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = VertxUtil.signalSleep((String)("CPCart" + this.api.getSiteURL()), (long)this.shopifyTask.task.getMonitorDelay());
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$atcAJAX(this, string, n, httpRequest, completableFuture4, httpResponse, null, 2, arg_0));
-                }
-                completableFuture3.join();
+            CaptchaToken var2 = (CaptchaToken)var10000.join();
+            var10000 = this.submitCheckpoint(var2);
+            if (!var10000.isDone()) {
+               var3 = var10000;
+               return var3.exceptionally(Function.identity()).thenCompose(Presolver::async$run);
             }
-            catch (Throwable throwable) {
-                if (!throwable.getMessage().contains("closed")) {
-                    this.shopifyTask.getLogger().error("Failed CPCart: {}", (Object)throwable.getMessage());
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep((long)3000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> Presolver.async$atcAJAX(this, string, n, null, completableFuture5, null, throwable, 3, arg_0));
-                }
-                completableFuture.join();
+
+            var10000.join();
+            if (this.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint") == null) {
+               this.shopifyTask.getLogger().error("CP cookie not found. Severe error");
+            } else {
+               this.api.getCookies().put("_shopify_checkpoint", this.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint"), this.api.getSiteURL());
             }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
+         }
+
+         return CompletableFuture.completedFuture((Object)null);
+      }
+   }
+
+   public static CompletableFuture async$run(Presolver var0, CompletableFuture var1, String var2, CaptchaToken var3, int var4, Object var5) {
+      CompletableFuture var10000;
+      label44: {
+         String var6;
+         CompletableFuture var8;
+         label49: {
+            switch (var4) {
+               case 0:
+                  var10000 = var0.monitorCP();
+                  if (!var10000.isDone()) {
+                     var8 = var10000;
+                     return var8.exceptionally(Function.identity()).thenCompose(Presolver::async$run);
+                  }
+                  break;
+               case 1:
+                  var10000 = var1;
+                  break;
+               case 2:
+                  var10000 = var1;
+                  var6 = var2;
+                  break label49;
+               case 3:
+                  var10000 = var1;
+                  break label44;
+               default:
+                  throw new IllegalArgumentException();
+            }
+
+            var6 = (String)var10000.join();
+            if (!var0.shopifyTask.isCPMonitorTriggered.compareAndSet(false, true) || !var0.isRunning || !var0.api.getWebClient().isActive()) {
+               return CompletableFuture.completedFuture((Object)null);
+            }
+
+            var10000 = var0.shopifyTask.solveCheckpointCaptcha(var6);
+            if (!var10000.isDone()) {
+               var8 = var10000;
+               return var8.exceptionally(Function.identity()).thenCompose(Presolver::async$run);
+            }
+         }
+
+         CaptchaToken var7 = (CaptchaToken)var10000.join();
+         var10000 = var0.submitCheckpoint(var7);
+         if (!var10000.isDone()) {
+            var8 = var10000;
+            return var8.exceptionally(Function.identity()).thenCompose(Presolver::async$run);
+         }
+      }
+
+      var10000.join();
+      if (var0.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint") == null) {
+         var0.shopifyTask.getLogger().error("CP cookie not found. Severe error");
+      } else {
+         var0.api.getCookies().put("_shopify_checkpoint", var0.api.checkpointClient.cookieStore().getCookieValue("_shopify_checkpoint"), var0.api.getSiteURL());
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public Presolver(Shopify var1) {
+      this.api = var1.api;
+      this.shopifyTask = var1;
+   }
+
+   public static CompletableFuture async$submitCheckpoint(Presolver param0, CaptchaToken param1, int param2, HttpRequest param3, CompletableFuture param4, HttpResponse param5, Throwable param6, int param7, Object param8) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public static CompletableFuture async$monitorCP(Presolver param0, int param1, HttpRequest param2, CompletableFuture param3, HttpResponse param4, String param5, int param6, Throwable param7, int param8, Object param9) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public CompletableFuture submitCheckpoint(CaptchaToken var1) {
+      this.shopifyTask.getLogger().info("Submitting checkpoint...");
+      int var2 = 0;
+
+      while(var2++ < Integer.MAX_VALUE && this.isRunning && this.api.getWebClient().isActive()) {
+         CompletableFuture var5;
+         CompletableFuture var7;
+         try {
+            HttpRequest var3 = this.api.submitCheckpoint();
+            var7 = Request.send(var3, Shopify.checkpointForm(var1));
+            if (!var7.isDone()) {
+               var5 = var7;
+               return var5.exceptionally(Function.identity()).thenCompose(Presolver::async$submitCheckpoint);
+            }
+
+            HttpResponse var4 = (HttpResponse)var7.join();
+            if (var4 != null) {
+               if (var4.statusCode() == 302) {
+                  return CompletableFuture.completedFuture((Object)null);
+               }
+
+               this.shopifyTask.getLogger().warn("Retrying submitting checkpoint: status: '{}'", var4.statusCode());
+               var7 = VertxUtil.sleep((long)this.shopifyTask.task.getRetryDelay());
+               if (!var7.isDone()) {
+                  var5 = var7;
+                  return var5.exceptionally(Function.identity()).thenCompose(Presolver::async$submitCheckpoint);
+               }
+
+               var7.join();
+            }
+         } catch (Throwable var6) {
+            this.shopifyTask.getLogger().error("Error with checkpoint submission: {}", var6.getMessage());
+            var7 = VertxUtil.randomSleep(3000L);
+            if (!var7.isDone()) {
+               var5 = var7;
+               return var5.exceptionally(Function.identity()).thenCompose(Presolver::async$submitCheckpoint);
+            }
+
+            var7.join();
+         }
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public void close() {
+      this.isRunning = false;
+   }
+
+   public static CompletableFuture async$fetchRandItem(Presolver param0, int param1, HttpRequest param2, CompletableFuture param3, HttpResponse param4, Throwable param5, int param6, Object param7) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public CompletableFuture atcAJAX(String var1) {
+      int var2 = 0;
+
+      while(var2++ < Integer.MAX_VALUE && this.isRunning && this.api.getWebClient().isActive()) {
+         CompletableFuture var5;
+         CompletableFuture var7;
+         try {
+            HttpRequest var3 = this.api.atcAJAX(var1);
+            var7 = Request.send(var3);
+            if (!var7.isDone()) {
+               var5 = var7;
+               return var5.exceptionally(Function.identity()).thenCompose(Presolver::async$atcAJAX);
+            }
+
+            HttpResponse var4 = (HttpResponse)var7.join();
+            if (var4 != null) {
+               if (var4.statusCode() == 200) {
+                  VertxUtil.sendSignal("CPCart" + this.api.getSiteURL());
+                  return CompletableFuture.completedFuture((Object)null);
+               }
+
+               this.shopifyTask.getLogger().error("Failed CPCart: {}", var4.statusCode());
+               var7 = VertxUtil.signalSleep("CPCart" + this.api.getSiteURL(), (long)this.shopifyTask.task.getMonitorDelay());
+               if (!var7.isDone()) {
+                  var5 = var7;
+                  return var5.exceptionally(Function.identity()).thenCompose(Presolver::async$atcAJAX);
+               }
+
+               var7.join();
+            }
+         } catch (Throwable var6) {
+            if (!var6.getMessage().contains("closed")) {
+               this.shopifyTask.getLogger().error("Failed CPCart: {}", var6.getMessage());
+            }
+
+            var7 = VertxUtil.randomSleep(3000L);
+            if (!var7.isDone()) {
+               var5 = var7;
+               return var5.exceptionally(Function.identity()).thenCompose(Presolver::async$atcAJAX);
+            }
+
+            var7.join();
+         }
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
 }

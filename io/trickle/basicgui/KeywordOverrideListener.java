@@ -1,11 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.Controller
- *  io.trickle.core.Engine
- *  io.trickle.task.TaskController
- */
 package io.trickle.basicgui;
 
 import io.trickle.core.Controller;
@@ -17,32 +9,28 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class KeywordOverrideListener
-implements ActionListener,
-KeyListener {
-    public TextField keywordField;
+public class KeywordOverrideListener implements ActionListener, KeyListener {
+   public TextField keywordField;
 
-    public KeywordOverrideListener(TextField textField) {
-        this.keywordField = textField;
-    }
+   public KeywordOverrideListener(TextField var1) {
+      this.keywordField = var1;
+   }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        String string = this.keywordField.getText();
-        if (string.isBlank()) return;
-        System.out.println("Mass keyword changed -> " + string);
-        ((TaskController)Engine.get().getModule(Controller.TASK)).massEditLinkOrKeyword(string);
-    }
+   public void actionPerformed(ActionEvent var1) {
+      String var2 = this.keywordField.getText();
+      if (!var2.isBlank()) {
+         System.out.println("Mass keyword changed -> " + var2);
+         ((TaskController)Engine.get().getModule(Controller.TASK)).massEditLinkOrKeyword(var2);
+      }
 
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-    }
+   }
 
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
-    }
+   public void keyReleased(KeyEvent var1) {
+   }
 
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
-    }
+   public void keyTyped(KeyEvent var1) {
+   }
+
+   public void keyPressed(KeyEvent var1) {
+   }
 }

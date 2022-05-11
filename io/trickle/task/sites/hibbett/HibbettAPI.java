@@ -1,30 +1,10 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.Task
- *  io.trickle.task.antibot.impl.px.PXToken
- *  io.trickle.task.antibot.impl.px.PXTokenAPI
- *  io.trickle.task.antibot.impl.px.PXTokenBase
- *  io.trickle.task.sites.hibbett.FakeIOSValueGens
- *  io.trickle.util.request.Headers$Pseudo
- *  io.trickle.webclient.ClientType
- *  io.trickle.webclient.RealClient
- *  io.trickle.webclient.RealClientFactory
- *  io.trickle.webclient.TaskApiClient
- *  io.vertx.core.Vertx
- *  io.vertx.core.json.JsonObject
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.codec.BodyCodec
- */
 package io.trickle.task.sites.hibbett;
 
 import io.trickle.task.Task;
 import io.trickle.task.antibot.impl.px.PXToken;
 import io.trickle.task.antibot.impl.px.PXTokenAPI;
 import io.trickle.task.antibot.impl.px.PXTokenBase;
-import io.trickle.task.sites.hibbett.FakeIOSValueGens;
-import io.trickle.util.request.Headers;
+import io.trickle.util.request.Headers$Pseudo;
 import io.trickle.webclient.ClientType;
 import io.trickle.webclient.RealClient;
 import io.trickle.webclient.RealClientFactory;
@@ -33,638 +13,670 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.codec.BodyCodec;
-import java.lang.invoke.LambdaMetafactory;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
-public class HibbettAPI
-extends TaskApiClient {
-    public boolean ios;
-    public static String PX_TOKEN;
-    public int cartTries = 0;
-    public boolean api;
-    public PXToken pxToken = null;
-    public boolean isSkip;
-    public static int EXCEPTION_RETRY_DELAY;
-    public String dynamicUA;
-    public PXTokenAPI s;
+public class HibbettAPI extends TaskApiClient {
+   public boolean ios;
+   public static String PX_TOKEN = "3";
+   public int cartTries = 0;
+   public boolean api;
+   public PXToken pxToken = null;
+   public boolean isSkip;
+   public static int EXCEPTION_RETRY_DELAY = 5000;
+   public String dynamicUA;
+   public PXTokenAPI s;
 
-    public HttpRequest createCart(String string) {
-        HttpRequest httpRequest = this.client.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/create").as(BodyCodec.jsonObject());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", ++this.cartTries == 1 ? "1" : (this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue()));
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-        }
-        return httpRequest;
-    }
+   public HttpRequest createCart(String var1) {
+      HttpRequest var2 = this.client.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/create").as(BodyCodec.jsonObject());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("x-px-authorization", ++this.cartTries == 1 ? "1" : (this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue()));
+         var2.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("version", "4.15.0");
+         var2.putHeader("platform", "android");
+         var2.putHeader("user-agent", this.dynamicUA);
+         var2.putHeader("authorization", var1);
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("accept-encoding", "gzip");
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("version", "4.15.0");
+         var2.putHeader("platform", "android");
+         var2.putHeader("user-agent", this.dynamicUA);
+         var2.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var2.putHeader("authorization", var1);
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("accept-encoding", "gzip");
+      } else {
+         var2.putHeaders(Headers$Pseudo.MSPA.get());
+         var2.putHeader("content-type", "application/json; charset=utf-8");
+         var2.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var2.putHeader("accept", "*/*");
+         var2.putHeader("version", "4.15.0");
+         var2.putHeader("authorization", var1);
+         var2.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var2.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var2.putHeader("platform", "ios");
+         var2.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var2.putHeader("content-length", "DEFAULT_VALUE");
+         var2.putHeader("user-agent", this.dynamicUA);
+      }
 
-    public HttpRequest checkStock(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.client.getAbs("https://hibbett-mobileapi.prolific.io/ecommerce/products/" + string3 + "?customerId=" + string2).as(BodyCodec.buffer());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-        }
-        return httpRequest;
-    }
+      return var2;
+   }
 
-    public void close() {
-        if (this.pxToken != null) {
-            // empty if block
-        }
-        super.close();
-    }
+   public HttpRequest checkStock(String var1, String var2, String var3) {
+      HttpRequest var4 = this.client.getAbs("https://hibbett-mobileapi.prolific.io/ecommerce/products/" + var3 + "?customerId=" + var2).as(BodyCodec.buffer());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var4.putHeaders(Headers$Pseudo.MPAS.get());
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("content-type", "application/json");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("platform", "android");
+         var4.putHeader("user-agent", this.dynamicUA);
+         var4.putHeader("authorization", var1);
+         var4.putHeader("accept-encoding", "gzip");
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var4.putHeaders(Headers$Pseudo.MPAS.get());
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("content-type", "application/json");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("platform", "android");
+         var4.putHeader("user-agent", this.dynamicUA);
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("authorization", var1);
+         var4.putHeader("accept-encoding", "gzip");
+      } else {
+         var4.putHeaders(Headers$Pseudo.MSPA.get());
+         var4.putHeader("content-type", "application/json; charset=utf-8");
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("accept", "*/*");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("authorization", var1);
+         var4.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("platform", "ios");
+         var4.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var4.putHeader("user-agent", this.dynamicUA);
+      }
 
-    static {
-        EXCEPTION_RETRY_DELAY = 5000;
-        PX_TOKEN = "3";
-    }
+      return var4;
+   }
 
-    public HttpRequest submitCvv(String string) {
-        HttpRequest httpRequest = this.client.postAbs("https://hostedpayments.radial.com/hosted-payments/encrypt/pancsc?access_token=" + string).as(BodyCodec.jsonObject());
-        httpRequest.putHeader("Content-Type", "application/json; charset=UTF-8");
-        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        httpRequest.putHeader("Host", "hostedpayments.radial.com");
-        httpRequest.putHeader("Connection", "Keep-Alive");
-        httpRequest.putHeader("Accept-Encoding", "gzip");
-        httpRequest.putHeader("User-Agent", "okhttp/4.9.0");
-        return httpRequest;
-    }
+   public void close() {
+      if (this.pxToken != null) {
+      }
 
-    public void setDynamicUA(String string) {
-        this.dynamicUA = string;
-    }
+      super.close();
+   }
 
-    public void setS(PXTokenAPI pXTokenAPI) {
-        this.s = pXTokenAPI;
-    }
+   public HttpRequest submitCvv(String var1) {
+      HttpRequest var2 = this.client.postAbs("https://hostedpayments.radial.com/hosted-payments/encrypt/pancsc?access_token=" + var1).as(BodyCodec.jsonObject());
+      var2.putHeader("Content-Type", "application/json; charset=UTF-8");
+      var2.putHeader("Content-Length", "DEFAULT_VALUE");
+      var2.putHeader("Host", "hostedpayments.radial.com");
+      var2.putHeader("Connection", "Keep-Alive");
+      var2.putHeader("Accept-Encoding", "gzip");
+      var2.putHeader("User-Agent", "okhttp/4.9.0");
+      return var2;
+   }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$handleBadResponse(HibbettAPI var0, int var1_1, String var2_2, String var3_3, CompletableFuture var4_4, int var5_6, Object var6_10) {
-        switch (var5_6) {
-            case 0: {
-                if (var1_1 != 403 || !var0.isSkip) ** GOTO lbl9
-                v0 = var0.pxToken.reInit();
-                if (!v0.isDone()) {
-                    var5_7 = v0;
-                    return var5_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleBadResponse(io.trickle.task.sites.hibbett.HibbettAPI int java.lang.String java.lang.String java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HibbettAPI)var0, (int)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var5_7, (int)1));
-                }
-                ** GOTO lbl33
-lbl9:
-                // 1 sources
+   public void setDynamicUA(String var1) {
+      this.dynamicUA = var1;
+   }
 
-                switch (var1_1) {
-                    case 403: {
-                        if (!var0.api) ** GOTO lbl17
-                        v1 = var0.s.solveCaptcha(var2_2, var3_3, var0.pxToken.getSid());
-                        if (!v1.isDone()) {
-                            var5_8 = v1;
-                            return var5_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleBadResponse(io.trickle.task.sites.hibbett.HibbettAPI int java.lang.String java.lang.String java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HibbettAPI)var0, (int)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var5_8, (int)2));
+   public void setS(PXTokenAPI var1) {
+      this.s = var1;
+   }
+
+   public static CompletableFuture async$handleBadResponse(HibbettAPI var0, int var1, String var2, String var3, CompletableFuture var4, int var5, Object var6) {
+      CompletableFuture var10000;
+      label88: {
+         label89: {
+            Throwable var11;
+            label65: {
+               boolean var10001;
+               label58:
+               switch (var5) {
+                  case 0:
+                     CompletableFuture var10;
+                     if (var1 == 403 && var0.isSkip) {
+                        var10000 = var0.pxToken.reInit();
+                        if (!var10000.isDone()) {
+                           var10 = var10000;
+                           return var10.exceptionally(Function.identity()).thenCompose(HibbettAPI::async$handleBadResponse);
                         }
-                        ** GOTO lbl38
-lbl17:
-                        // 1 sources
+                        break label89;
+                     }
 
-                        try {
-                            v2 = var0.pxToken.solveCaptchaDesktop(var2_2, var3_3, "https://www.hibbett.com/");
-                            if (!v2.isDone()) {
-                                var5_9 = v2;
-                                return var5_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$handleBadResponse(io.trickle.task.sites.hibbett.HibbettAPI int java.lang.String java.lang.String java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HibbettAPI)var0, (int)var1_1, (String)var2_2, (String)var3_3, (CompletableFuture)var5_9, (int)3));
-                            }
-lbl22:
-                            // 3 sources
+                     switch (var1) {
+                        case 403:
+                           if (var0.api) {
+                              var10000 = var0.s.solveCaptcha(var2, var3, var0.pxToken.getSid());
+                              if (!var10000.isDone()) {
+                                 var10 = var10000;
+                                 return var10.exceptionally(Function.identity()).thenCompose(HibbettAPI::async$handleBadResponse);
+                              }
+                              break label88;
+                           }
 
-                            while (true) {
-                                v2.join();
-                                break;
-                            }
-                        }
-                        catch (Throwable var4_5) {
-                            var4_5.printStackTrace();
-                        }
-                        return CompletableFuture.completedFuture(true);
-                    }
-                    default: {
-                        return CompletableFuture.completedFuture(false);
-                    }
-                }
+                           try {
+                              var10000 = var0.pxToken.solveCaptchaDesktop(var2, var3, "https://www.hibbett.com/");
+                              if (!var10000.isDone()) {
+                                 var10 = var10000;
+                                 return var10.exceptionally(Function.identity()).thenCompose(HibbettAPI::async$handleBadResponse);
+                              }
+                              break label58;
+                           } catch (Throwable var8) {
+                              var11 = var8;
+                              var10001 = false;
+                              break label65;
+                           }
+                        default:
+                           return CompletableFuture.completedFuture(false);
+                     }
+                  case 1:
+                     var10000 = var4;
+                     break label89;
+                  case 2:
+                     var10000 = var4;
+                     break label88;
+                  case 3:
+                     var10000 = var4;
+                     break;
+                  default:
+                     throw new IllegalArgumentException();
+               }
+
+               try {
+                  var10000.join();
+                  return CompletableFuture.completedFuture(true);
+               } catch (Throwable var7) {
+                  var11 = var7;
+                  var10001 = false;
+               }
             }
-            case 1: {
-                v0 = var4_4;
-lbl33:
-                // 2 sources
 
-                v0.join();
-                return CompletableFuture.completedFuture(true);
-            }
-            case 2: {
-                v1 = var4_4;
-lbl38:
-                // 2 sources
-
-                if ((Boolean)v1.join() == false) return CompletableFuture.completedFuture(false);
-                var0.pxToken.setValue((String)var0.s.getValue());
-                var0.pxToken.setTokenCaptcha(true);
-                return CompletableFuture.completedFuture(true);
-            }
-            case 3: {
-                v2 = var4_4;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public HttpRequest shopView(String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://hibbett-mobileapi.prolific.io/ecommerce/shopview").as(BodyCodec.buffer());
-        httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-        httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-        httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("version", "4.15.0");
-        httpRequest.putHeader("platform", "android");
-        httpRequest.putHeader("user-agent", this.dynamicUA);
-        httpRequest.putHeader("authorization", string);
-        httpRequest.putHeader("accept-encoding", "gzip");
-        return httpRequest;
-    }
-
-    public HttpRequest session() {
-        HttpRequest httpRequest = this.client.postAbs("https://hibbett-mobileapi.prolific.io/users/guest").as(BodyCodec.jsonObject());
-        httpRequest.putHeader("x-px-authorization", "1");
-        if (!this.ios) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("if-none-match", FakeIOSValueGens.genTag());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
-
-    public HttpRequest atc(String string, String string2, String string3, String string4) {
-        HttpRequest httpRequest = this.client.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + string3 + "/items?skuIds=" + string4 + "&customerId=" + string2).as(BodyCodec.buffer());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("if-none-match", FakeIOSValueGens.genTag());
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-        }
-        return httpRequest;
-    }
-
-    public void setPxToken(PXToken pXToken) {
-        this.pxToken = pXToken;
-    }
-
-    public PXTokenBase getPXToken() {
-        return this.pxToken;
-    }
-
-    public HttpRequest submitCard(String string) {
-        HttpRequest httpRequest = this.client.postAbs("https://hostedpayments.radial.com/hosted-payments/pan/tokenize?access_token=" + string).as(BodyCodec.jsonObject());
-        httpRequest.putHeader("Content-Type", "application/json; charset=UTF-8");
-        httpRequest.putHeader("Content-Length", "DEFAULT_VALUE");
-        httpRequest.putHeader("Host", "hostedpayments.radial.com");
-        httpRequest.putHeader("Connection", "Keep-Alive");
-        httpRequest.putHeader("Accept-Encoding", "gzip");
-        httpRequest.putHeader("User-Agent", "okhttp/4.9.0");
-        return httpRequest;
-    }
-
-    public boolean isSkip() {
-        return this.isSkip;
-    }
-
-    public void setDevice(JsonObject jsonObject) {
-        if (this.ios) {
-            this.dynamicUA = FakeIOSValueGens.genUA();
-            return;
-        }
-        this.dynamicUA = "Hibbett Sports/4.15.0 ";
-        this.dynamicUA = this.dynamicUA + "(" + jsonObject.getString("model") + "; android ";
-        int n = ThreadLocalRandom.current().nextInt(10);
-        this.dynamicUA = n <= 4 ? this.dynamicUA + "10" : this.dynamicUA + "11";
-        this.dynamicUA = this.dynamicUA + ")";
-    }
-
-    public HttpRequest processPayment(String string, String string2, String string3) {
-        String string4 = !this.ios ? "https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + string3 + "/place_order?customerId=" + string2 : "https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + string3 + "/place_order?optIn=false&customerId=&phone=&firstName=";
-        HttpRequest httpRequest = this.client.postAbs(string4).as(BodyCodec.buffer());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-        }
-        return httpRequest;
-    }
-
-    public HttpRequest submitEmail(String string, String string2) {
-        HttpRequest httpRequest = this.client.putAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + string2 + "/customer").as(BodyCodec.jsonObject());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-        }
-        return httpRequest;
-    }
-
-    public CompletableFuture handleBadResponse(int n, String string, String string2) {
-        if (n == 403 && this.isSkip) {
-            CompletableFuture completableFuture = this.pxToken.reInit();
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> HibbettAPI.async$handleBadResponse(this, n, string, string2, completableFuture2, 1, arg_0));
-            }
-            completableFuture.join();
+            Throwable var9 = var11;
+            var9.printStackTrace();
             return CompletableFuture.completedFuture(true);
-        }
-        switch (n) {
-            case 403: {
-                if (this.api) {
-                    CompletableFuture completableFuture = this.s.solveCaptcha(string, string2, this.pxToken.getSid());
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture3 = completableFuture;
-                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> HibbettAPI.async$handleBadResponse(this, n, string, string2, completableFuture3, 2, arg_0));
-                    }
-                    if ((Boolean)completableFuture.join() == false) return CompletableFuture.completedFuture(false);
-                    this.pxToken.setValue((String)this.s.getValue());
-                    this.pxToken.setTokenCaptcha(true);
-                    return CompletableFuture.completedFuture(true);
-                }
-                try {
-                    CompletableFuture completableFuture = this.pxToken.solveCaptchaDesktop(string, string2, "https://www.hibbett.com/");
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> HibbettAPI.async$handleBadResponse(this, n, string, string2, completableFuture4, 3, arg_0));
-                    }
-                    completableFuture.join();
-                }
-                catch (Throwable throwable) {
-                    throwable.printStackTrace();
-                }
-                return CompletableFuture.completedFuture(true);
-            }
-        }
-        return CompletableFuture.completedFuture(false);
-    }
+         }
 
-    public HttpRequest submitShipping(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.client.putAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + string3 + "/shipments/me/shipping_address?useAsBilling=true&customerId=" + string2).as(BodyCodec.jsonObject());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        }
-        return httpRequest;
-    }
+         var10000.join();
+         return CompletableFuture.completedFuture(true);
+      }
 
-    public void swapClient() {
-        try {
-            RealClient realClient = RealClientFactory.fromOther((Vertx)Vertx.currentContext().owner(), (RealClient)this.client, (ClientType)this.client.type());
-            this.client.close();
-            this.client = realClient;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
+      if ((Boolean)var10000.join()) {
+         var0.pxToken.setValue((String)var0.s.getValue());
+         var0.pxToken.setTokenCaptcha(true);
+         return CompletableFuture.completedFuture(true);
+      } else {
+         return CompletableFuture.completedFuture(false);
+      }
+   }
 
-    public HibbettAPI(Task task) {
-        super(ClientType.HIBBETT_ANDROID);
-        this.ios = task.getMode().contains("test");
-        this.isSkip = task.getMode().contains("skip");
-        this.api = task.getMode().contains("api");
-    }
+   public HttpRequest shopView(String var1) {
+      HttpRequest var2 = this.client.getAbs("https://hibbett-mobileapi.prolific.io/ecommerce/shopview").as(BodyCodec.buffer());
+      var2.putHeaders(Headers$Pseudo.MPAS.get());
+      var2.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+      var2.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+      var2.putHeader("content-type", "application/json");
+      var2.putHeader("version", "4.15.0");
+      var2.putHeader("platform", "android");
+      var2.putHeader("user-agent", this.dynamicUA);
+      var2.putHeader("authorization", var1);
+      var2.putHeader("accept-encoding", "gzip");
+      return var2;
+   }
 
-    public HttpRequest submitPayment(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.client.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + string3 + "/payment_methods?customerId=" + string2).as(BodyCodec.buffer());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-        }
-        return httpRequest;
-    }
+   public HttpRequest session() {
+      HttpRequest var1 = this.client.postAbs("https://hibbett-mobileapi.prolific.io/users/guest").as(BodyCodec.jsonObject());
+      var1.putHeader("x-px-authorization", "1");
+      if (!this.ios) {
+         var1.putHeaders(Headers$Pseudo.MPAS.get());
+         var1.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var1.putHeader("content-type", "application/json");
+         var1.putHeader("version", "4.15.0");
+         var1.putHeader("platform", "android");
+         var1.putHeader("user-agent", this.dynamicUA);
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+         var1.putHeader("accept-encoding", "gzip");
+      } else {
+         var1.putHeaders(Headers$Pseudo.MSPA.get());
+         var1.putHeader("accept", "*/*");
+         var1.putHeader("version", "4.15.0");
+         var1.putHeader("if-none-match", FakeIOSValueGens.genTag());
+         var1.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var1.putHeader("platform", "ios");
+         var1.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var1.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var1.putHeader("user-agent", this.dynamicUA);
+         var1.putHeader("content-length", "DEFAULT_VALUE");
+      }
 
-    public HttpRequest submitShippingRate(String string, String string2) {
-        HttpRequest httpRequest = this.client.putAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + string2 + "/shipments/me/shipping_options").as(BodyCodec.jsonObject());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("if-none-match", FakeIOSValueGens.genTag());
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("content-type", "application/json; charset=UTF-8");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("accept-encoding", "gzip");
-            httpRequest.putHeader("if-none-match", FakeIOSValueGens.genTag());
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("if-none-match", FakeIOSValueGens.genTag());
-        }
-        return httpRequest;
-    }
+      return var1;
+   }
 
-    public HttpRequest nonce(String string) {
-        HttpRequest httpRequest = this.client.getAbs("https://hibbett-mobileapi.prolific.io/users/radial/nonce").as(BodyCodec.jsonObject());
-        if (!this.ios && !this.pxToken.isTokenCaptcha()) {
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
-            this.pxToken.setTokenCaptcha(false);
-            httpRequest.putHeaders(Headers.Pseudo.MPAS.get());
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("content-type", "application/json");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("platform", "android");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "gzip");
-        } else {
-            httpRequest.putHeaders(Headers.Pseudo.MSPA.get());
-            httpRequest.putHeader("content-type", "application/json; charset=utf-8");
-            httpRequest.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
-            httpRequest.putHeader("accept", "*/*");
-            httpRequest.putHeader("version", "4.15.0");
-            httpRequest.putHeader("authorization", string);
-            httpRequest.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
-            httpRequest.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
-            httpRequest.putHeader("platform", "ios");
-            httpRequest.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
-            httpRequest.putHeader("user-agent", this.dynamicUA);
-        }
-        return httpRequest;
-    }
+   public HttpRequest atc(String var1, String var2, String var3, String var4) {
+      HttpRequest var5 = this.client.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + var3 + "/items?skuIds=" + var4 + "&customerId=" + var2).as(BodyCodec.buffer());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var5.putHeaders(Headers$Pseudo.MPAS.get());
+         var5.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var5.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var5.putHeader("version", "4.15.0");
+         var5.putHeader("platform", "android");
+         var5.putHeader("user-agent", this.dynamicUA);
+         var5.putHeader("authorization", var1);
+         var5.putHeader("content-type", "application/json; charset=UTF-8");
+         var5.putHeader("content-length", "DEFAULT_VALUE");
+         var5.putHeader("accept-encoding", "gzip");
+         var5.putHeader("if-none-match", FakeIOSValueGens.genTag());
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         var5.putHeaders(Headers$Pseudo.MPAS.get());
+         var5.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var5.putHeader("version", "4.15.0");
+         var5.putHeader("platform", "android");
+         var5.putHeader("user-agent", this.dynamicUA);
+         var5.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var5.putHeader("authorization", var1);
+         var5.putHeader("content-type", "application/json; charset=UTF-8");
+         var5.putHeader("content-length", "DEFAULT_VALUE");
+         var5.putHeader("accept-encoding", "gzip");
+      } else {
+         var5.putHeaders(Headers$Pseudo.MSPA.get());
+         var5.putHeader("content-type", "application/json; charset=utf-8");
+         var5.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var5.putHeader("accept", "*/*");
+         var5.putHeader("version", "4.15.0");
+         var5.putHeader("authorization", var1);
+         var5.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var5.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var5.putHeader("platform", "ios");
+         var5.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var5.putHeader("content-length", "DEFAULT_VALUE");
+         var5.putHeader("user-agent", this.dynamicUA);
+      }
+
+      return var5;
+   }
+
+   public void setPxToken(PXToken var1) {
+      this.pxToken = var1;
+   }
+
+   public PXTokenBase getPXToken() {
+      return this.pxToken;
+   }
+
+   public HttpRequest submitCard(String var1) {
+      HttpRequest var2 = this.client.postAbs("https://hostedpayments.radial.com/hosted-payments/pan/tokenize?access_token=" + var1).as(BodyCodec.jsonObject());
+      var2.putHeader("Content-Type", "application/json; charset=UTF-8");
+      var2.putHeader("Content-Length", "DEFAULT_VALUE");
+      var2.putHeader("Host", "hostedpayments.radial.com");
+      var2.putHeader("Connection", "Keep-Alive");
+      var2.putHeader("Accept-Encoding", "gzip");
+      var2.putHeader("User-Agent", "okhttp/4.9.0");
+      return var2;
+   }
+
+   public boolean isSkip() {
+      return this.isSkip;
+   }
+
+   public void setDevice(JsonObject var1) {
+      if (this.ios) {
+         this.dynamicUA = FakeIOSValueGens.genUA();
+      } else {
+         this.dynamicUA = "Hibbett Sports/4.15.0 ";
+         String var10001 = this.dynamicUA;
+         this.dynamicUA = var10001 + "(" + var1.getString("model") + "; android ";
+         int var2 = ThreadLocalRandom.current().nextInt(10);
+         if (var2 <= 4) {
+            this.dynamicUA = this.dynamicUA + "10";
+         } else {
+            this.dynamicUA = this.dynamicUA + "11";
+         }
+
+         this.dynamicUA = this.dynamicUA + ")";
+      }
+   }
+
+   public HttpRequest processPayment(String var1, String var2, String var3) {
+      String var4;
+      if (!this.ios) {
+         var4 = "https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + var3 + "/place_order?customerId=" + var2;
+      } else {
+         var4 = "https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + var3 + "/place_order?optIn=false&customerId=&phone=&firstName=";
+      }
+
+      HttpRequest var5 = this.client.postAbs(var4).as(BodyCodec.buffer());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var5.putHeaders(Headers$Pseudo.MPAS.get());
+         var5.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var5.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var5.putHeader("content-type", "application/json");
+         var5.putHeader("version", "4.15.0");
+         var5.putHeader("platform", "android");
+         var5.putHeader("user-agent", this.dynamicUA);
+         var5.putHeader("authorization", var1);
+         var5.putHeader("content-length", "DEFAULT_VALUE");
+         var5.putHeader("accept-encoding", "gzip");
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var5.putHeaders(Headers$Pseudo.MPAS.get());
+         var5.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var5.putHeader("content-type", "application/json");
+         var5.putHeader("version", "4.15.0");
+         var5.putHeader("platform", "android");
+         var5.putHeader("user-agent", this.dynamicUA);
+         var5.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var5.putHeader("authorization", var1);
+         var5.putHeader("content-length", "DEFAULT_VALUE");
+         var5.putHeader("accept-encoding", "gzip");
+      } else {
+         var5.putHeaders(Headers$Pseudo.MSPA.get());
+         var5.putHeader("content-type", "application/json; charset=utf-8");
+         var5.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var5.putHeader("accept", "*/*");
+         var5.putHeader("version", "4.15.0");
+         var5.putHeader("authorization", var1);
+         var5.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var5.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var5.putHeader("platform", "ios");
+         var5.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var5.putHeader("content-length", "DEFAULT_VALUE");
+         var5.putHeader("user-agent", this.dynamicUA);
+      }
+
+      return var5;
+   }
+
+   public HttpRequest submitEmail(String var1, String var2) {
+      HttpRequest var3 = this.client.putAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + var2 + "/customer").as(BodyCodec.jsonObject());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var3.putHeaders(Headers$Pseudo.MPAS.get());
+         var3.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var3.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var3.putHeader("version", "4.15.0");
+         var3.putHeader("platform", "android");
+         var3.putHeader("user-agent", this.dynamicUA);
+         var3.putHeader("authorization", var1);
+         var3.putHeader("content-type", "application/json; charset=UTF-8");
+         var3.putHeader("content-length", "DEFAULT_VALUE");
+         var3.putHeader("accept-encoding", "gzip");
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var3.putHeaders(Headers$Pseudo.MPAS.get());
+         var3.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var3.putHeader("version", "4.15.0");
+         var3.putHeader("platform", "android");
+         var3.putHeader("user-agent", this.dynamicUA);
+         var3.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var3.putHeader("authorization", var1);
+         var3.putHeader("content-type", "application/json; charset=UTF-8");
+         var3.putHeader("content-length", "DEFAULT_VALUE");
+         var3.putHeader("accept-encoding", "gzip");
+      } else {
+         var3.putHeaders(Headers$Pseudo.MSPA.get());
+         var3.putHeader("content-type", "application/json; charset=utf-8");
+         var3.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var3.putHeader("accept", "*/*");
+         var3.putHeader("version", "4.15.0");
+         var3.putHeader("authorization", var1);
+         var3.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var3.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var3.putHeader("platform", "ios");
+         var3.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var3.putHeader("content-length", "DEFAULT_VALUE");
+         var3.putHeader("user-agent", this.dynamicUA);
+      }
+
+      return var3;
+   }
+
+   public CompletableFuture handleBadResponse(int var1, String var2, String var3) {
+      CompletableFuture var10000;
+      CompletableFuture var5;
+      if (var1 == 403 && this.isSkip) {
+         var10000 = this.pxToken.reInit();
+         if (!var10000.isDone()) {
+            var5 = var10000;
+            return var5.exceptionally(Function.identity()).thenCompose(HibbettAPI::async$handleBadResponse);
+         } else {
+            var10000.join();
+            return CompletableFuture.completedFuture(true);
+         }
+      } else {
+         switch (var1) {
+            case 403:
+               if (this.api) {
+                  var10000 = this.s.solveCaptcha(var2, var3, this.pxToken.getSid());
+                  if (!var10000.isDone()) {
+                     var5 = var10000;
+                     return var5.exceptionally(Function.identity()).thenCompose(HibbettAPI::async$handleBadResponse);
+                  } else {
+                     if ((Boolean)var10000.join()) {
+                        this.pxToken.setValue((String)this.s.getValue());
+                        this.pxToken.setTokenCaptcha(true);
+                        return CompletableFuture.completedFuture(true);
+                     }
+
+                     return CompletableFuture.completedFuture(false);
+                  }
+               } else {
+                  try {
+                     var10000 = this.pxToken.solveCaptchaDesktop(var2, var3, "https://www.hibbett.com/");
+                     if (!var10000.isDone()) {
+                        var5 = var10000;
+                        return var5.exceptionally(Function.identity()).thenCompose(HibbettAPI::async$handleBadResponse);
+                     }
+
+                     var10000.join();
+                  } catch (Throwable var6) {
+                     var6.printStackTrace();
+                  }
+
+                  return CompletableFuture.completedFuture(true);
+               }
+            default:
+               return CompletableFuture.completedFuture(false);
+         }
+      }
+   }
+
+   public HttpRequest submitShipping(String var1, String var2, String var3) {
+      HttpRequest var4 = this.client.putAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + var3 + "/shipments/me/shipping_address?useAsBilling=true&customerId=" + var2).as(BodyCodec.jsonObject());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var4.putHeaders(Headers$Pseudo.MPAS.get());
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("platform", "android");
+         var4.putHeader("user-agent", this.dynamicUA);
+         var4.putHeader("authorization", var1);
+         var4.putHeader("content-type", "application/json; charset=UTF-8");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+         var4.putHeader("accept-encoding", "gzip");
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var4.putHeaders(Headers$Pseudo.MPAS.get());
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("platform", "android");
+         var4.putHeader("user-agent", this.dynamicUA);
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("authorization", var1);
+         var4.putHeader("content-type", "application/json; charset=UTF-8");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+         var4.putHeader("accept-encoding", "gzip");
+      } else {
+         var4.putHeaders(Headers$Pseudo.MSPA.get());
+         var4.putHeader("content-type", "application/json; charset=utf-8");
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("accept", "*/*");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("authorization", var1);
+         var4.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("platform", "ios");
+         var4.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+      }
+
+      return var4;
+   }
+
+   public void swapClient() {
+      try {
+         RealClient var1 = RealClientFactory.fromOther(Vertx.currentContext().owner(), super.client, this.client.type());
+         super.client.close();
+         super.client = var1;
+      } catch (Throwable var2) {
+      }
+
+   }
+
+   public HibbettAPI(Task var1) {
+      super(ClientType.HIBBETT_ANDROID);
+      this.ios = var1.getMode().contains("test");
+      this.isSkip = var1.getMode().contains("skip");
+      this.api = var1.getMode().contains("api");
+   }
+
+   public HttpRequest submitPayment(String var1, String var2, String var3) {
+      HttpRequest var4 = this.client.postAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + var3 + "/payment_methods?customerId=" + var2).as(BodyCodec.buffer());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var4.putHeaders(Headers$Pseudo.MPAS.get());
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("platform", "android");
+         var4.putHeader("user-agent", this.dynamicUA);
+         var4.putHeader("authorization", var1);
+         var4.putHeader("content-type", "application/json; charset=UTF-8");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+         var4.putHeader("accept-encoding", "gzip");
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var4.putHeaders(Headers$Pseudo.MPAS.get());
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("platform", "android");
+         var4.putHeader("user-agent", this.dynamicUA);
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("authorization", var1);
+         var4.putHeader("content-type", "application/json; charset=UTF-8");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+         var4.putHeader("accept-encoding", "gzip");
+      } else {
+         var4.putHeaders(Headers$Pseudo.MSPA.get());
+         var4.putHeader("content-type", "application/json; charset=utf-8");
+         var4.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var4.putHeader("accept", "*/*");
+         var4.putHeader("version", "4.15.0");
+         var4.putHeader("authorization", var1);
+         var4.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var4.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var4.putHeader("platform", "ios");
+         var4.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var4.putHeader("content-length", "DEFAULT_VALUE");
+         var4.putHeader("user-agent", this.dynamicUA);
+      }
+
+      return var4;
+   }
+
+   public HttpRequest submitShippingRate(String var1, String var2) {
+      HttpRequest var3 = this.client.putAbs("https://hibbett-mobileapi.prolific.io/ecommerce/cart/" + var2 + "/shipments/me/shipping_options").as(BodyCodec.jsonObject());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var3.putHeaders(Headers$Pseudo.MPAS.get());
+         var3.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var3.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var3.putHeader("version", "4.15.0");
+         var3.putHeader("platform", "android");
+         var3.putHeader("user-agent", this.dynamicUA);
+         var3.putHeader("authorization", var1);
+         var3.putHeader("content-type", "application/json; charset=UTF-8");
+         var3.putHeader("content-length", "DEFAULT_VALUE");
+         var3.putHeader("accept-encoding", "gzip");
+         var3.putHeader("if-none-match", FakeIOSValueGens.genTag());
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var3.putHeaders(Headers$Pseudo.MPAS.get());
+         var3.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var3.putHeader("version", "4.15.0");
+         var3.putHeader("platform", "android");
+         var3.putHeader("user-agent", this.dynamicUA);
+         var3.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var3.putHeader("authorization", var1);
+         var3.putHeader("content-type", "application/json; charset=UTF-8");
+         var3.putHeader("content-length", "DEFAULT_VALUE");
+         var3.putHeader("accept-encoding", "gzip");
+         var3.putHeader("if-none-match", FakeIOSValueGens.genTag());
+      } else {
+         var3.putHeaders(Headers$Pseudo.MSPA.get());
+         var3.putHeader("content-type", "application/json; charset=utf-8");
+         var3.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var3.putHeader("accept", "*/*");
+         var3.putHeader("version", "4.15.0");
+         var3.putHeader("authorization", var1);
+         var3.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var3.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var3.putHeader("platform", "ios");
+         var3.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var3.putHeader("content-length", "DEFAULT_VALUE");
+         var3.putHeader("user-agent", this.dynamicUA);
+         var3.putHeader("if-none-match", FakeIOSValueGens.genTag());
+      }
+
+      return var3;
+   }
+
+   public HttpRequest nonce(String var1) {
+      HttpRequest var2 = this.client.getAbs("https://hibbett-mobileapi.prolific.io/users/radial/nonce").as(BodyCodec.jsonObject());
+      if (!this.ios && !this.pxToken.isTokenCaptcha()) {
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var2.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("version", "4.15.0");
+         var2.putHeader("platform", "android");
+         var2.putHeader("user-agent", this.dynamicUA);
+         var2.putHeader("authorization", var1);
+         var2.putHeader("accept-encoding", "gzip");
+      } else if (!this.ios && this.pxToken.isTokenCaptcha()) {
+         this.pxToken.setTokenCaptcha(false);
+         var2.putHeaders(Headers$Pseudo.MPAS.get());
+         var2.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var2.putHeader("content-type", "application/json");
+         var2.putHeader("version", "4.15.0");
+         var2.putHeader("platform", "android");
+         var2.putHeader("user-agent", this.dynamicUA);
+         var2.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var2.putHeader("authorization", var1);
+         var2.putHeader("accept-encoding", "gzip");
+      } else {
+         var2.putHeaders(Headers$Pseudo.MSPA.get());
+         var2.putHeader("content-type", "application/json; charset=utf-8");
+         var2.putHeader("x-px-authorization", this.pxToken.getValue() == null ? "3" : (String)this.pxToken.getValue());
+         var2.putHeader("accept", "*/*");
+         var2.putHeader("version", "4.15.0");
+         var2.putHeader("authorization", var1);
+         var2.putHeader("accept-encoding", "br;q=1.0, gzip;q=0.9, deflate;q=0.8");
+         var2.putHeader("x-api-key", "0PutYAUfHz8ozEeqTFlF014LMJji6Rsc8bpRBGB0");
+         var2.putHeader("platform", "ios");
+         var2.putHeader("accept-language", "en-US;q=1.0, fa-US;q=0.9");
+         var2.putHeader("user-agent", this.dynamicUA);
+      }
+
+      return var2;
+   }
 }

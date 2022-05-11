@@ -1,32 +1,29 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.antibot.impl.px.payload.captcha;
 
 public interface Devices$Device {
-    public String getPlatform();
+   String getPlatform();
 
-    public int getAvailHeight();
+   int getAvailHeight();
 
-    public int getHeight();
+   int getHeight();
 
-    public String getAppVersion();
+   String getAppVersion();
 
-    public int getAvailWidth();
+   int getAvailWidth();
 
-    public String getProductSub();
+   String getProductSub();
 
-    public String getAppCodeName();
+   String getAppCodeName();
 
-    public int getInnerHeight();
+   int getInnerHeight();
 
-    public int getWidth();
+   int getWidth();
 
-    public String getUserAgent();
+   String getUserAgent();
 
-    public int getInnerWidth();
+   int getInnerWidth();
 
-    public String getAppName();
+   String getAppName();
 
-    public String getProduct();
+   String getProduct();
 }

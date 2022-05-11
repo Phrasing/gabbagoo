@@ -1,17 +1,14 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.util;
 
 public class Pair {
-    public V second;
-    public T first;
+   public Object second;
+   public Object first;
 
-    public Pair() {
-    }
+   public Pair() {
+   }
 
-    public Pair(Object object, Object object2) {
-        this.first = object;
-        this.second = object2;
-    }
+   public Pair(Object var1, Object var2) {
+      this.first = var1;
+      this.second = var2;
+   }
 }

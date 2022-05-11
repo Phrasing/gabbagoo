@@ -1,16 +1,13 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.sites.shopify.util;
 
 public class Triplet {
-    public V second;
-    public T first;
-    public Z third;
+   public Object second;
+   public Object first;
+   public Object third;
 
-    public Triplet(Object object, Object object2, Object object3) {
-        this.first = object;
-        this.second = object2;
-        this.third = object3;
-    }
+   public Triplet(Object var1, Object var2, Object var3) {
+      this.first = var1;
+      this.second = var2;
+      this.third = var3;
+   }
 }

@@ -1,11 +1,9 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.sites.walmart.canada;
 
 public enum PaymentInstance$State {
-    FAILED_INIT,
-    PROCEED_CHECKOUT,
-    NO_STOCK;
+   PROCEED_CHECKOUT,
+   FAILED_INIT,
+   NO_STOCK;
 
+   public static PaymentInstance$State[] $VALUES = new PaymentInstance$State[]{FAILED_INIT, PROCEED_CHECKOUT, NO_STOCK};
 }

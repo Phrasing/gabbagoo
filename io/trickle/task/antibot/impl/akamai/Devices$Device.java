@@ -1,101 +1,95 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.vertx.core.json.JsonObject
- */
 package io.trickle.task.antibot.impl.akamai;
 
 import io.vertx.core.json.JsonObject;
 
 public interface Devices$Device {
-    public boolean webrtcKey();
+   boolean webrtcKey();
 
-    public String getTouchEvent();
+   String getTouchEvent();
 
-    public boolean isBrave();
+   boolean isBrave();
 
-    public String getProductSub();
+   String getProductSub();
 
-    public String getDeviceOrientation();
+   String getDeviceOrientation();
 
-    public boolean localStorageKey();
+   boolean localStorageKey();
 
-    public int getTimezoneOffset();
+   int getTimezoneOffset();
 
-    public int getDoNotTrack();
+   int getDoNotTrack();
 
-    public int getPluginLength();
+   int getPluginLength();
 
-    public JsonObject getWindowPerms();
+   JsonObject getWindowPerms();
 
-    public int getInnerHeight();
+   int getInnerHeight();
 
-    public String getUserAgent();
+   String getUserAgent();
 
-    public int getOuterWidth();
+   int getOuterWidth();
 
-    public int isChrome();
+   int isChrome();
 
-    public int getColorDepth();
+   int getColorDepth();
 
-    public int hasRTCPeerConnection();
+   int hasRTCPeerConnection();
 
-    public int hasForEach();
+   int hasForEach();
 
-    public int hasFileReader();
+   int hasFileReader();
 
-    public int getScreenHeight();
+   int getScreenHeight();
 
-    public String getProduct();
+   String getProduct();
 
-    public int isOnline();
+   int isOnline();
 
-    public int hasHTMLElement();
+   int hasHTMLElement();
 
-    public String getCanvas2();
+   String getCanvas2();
 
-    public String getCanvas1();
+   String getCanvas1();
 
-    public int getScreenAvailHeight();
+   int getScreenAvailHeight();
 
-    public int hasMozInnerScreen();
+   int hasMozInnerScreen();
 
-    public boolean sessionStorageKey();
+   boolean sessionStorageKey();
 
-    public int getScreenAvailWidth();
+   int getScreenAvailWidth();
 
-    public int getPixelDepth();
+   int getPixelDepth();
 
-    public int getInnerWidth();
+   int getInnerWidth();
 
-    public String getDeviceMotion();
+   String getDeviceMotion();
 
-    public long getNavigatorFasSettings();
+   long getNavigatorFasSettings();
 
-    public boolean isJavaEnabled();
+   boolean isJavaEnabled();
 
-    public int hasVibrate();
+   int hasVibrate();
 
-    public String getSed();
+   String getSed();
 
-    public int hasBattery();
+   int hasBattery();
 
-    public int getScreenWidth();
+   int getScreenWidth();
 
-    public int isOpera();
+   int isOpera();
 
-    public int getDocumentMode();
+   int getDocumentMode();
 
-    public boolean isCookieEnabled();
+   boolean isCookieEnabled();
 
-    public boolean indexedDBKey();
+   boolean indexedDBKey();
 
-    public String getLanguage();
+   String getLanguage();
 
-    public String getPluginInfo();
+   String getPluginInfo();
 
-    public int hasActiveXObject();
+   int hasActiveXObject();
 
-    public int hasInstallTrigger();
+   int hasInstallTrigger();
 }

@@ -1,29 +1,22 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.Task
- *  io.trickle.task.sites.yeezy.util.rotator.ProfileRotator$Builder$MockSizeZipMap
- */
 package io.trickle.task.sites.yeezy.util.rotator;
 
 import io.trickle.task.Task;
-import io.trickle.task.sites.yeezy.util.rotator.ProfileRotator$Builder;
 import java.util.HashMap;
 
 public class ProfileRotator$Builder {
-    public HashMap<String, MockSizeZipMap> keywordsToSize = new HashMap();
+   public HashMap keywordsToSize = new HashMap();
 
-    public void build() {
-    }
+   public void build() {
+   }
 
-    public ProfileRotator$Builder add(Task task) {
-        MockSizeZipMap mockSizeZipMap = this.keywordsToSize.get(task.getKeywords()[0]);
-        if (mockSizeZipMap == null) {
-            mockSizeZipMap = new MockSizeZipMap();
-            this.keywordsToSize.put(task.getKeywords()[0], mockSizeZipMap);
-        }
-        mockSizeZipMap.put(task.getSize(), task.getProfile());
-        return this;
-    }
+   public ProfileRotator$Builder add(Task var1) {
+      ProfileRotator$Builder$MockSizeZipMap var2 = (ProfileRotator$Builder$MockSizeZipMap)this.keywordsToSize.get(var1.getKeywords()[0]);
+      if (var2 == null) {
+         var2 = new ProfileRotator$Builder$MockSizeZipMap();
+         this.keywordsToSize.put(var1.getKeywords()[0], var2);
+      }
+
+      var2.put(var1.getSize(), var1.getProfile());
+      return this;
+   }
 }

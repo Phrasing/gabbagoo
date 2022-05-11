@@ -1,26 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.netty.util.AsciiString
- *  io.trickle.core.VertxSingleton
- *  io.trickle.core.actor.TaskActor
- *  io.trickle.task.antibot.impl.px.PerimeterX
- *  io.trickle.task.sites.Site
- *  io.trickle.util.concurrent.VertxUtil
- *  io.trickle.util.request.Request
- *  io.trickle.webclient.ClientType
- *  io.trickle.webclient.TaskApiClient
- *  io.vertx.core.MultiMap
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.http.HttpMethod
- *  io.vertx.core.json.JsonArray
- *  io.vertx.core.json.JsonObject
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- *  io.vertx.ext.web.client.impl.HttpRequestImpl
- *  io.vertx.ext.web.codec.BodyCodec
- */
 package io.trickle.task.antibot.impl.px.payload.captcha;
 
 import io.netty.util.AsciiString;
@@ -41,7 +18,6 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.impl.HttpRequestImpl;
 import io.vertx.ext.web.codec.BodyCodec;
-import java.lang.invoke.LambdaMetafactory;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -50,934 +26,1473 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
-public class DesktopPX
-extends PerimeterX {
-    public Function<HttpResponse<?>, Buffer> okayAndConversionFunc;
-    public Function<HttpResponse<?>, Buffer> setupDevice = this::lambda$new$1;
-    public static Site site;
-    public TaskApiClient delegate;
-    public static CharSequence DEFAULT_UA;
-    public long lockoutTiming = -1L;
-    public String userAgent;
-    public static CharSequence CTS_VALUE;
-    public static CharSequence PXHD_VALUE;
-    public static CharSequence PXDE_VALUE;
-    public static CharSequence FP_VALUE;
-    public String deviceNumber = "undefined";
-    public MultiMap cachedResponse = null;
-    public String sid;
-    public static Function<HttpResponse<?>, String> okayStatusFunc;
-    public static CharSequence DEFAULT_SEC_UA;
-    public static CharSequence PX3_VALUE;
-    public static CharSequence CFP_VALUE;
-    public static CharSequence ONE_VALUE;
-    public JsonArray performance;
-    public String uuid;
-    public String vid;
-    public long waitTime;
-    public JsonObject cookieSession;
-    public static CharSequence VID_COOKIE;
-    public static CharSequence RF_VALUE;
-    public String secUA;
+public class DesktopPX extends PerimeterX {
+   public Function okayAndConversionFunc;
+   public Function setupDevice;
+   public static Site site;
+   public TaskApiClient delegate;
+   public static CharSequence DEFAULT_UA = AsciiString.cached("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36");
+   public long lockoutTiming = -1L;
+   public String userAgent;
+   public static CharSequence CTS_VALUE = AsciiString.cached("pxcts");
+   public static CharSequence PXHD_VALUE = AsciiString.cached("_pxhd");
+   public static CharSequence PXDE_VALUE = AsciiString.cached("_pxde");
+   public static CharSequence FP_VALUE = AsciiString.cached("_pxff_fp");
+   public String deviceNumber;
+   public MultiMap cachedResponse;
+   public String sid;
+   public static Function okayStatusFunc;
+   public static CharSequence DEFAULT_SEC_UA = AsciiString.cached("\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
+   public static CharSequence PX3_VALUE = AsciiString.cached("_px3");
+   public static CharSequence CFP_VALUE = AsciiString.cached("_pxff_cfp");
+   public static CharSequence ONE_VALUE = AsciiString.cached("1");
+   public JsonArray performance;
+   public String uuid;
+   public String vid;
+   public long waitTime;
+   public JsonObject cookieSession;
+   public static CharSequence VID_COOKIE = AsciiString.cached("_pxvid");
+   public static CharSequence RF_VALUE = AsciiString.cached("_pxff_rf");
+   public String secUA;
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$execute(DesktopPX var0, String var1_1, Function var2_2, Supplier var3_3, Object var4_4, int var5_5, HttpRequest var6_6, CompletableFuture var7_8, HttpResponse var8_9, int var9_11, Optional var10_13, Throwable var11_14, int var12_15, Object var13_16) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [9[CATCHBLOCK]], but top level block is 15[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:850)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1055)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:942)
-         *     at org.benf.cfr.reader.Driver.doClass(Driver.java:84)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:78)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompile(CFRDecompiler.java:91)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:122)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.decompileSaveAll(ResourceDecompiling.java:262)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$decompileSaveAll$0(ResourceDecompiling.java:127)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
+   public static CompletableFuture async$execute(DesktopPX param0, String param1, Function param2, Supplier param3, Object param4, int param5, HttpRequest param6, CompletableFuture param7, HttpResponse param8, int param9, Optional param10, Throwable param11, int param12, Object param13) {
+      // $FF: Couldn't be decompiled
+   }
 
-    public CompletableFuture solve() {
-        int n = 1;
-        if (n > 30) return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
-        CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solve$3, this.buildReqBody(null, null));
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture2, null, null, null, 1, arg_0));
-        }
-        Buffer buffer = (Buffer)completableFuture.join();
-        CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep((long)this.waitTime);
-        if (!completableFuture3.isDone()) {
-            CompletableFuture completableFuture4 = completableFuture3;
-            return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture4, buffer, null, null, 2, arg_0));
-        }
-        completableFuture3.join();
-        CompletableFuture completableFuture5 = this.execute("Sensor 1/2", okayStatusFunc, this::collectorReq, buffer);
-        if (!completableFuture5.isDone()) {
-            CompletableFuture completableFuture6 = completableFuture5;
-            return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture6, buffer, null, null, 3, arg_0));
-        }
-        String string = (String)completableFuture5.join();
-        CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solve$4, this.buildReqBody(string, this.performance));
-        if (!completableFuture7.isDone()) {
-            CompletableFuture completableFuture8 = completableFuture7;
-            return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture8, buffer, string, null, 4, arg_0));
-        }
-        Buffer buffer2 = (Buffer)completableFuture7.join();
-        CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep((long)this.waitTime);
-        if (!completableFuture9.isDone()) {
-            CompletableFuture completableFuture10 = completableFuture9;
-            return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture10, buffer, string, buffer2, 5, arg_0));
-        }
-        completableFuture9.join();
-        CompletableFuture completableFuture11 = this.execute("Sensor 2/2", okayStatusFunc, this::collectorReq, buffer2);
-        if (!completableFuture11.isDone()) {
-            CompletableFuture completableFuture12 = completableFuture11;
-            return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solve(this, n, completableFuture12, buffer, string, buffer2, 6, arg_0));
-        }
-        String string2 = (String)completableFuture11.join();
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        if (this.getVid() != null && !this.getVid().isBlank()) {
-            multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
-        }
-        multiMap.add(RF_VALUE, ONE_VALUE);
-        multiMap.add(FP_VALUE, ONE_VALUE);
-        multiMap.add(CFP_VALUE, ONE_VALUE);
-        this.parseResultCookies(string2, multiMap);
-        return CompletableFuture.completedFuture(multiMap);
-    }
+   public CompletableFuture solve() {
+      byte var1 = 1;
+      if (var1 <= 30) {
+         CompletableFuture var10000 = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solve$3, this.buildReqBody((String)null, (JsonArray)null));
+         CompletableFuture var7;
+         if (!var10000.isDone()) {
+            var7 = var10000;
+            return var7.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+         } else {
+            Buffer var2 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(this.waitTime);
+            if (!var10000.isDone()) {
+               var7 = var10000;
+               return var7.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+            } else {
+               var10000.join();
+               var10000 = this.execute("Sensor 1/2", okayStatusFunc, this::collectorReq, var2);
+               if (!var10000.isDone()) {
+                  var7 = var10000;
+                  return var7.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+               } else {
+                  String var3 = (String)var10000.join();
+                  var10000 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solve$4, this.buildReqBody(var3, this.performance));
+                  if (!var10000.isDone()) {
+                     var7 = var10000;
+                     return var7.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+                  } else {
+                     Buffer var4 = (Buffer)var10000.join();
+                     var10000 = VertxUtil.hardCodedSleep(this.waitTime);
+                     if (!var10000.isDone()) {
+                        var7 = var10000;
+                        return var7.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+                     } else {
+                        var10000.join();
+                        var10000 = this.execute("Sensor 2/2", okayStatusFunc, this::collectorReq, var4);
+                        if (!var10000.isDone()) {
+                           var7 = var10000;
+                           return var7.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+                        } else {
+                           String var5 = (String)var10000.join();
+                           MultiMap var6 = MultiMap.caseInsensitiveMultiMap();
+                           if (this.getVid() != null && !this.getVid().isBlank()) {
+                              var6.add(VID_COOKIE, this.getVid());
+                           }
 
-    public HttpRequest lambda$solve$4() {
-        return this.apiRequest("2", null);
-    }
-
-    public static String lambda$static$0(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        return httpResponse.bodyAsString();
-    }
-
-    public HttpRequest bundleReq() {
-        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/assets/js/bundle").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
-    public String getVid() {
-        return this.cookieSession.getString("vid", null);
-    }
-
-    public Buffer lambda$new$1(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        this.userAgent = httpResponse.bodyAsString();
-        this.secUA = httpResponse.getHeader("sec-ua");
-        this.deviceNumber = httpResponse.getHeader("device");
-        return httpResponse.bodyAsBuffer();
-    }
-
-    public Buffer lambda$new$2(HttpResponse httpResponse) {
-        if (httpResponse.statusCode() != 200) return null;
-        if (httpResponse.getHeader("performance") == null) return null;
-        this.uuid = httpResponse.getHeader("uuid");
-        this.sid = httpResponse.getHeader("sid");
-        this.vid = httpResponse.getHeader("vid");
-        this.waitTime = Long.parseLong(httpResponse.getHeader("completionEpoch")) - System.currentTimeMillis();
-        this.performance = new JsonArray(httpResponse.getHeader("performance"));
-        if (httpResponse.getHeader("cts") != null) {
-            this.delegate.getCookies().put(String.valueOf(CTS_VALUE), httpResponse.getHeader("cts"), ".walmart.com");
-        }
-        this.deviceNumber = httpResponse.getHeader("device");
-        return httpResponse.bodyAsBuffer();
-    }
-
-    public CompletableFuture execute(String string, Function function, Supplier supplier, Object object) {
-        int n = 0;
-        while (n++ < Integer.MAX_VALUE) {
-            try {
-                HttpResponse httpResponse;
-                HttpRequest httpRequest = (HttpRequest)supplier.get();
-                if (((HttpRequestImpl)httpRequest).method().equals((Object)HttpMethod.POST)) {
-                    CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (Object)object);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture2, null, 0, null, null, 1, arg_0));
-                    }
-                    httpResponse = (HttpResponse)completableFuture.join();
-                } else {
-                    CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture3 = completableFuture;
-                        return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture3, null, 0, null, null, 2, arg_0));
-                    }
-                    httpResponse = (HttpResponse)completableFuture.join();
-                }
-                if (httpResponse != null) {
-                    int n2 = httpResponse.statusCode();
-                    Optional optional = Optional.ofNullable(function.apply(httpResponse));
-                    if (optional.isPresent()) {
-                        return CompletableFuture.completedFuture(optional.get());
-                    }
-                    this.logger.warn("Failed {}: '{}'", (Object)string.toLowerCase(Locale.ROOT), (Object)n2);
-                    CompletableFuture completableFuture = VertxUtil.randomSleep((long)5000L);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture4, httpResponse, n2, optional, null, 3, arg_0));
-                    }
-                    completableFuture.join();
-                    continue;
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep((long)5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, httpRequest, completableFuture5, httpResponse, 0, null, null, 4, arg_0));
-                }
-                completableFuture.join();
+                           var6.add(RF_VALUE, ONE_VALUE);
+                           var6.add(FP_VALUE, ONE_VALUE);
+                           var6.add(CFP_VALUE, ONE_VALUE);
+                           this.parseResultCookies(var5, var6);
+                           return CompletableFuture.completedFuture(var6);
+                        }
+                     }
+                  }
+               }
             }
-            catch (Throwable throwable) {
-                this.logger.error("Error " + string.toLowerCase(Locale.ROOT) + ": {}", (Object)throwable.getMessage());
-                if (this.logger.isDebugEnabled()) {
-                    this.logger.debug((Object)throwable);
-                }
-                CompletableFuture completableFuture = VertxUtil.randomSleep((long)5000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture6 = completableFuture;
-                    return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$execute(this, string, function, (Supplier)supplier, object, n, null, completableFuture6, null, 0, null, throwable, 5, arg_0));
-                }
-                completableFuture.join();
+         }
+      } else {
+         return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+      }
+   }
+
+   public HttpRequest lambda$solve$4() {
+      return this.apiRequest("2", (Boolean)null);
+   }
+
+   public static String lambda$static$0(HttpResponse var0) {
+      return var0.statusCode() == 200 ? var0.bodyAsString() : null;
+   }
+
+   public HttpRequest bundleReq() {
+      HttpRequest var1 = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/assets/js/bundle").as(BodyCodec.buffer());
+      var1.putHeader("content-length", "DEFAULT_VALUE");
+      var1.putHeader("sec-ch-ua", this.getDeviceSecUA());
+      var1.putHeader("sec-ch-ua-mobile", "?0");
+      var1.putHeader("user-agent", this.getDeviceUA());
+      var1.putHeader("sec-ch-ua-platform", "\"macOS\"");
+      var1.putHeader("content-type", "application/x-www-form-urlencoded");
+      var1.putHeader("accept", "*/*");
+      var1.putHeader("origin", "https://www.walmart.com");
+      var1.putHeader("sec-fetch-site", "cross-site");
+      var1.putHeader("sec-fetch-mode", "cors");
+      var1.putHeader("sec-fetch-dest", "empty");
+      var1.putHeader("referer", "https://www.walmart.com/");
+      var1.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+      var1.putHeader("accept-language", this.getDeviceLang());
+      return var1;
+   }
+
+   public String getVid() {
+      return this.cookieSession.getString("vid", (String)null);
+   }
+
+   public Buffer lambda$new$1(HttpResponse var1) {
+      if (var1.statusCode() == 200) {
+         this.userAgent = var1.bodyAsString();
+         this.secUA = var1.getHeader("sec-ua");
+         this.deviceNumber = var1.getHeader("device");
+         return var1.bodyAsBuffer();
+      } else {
+         return null;
+      }
+   }
+
+   public Buffer lambda$new$2(HttpResponse var1) {
+      if (var1.statusCode() == 200 && var1.getHeader("performance") != null) {
+         this.uuid = var1.getHeader("uuid");
+         this.sid = var1.getHeader("sid");
+         this.vid = var1.getHeader("vid");
+         this.waitTime = Long.parseLong(var1.getHeader("completionEpoch")) - System.currentTimeMillis();
+         this.performance = new JsonArray(var1.getHeader("performance"));
+         if (var1.getHeader("cts") != null) {
+            this.delegate.getCookies().put(String.valueOf(CTS_VALUE), var1.getHeader("cts"), ".walmart.com");
+         }
+
+         this.deviceNumber = var1.getHeader("device");
+         return var1.bodyAsBuffer();
+      } else {
+         return null;
+      }
+   }
+
+   public CompletableFuture execute(String var1, Function var2, Supplier var3, Object var4) {
+      int var5 = 0;
+
+      while(var5++ < Integer.MAX_VALUE) {
+         CompletableFuture var10;
+         CompletableFuture var12;
+         try {
+            HttpRequest var7 = (HttpRequest)var3.get();
+            HttpResponse var6;
+            if (((HttpRequestImpl)var7).method().equals(HttpMethod.POST)) {
+               var12 = Request.send(var7, var4);
+               if (!var12.isDone()) {
+                  var10 = var12;
+                  return var10.exceptionally(Function.identity()).thenCompose(DesktopPX::async$execute);
+               }
+
+               var6 = (HttpResponse)var12.join();
+            } else {
+               var12 = Request.send(var7);
+               if (!var12.isDone()) {
+                  var10 = var12;
+                  return var10.exceptionally(Function.identity()).thenCompose(DesktopPX::async$execute);
+               }
+
+               var6 = (HttpResponse)var12.join();
             }
-        }
-        return CompletableFuture.failedFuture(new Exception("Failed to execute " + string));
-    }
 
-    public JsonObject buildReqBody(String string, JsonArray jsonArray) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.put("pxhd", (Object)this.delegate.getCookies().getCookieValue("_pxhd"));
-        jsonObject.put("uuid", (Object)this.uuid);
-        jsonObject.put("sid", (Object)this.sid);
-        jsonObject.put("vid", (Object)this.vid);
-        jsonObject.put("firstResponse", (Object)string);
-        jsonObject.put("performance", (Object)jsonArray);
-        jsonObject.put("cts", (Object)this.delegate.getCookies().getCookieValue(String.valueOf(CTS_VALUE)));
-        jsonObject.put("device", (Object)this.deviceNumber);
-        return jsonObject;
-    }
+            if (var6 != null) {
+               int var8 = var6.statusCode();
+               Optional var9 = Optional.ofNullable(var2.apply(var6));
+               if (var9.isPresent()) {
+                  return CompletableFuture.completedFuture(var9.get());
+               }
 
-    public HttpRequest lambda$initialise$10() {
-        return this.apiRequest("ua", null).method(HttpMethod.GET);
-    }
+               this.logger.warn("Failed {}: '{}'", var1.toLowerCase(Locale.ROOT), var8);
+               var12 = VertxUtil.randomSleep(5000L);
+               if (!var12.isDone()) {
+                  var10 = var12;
+                  return var10.exceptionally(Function.identity()).thenCompose(DesktopPX::async$execute);
+               }
 
-    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
-        this.uuid = string2;
-        this.vid = string;
-        int n = 1;
-        while (true) {
-            if (n > ThreadLocalRandom.current().nextInt(1, 4)) {
-                this.delegate.getCookies().removeAnyMatch("_pxhd");
-                return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+               var12.join();
+            } else {
+               var12 = VertxUtil.randomSleep(5000L);
+               if (!var12.isDone()) {
+                  var10 = var12;
+                  return var10.exceptionally(Function.identity()).thenCompose(DesktopPX::async$execute);
+               }
+
+               var12.join();
             }
-            this.performance = null;
-            CompletableFuture completableFuture = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solveCaptcha$5, this.buildReqBody(null, null));
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture2, null, null, null, null, null, null, null, null, 1, arg_0));
+         } catch (Throwable var11) {
+            this.logger.error("Error " + var1.toLowerCase(Locale.ROOT) + ": {}", var11.getMessage());
+            if (this.logger.isDebugEnabled()) {
+               this.logger.debug(var11);
             }
-            Buffer buffer = (Buffer)completableFuture.join();
-            CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep((long)this.waitTime);
-            if (!completableFuture3.isDone()) {
-                CompletableFuture completableFuture4 = completableFuture3;
-                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture4, buffer, null, null, null, null, null, null, null, 2, arg_0));
+
+            var12 = VertxUtil.randomSleep(5000L);
+            if (!var12.isDone()) {
+               var10 = var12;
+               return var10.exceptionally(Function.identity()).thenCompose(DesktopPX::async$execute);
             }
-            completableFuture3.join();
-            CompletableFuture completableFuture5 = this.execute("Sensor 1/4", okayStatusFunc, this::bundleReq, buffer);
-            if (!completableFuture5.isDone()) {
-                CompletableFuture completableFuture6 = completableFuture5;
-                return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture6, buffer, null, null, null, null, null, null, null, 3, arg_0));
+
+            var12.join();
+         }
+      }
+
+      return CompletableFuture.failedFuture(new Exception("Failed to execute " + var1));
+   }
+
+   public JsonObject buildReqBody(String var1, JsonArray var2) {
+      JsonObject var3 = new JsonObject();
+      var3.put("pxhd", this.delegate.getCookies().getCookieValue("_pxhd"));
+      var3.put("uuid", this.uuid);
+      var3.put("sid", this.sid);
+      var3.put("vid", this.vid);
+      var3.put("firstResponse", var1);
+      var3.put("performance", var2);
+      var3.put("cts", this.delegate.getCookies().getCookieValue(String.valueOf(CTS_VALUE)));
+      var3.put("device", this.deviceNumber);
+      return var3;
+   }
+
+   public HttpRequest lambda$initialise$10() {
+      return this.apiRequest("ua", (Boolean)null).method(HttpMethod.GET);
+   }
+
+   public CompletableFuture solveCaptcha(String var1, String var2, String var3) {
+      this.uuid = var2;
+      this.vid = var1;
+
+      for(int var4 = 1; var4 <= ThreadLocalRandom.current().nextInt(1, 4); ++var4) {
+         this.performance = null;
+         CompletableFuture var10000 = this.execute("API 1", this.okayAndConversionFunc, this::lambda$solveCaptcha$5, this.buildReqBody((String)null, (JsonArray)null));
+         CompletableFuture var14;
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         Buffer var5 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(this.waitTime);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = this.execute("Sensor 1/4", okayStatusFunc, this::bundleReq, var5);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         String var6 = (String)var10000.join();
+         var10000 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solveCaptcha$6, this.buildReqBody(var6, this.performance));
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         Buffer var7 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(this.waitTime);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = this.execute("Sensor 2/4", okayStatusFunc, this::bundleReq, var7);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         String var8 = (String)var10000.join();
+         var10000 = this.execute("API 3", this.okayAndConversionFunc, this::lambda$solveCaptcha$7, this.buildReqBody(var6, this.performance));
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         Buffer var9 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(this.waitTime);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = this.execute("Sensor 3/4", okayStatusFunc, this::lambda$solveCaptcha$8, (Object)null);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         String var10 = (String)var10000.join();
+         var10000 = this.execute("API 4", this.okayAndConversionFunc, this::lambda$solveCaptcha$9, this.buildReqBody(var6, this.performance));
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         Buffer var11 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(this.waitTime);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = this.execute("Sensor 4/4", okayStatusFunc, this::bundleReq, var11);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         String var12 = (String)var10000.join();
+         if (var12.contains("cv|0")) {
+            this.logger.info("Successfully solved captcha");
+            MultiMap var13 = MultiMap.caseInsensitiveMultiMap();
+            if (this.getVid() != null && !this.getVid().isBlank()) {
+               var13.add(VID_COOKIE, this.getVid());
             }
-            String string4 = (String)completableFuture5.join();
-            CompletableFuture completableFuture7 = this.execute("API 2", this.okayAndConversionFunc, this::lambda$solveCaptcha$6, this.buildReqBody(string4, this.performance));
-            if (!completableFuture7.isDone()) {
-                CompletableFuture completableFuture8 = completableFuture7;
-                return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture8, buffer, string4, null, null, null, null, null, null, 4, arg_0));
+
+            var13.add(RF_VALUE, ONE_VALUE);
+            var13.add(FP_VALUE, ONE_VALUE);
+            var13.add(CFP_VALUE, ONE_VALUE);
+            this.parseResultCookies(var12, var13);
+            return CompletableFuture.completedFuture(var13);
+         }
+
+         this.logger.error("Retrying captcha solve...");
+         this.sid = null;
+         var10000 = VertxUtil.randomSleep(1000L);
+         if (!var10000.isDone()) {
+            var14 = var10000;
+            return var14.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+      }
+
+      this.delegate.getCookies().removeAnyMatch("_pxhd");
+      return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+   }
+
+   public HttpRequest imageReq(Buffer var1) {
+      HttpRequest var2 = this.client.getAbs("https://collector-pxu6b0qd2s.px-client.net/b/g?" + var1.toString()).as(BodyCodec.buffer());
+      var2.putHeader("sec-ch-ua", this.getDeviceSecUA());
+      var2.putHeader("sec-ch-ua-mobile", "?0");
+      var2.putHeader("user-agent", this.getDeviceUA());
+      var2.putHeader("sec-ch-ua-platform", "\"macOS\"");
+      var2.putHeader("accept", "*/*");
+      var2.putHeader("origin", "https://www.walmart.com");
+      var2.putHeader("sec-fetch-site", "cross-site");
+      var2.putHeader("sec-fetch-mode", "cors");
+      var2.putHeader("sec-fetch-dest", "empty");
+      var2.putHeader("referer", "https://www.walmart.com/");
+      var2.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+      var2.putHeader("accept-language", this.getDeviceLang());
+      return var2;
+   }
+
+   public HttpRequest collectorReq() {
+      HttpRequest var1 = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/api/v2/collector").as(BodyCodec.buffer());
+      var1.putHeader("content-length", "DEFAULT_VALUE");
+      var1.putHeader("sec-ch-ua", this.getDeviceSecUA());
+      var1.putHeader("sec-ch-ua-mobile", "?0");
+      var1.putHeader("user-agent", this.getDeviceUA());
+      var1.putHeader("sec-ch-ua-platform", "\"macOS\"");
+      var1.putHeader("content-type", "application/x-www-form-urlencoded");
+      var1.putHeader("accept", "*/*");
+      var1.putHeader("origin", "https://www.walmart.com");
+      var1.putHeader("sec-fetch-site", "cross-site");
+      var1.putHeader("sec-fetch-mode", "cors");
+      var1.putHeader("sec-fetch-dest", "empty");
+      var1.putHeader("referer", "https://www.walmart.com/");
+      var1.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
+      var1.putHeader("accept-language", this.getDeviceLang());
+      return var1;
+   }
+
+   public HttpRequest lambda$solveCaptcha$7() {
+      return this.apiRequest("img", true);
+   }
+
+   public DesktopPX(TaskActor var1) {
+      super(var1, ClientType.CHROME);
+      this.lockoutTiming = -1L;
+      this.cachedResponse = null;
+      this.setupDevice = this::lambda$new$1;
+      this.okayAndConversionFunc = this::lambda$new$2;
+      this.deviceNumber = "undefined";
+      this.cookieSession = new JsonObject();
+      this.delegate = var1.getClient();
+   }
+
+   public void parseResultCookies(String var1, MultiMap var2) {
+      try {
+         Matcher var3 = PXDE_PATTERN.matcher(var1);
+         Matcher var4 = BAKE_PATTERN.matcher(var1);
+         if (var4.find()) {
+            var2.add(PX3_VALUE, var4.group(1));
+         }
+
+         if (var3.find()) {
+            var2.add(PXDE_VALUE, var3.group(1));
+         }
+      } catch (Throwable var5) {
+         if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Failed to find px3 or pxde ", var5);
+         }
+      }
+
+   }
+
+   public static CompletableFuture async$solve(DesktopPX var0, int var1, CompletableFuture var2, Buffer var3, String var4, Buffer var5, int var6, Object var7) {
+      CompletableFuture var10000;
+      label76: {
+         Buffer var8;
+         String var9;
+         Buffer var10;
+         CompletableFuture var13;
+         label77: {
+            label78: {
+               label61: {
+                  label60: {
+                     Buffer var10001;
+                     switch (var6) {
+                        case 0:
+                           var1 = 1;
+                           if (var1 > 30) {
+                              return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+                           }
+
+                           var10000 = var0.execute("API 1", var0.okayAndConversionFunc, var0::lambda$solve$3, var0.buildReqBody((String)null, (JsonArray)null));
+                           if (!var10000.isDone()) {
+                              var13 = var10000;
+                              return var13.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+                           }
+                           break;
+                        case 1:
+                           var10000 = var2;
+                           break;
+                        case 2:
+                           var10000 = var2;
+                           var8 = var3;
+                           break label60;
+                        case 3:
+                           var10000 = var2;
+                           var8 = var3;
+                           break label61;
+                        case 4:
+                           var10000 = var2;
+                           var10001 = var3;
+                           var9 = var4;
+                           var8 = var10001;
+                           break label78;
+                        case 5:
+                           var10000 = var2;
+                           var10001 = var3;
+                           String var10002 = var4;
+                           var10 = var5;
+                           var9 = var10002;
+                           var8 = var10001;
+                           break label77;
+                        case 6:
+                           var10000 = var2;
+                           break label76;
+                        default:
+                           throw new IllegalArgumentException();
+                     }
+
+                     var8 = (Buffer)var10000.join();
+                     var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+                     if (!var10000.isDone()) {
+                        var13 = var10000;
+                        return var13.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+                     }
+                  }
+
+                  var10000.join();
+                  var10000 = var0.execute("Sensor 1/2", okayStatusFunc, var0::collectorReq, var8);
+                  if (!var10000.isDone()) {
+                     var13 = var10000;
+                     return var13.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+                  }
+               }
+
+               var9 = (String)var10000.join();
+               var10000 = var0.execute("API 2", var0.okayAndConversionFunc, var0::lambda$solve$4, var0.buildReqBody(var9, var0.performance));
+               if (!var10000.isDone()) {
+                  var13 = var10000;
+                  return var13.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+               }
             }
-            Buffer buffer2 = (Buffer)completableFuture7.join();
-            CompletableFuture completableFuture9 = VertxUtil.hardCodedSleep((long)this.waitTime);
-            if (!completableFuture9.isDone()) {
-                CompletableFuture completableFuture10 = completableFuture9;
-                return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture10, buffer, string4, buffer2, null, null, null, null, null, 5, arg_0));
+
+            var10 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var13 = var10000;
+               return var13.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
             }
-            completableFuture9.join();
-            CompletableFuture completableFuture11 = this.execute("Sensor 2/4", okayStatusFunc, this::bundleReq, buffer2);
-            if (!completableFuture11.isDone()) {
-                CompletableFuture completableFuture12 = completableFuture11;
-                return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture12, buffer, string4, buffer2, null, null, null, null, null, 6, arg_0));
+         }
+
+         var10000.join();
+         var10000 = var0.execute("Sensor 2/2", okayStatusFunc, var0::collectorReq, var10);
+         if (!var10000.isDone()) {
+            var13 = var10000;
+            return var13.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solve);
+         }
+      }
+
+      String var11 = (String)var10000.join();
+      MultiMap var12 = MultiMap.caseInsensitiveMultiMap();
+      if (var0.getVid() != null && !var0.getVid().isBlank()) {
+         var12.add(VID_COOKIE, var0.getVid());
+      }
+
+      var12.add(RF_VALUE, ONE_VALUE);
+      var12.add(FP_VALUE, ONE_VALUE);
+      var12.add(CFP_VALUE, ONE_VALUE);
+      var0.parseResultCookies(var11, var12);
+      return CompletableFuture.completedFuture(var12);
+   }
+
+   public HttpRequest lambda$solveCaptcha$8(Buffer var1) {
+      return this.imageReq(var1);
+   }
+
+   public static CompletableFuture async$solveCaptcha(DesktopPX var0, String var1, String var2, String var3, int var4, CompletableFuture var5, Buffer var6, String var7, Buffer var8, String var9, Buffer var10, String var11, Buffer var12, String var13, int var14, Object var15) {
+      Buffer var16;
+      CompletableFuture var10000;
+      String var17;
+      Buffer var18;
+      String var19;
+      Buffer var20;
+      String var21;
+      Buffer var22;
+      CompletableFuture var25;
+      switch (var14) {
+         case 0:
+            var0.uuid = var2;
+            var0.vid = var1;
+            var4 = 1;
+            if (var4 > ThreadLocalRandom.current().nextInt(1, 4)) {
+               var0.delegate.getCookies().removeAnyMatch("_pxhd");
+               return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
             }
-            String string5 = (String)completableFuture11.join();
-            CompletableFuture completableFuture13 = this.execute("API 3", this.okayAndConversionFunc, this::lambda$solveCaptcha$7, this.buildReqBody(string4, this.performance));
-            if (!completableFuture13.isDone()) {
-                CompletableFuture completableFuture14 = completableFuture13;
-                return ((CompletableFuture)completableFuture14.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture14, buffer, string4, buffer2, string5, null, null, null, null, 7, arg_0));
+
+            var0.performance = null;
+            var10000 = var0.execute("API 1", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$5, var0.buildReqBody((String)null, (JsonArray)null));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            Buffer buffer3 = (Buffer)completableFuture13.join();
-            CompletableFuture completableFuture15 = VertxUtil.hardCodedSleep((long)this.waitTime);
-            if (!completableFuture15.isDone()) {
-                CompletableFuture completableFuture16 = completableFuture15;
-                return ((CompletableFuture)completableFuture16.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture16, buffer, string4, buffer2, string5, buffer3, null, null, null, 8, arg_0));
+
+            var16 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            completableFuture15.join();
-            CompletableFuture completableFuture17 = this.execute("Sensor 3/4", okayStatusFunc, () -> this.lambda$solveCaptcha$8(buffer3), null);
-            if (!completableFuture17.isDone()) {
-                CompletableFuture completableFuture18 = completableFuture17;
-                return ((CompletableFuture)completableFuture18.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture18, buffer, string4, buffer2, string5, buffer3, null, null, null, 9, arg_0));
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 1/4", okayStatusFunc, var0::bundleReq, var16);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            String string6 = (String)completableFuture17.join();
-            CompletableFuture completableFuture19 = this.execute("API 4", this.okayAndConversionFunc, this::lambda$solveCaptcha$9, this.buildReqBody(string4, this.performance));
-            if (!completableFuture19.isDone()) {
-                CompletableFuture completableFuture20 = completableFuture19;
-                return ((CompletableFuture)completableFuture20.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture20, buffer, string4, buffer2, string5, buffer3, string6, null, null, 10, arg_0));
+
+            var17 = (String)var10000.join();
+            var10000 = var0.execute("API 2", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$6, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            Buffer buffer4 = (Buffer)completableFuture19.join();
-            CompletableFuture completableFuture21 = VertxUtil.hardCodedSleep((long)this.waitTime);
-            if (!completableFuture21.isDone()) {
-                CompletableFuture completableFuture22 = completableFuture21;
-                return ((CompletableFuture)completableFuture22.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture22, buffer, string4, buffer2, string5, buffer3, string6, buffer4, null, 11, arg_0));
+
+            var18 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            completableFuture21.join();
-            CompletableFuture completableFuture23 = this.execute("Sensor 4/4", okayStatusFunc, this::bundleReq, buffer4);
-            if (!completableFuture23.isDone()) {
-                CompletableFuture completableFuture24 = completableFuture23;
-                return ((CompletableFuture)completableFuture24.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture24, buffer, string4, buffer2, string5, buffer3, string6, buffer4, null, 12, arg_0));
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var18);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            String string7 = (String)completableFuture23.join();
-            if (string7.contains("cv|0")) {
-                this.logger.info("Successfully solved captcha");
-                MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-                if (this.getVid() != null && !this.getVid().isBlank()) {
-                    multiMap.add(VID_COOKIE, (CharSequence)this.getVid());
-                }
-                multiMap.add(RF_VALUE, ONE_VALUE);
-                multiMap.add(FP_VALUE, ONE_VALUE);
-                multiMap.add(CFP_VALUE, ONE_VALUE);
-                this.parseResultCookies(string7, multiMap);
-                return CompletableFuture.completedFuture(multiMap);
+
+            var19 = (String)var10000.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            this.logger.error("Retrying captcha solve...");
-            this.sid = null;
-            CompletableFuture completableFuture25 = VertxUtil.randomSleep((long)1000L);
-            if (!completableFuture25.isDone()) {
-                CompletableFuture completableFuture26 = completableFuture25;
-                return ((CompletableFuture)completableFuture26.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$solveCaptcha(this, string, string2, string3, n, completableFuture26, buffer, string4, buffer2, string5, buffer3, string6, buffer4, string7, 13, arg_0));
+
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            completableFuture25.join();
-            ++n;
-        }
-    }
 
-    public HttpRequest imageReq(Buffer buffer) {
-        HttpRequest httpRequest = this.client.getAbs("https://collector-pxu6b0qd2s.px-client.net/b/g?" + buffer.toString()).as(BodyCodec.buffer());
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
-    public HttpRequest collectorReq() {
-        HttpRequest httpRequest = this.client.postAbs("https://collector-pxu6b0qd2s.px-cloud.net/api/v2/collector").as(BodyCodec.buffer());
-        httpRequest.putHeader("content-length", "DEFAULT_VALUE");
-        httpRequest.putHeader("sec-ch-ua", this.getDeviceSecUA());
-        httpRequest.putHeader("sec-ch-ua-mobile", "?0");
-        httpRequest.putHeader("user-agent", this.getDeviceUA());
-        httpRequest.putHeader("sec-ch-ua-platform", "\"macOS\"");
-        httpRequest.putHeader("content-type", "application/x-www-form-urlencoded");
-        httpRequest.putHeader("accept", "*/*");
-        httpRequest.putHeader("origin", "https://www.walmart.com");
-        httpRequest.putHeader("sec-fetch-site", "cross-site");
-        httpRequest.putHeader("sec-fetch-mode", "cors");
-        httpRequest.putHeader("sec-fetch-dest", "empty");
-        httpRequest.putHeader("referer", "https://www.walmart.com/");
-        httpRequest.putHeader("accept-encoding", this.getDeviceAcceptEncoding());
-        httpRequest.putHeader("accept-language", this.getDeviceLang());
-        return httpRequest;
-    }
-
-    public HttpRequest lambda$solveCaptcha$7() {
-        return this.apiRequest("img", true);
-    }
-
-    public DesktopPX(TaskActor taskActor) {
-        super(taskActor, ClientType.CHROME);
-        this.okayAndConversionFunc = this::lambda$new$2;
-        this.cookieSession = new JsonObject();
-        this.delegate = taskActor.getClient();
-    }
-
-    public void parseResultCookies(String string, MultiMap multiMap) {
-        try {
-            Matcher matcher = PXDE_PATTERN.matcher(string);
-            Matcher matcher2 = BAKE_PATTERN.matcher(string);
-            if (matcher2.find()) {
-                multiMap.add(PX3_VALUE, (CharSequence)matcher2.group(1));
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            if (!matcher.find()) return;
-            multiMap.add(PXDE_VALUE, (CharSequence)matcher.group(1));
-        }
-        catch (Throwable throwable) {
-            if (!this.logger.isDebugEnabled()) return;
-            this.logger.debug("Failed to find px3 or pxde ", throwable);
-        }
-    }
 
-    /*
-     * Unable to fully structure code
-     * Could not resolve type clashes
-     */
-    public static CompletableFuture async$solve(DesktopPX var0, int var1_1, CompletableFuture var2_2, Buffer var3_3, String var4_4, Buffer var5_5, int var6_6, Object var7_8) {
-        switch (var6_6) {
-            case 0: {
-                var1_1 = 1;
-                if (var1_1 > 30) return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
-                v0 = var0.execute("API 1", var0.okayAndConversionFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$solve$3(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var0.buildReqBody(null, null));
-                if (!v0.isDone()) {
-                    var7_8 = v0;
-                    return var7_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solve(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (int)var1_1, (CompletableFuture)var7_8, null, null, null, (int)1));
-                }
-                ** GOTO lbl12
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 1: {
-                v0 = var2_2;
-lbl12:
-                // 2 sources
 
-                var2_2 = (Buffer)v0.join();
-                v1 = VertxUtil.hardCodedSleep((long)var0.waitTime);
-                if (!v1.isDone()) {
-                    var7_8 = v1;
-                    return var7_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solve(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (int)var1_1, (CompletableFuture)var7_8, (Buffer)var2_2, null, null, (int)2));
-                }
-                ** GOTO lbl21
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 2: {
-                v1 = var2_2;
-                var2_2 = var3_3 /* !! */ ;
-lbl21:
-                // 2 sources
 
-                v1.join();
-                v2 = var0.execute("Sensor 1/2", DesktopPX.okayStatusFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, collectorReq(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var2_2);
-                if (!v2.isDone()) {
-                    var7_8 = v2;
-                    return var7_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solve(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (int)var1_1, (CompletableFuture)var7_8, (Buffer)var2_2, null, null, (int)3));
-                }
-                ** GOTO lbl31
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 3: {
-                v2 = var2_2;
-                var2_2 = var3_3 /* !! */ ;
-lbl31:
-                // 2 sources
-
-                if (!(v3 = var0.execute("API 2", var0.okayAndConversionFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$solve$4(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var0.buildReqBody((String)(var3_3 /* !! */  = (String)v2.join()), var0.performance))).isDone()) {
-                    var7_8 = v3;
-                    return var7_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solve(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (int)var1_1, (CompletableFuture)var7_8, (Buffer)var2_2, (String)var3_3 /* !! */ , null, (int)4));
-                }
-                ** GOTO lbl40
+            break;
+         case 1:
+            var16 = (Buffer)var5.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 4: {
-                v3 = var2_2;
-                v4 = var3_3 /* !! */ ;
-                var3_3 /* !! */  = var4_4;
-                var2_2 = v4;
-lbl40:
-                // 2 sources
 
-                var4_4 = (Buffer)v3.join();
-                v5 = VertxUtil.hardCodedSleep((long)var0.waitTime);
-                if (!v5.isDone()) {
-                    var7_8 = v5;
-                    return var7_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solve(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (int)var1_1, (CompletableFuture)var7_8, (Buffer)var2_2, (String)var3_3 /* !! */ , (Buffer)var4_4, (int)5));
-                }
-                ** GOTO lbl53
+            var10000.join();
+            var10000 = var0.execute("Sensor 1/4", okayStatusFunc, var0::bundleReq, var16);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 5: {
-                v5 = var2_2;
-                v6 = var3_3 /* !! */ ;
-                v7 = var4_4;
-                var4_4 = var5_5 /* !! */ ;
-                var3_3 /* !! */  = v7;
-                var2_2 = v6;
-lbl53:
-                // 2 sources
 
-                v5.join();
-                v8 = var0.execute("Sensor 2/2", DesktopPX.okayStatusFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, collectorReq(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var4_4);
-                if (!v8.isDone()) {
-                    var7_8 = v8;
-                    return var7_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solve(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (int)var1_1, (CompletableFuture)var7_8, (Buffer)var2_2, (String)var3_3 /* !! */ , (Buffer)var4_4, (int)6));
-                }
-                ** GOTO lbl67
+            var17 = (String)var10000.join();
+            var10000 = var0.execute("API 2", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$6, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 6: {
-                v8 = var2_2;
-                v9 = var3_3 /* !! */ ;
-                v10 = var4_4;
-                var4_4 = var5_5 /* !! */ ;
-                var3_3 /* !! */  = v10;
-                var2_2 = v9;
-lbl67:
-                // 2 sources
 
-                var5_5 /* !! */  = (String)v8.join();
-                var6_7 = MultiMap.caseInsensitiveMultiMap();
-                if (var0.getVid() != null && !var0.getVid().isBlank()) {
-                    var6_7.add(DesktopPX.VID_COOKIE, (CharSequence)var0.getVid());
-                }
-                var6_7.add(DesktopPX.RF_VALUE, DesktopPX.ONE_VALUE);
-                var6_7.add(DesktopPX.FP_VALUE, DesktopPX.ONE_VALUE);
-                var6_7.add(DesktopPX.CFP_VALUE, DesktopPX.ONE_VALUE);
-                var0.parseResultCookies((String)var5_5 /* !! */ , var6_7);
-                return CompletableFuture.completedFuture(var6_7);
+            var18 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public HttpRequest lambda$solveCaptcha$8(Buffer buffer) {
-        return this.imageReq(buffer);
-    }
-
-    /*
-     * Unable to fully structure code
-     * Could not resolve type clashes
-     */
-    public static CompletableFuture async$solveCaptcha(DesktopPX var0, String var1_1, String var2_2, String var3_3, int var4_4, CompletableFuture var5_5, Buffer var6_6, String var7_7, Buffer var8_8, String var9_9, Buffer var10_10, String var11_11, Buffer var12_12, String var13_13, int var14_14, Object var15_28) {
-        switch (var14_14) {
-            case 0: {
-                var0.uuid = var2_2;
-                var0.vid = var1_1;
-                var4_4 = 1;
-lbl6:
-                // 2 sources
-
-                while (true) {
-                    if (var4_4 > ThreadLocalRandom.current().nextInt(1, 4)) {
-                        var0.delegate.getCookies().removeAnyMatch("_pxhd");
-                        return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
-                    }
-                    var0.performance = null;
-                    v0 = var0.execute("API 1", var0.okayAndConversionFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$solveCaptcha$5(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var0.buildReqBody(null, null));
-                    if (!v0.isDone()) {
-                        var14_15 = v0;
-                        return var14_15.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_15, null, null, null, null, null, null, null, null, (int)1));
-                    }
-                    ** GOTO lbl18
-                    break;
-                }
+            var10000.join();
+            var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var18);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 1: {
-                v0 = var5_5;
-lbl18:
-                // 2 sources
 
-                var5_5 = (Buffer)v0.join();
-                v1 = VertxUtil.hardCodedSleep((long)var0.waitTime);
-                if (!v1.isDone()) {
-                    var14_16 = v1;
-                    return var14_16.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_16, (Buffer)var5_5, null, null, null, null, null, null, null, (int)2));
-                }
-                ** GOTO lbl27
+            var19 = (String)var10000.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 2: {
-                v1 = var5_5;
-                var5_5 = var6_6 /* !! */ ;
-lbl27:
-                // 2 sources
 
-                v1.join();
-                v2 = var0.execute("Sensor 1/4", DesktopPX.okayStatusFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, bundleReq(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var5_5);
-                if (!v2.isDone()) {
-                    var14_17 = v2;
-                    return var14_17.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_17, (Buffer)var5_5, null, null, null, null, null, null, null, (int)3));
-                }
-                ** GOTO lbl37
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 3: {
-                v2 = var5_5;
-                var5_5 = var6_6 /* !! */ ;
-lbl37:
-                // 2 sources
 
-                if (!(v3 = var0.execute("API 2", var0.okayAndConversionFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$solveCaptcha$6(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var0.buildReqBody((String)(var6_6 /* !! */  = (String)v2.join()), var0.performance))).isDone()) {
-                    var14_18 = v3;
-                    return var14_18.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_18, (Buffer)var5_5, (String)var6_6 /* !! */ , null, null, null, null, null, null, (int)4));
-                }
-                ** GOTO lbl46
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 4: {
-                v3 = var5_5;
-                v4 = var6_6 /* !! */ ;
-                var6_6 /* !! */  = var7_7;
-                var5_5 = v4;
-lbl46:
-                // 2 sources
 
-                var7_7 = (Buffer)v3.join();
-                v5 = VertxUtil.hardCodedSleep((long)var0.waitTime);
-                if (!v5.isDone()) {
-                    var14_19 = v5;
-                    return var14_19.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_19, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, null, null, null, null, null, (int)5));
-                }
-                ** GOTO lbl59
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 5: {
-                v5 = var5_5;
-                v6 = var6_6 /* !! */ ;
-                v7 = var7_7;
-                var7_7 = var8_8 /* !! */ ;
-                var6_6 /* !! */  = v7;
-                var5_5 = v6;
-lbl59:
-                // 2 sources
 
-                v5.join();
-                v8 = var0.execute("Sensor 2/4", DesktopPX.okayStatusFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, bundleReq(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var7_7);
-                if (!v8.isDone()) {
-                    var14_20 = v8;
-                    return var14_20.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_20, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, null, null, null, null, null, (int)6));
-                }
-                ** GOTO lbl73
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 6: {
-                v8 = var5_5;
-                v9 = var6_6 /* !! */ ;
-                v10 = var7_7;
-                var7_7 = var8_8 /* !! */ ;
-                var6_6 /* !! */  = v10;
-                var5_5 = v9;
-lbl73:
-                // 2 sources
 
-                var8_8 /* !! */  = (String)v8.join();
-                v11 = var0.execute("API 3", var0.okayAndConversionFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$solveCaptcha$7(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var0.buildReqBody((String)var6_6 /* !! */ , var0.performance));
-                if (!v11.isDone()) {
-                    var14_21 = v11;
-                    return var14_21.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_21, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, (String)var8_8 /* !! */ , null, null, null, null, (int)7));
-                }
-                ** GOTO lbl88
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 7: {
-                v11 = var5_5;
-                v12 = var6_6 /* !! */ ;
-                v13 = var7_7;
-                v14 = var8_8 /* !! */ ;
-                var8_8 /* !! */  = var9_9;
-                var7_7 = v14;
-                var6_6 /* !! */  = v13;
-                var5_5 = v12;
-lbl88:
-                // 2 sources
-
-                var9_9 = (Buffer)v11.join();
-                v15 = VertxUtil.hardCodedSleep((long)var0.waitTime);
-                if (!v15.isDone()) {
-                    var14_22 = v15;
-                    return var14_22.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_22, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, (String)var8_8 /* !! */ , (Buffer)var9_9, null, null, null, (int)8));
-                }
-                ** GOTO lbl105
+            break;
+         case 2:
+            var16 = var6;
+            var5.join();
+            var10000 = var0.execute("Sensor 1/4", okayStatusFunc, var0::bundleReq, var6);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 8: {
-                v15 = var5_5;
-                v16 = var6_6 /* !! */ ;
-                v17 = var7_7;
-                v18 = var8_8 /* !! */ ;
-                v19 = var9_9;
-                var9_9 = var10_10 /* !! */ ;
-                var8_8 /* !! */  = v19;
-                var7_7 = v18;
-                var6_6 /* !! */  = v17;
-                var5_5 = v16;
-lbl105:
-                // 2 sources
 
-                v15.join();
-                v20 = var0.execute("Sensor 3/4", DesktopPX.okayStatusFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$solveCaptcha$8(io.vertx.core.buffer.Buffer ), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0, (Buffer)var9_9), null);
-                if (!v20.isDone()) {
-                    var14_23 = v20;
-                    return var14_23.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_23, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, (String)var8_8 /* !! */ , (Buffer)var9_9, null, null, null, (int)9));
-                }
-                ** GOTO lbl123
+            var17 = (String)var10000.join();
+            var10000 = var0.execute("API 2", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$6, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 9: {
-                v20 = var5_5;
-                v21 = var6_6 /* !! */ ;
-                v22 = var7_7;
-                v23 = var8_8 /* !! */ ;
-                v24 = var9_9;
-                var9_9 = var10_10 /* !! */ ;
-                var8_8 /* !! */  = v24;
-                var7_7 = v23;
-                var6_6 /* !! */  = v22;
-                var5_5 = v21;
-lbl123:
-                // 2 sources
 
-                var10_10 /* !! */  = (String)v20.join();
-                v25 = var0.execute("API 4", var0.okayAndConversionFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$solveCaptcha$9(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var0.buildReqBody((String)var6_6 /* !! */ , var0.performance));
-                if (!v25.isDone()) {
-                    var14_24 = v25;
-                    return var14_24.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_24, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, (String)var8_8 /* !! */ , (Buffer)var9_9, (String)var10_10 /* !! */ , null, null, (int)10));
-                }
-                ** GOTO lbl142
+            var18 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 10: {
-                v25 = var5_5;
-                v26 = var6_6 /* !! */ ;
-                v27 = var7_7;
-                v28 = var8_8 /* !! */ ;
-                v29 = var9_9;
-                v30 = var10_10 /* !! */ ;
-                var10_10 /* !! */  = var11_11;
-                var9_9 = v30;
-                var8_8 /* !! */  = v29;
-                var7_7 = v28;
-                var6_6 /* !! */  = v27;
-                var5_5 = v26;
-lbl142:
-                // 2 sources
 
-                var11_11 = (Buffer)v25.join();
-                v31 = VertxUtil.hardCodedSleep((long)var0.waitTime);
-                if (!v31.isDone()) {
-                    var14_25 = v31;
-                    return var14_25.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_25, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, (String)var8_8 /* !! */ , (Buffer)var9_9, (String)var10_10 /* !! */ , (Buffer)var11_11, null, (int)11));
-                }
-                ** GOTO lbl163
+            var10000.join();
+            var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var18);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 11: {
-                v31 = var5_5;
-                v32 = var6_6 /* !! */ ;
-                v33 = var7_7;
-                v34 = var8_8 /* !! */ ;
-                v35 = var9_9;
-                v36 = var10_10 /* !! */ ;
-                v37 = var11_11;
-                var11_11 = var12_12;
-                var10_10 /* !! */  = v37;
-                var9_9 = v36;
-                var8_8 /* !! */  = v35;
-                var7_7 = v34;
-                var6_6 /* !! */  = v33;
-                var5_5 = v32;
-lbl163:
-                // 2 sources
 
-                v31.join();
-                v38 = var0.execute("Sensor 4/4", DesktopPX.okayStatusFunc, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, bundleReq(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), var11_11);
-                if (!v38.isDone()) {
-                    var14_26 = v38;
-                    return var14_26.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_26, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, (String)var8_8 /* !! */ , (Buffer)var9_9, (String)var10_10 /* !! */ , (Buffer)var11_11, null, (int)12));
-                }
-                ** GOTO lbl185
+            var19 = (String)var10000.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 12: {
-                v38 = var5_5;
-                v39 = var6_6 /* !! */ ;
-                v40 = var7_7;
-                v41 = var8_8 /* !! */ ;
-                v42 = var9_9;
-                v43 = var10_10 /* !! */ ;
-                v44 = var11_11;
-                var11_11 = var12_12;
-                var10_10 /* !! */  = v44;
-                var9_9 = v43;
-                var8_8 /* !! */  = v42;
-                var7_7 = v41;
-                var6_6 /* !! */  = v40;
-                var5_5 = v39;
-lbl185:
-                // 2 sources
 
-                if ((var12_12 = (String)v38.join()).contains("cv|0")) {
-                    var0.logger.info("Successfully solved captcha");
-                    var13_13 = MultiMap.caseInsensitiveMultiMap();
-                    if (var0.getVid() != null && !var0.getVid().isBlank()) {
-                        var13_13.add(DesktopPX.VID_COOKIE, (CharSequence)var0.getVid());
-                    }
-                    var13_13.add(DesktopPX.RF_VALUE, DesktopPX.ONE_VALUE);
-                    var13_13.add(DesktopPX.FP_VALUE, DesktopPX.ONE_VALUE);
-                    var13_13.add(DesktopPX.CFP_VALUE, DesktopPX.ONE_VALUE);
-                    var0.parseResultCookies((String)var12_12, (MultiMap)var13_13);
-                    return CompletableFuture.completedFuture(var13_13);
-                }
-                var0.logger.error("Retrying captcha solve...");
-                var0.sid = null;
-                v45 = VertxUtil.randomSleep((long)1000L);
-                if (!v45.isDone()) {
-                    var14_27 = v45;
-                    return var14_27.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.lang.String java.lang.String java.lang.String int java.util.concurrent.CompletableFuture io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String io.vertx.core.buffer.Buffer java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (CompletableFuture)var14_27, (Buffer)var5_5, (String)var6_6 /* !! */ , (Buffer)var7_7, (String)var8_8 /* !! */ , (Buffer)var9_9, (String)var10_10 /* !! */ , (Buffer)var11_11, (String)var12_12, (int)13));
-                }
-                ** GOTO lbl223
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 13: {
-                v45 = var5_5;
-                v46 = var6_6 /* !! */ ;
-                v47 = var7_7;
-                v48 = var8_8 /* !! */ ;
-                v49 = var9_9;
-                v50 = var10_10 /* !! */ ;
-                v51 = var11_11;
-                v52 = var12_12;
-                var12_12 = var13_13;
-                var11_11 = v52;
-                var10_10 /* !! */  = v51;
-                var9_9 = v50;
-                var8_8 /* !! */  = v49;
-                var7_7 = v48;
-                var6_6 /* !! */  = v47;
-                var5_5 = v46;
-lbl223:
-                // 2 sources
 
-                v45.join();
-                ++var4_4;
-                ** continue;
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public HttpRequest lambda$solveCaptcha$9() {
-        return this.apiRequest("3", true);
-    }
-
-    public String getDeviceSecUA() {
-        if (this.secUA != null) return this.secUA;
-        return DEFAULT_SEC_UA.toString();
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$initialise(DesktopPX var0, CompletableFuture var1_1, int var2_2, Object var3_3) {
-        switch (var2_2) {
-            case 0: {
-                v0 = var0.execute("Initiating...", var0.setupDevice, (Supplier<HttpRequest>)LambdaMetafactory.metafactory(null, null, null, ()Ljava/lang/Object;, lambda$initialise$10(), ()Lio/vertx/ext/web/client/HttpRequest;)((DesktopPX)var0), null);
-                if (!v0.isDone()) {
-                    var1_1 = v0;
-                    return var1_1.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$initialise(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPX java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPX)var0, (CompletableFuture)var1_1, (int)1));
-                }
-                ** GOTO lbl10
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-            case 1: {
-                v0 = var1_1;
-lbl10:
-                // 2 sources
 
-                v0.join();
-                return CompletableFuture.completedFuture(true);
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
             }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public String getDeviceAcceptEncoding() {
-        return "gzip, deflate, br";
-    }
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 3:
+            var16 = var6;
+            var17 = (String)var5.join();
+            var10000 = var0.execute("API 2", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$6, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public HttpRequest lambda$solveCaptcha$6() {
-        return this.apiRequest("2", true);
-    }
+            var18 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public String getDeviceLang() {
-        return "en-US,en;q=0.9";
-    }
+            var10000.join();
+            var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var18);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public boolean isBool(JsonObject jsonObject) {
-        Object object = jsonObject.getValue("error", null);
-        if (object == null) return false;
-        return object instanceof Boolean;
-    }
+            var19 = (String)var10000.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public CompletableFuture initialise() {
-        CompletableFuture completableFuture = this.execute("Initiating...", this.setupDevice, this::lambda$initialise$10, null);
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPX.async$initialise(this, completableFuture2, 1, arg_0));
-        }
-        completableFuture.join();
-        return CompletableFuture.completedFuture(true);
-    }
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public String getDeviceUA() {
-        if (this.userAgent != null) return this.userAgent;
-        return DEFAULT_UA.toString();
-    }
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public HttpRequest apiRequest(String string, Boolean bl) {
-        HttpRequest httpRequest = VertxSingleton.INSTANCE.getLocalClient().getClient().postAbs("https://trickle-px-oygn7nn37q-uc.a.run.app/gen/" + string + ".json").as(BodyCodec.buffer()).addQueryParam("mobile", "false");
-        if (bl == null) return httpRequest;
-        httpRequest.addQueryParam("captcha", bl != false ? "hold" : "recaptcha");
-        return httpRequest;
-    }
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    static {
-        DEFAULT_UA = AsciiString.cached((String)"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.45 Safari/537.36");
-        DEFAULT_SEC_UA = AsciiString.cached((String)"\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"96\", \"Google Chrome\";v=\"96\"");
-        VID_COOKIE = AsciiString.cached((String)"_pxvid");
-        RF_VALUE = AsciiString.cached((String)"_pxff_rf");
-        FP_VALUE = AsciiString.cached((String)"_pxff_fp");
-        ONE_VALUE = AsciiString.cached((String)"1");
-        CFP_VALUE = AsciiString.cached((String)"_pxff_cfp");
-        CTS_VALUE = AsciiString.cached((String)"pxcts");
-        PXHD_VALUE = AsciiString.cached((String)"_pxhd");
-        PX3_VALUE = AsciiString.cached((String)"_px3");
-        PXDE_VALUE = AsciiString.cached((String)"_pxde");
-        site = Site.WALMART;
-        okayStatusFunc = DesktopPX::lambda$static$0;
-    }
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public HttpRequest lambda$solve$3() {
-        return this.apiRequest("1", null);
-    }
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 4:
+            var17 = var7;
+            var16 = var6;
+            var18 = (Buffer)var5.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public HttpRequest lambda$solveCaptcha$5() {
-        return this.apiRequest("1", true);
-    }
+            var10000.join();
+            var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var18);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
 
-    public void reset() {
-        this.cookieSession = new JsonObject();
-        this.userAgent = null;
-        this.deviceNumber = "undefined";
-    }
+            var19 = (String)var10000.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 5:
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            var5.join();
+            var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var8);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var19 = (String)var10000.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 6:
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            var19 = (String)var5.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 7:
+            var19 = var9;
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            var20 = (Buffer)var5.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 8:
+            var20 = var10;
+            var19 = var9;
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            var5.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 9:
+            var20 = var10;
+            var19 = var9;
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            var21 = (String)var5.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var7, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 10:
+            var21 = var11;
+            var20 = var10;
+            var19 = var9;
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            var22 = (Buffer)var5.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 11:
+            var22 = var12;
+            var21 = var11;
+            var20 = var10;
+            var19 = var9;
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            var5.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var12);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         case 12:
+            var10000 = var5;
+            var22 = var12;
+            var21 = var11;
+            var20 = var10;
+            var19 = var9;
+            var18 = var8;
+            var17 = var7;
+            var16 = var6;
+            break;
+         case 13:
+            var5.join();
+            ++var4;
+            if (var4 > ThreadLocalRandom.current().nextInt(1, 4)) {
+               var0.delegate.getCookies().removeAnyMatch("_pxhd");
+               return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+            }
+
+            var0.performance = null;
+            var10000 = var0.execute("API 1", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$5, var0.buildReqBody((String)null, (JsonArray)null));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var16 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 1/4", okayStatusFunc, var0::bundleReq, var16);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var17 = (String)var10000.join();
+            var10000 = var0.execute("API 2", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$6, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var18 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var18);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var19 = (String)var10000.join();
+            var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var20 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var21 = (String)var10000.join();
+            var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var17, var0.performance));
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var22 = (Buffer)var10000.join();
+            var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+
+            var10000.join();
+            var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+            if (!var10000.isDone()) {
+               var25 = var10000;
+               return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+            }
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      do {
+         String var23 = (String)var10000.join();
+         if (var23.contains("cv|0")) {
+            var0.logger.info("Successfully solved captcha");
+            MultiMap var24 = MultiMap.caseInsensitiveMultiMap();
+            if (var0.getVid() != null && !var0.getVid().isBlank()) {
+               var24.add(VID_COOKIE, var0.getVid());
+            }
+
+            var24.add(RF_VALUE, ONE_VALUE);
+            var24.add(FP_VALUE, ONE_VALUE);
+            var24.add(CFP_VALUE, ONE_VALUE);
+            var0.parseResultCookies(var23, var24);
+            return CompletableFuture.completedFuture(var24);
+         }
+
+         var0.logger.error("Retrying captcha solve...");
+         var0.sid = null;
+         var10000 = VertxUtil.randomSleep(1000L);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         ++var4;
+         if (var4 > ThreadLocalRandom.current().nextInt(1, 4)) {
+            var0.delegate.getCookies().removeAnyMatch("_pxhd");
+            return CompletableFuture.completedFuture(MultiMap.caseInsensitiveMultiMap());
+         }
+
+         var0.performance = null;
+         var10000 = var0.execute("API 1", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$5, var0.buildReqBody((String)null, (JsonArray)null));
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var16 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = var0.execute("Sensor 1/4", okayStatusFunc, var0::bundleReq, var16);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var17 = (String)var10000.join();
+         var10000 = var0.execute("API 2", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$6, var0.buildReqBody(var17, var0.performance));
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var18 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = var0.execute("Sensor 2/4", okayStatusFunc, var0::bundleReq, var18);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var19 = (String)var10000.join();
+         var10000 = var0.execute("API 3", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$7, var0.buildReqBody(var17, var0.performance));
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var20 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = var0.execute("Sensor 3/4", okayStatusFunc, var0::lambda$solveCaptcha$8, (Object)null);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var21 = (String)var10000.join();
+         var10000 = var0.execute("API 4", var0.okayAndConversionFunc, var0::lambda$solveCaptcha$9, var0.buildReqBody(var17, var0.performance));
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var22 = (Buffer)var10000.join();
+         var10000 = VertxUtil.hardCodedSleep(var0.waitTime);
+         if (!var10000.isDone()) {
+            var25 = var10000;
+            return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+         }
+
+         var10000.join();
+         var10000 = var0.execute("Sensor 4/4", okayStatusFunc, var0::bundleReq, var22);
+      } while(var10000.isDone());
+
+      var25 = var10000;
+      return var25.exceptionally(Function.identity()).thenCompose(DesktopPX::async$solveCaptcha);
+   }
+
+   public HttpRequest lambda$solveCaptcha$9() {
+      return this.apiRequest("3", true);
+   }
+
+   public String getDeviceSecUA() {
+      return this.secUA == null ? DEFAULT_SEC_UA.toString() : this.secUA;
+   }
+
+   public static CompletableFuture async$initialise(DesktopPX var0, CompletableFuture var1, int var2, Object var3) {
+      CompletableFuture var10000;
+      switch (var2) {
+         case 0:
+            var10000 = var0.execute("Initiating...", var0.setupDevice, var0::lambda$initialise$10, (Object)null);
+            if (!var10000.isDone()) {
+               var1 = var10000;
+               return var1.exceptionally(Function.identity()).thenCompose(DesktopPX::async$initialise);
+            }
+            break;
+         case 1:
+            var10000 = var1;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      var10000.join();
+      return CompletableFuture.completedFuture(true);
+   }
+
+   public String getDeviceAcceptEncoding() {
+      return "gzip, deflate, br";
+   }
+
+   public HttpRequest lambda$solveCaptcha$6() {
+      return this.apiRequest("2", true);
+   }
+
+   public String getDeviceLang() {
+      return "en-US,en;q=0.9";
+   }
+
+   public boolean isBool(JsonObject var1) {
+      Object var2 = var1.getValue("error", (Object)null);
+      return var2 != null ? var2 instanceof Boolean : false;
+   }
+
+   public CompletableFuture initialise() {
+      CompletableFuture var10000 = this.execute("Initiating...", this.setupDevice, this::lambda$initialise$10, (Object)null);
+      if (!var10000.isDone()) {
+         CompletableFuture var1 = var10000;
+         return var1.exceptionally(Function.identity()).thenCompose(DesktopPX::async$initialise);
+      } else {
+         var10000.join();
+         return CompletableFuture.completedFuture(true);
+      }
+   }
+
+   public String getDeviceUA() {
+      return this.userAgent == null ? DEFAULT_UA.toString() : this.userAgent;
+   }
+
+   public HttpRequest apiRequest(String var1, Boolean var2) {
+      HttpRequest var3 = VertxSingleton.INSTANCE.getLocalClient().getClient().postAbs("https://trickle-px-oygn7nn37q-uc.a.run.app/gen/" + var1 + ".json").as(BodyCodec.buffer()).addQueryParam("mobile", "false");
+      if (var2 != null) {
+         var3.addQueryParam("captcha", var2 ? "hold" : "recaptcha");
+      }
+
+      return var3;
+   }
+
+   static {
+      site = Site.WALMART;
+      okayStatusFunc = DesktopPX::lambda$static$0;
+   }
+
+   public HttpRequest lambda$solve$3() {
+      return this.apiRequest("1", (Boolean)null);
+   }
+
+   public HttpRequest lambda$solveCaptcha$5() {
+      return this.apiRequest("1", true);
+   }
+
+   public void reset() {
+      this.cookieSession = new JsonObject();
+      this.userAgent = null;
+      this.deviceNumber = "undefined";
+   }
 }

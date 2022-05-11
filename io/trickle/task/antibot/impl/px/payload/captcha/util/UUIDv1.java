@@ -1,85 +1,77 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.antibot.impl.px.payload.captcha.util.Ww
- */
 package io.trickle.task.antibot.impl.px.payload.captcha.util;
 
-import io.trickle.task.antibot.impl.px.payload.captcha.util.Ww;
 import java.time.Instant;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class UUIDv1 {
-    public static String[] gg = UUIDv1.fillHexStringArr256();
+   public static String[] gg = fillHexStringArr256();
 
-    public static String[] fillHexStringArr256() {
-        String[] stringArray = new String[256];
-        int n = 0;
-        while (n < stringArray.length) {
-            stringArray[n] = Integer.toHexString(n);
-            ++n;
-        }
-        return stringArray;
-    }
+   public static String[] fillHexStringArr256() {
+      String[] var0 = new String[256];
 
-    public static String genUUIDv1() {
-        int[] nArray;
-        long l;
-        long l2 = 0L;
-        String string = "";
-        int[] nArray2 = UUIDv1.fillArrRandInt256(new int[16]);
-        int n = 0;
-        int[] nArray3 = new int[16];
-        int[] nArray4 = new int[]{};
-        int n2 = 0x3FFF & (Ww.leftBitwise((long)nArray2[6], (long)8L) | nArray2[7]);
-        long l3 = Instant.now().toEpochMilli();
-        long l4 = l3 - 0L + ((l = 1L) - 0L) / 10000L;
-        if (l4 < 0L || l3 > l2) {
-            l = 0L;
-        }
-        if ((double)l >= Double.longBitsToDouble(4666723172467343360L)) {
-            throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
-        }
-        l2 = l3;
-        long l5 = l;
-        long l6 = n2;
-        long l7 = (10000L * (0xFFFFFFFL & (l3 += 12219292800000L)) + l) % 0x100000000L;
-        nArray3[n++] = Ww.rightTripleBitwise((long)l7, (long)24L) & 0xFF;
-        nArray3[n++] = Ww.rightTripleBitwise((long)l7, (long)16L) & 0xFF;
-        nArray3[n++] = Ww.rightTripleBitwise((long)l7, (long)8L) & 0xFF;
-        nArray3[n++] = (int)(0xFFL & l7);
-        int n3 = (int)((double)l3 / Double.longBitsToDouble(4751297606875873280L) * Double.longBitsToDouble(4666723172467343360L)) & 0xFFFFFFF;
-        nArray3[n++] = Ww.rightTripleBitwise((long)n3, (long)8L) & 0xFF;
-        nArray3[n++] = 0xFF & n3;
-        nArray3[n++] = Ww.rightTripleBitwise((long)n3, (long)24L) & 0xF | 0x10;
-        nArray3[n++] = Ww.rightTripleBitwise((long)n3, (long)16L) & 0xFF;
-        nArray3[n++] = Ww.rightTripleBitwise((long)n2, (long)8L) | 0x80;
-        nArray3[n++] = 0xFF & n2;
-        int[] nArray5 = nArray = new int[]{1 | nArray2[0], nArray2[1], nArray2[2], nArray2[3], nArray2[4], nArray2[5]};
-        int n4 = 0;
-        while (true) {
-            if (n4 >= 6) {
-                String string2 = UUIDv1.Cn(nArray3, 0);
-                return string2;
-            }
-            nArray3[n + n4] = nArray5[n4];
-            ++n4;
-        }
-    }
+      for(int var1 = 0; var1 < var0.length; ++var1) {
+         var0[var1] = Integer.toHexString(var1);
+      }
 
-    public static String Cn(int[] nArray, int n) {
-        int n2 = 0;
-        String[] stringArray = gg;
-        return stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + "-" + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]] + stringArray[nArray[n2++]];
-    }
+      return var0;
+   }
 
-    public static int[] fillArrRandInt256(int[] nArray) {
-        int n = 0;
-        while (n < nArray.length) {
-            nArray[n] = ThreadLocalRandom.current().nextInt(256);
-            ++n;
-        }
-        return nArray;
-    }
+   public static String genUUIDv1() {
+      long var0 = 0L;
+      String var2 = "";
+      int[] var3 = fillArrRandInt256(new int[16]);
+      int var4 = 0;
+      int[] var5 = new int[16];
+      int[] var6 = new int[0];
+      int var7 = 16383 & (Ww.leftBitwise((long)var3[6], 8L) | var3[7]);
+      long var8 = Instant.now().toEpochMilli();
+      long var10 = 1L;
+      long var12 = var8 - 0L + (var10 - 0L) / 10000L;
+      if (var12 < 0L || var8 > var0) {
+         var10 = 0L;
+      }
+
+      if ((double)var10 >= Double.longBitsToDouble(4666723172467343360L)) {
+         throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
+      } else {
+         long var16 = (long)var7;
+         var8 += 12219292800000L;
+         long var18 = (10000L * (268435455L & var8) + var10) % 4294967296L;
+         var5[var4++] = Ww.rightTripleBitwise(var18, 24L) & 255;
+         var5[var4++] = Ww.rightTripleBitwise(var18, 16L) & 255;
+         var5[var4++] = Ww.rightTripleBitwise(var18, 8L) & 255;
+         var5[var4++] = (int)(255L & var18);
+         int var20 = (int)((double)var8 / Double.longBitsToDouble(4751297606875873280L) * Double.longBitsToDouble(4666723172467343360L)) & 268435455;
+         var5[var4++] = Ww.rightTripleBitwise((long)var20, 8L) & 255;
+         var5[var4++] = 255 & var20;
+         var5[var4++] = Ww.rightTripleBitwise((long)var20, 24L) & 15 | 16;
+         var5[var4++] = Ww.rightTripleBitwise((long)var20, 16L) & 255;
+         var5[var4++] = Ww.rightTripleBitwise((long)var7, 8L) | 128;
+         var5[var4++] = 255 & var7;
+         int[] var21 = new int[]{1 | var3[0], var3[1], var3[2], var3[3], var3[4], var3[5]};
+         int[] var22 = var21;
+
+         for(int var23 = 0; var23 < 6; ++var23) {
+            var5[var4 + var23] = var22[var23];
+         }
+
+         String var24 = Cn(var5, 0);
+         return var24;
+      }
+   }
+
+   public static String Cn(int[] var0, int var1) {
+      int var2 = 0;
+      String[] var3 = gg;
+      String var10000 = var3[var0[var2++]];
+      return var10000 + var3[var0[var2++]] + var3[var0[var2++]] + var3[var0[var2++]] + "-" + var3[var0[var2++]] + var3[var0[var2++]] + "-" + var3[var0[var2++]] + var3[var0[var2++]] + "-" + var3[var0[var2++]] + var3[var0[var2++]] + "-" + var3[var0[var2++]] + var3[var0[var2++]] + var3[var0[var2++]] + var3[var0[var2++]] + var3[var0[var2++]] + var3[var0[var2++]];
+   }
+
+   public static int[] fillArrRandInt256(int[] var0) {
+      for(int var1 = 0; var1 < var0.length; ++var1) {
+         var0[var1] = ThreadLocalRandom.current().nextInt(256);
+      }
+
+      return var0;
+   }
 }

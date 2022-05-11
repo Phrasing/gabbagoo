@@ -1,25 +1,17 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.sites.yeezy.util.CodeScreen
- */
 package io.trickle.task.sites.yeezy.util;
 
-import io.trickle.task.sites.yeezy.util.CodeScreen;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class CodeScreen$1
-extends WindowAdapter {
-    public CodeScreen val$newContentPane;
+public class CodeScreen$1 extends WindowAdapter {
+   public CodeScreen val$newContentPane;
 
-    public CodeScreen$1(CodeScreen codeScreen) {
-        this.val$newContentPane = codeScreen;
-    }
+   public CodeScreen$1(CodeScreen var1) {
+      this.val$newContentPane = var1;
+      super();
+   }
 
-    @Override
-    public void windowActivated(WindowEvent windowEvent) {
-        this.val$newContentPane.resetFocus();
-    }
+   public void windowActivated(WindowEvent var1) {
+      this.val$newContentPane.resetFocus();
+   }
 }

@@ -1,18 +1,9 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  c
- */
-/*
- * Illegal identifiers - consider using --renameillegalidents true
- */
 public final class 1 {
-    public static String 0(String string, int n) {
-        return c.0((String)string, (int)(n + 1));
-    }
+   public static String _/* $FF was: 0*/(String var0, int var1) {
+      return c.0(var0, var1 + 1);
+   }
 
-    public static String 2(String string) {
-        return c.0((String)string, (int)3);
-    }
+   public static String _/* $FF was: 2*/(String var0) {
+      return c.0(var0, 3);
+   }
 }

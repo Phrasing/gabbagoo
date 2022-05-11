@@ -1,95 +1,19 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.sites.Site
- *  io.trickle.task.sites.shopify.util.PriceHandler$1
- */
 package io.trickle.task.sites.shopify.util;
 
 import io.trickle.task.sites.Site;
-import io.trickle.task.sites.shopify.util.PriceHandler;
 
 public class PriceHandler {
-    public static int calculateTax(Site site, int n) {
-        switch (1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
-            case 1: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 2: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 3: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 4: {
-                return (int)((double)(n * 6) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 5: {
-                return (int)((double)(n * 6) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 6: {
-                return (int)((double)(n * 6) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 7: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 8: {
-                return (int)((double)(n * 6) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 9: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 10: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 11: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 12: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 13: {
-                return (int)((double)(n * 6) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 14: {
-                return (int)((double)(n * 6) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 15: {
-                return (int)((double)(n * 6) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 16: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 17: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 18: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 19: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 20: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 21: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-            case 22: {
-                return (int)((double)(n * 0) * Double.longBitsToDouble(4576918229304087675L));
-            }
-        }
-        throw new Exception("Tax unable to be calculated");
-    }
+   public static int calculateTax(Site var0, int var1) {
+      // $FF: Couldn't be decompiled
+   }
 
-    public static boolean isCalculatingTaxes(String string) {
-        boolean bl = false;
-        return string.contains("hidden\" data-checkout-taxes>");
-    }
+   public static boolean isCalculatingTaxes(String var0) {
+      boolean var1 = false;
+      return var0.contains("hidden\" data-checkout-taxes>");
+   }
 
-    public static int calculateShippingPrice(String string) {
-        String[] stringArray = string.split("-");
-        return Integer.parseInt(stringArray[stringArray.length - 1].replace(".", ""));
-    }
+   public static int calculateShippingPrice(String var0) {
+      String[] var1 = var0.split("-");
+      return Integer.parseInt(var1[var1.length - 1].replace(".", ""));
+   }
 }

@@ -1,45 +1,38 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.profile;
 
 public enum PaymentMethod {
-    VISA("VISA"),
-    AMEX("AMEX"),
-    DISCOVER("DISCOVER"),
-    MASTERCARD("MASTERCARD");
+   public static PaymentMethod[] $VALUES = new PaymentMethod[]{VISA, AMEX, DISCOVER, MASTERCARD};
+   DISCOVER("DISCOVER");
 
-    public String method;
+   public String method;
+   MASTERCARD("MASTERCARD"),
+   AMEX("AMEX"),
+   VISA("VISA");
 
-    /*
-     * WARNING - Possible parameter corruption
-     * WARNING - void declaration
-     */
-    public PaymentMethod() {
-        void var3_1;
-        this.method = var3_1;
-    }
+   public PaymentMethod(String var3) {
+      this.method = var3;
+   }
 
-    public String getFirstLetterUppercase() {
-        return this.method.charAt(0) + this.method.substring(1).toLowerCase();
-    }
+   public String getFirstLetterUppercase() {
+      char var10000 = this.method.charAt(0);
+      return "" + var10000 + this.method.substring(1).toLowerCase();
+   }
 
-    public static PaymentMethod detectMethod(String string) {
-        switch (string.charAt(0)) {
-            case '3': {
-                return AMEX;
-            }
-            case '4': {
-                return VISA;
-            }
-            case '6': {
-                return DISCOVER;
-            }
-        }
-        return MASTERCARD;
-    }
+   public static PaymentMethod detectMethod(String var0) {
+      switch (var0.charAt(0)) {
+         case '3':
+            return AMEX;
+         case '4':
+            return VISA;
+         case '5':
+         default:
+            return MASTERCARD;
+         case '6':
+            return DISCOVER;
+      }
+   }
 
-    public String get() {
-        return this.method;
-    }
+   public String get() {
+      return this.method;
+   }
 }

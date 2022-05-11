@@ -1,18 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.Controller
- *  io.trickle.core.actor.TaskActor
- *  io.trickle.task.antibot.AntiBotService
- *  io.trickle.util.concurrent.ContextCompletableFuture
- *  io.trickle.webclient.ClientType
- *  io.trickle.webclient.RealClient
- *  io.trickle.webclient.RealClientFactory
- *  io.vertx.core.AbstractVerticle
- *  io.vertx.core.Vertx
- *  org.apache.logging.log4j.Logger
- */
 package io.trickle.task.antibot.impl;
 
 import io.trickle.core.Controller;
@@ -27,63 +12,61 @@ import io.vertx.core.Vertx;
 import java.util.concurrent.CompletableFuture;
 import org.apache.logging.log4j.Logger;
 
-public abstract class AntiBotServiceBase
-extends AbstractVerticle
-implements AntiBotService {
-    public T value;
-    public RealClient client;
-    public Logger logger;
-    public CompletableFuture<Boolean> initFuture;
+public abstract class AntiBotServiceBase extends AbstractVerticle implements AntiBotService {
+   public Object value;
+   public RealClient client;
+   public Logger logger;
+   public CompletableFuture initFuture;
 
-    public Object getValue() {
-        return this.value;
-    }
+   public Object getValue() {
+      return this.value;
+   }
 
-    public void restartClient(RealClient realClient) {
-        try {
-            RealClient realClient2 = RealClientFactory.fromOther((Vertx)Vertx.currentContext().owner(), (RealClient)realClient, (ClientType)this.client.type());
-            this.client.close();
-            this.client = realClient2;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
+   public void restartClient(RealClient var1) {
+      try {
+         RealClient var2 = RealClientFactory.fromOther(Vertx.currentContext().owner(), var1, this.client.type());
+         this.client.close();
+         this.client = var2;
+      } catch (Throwable var3) {
+      }
 
-    public void lambda$start$0(Boolean bl, Throwable throwable) {
-        if (bl == null) return;
-        this.initFuture.complete(bl);
-    }
+   }
 
-    public AntiBotServiceBase(TaskActor taskActor) {
-        this.logger = taskActor.getLogger();
-        this.client = taskActor.getClient().getWebClient();
-        this.initFuture = new ContextCompletableFuture();
-    }
+   public void lambda$start$0(Boolean var1, Throwable var2) {
+      if (var1 != null) {
+         this.initFuture.complete(var1);
+      }
 
-    public void start() {
-        super.start();
-        this.initialize().whenComplete(this::lambda$start$0);
-    }
+   }
 
-    public void stop() {
-        try {
-            super.stop();
-        }
-        catch (Exception exception) {
-            // empty catch block
-        }
-    }
+   public AntiBotServiceBase(TaskActor var1) {
+      this.logger = var1.getLogger();
+      this.client = var1.getClient().getWebClient();
+      this.initFuture = new ContextCompletableFuture();
+   }
 
-    public AntiBotServiceBase(TaskActor taskActor, ClientType clientType) {
-        this.logger = taskActor.getLogger();
-        this.client = RealClientFactory.fromOther((Vertx)taskActor.getVertx(), (RealClient)taskActor.getClient().getWebClient(), (ClientType)clientType);
-        this.initFuture = new ContextCompletableFuture();
-    }
+   public void start() {
+      super.start();
+      this.initialize().whenComplete(this::lambda$start$0);
+   }
 
-    public AntiBotServiceBase(TaskActor taskActor, ClientType clientType, Controller controller) {
-        this.logger = taskActor.getLogger();
-        this.client = RealClientFactory.buildProxied((Vertx)taskActor.getVertx(), (ClientType)clientType, (Controller)controller);
-        this.initFuture = new ContextCompletableFuture();
-    }
+   public void stop() {
+      try {
+         super.stop();
+      } catch (Exception var2) {
+      }
+
+   }
+
+   public AntiBotServiceBase(TaskActor var1, ClientType var2) {
+      this.logger = var1.getLogger();
+      this.client = RealClientFactory.fromOther(var1.getVertx(), var1.getClient().getWebClient(), var2);
+      this.initFuture = new ContextCompletableFuture();
+   }
+
+   public AntiBotServiceBase(TaskActor var1, ClientType var2, Controller var3) {
+      this.logger = var1.getLogger();
+      this.client = RealClientFactory.buildProxied(var1.getVertx(), var2, var3);
+      this.initFuture = new ContextCompletableFuture();
+   }
 }

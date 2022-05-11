@@ -1,31 +1,10 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.api.LoadableAsync
- *  io.trickle.core.api.Module
- *  io.trickle.proxy.Proxy
- *  io.trickle.proxy.RandomProxyProducer
- *  io.trickle.util.FileUtils
- *  io.trickle.util.Storage
- *  io.vertx.core.Future
- *  io.vertx.core.Handler
- *  io.vertx.core.Vertx
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.file.FileSystem
- *  org.apache.logging.log4j.LogManager
- *  org.apache.logging.log4j.Logger
- */
 package io.trickle.proxy;
 
 import io.trickle.core.api.LoadableAsync;
 import io.trickle.core.api.Module;
-import io.trickle.proxy.Proxy;
-import io.trickle.proxy.RandomProxyProducer;
 import io.trickle.util.FileUtils;
 import io.trickle.util.Storage;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
@@ -41,114 +20,117 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class ProxyController
-implements Module,
-LoadableAsync {
-    public AtomicInteger idxRand;
-    public String fileName;
-    public AtomicInteger idx = new AtomicInteger(0);
-    public Vertx vertx;
-    public static Logger logger = LogManager.getLogger(ProxyController.class);
-    public static int PROXY_COUNT = 0;
-    public String LOCK_IDENTITY;
-    public List<Proxy> proxiesRandomized;
-    public List<Proxy> proxies;
-    public boolean doCount;
+public class ProxyController implements Module, LoadableAsync {
+   public AtomicInteger idxRand = new AtomicInteger(0);
+   public String fileName;
+   public AtomicInteger idx = new AtomicInteger(0);
+   public Vertx vertx;
+   public static Logger logger = LogManager.getLogger(ProxyController.class);
+   public static int PROXY_COUNT = 0;
+   public String LOCK_IDENTITY;
+   public List proxiesRandomized = new ArrayList();
+   public List proxies = new ArrayList();
+   public boolean doCount;
 
-    public static int lambda$getProxyCyclic$3(int n, int n2) {
-        return ++n2 < n ? n2 : 0;
-    }
+   public static int lambda$getProxyCyclic$3(int var0, int var1) {
+      ++var1;
+      return var1 < var0 ? var1 : 0;
+   }
 
-    public ProxyController(Vertx vertx, String string) {
-        this.idxRand = new AtomicInteger(0);
-        this.proxies = new ArrayList<Proxy>();
-        this.proxiesRandomized = new ArrayList<Proxy>();
-        this.vertx = vertx;
-        this.fileName = string;
-        this.doCount = false;
-        this.LOCK_IDENTITY = UUID.randomUUID().toString();
-    }
+   public ProxyController(Vertx var1, String var2) {
+      this.vertx = var1;
+      this.fileName = var2;
+      this.doCount = false;
+      this.LOCK_IDENTITY = UUID.randomUUID().toString();
+   }
 
-    public Proxy getProxyRandomCyclic() {
-        int n = this.proxiesRandomized.size();
-        return n == 1 ? this.proxiesRandomized.get(0) : this.proxiesRandomized.get(this.idxRand.getAndUpdate(arg_0 -> ProxyController.lambda$getProxyRandomCyclic$2(n, arg_0)));
-    }
+   public Proxy getProxyRandomCyclic() {
+      int var1 = this.proxiesRandomized.size();
+      return var1 == 1 ? (Proxy)this.proxiesRandomized.get(0) : (Proxy)this.proxiesRandomized.get(this.idxRand.getAndUpdate(ProxyController::lambda$getProxyRandomCyclic$2));
+   }
 
-    public Future getProxy() {
-        RandomProxyProducer randomProxyProducer = new RandomProxyProducer(this.proxies);
-        this.vertx.sharedData().getLock(this.LOCK_IDENTITY, (Handler)randomProxyProducer);
-        return randomProxyProducer.getProduct();
-    }
+   public Future getProxy() {
+      RandomProxyProducer var1 = new RandomProxyProducer(this.proxies);
+      this.vertx.sharedData().getLock(this.LOCK_IDENTITY, var1);
+      return var1.getProduct();
+   }
 
-    public int loadedProxies() {
-        return this.proxies.size();
-    }
+   public int loadedProxies() {
+      return this.proxies.size();
+   }
 
-    public List parseFile(String string) {
-        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).map(ProxyController::lambda$parseFile$4).map(Proxy::fromArray).filter(Objects::nonNull).collect(Collectors.toList());
-    }
+   public List parseFile(String var1) {
+      return (List)Arrays.stream(var1.split("\n")).filter(Objects::nonNull).map(String::trim).map(ProxyController::lambda$parseFile$4).map(Proxy::fromArray).filter(Objects::nonNull).collect(Collectors.toList());
+   }
 
-    public Proxy getProxy(int n) {
-        if (!this.proxies.isEmpty()) int n2;
-        return (n2 = this.proxies.size()) == 1 ? this.proxies.get(0) : this.proxies.get(n % n2);
-        return null;
-    }
+   public Proxy getProxy(int var1) {
+      if (this.proxies.isEmpty()) {
+         return null;
+      } else {
+         int var2 = this.proxies.size();
+         return var2 == 1 ? (Proxy)this.proxies.get(0) : (Proxy)this.proxies.get(var1 % var2);
+      }
+   }
 
-    public static int lambda$getProxyRandomCyclic$2(int n, int n2) {
-        return ++n2 < n ? n2 : 0;
-    }
+   public static int lambda$getProxyRandomCyclic$2(int var0, int var1) {
+      ++var1;
+      return var1 < var0 ? var1 : 0;
+   }
 
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile(Storage.CONFIG_PATH + this.fileName).otherwise(arg_0 -> this.lambda$load$0(fileSystem, arg_0)).map(Buffer::toString).map(this::parseFile).map(this.proxies::addAll).compose(this::lambda$load$1);
-    }
+   public Future load() {
+      FileSystem var1 = this.vertx.fileSystem();
+      Future var10000 = var1.readFile(Storage.CONFIG_PATH + this.fileName).otherwise(this::lambda$load$0).map(Buffer::toString).map(this::parseFile);
+      List var10001 = this.proxies;
+      Objects.requireNonNull(var10001);
+      return var10000.map(var10001::addAll).compose(this::lambda$load$1);
+   }
 
-    public void initialise() {
-        logger.debug("Initialised.");
-    }
+   public void initialise() {
+      logger.debug("Initialised.");
+   }
 
-    public Buffer lambda$load$0(FileSystem fileSystem, Throwable throwable) {
-        logger.warn("Failed to find '{}'. Proceeding without...", (Object)this.fileName.replace("/", ""));
-        FileUtils.createAndWrite((FileSystem)fileSystem, (String)(Storage.CONFIG_PATH + this.fileName), (Buffer)Buffer.buffer());
-        return Buffer.buffer((String)"");
-    }
+   public Buffer lambda$load$0(FileSystem var1, Throwable var2) {
+      logger.warn("Failed to find '{}'. Proceeding without...", this.fileName.replace("/", ""));
+      FileUtils.createAndWrite(var1, Storage.CONFIG_PATH + this.fileName, Buffer.buffer());
+      return Buffer.buffer("");
+   }
 
-    public Optional getProxyPlain() {
-        int n = this.idx.get();
-        if (n < this.proxies.size()) return Optional.ofNullable(this.proxies.get(n));
-        return Optional.empty();
-    }
+   public Optional getProxyPlain() {
+      int var1 = this.idx.get();
+      return var1 >= this.proxies.size() ? Optional.empty() : Optional.ofNullable((Proxy)this.proxies.get(var1));
+   }
 
-    public static String[] lambda$parseFile$4(String string) {
-        return string.split(":");
-    }
+   public static String[] lambda$parseFile$4(String var0) {
+      return var0.split(":");
+   }
 
-    public void terminate() {
-        this.proxies.clear();
-    }
+   public void terminate() {
+      this.proxies.clear();
+   }
 
-    public Future lambda$load$1(Boolean bl) {
-        if (this.doCount) {
-            PROXY_COUNT = this.proxies.size();
-        }
-        this.proxiesRandomized.addAll(this.proxies);
-        Collections.shuffle(this.proxiesRandomized);
-        return Future.succeededFuture();
-    }
+   public Future lambda$load$1(Boolean var1) {
+      if (this.doCount) {
+         PROXY_COUNT = this.proxies.size();
+      }
 
-    public Proxy getProxyCyclic() {
-        if (!this.proxies.isEmpty()) int n;
-        return (n = this.proxies.size()) == 1 ? this.proxies.get(0) : this.proxies.get(this.idx.getAndUpdate(arg_0 -> ProxyController.lambda$getProxyCyclic$3(n, arg_0)));
-        return null;
-    }
+      this.proxiesRandomized.addAll(this.proxies);
+      Collections.shuffle(this.proxiesRandomized);
+      return Future.succeededFuture();
+   }
 
-    public ProxyController(Vertx vertx) {
-        this.idxRand = new AtomicInteger(0);
-        this.proxies = new ArrayList<Proxy>();
-        this.proxiesRandomized = new ArrayList<Proxy>();
-        this.vertx = vertx;
-        this.fileName = "/proxies.txt";
-        this.doCount = true;
-        this.LOCK_IDENTITY = UUID.randomUUID().toString();
-    }
+   public Proxy getProxyCyclic() {
+      if (this.proxies.isEmpty()) {
+         return null;
+      } else {
+         int var1 = this.proxies.size();
+         return var1 == 1 ? (Proxy)this.proxies.get(0) : (Proxy)this.proxies.get(this.idx.getAndUpdate(ProxyController::lambda$getProxyCyclic$3));
+      }
+   }
+
+   public ProxyController(Vertx var1) {
+      this.vertx = var1;
+      this.fileName = "/proxies.txt";
+      this.doCount = true;
+      this.LOCK_IDENTITY = UUID.randomUUID().toString();
+   }
 }

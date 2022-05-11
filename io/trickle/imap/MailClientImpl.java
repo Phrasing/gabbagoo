@@ -1,24 +1,5 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.imap.MailClient
- *  io.trickle.imap.MailClientImpl$1
- *  io.vertx.core.Context
- *  io.vertx.core.Future
- *  io.vertx.core.Promise
- *  io.vertx.core.Vertx
- *  javax.mail.Folder
- *  javax.mail.Message
- *  javax.mail.MessagingException
- *  javax.mail.Session
- *  javax.mail.Store
- *  javax.mail.search.SearchTerm
- */
 package io.trickle.imap;
 
-import io.trickle.imap.MailClient;
-import io.trickle.imap.MailClientImpl;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -28,6 +9,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import javax.mail.Authenticator;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -35,124 +17,130 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.search.SearchTerm;
 
-public class MailClientImpl
-implements MailClient {
-    public Session session;
-    public Date openTime;
-    public Vertx vertx;
-    public static Properties mailProperties = new Properties();
-    public Folder inbox;
-    public Store store;
+public class MailClientImpl implements MailClient {
+   public Session session;
+   public Date openTime;
+   public Vertx vertx;
+   public static Properties mailProperties = new Properties();
+   public Folder inbox;
+   public Store store;
 
-    public void _close() {
-        if (this.inbox != null && this.inbox.isOpen()) {
-            this.inbox.close();
-        }
-        if (this.store == null) return;
-        if (!this.store.isConnected()) return;
-        this.store.close();
-    }
+   public void _close() {
+      if (this.inbox != null && this.inbox.isOpen()) {
+         this.inbox.close();
+      }
 
-    static {
-        mailProperties.setProperty("mail.store.protocol", "imaps");
-    }
+      if (this.store != null && this.store.isConnected()) {
+         this.store.close();
+      }
 
-    public void close() {
-        Context context = this.vertx.getOrCreateContext();
-        context.executeBlocking(this::lambda$close$2);
-    }
+   }
 
-    public Future readInbox(SearchTerm searchTerm) {
-        Context context = this.vertx.getOrCreateContext();
-        return context.executeBlocking(arg_0 -> this.lambda$readInbox$0(searchTerm, arg_0));
-    }
+   static {
+      mailProperties.setProperty("mail.store.protocol", "imaps");
+   }
 
-    public SearchTerm getDefault() {
-        return new 1(this);
-    }
+   public void close() {
+      Context var1 = this.vertx.getOrCreateContext();
+      var1.executeBlocking(this::lambda$close$2);
+   }
 
-    public void lambda$readInbox$0(SearchTerm searchTerm, Promise promise) {
-        try {
-            Message[] messageArray = this._readInbox(searchTerm);
-            promise.tryComplete((Object)messageArray);
-        }
-        catch (MessagingException messagingException) {
-            promise.tryFail((Throwable)messagingException);
-        }
-    }
+   public Future readInbox(SearchTerm var1) {
+      Context var2 = this.vertx.getOrCreateContext();
+      return var2.executeBlocking(this::lambda$readInbox$0);
+   }
 
-    public Message[] _readInbox(SearchTerm searchTerm) {
-        return this.getInbox().search(Objects.requireNonNullElseGet(searchTerm, this::getDefault), this.getReversedMessages());
-    }
+   public SearchTerm getDefault() {
+      return new MailClientImpl$1(this);
+   }
 
-    public Folder getInbox() {
-        if (this.inbox == null) {
-            this.inbox = this.store.getFolder("Inbox");
-        }
-        if (this.inbox.isOpen()) return this.inbox;
-        this.inbox.open(1);
-        this.openTime = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L));
-        return this.inbox;
-    }
+   public void lambda$readInbox$0(SearchTerm var1, Promise var2) {
+      try {
+         Message[] var3 = this._readInbox(var1);
+         var2.tryComplete(var3);
+      } catch (MessagingException var4) {
+         var2.tryFail(var4);
+      }
 
-    public Future connect(String string, String string2) {
-        Objects.requireNonNull(string, "Email can not be null");
-        Objects.requireNonNull(string2, "Password can not be null");
-        Context context = this.vertx.getOrCreateContext();
-        return context.executeBlocking(arg_0 -> this.lambda$connect$1(string, string2, arg_0));
-    }
+   }
 
-    public void lambda$connect$1(String string, String string2, Promise promise) {
-        try {
-            this._connect(string, string2);
-            promise.tryComplete();
-        }
-        catch (MessagingException messagingException) {
-            promise.tryFail((Throwable)messagingException);
-        }
-    }
+   public Message[] _readInbox(SearchTerm var1) {
+      return this.getInbox().search((SearchTerm)Objects.requireNonNullElseGet(var1, this::getDefault), this.getReversedMessages());
+   }
 
-    public CompletableFuture connectFut(String string, String string2) {
-        return this.connect(string, string2).toCompletionStage().toCompletableFuture();
-    }
+   public Folder getInbox() {
+      if (this.inbox == null) {
+         this.inbox = this.store.getFolder("Inbox");
+      }
 
-    public Message[] getReversedMessages() {
-        int n = this.inbox.getMessageCount();
-        Message[] messageArray = n > 10 ? this.inbox.getMessages(this.inbox.getMessageCount() - 10, this.inbox.getMessageCount()) : this.inbox.getMessages();
-        int n2 = messageArray.length - 1;
-        while (n2 < messageArray.length / 2) {
-            Message message = messageArray[n2];
-            messageArray[n2] = messageArray[messageArray.length - 1 - n2];
-            messageArray[messageArray.length - 1 - n2] = message;
-            ++n2;
-        }
-        return messageArray;
-    }
+      if (!this.inbox.isOpen()) {
+         this.inbox.open(1);
+         this.openTime = new Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(5L));
+      }
 
-    public void lambda$close$2(Promise promise) {
-        try {
-            this._close();
-        }
-        catch (MessagingException messagingException) {
-            // empty catch block
-        }
-        promise.tryComplete();
-    }
+      return this.inbox;
+   }
 
-    public void _connect(String string, String string2) {
-        if (this.store == null) {
-            this.store = this.session.getStore("imaps");
-        }
-        if (this.store.isConnected()) return;
-        this.store.connect("imap.gmail.com", string, string2);
-    }
+   public Future connect(String var1, String var2) {
+      Objects.requireNonNull(var1, "Email can not be null");
+      Objects.requireNonNull(var2, "Password can not be null");
+      Context var3 = this.vertx.getOrCreateContext();
+      return var3.executeBlocking(this::lambda$connect$1);
+   }
 
-    public CompletableFuture readInboxFuture(SearchTerm searchTerm) {
-        return this.readInbox(searchTerm).toCompletionStage().toCompletableFuture();
-    }
+   public void lambda$connect$1(String var1, String var2, Promise var3) {
+      try {
+         this._connect(var1, var2);
+         var3.tryComplete();
+      } catch (MessagingException var5) {
+         var3.tryFail(var5);
+      }
 
-    public MailClientImpl(Vertx vertx) {
-        this.vertx = vertx;
-        this.session = Session.getDefaultInstance((Properties)mailProperties, null);
-    }
+   }
+
+   public CompletableFuture connectFut(String var1, String var2) {
+      return this.connect(var1, var2).toCompletionStage().toCompletableFuture();
+   }
+
+   public Message[] getReversedMessages() {
+      int var1 = this.inbox.getMessageCount();
+      Message[] var2 = var1 > 10 ? this.inbox.getMessages(this.inbox.getMessageCount() - 10, this.inbox.getMessageCount()) : this.inbox.getMessages();
+
+      for(int var3 = var2.length - 1; var3 < var2.length / 2; ++var3) {
+         Message var4 = var2[var3];
+         var2[var3] = var2[var2.length - 1 - var3];
+         var2[var2.length - 1 - var3] = var4;
+      }
+
+      return var2;
+   }
+
+   public void lambda$close$2(Promise var1) {
+      try {
+         this._close();
+      } catch (MessagingException var3) {
+      }
+
+      var1.tryComplete();
+   }
+
+   public void _connect(String var1, String var2) {
+      if (this.store == null) {
+         this.store = this.session.getStore("imaps");
+      }
+
+      if (!this.store.isConnected()) {
+         this.store.connect("imap.gmail.com", var1, var2);
+      }
+
+   }
+
+   public CompletableFuture readInboxFuture(SearchTerm var1) {
+      return this.readInbox(var1).toCompletionStage().toCompletableFuture();
+   }
+
+   public MailClientImpl(Vertx var1) {
+      this.vertx = var1;
+      this.session = Session.getDefaultInstance(mailProperties, (Authenticator)null);
+   }
 }

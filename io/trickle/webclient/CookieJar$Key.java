@@ -1,87 +1,107 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.webclient;
 
-public class CookieJar$Key
-implements Comparable {
-    public String name;
-    public static String NO_DOMAIN = "";
-    public String domain;
-    public String path;
+public class CookieJar$Key implements Comparable {
+   public String name;
+   public static String NO_DOMAIN = "";
+   public String domain;
+   public String path;
 
-    public int hashCode() {
-        int n = 31;
-        int n2 = 1;
-        n2 = 31 * n2 + (this.domain == null ? 0 : this.domain.hashCode());
-        n2 = 31 * n2 + (this.name == null ? 0 : this.name.hashCode());
-        n2 = 31 * n2 + (this.path == null ? 0 : this.path.hashCode());
-        return n2;
-    }
+   public int hashCode() {
+      boolean var1 = true;
+      int var2 = 1;
+      var2 = 31 * var2 + (this.domain == null ? 0 : this.domain.hashCode());
+      var2 = 31 * var2 + (this.name == null ? 0 : this.name.hashCode());
+      var2 = 31 * var2 + (this.path == null ? 0 : this.path.hashCode());
+      return var2;
+   }
 
-    public CookieJar$Key(String string, String string2, String string3) {
-        if (string == null || string.length() == 0) {
-            this.domain = "";
-        } else {
-            while (string.charAt(0) == '.') {
-                string = string.substring(1);
+   public CookieJar$Key(String var1, String var2, String var3) {
+      if (var1 != null && var1.length() != 0) {
+         while(var1.charAt(0) == '.') {
+            var1 = var1.substring(1);
+         }
+
+         while(true) {
+            if (var1.charAt(var1.length() - 1) != '.') {
+               if (var1.length() == 0) {
+                  this.domain = "";
+               } else {
+                  String[] var4 = var1.split("\\.");
+                  int var6 = 0;
+
+                  for(int var7 = var4.length - 1; var6 < var4.length / 2; --var7) {
+                     String var5 = var4[var7];
+                     var4[var7] = var4[var6];
+                     var4[var6] = var5;
+                     ++var6;
+                  }
+
+                  this.domain = String.join(".", var4);
+               }
+               break;
             }
-            while (string.charAt(string.length() - 1) == '.') {
-                string = string.substring(0, string.length() - 1);
+
+            var1 = var1.substring(0, var1.length() - 1);
+         }
+      } else {
+         this.domain = "";
+      }
+
+      this.path = var2 == null ? "" : var2;
+      this.name = var3;
+   }
+
+   public int compareTo(CookieJar$Key var1) {
+      int var2 = this.domain.compareTo(var1.domain);
+      if (var2 == 0) {
+         var2 = this.path.compareTo(var1.path);
+      }
+
+      if (var2 == 0) {
+         var2 = this.name.compareTo(var1.name);
+      }
+
+      return var2;
+   }
+
+   public String toString() {
+      return "Key{domain='" + this.domain + "', path='" + this.path + "', name='" + this.name + "'}";
+   }
+
+   public boolean equals(Object var1) {
+      if (this == var1) {
+         return true;
+      } else if (var1 == null) {
+         return false;
+      } else if (this.getClass() != var1.getClass()) {
+         return false;
+      } else {
+         CookieJar$Key var2 = (CookieJar$Key)var1;
+         if (this.domain == null) {
+            if (var2.domain != null) {
+               return false;
             }
-            if (string.length() == 0) {
-                this.domain = "";
-            } else {
-                CharSequence[] charSequenceArray = string.split("\\.");
-                int n = charSequenceArray.length - 1;
-                for (int i = 0; i < charSequenceArray.length / 2; ++i, --n) {
-                    String string4 = charSequenceArray[n];
-                    charSequenceArray[n] = charSequenceArray[i];
-                    charSequenceArray[i] = string4;
-                }
-                this.domain = String.join((CharSequence)".", charSequenceArray);
+         } else if (!this.domain.equals(var2.domain)) {
+            return false;
+         }
+
+         if (this.name == null) {
+            if (var2.name != null) {
+               return false;
             }
-        }
-        this.path = string2 == null ? "" : string2;
-        this.name = string3;
-    }
-
-    public int compareTo(CookieJar$Key cookieJar$Key) {
-        int n = this.domain.compareTo(cookieJar$Key.domain);
-        if (n == 0) {
-            n = this.path.compareTo(cookieJar$Key.path);
-        }
-        if (n != 0) return n;
-        n = this.name.compareTo(cookieJar$Key.name);
-        return n;
-    }
-
-    public String toString() {
-        return "Key{domain='" + this.domain + "', path='" + this.path + "', name='" + this.name + "'}";
-    }
-
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null) {
+         } else if (!this.name.equals(var2.name)) {
             return false;
-        }
-        if (this.getClass() != object.getClass()) {
-            return false;
-        }
-        CookieJar$Key cookieJar$Key = (CookieJar$Key)object;
-        if (this.domain == null ? cookieJar$Key.domain != null : !this.domain.equals(cookieJar$Key.domain)) {
-            return false;
-        }
-        if (this.name == null ? cookieJar$Key.name != null : !this.name.equals(cookieJar$Key.name)) {
-            return false;
-        }
-        if (this.path != null) return this.path.equals(cookieJar$Key.path);
-        return cookieJar$Key.path == null;
-    }
+         }
 
-    public int compareTo(Object object) {
-        return this.compareTo((CookieJar$Key)object);
-    }
+         if (this.path == null) {
+            return var2.path == null;
+         } else {
+            return this.path.equals(var2.path);
+         }
+      }
+   }
+
+   public int compareTo(Object var1) {
+      return this.compareTo((CookieJar$Key)var1);
+   }
 }

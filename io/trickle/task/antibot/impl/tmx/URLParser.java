@@ -1,13 +1,5 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.antibot.impl.tmx.Decoding
- *  io.trickle.util.Utils
- */
 package io.trickle.task.antibot.impl.tmx;
 
-import io.trickle.task.antibot.impl.tmx.Decoding;
 import io.trickle.util.Utils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,48 +9,53 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class URLParser {
-    public static Pattern FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
-    public static Pattern ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
-    public Map<String, Decoding> decodingMap;
-    public List<String> urls;
+   public static Pattern FUNCTION_VAR_PAT = Pattern.compile("(.*?) {0,2}= {0,2}new.*\\(\"(.*?)\"");
+   public static Pattern ENCODED_STR_PAT = Pattern.compile("([.-z]*)\\(([0-9]*),([0-9]*)\\)");
+   public Map decodingMap;
+   public List urls;
 
-    public void parseUrls(String string) {
-        Matcher matcher = ENCODED_STR_PAT.matcher(string);
-        System.out.println(this.decodingMap.keySet());
-        while (matcher.find()) {
-            try {
-                String string2;
-                String[] stringArray = matcher.group(1).split("\\.");
-                String string3 = string2 = stringArray.length == 2 ? stringArray[0] : stringArray[1];
-                String string4 = this.decodingMap.get(string2 = string2.replace("?", "").trim()).td_f(Integer.valueOf(Integer.parseInt(matcher.group(2))), Integer.valueOf(Integer.parseInt(matcher.group(3))));
-                if (!string4.contains("http")) continue;
-                this.urls.add(string4);
+   public void parseUrls(String var1) {
+      Matcher var2 = ENCODED_STR_PAT.matcher(var1);
+      System.out.println(this.decodingMap.keySet());
+
+      while(var2.find()) {
+         try {
+            String[] var3 = var2.group(1).split("\\.");
+            String var4 = var3.length == 2 ? var3[0] : var3[1];
+            var4 = var4.replace("?", "").trim();
+            String var5 = ((Decoding)this.decodingMap.get(var4)).td_f(Integer.parseInt(var2.group(2)), Integer.parseInt(var2.group(3)));
+            if (var5.contains("http")) {
+               this.urls.add(var5);
             }
-            catch (Exception exception) {}
-        }
-    }
+         } catch (Exception var6) {
+         }
+      }
 
-    public void parseFuncVars(String string) {
-        Matcher matcher = FUNCTION_VAR_PAT.matcher(string);
-        while (matcher.find()) {
-            String[] stringArray = matcher.group(1).split("\\.");
-            String string2 = stringArray.length == 1 ? stringArray[0] : stringArray[1];
-            string2 = string2.replace("var", "").trim();
-            String string3 = matcher.group(2);
-            this.decodingMap.put(string2, new Decoding(string3));
-        }
-    }
+   }
 
-    public static void main(String[] stringArray) {
-        URLParser uRLParser = new URLParser(Utils.readFileAsString((String)"/Users/bayanrasooly/Documents/GitHub/TrickleV1.0/dev/bestbuy/tmx_raw.js"));
-        System.out.println(uRLParser.urls);
-    }
+   public void parseFuncVars(String var1) {
+      Matcher var2 = FUNCTION_VAR_PAT.matcher(var1);
 
-    public URLParser(String string) {
-        string = string.replace("{", "\n").replace("}", "\n").replace(";", "\n");
-        this.decodingMap = new HashMap<String, Decoding>();
-        this.urls = new ArrayList<String>();
-        this.parseFuncVars(string);
-        this.parseUrls(string);
-    }
+      while(var2.find()) {
+         String[] var3 = var2.group(1).split("\\.");
+         String var4 = var3.length == 1 ? var3[0] : var3[1];
+         var4 = var4.replace("var", "").trim();
+         String var5 = var2.group(2);
+         this.decodingMap.put(var4, new Decoding(var5));
+      }
+
+   }
+
+   public static void main(String[] var0) {
+      URLParser var1 = new URLParser(Utils.readFileAsString("/Users/bayanrasooly/Documents/GitHub/TrickleV1.0/dev/bestbuy/tmx_raw.js"));
+      System.out.println(var1.urls);
+   }
+
+   public URLParser(String var1) {
+      var1 = var1.replace("{", "\n").replace("}", "\n").replace(";", "\n");
+      this.decodingMap = new HashMap();
+      this.urls = new ArrayList();
+      this.parseFuncVars(var1);
+      this.parseUrls(var1);
+   }
 }

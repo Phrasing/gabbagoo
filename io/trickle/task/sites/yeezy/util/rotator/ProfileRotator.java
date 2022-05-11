@@ -1,18 +1,6 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.Task
- *  io.trickle.task.sites.yeezy.util.rotator.SizeZipMap
- *  io.trickle.task.sites.yeezy.util.rotator.ZipCodeGroup
- *  io.trickle.task.sites.yeezy.util.rotator.ZipCodes
- */
 package io.trickle.task.sites.yeezy.util.rotator;
 
 import io.trickle.task.Task;
-import io.trickle.task.sites.yeezy.util.rotator.SizeZipMap;
-import io.trickle.task.sites.yeezy.util.rotator.ZipCodeGroup;
-import io.trickle.task.sites.yeezy.util.rotator.ZipCodes;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,62 +8,70 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ProfileRotator {
-    public HashMap<String, SizeZipMap> keywordToSize = new HashMap();
-    public boolean finished = false;
+   public HashMap keywordToSize = new HashMap();
+   public boolean finished = false;
 
-    public void put(Task task) {
-        SizeZipMap sizeZipMap = this.keywordToSize.get(task.getKeywords()[0]);
-        if (sizeZipMap == null) {
-            sizeZipMap = new SizeZipMap();
-            this.keywordToSize.put(task.getKeywords()[0], sizeZipMap);
-        }
-        sizeZipMap.put(task.getSize(), task.getProfile());
-    }
+   public void put(Task var1) {
+      SizeZipMap var2 = (SizeZipMap)this.keywordToSize.get(var1.getKeywords()[0]);
+      if (var2 == null) {
+         var2 = new SizeZipMap();
+         this.keywordToSize.put(var1.getKeywords()[0], var2);
+      }
 
-    public Optional get(String string, String string2) {
-        try {
-            return Optional.ofNullable(this.keywordToSize.get(string).getZipsOfSize(string2).get());
-        }
-        catch (Throwable throwable) {
-            return Optional.empty();
-        }
-    }
+      var2.put(var1.getSize(), var1.getProfile());
+   }
 
-    public synchronized void finish() {
-        if (this.finished) return;
-        this.finished = true;
-        Iterator<SizeZipMap> iterator = this.keywordToSize.values().iterator();
-        block0: while (iterator.hasNext()) {
-            SizeZipMap sizeZipMap = iterator.next();
-            Iterator iterator2 = sizeZipMap.sizeToZip.values().iterator();
-            while (true) {
-                if (!iterator2.hasNext()) continue block0;
-                ZipCodes zipCodes = (ZipCodes)iterator2.next();
-                for (ZipCodeGroup zipCodeGroup : zipCodes.writeList) {
-                    zipCodeGroup.finish();
-                }
-                zipCodes.finish();
+   public Optional get(String var1, String var2) {
+      try {
+         return Optional.ofNullable(((SizeZipMap)this.keywordToSize.get(var1)).getZipsOfSize(var2).get());
+      } catch (Throwable var4) {
+         return Optional.empty();
+      }
+   }
+
+   public synchronized void finish() {
+      if (!this.finished) {
+         this.finished = true;
+         Iterator var1 = this.keywordToSize.values().iterator();
+
+         while(var1.hasNext()) {
+            SizeZipMap var2 = (SizeZipMap)var1.next();
+            Iterator var3 = var2.sizeToZip.values().iterator();
+
+            while(var3.hasNext()) {
+               ZipCodes var4 = (ZipCodes)var3.next();
+               Iterator var5 = var4.writeList.iterator();
+
+               while(var5.hasNext()) {
+                  ZipCodeGroup var6 = (ZipCodeGroup)var5.next();
+                  var6.finish();
+               }
+
+               var4.finish();
             }
-            break;
-        }
-        return;
-    }
+         }
+      }
 
-    public Optional getAnySku(String string) {
-        try {
-            SizeZipMap sizeZipMap;
-            Collection<SizeZipMap> collection = this.keywordToSize.values();
-            if (collection.isEmpty()) return Optional.empty();
-            Iterator<SizeZipMap> iterator = collection.iterator();
-            do {
-                if (!iterator.hasNext()) return Optional.empty();
-                sizeZipMap = iterator.next();
-            } while (!sizeZipMap.sizeToZip.containsKey(string) || !ThreadLocalRandom.current().nextBoolean());
-            return Optional.ofNullable(sizeZipMap.getZipsOfSize(string).get());
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return Optional.empty();
-    }
+   }
+
+   public Optional getAnySku(String var1) {
+      try {
+         Collection var2 = this.keywordToSize.values();
+         if (var2.isEmpty()) {
+            return Optional.empty();
+         }
+
+         Iterator var3 = var2.iterator();
+
+         while(var3.hasNext()) {
+            SizeZipMap var4 = (SizeZipMap)var3.next();
+            if (var4.sizeToZip.containsKey(var1) && ThreadLocalRandom.current().nextBoolean()) {
+               return Optional.ofNullable(var4.getZipsOfSize(var1).get());
+            }
+         }
+      } catch (Throwable var5) {
+      }
+
+      return Optional.empty();
+   }
 }

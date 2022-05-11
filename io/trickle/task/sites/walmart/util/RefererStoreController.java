@@ -1,17 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.api.LoadableAsync
- *  io.trickle.core.api.Module
- *  io.trickle.task.antibot.impl.akamai.DeviceStoreController
- *  io.vertx.core.Future
- *  io.vertx.core.Vertx
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.file.FileSystem
- *  org.apache.logging.log4j.LogManager
- *  org.apache.logging.log4j.Logger
- */
 package io.trickle.task.sites.walmart.util;
 
 import io.trickle.core.api.LoadableAsync;
@@ -30,51 +16,48 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RefererStoreController
-implements Module,
-LoadableAsync {
-    public static Logger logger;
-    public static String REFERER_DEVICE_PATH;
-    public Vertx vertx;
-    public List<String> referers;
+public class RefererStoreController implements Module, LoadableAsync {
+   public static Logger logger = LogManager.getLogger(DeviceStoreController.class);
+   public static String REFERER_DEVICE_PATH = "links.txt";
+   public Vertx vertx;
+   public List referers;
 
-    public List parseFile(String string) {
-        return Arrays.stream(string.split("\n")).filter(Objects::nonNull).map(String::trim).collect(Collectors.toList());
-    }
+   public List parseFile(String var1) {
+      return (List)Arrays.stream(var1.split("\n")).filter(Objects::nonNull).map(String::trim).collect(Collectors.toList());
+   }
 
-    public Future load() {
-        FileSystem fileSystem = this.vertx.fileSystem();
-        return fileSystem.readFile("links.txt").otherwise(RefererStoreController::lambda$load$0).map(Buffer::toString).map(this::parseFile).map(this.referers::addAll).compose(RefererStoreController::lambda$load$1);
-    }
+   public Future load() {
+      FileSystem var1 = this.vertx.fileSystem();
+      Future var10000 = var1.readFile("links.txt").otherwise(RefererStoreController::lambda$load$0).map(Buffer::toString).map(this::parseFile);
+      List var10001 = this.referers;
+      Objects.requireNonNull(var10001);
+      return var10000.map(var10001::addAll).compose(RefererStoreController::lambda$load$1);
+   }
 
-    public String getRandomReferer() {
-        return "https://www.walmart.com/ip/" + this.referers.get(ThreadLocalRandom.current().nextInt(this.referers.size()));
-    }
+   public String getRandomReferer() {
+      Object var10000 = this.referers.get(ThreadLocalRandom.current().nextInt(this.referers.size()));
+      return "https://www.walmart.com/ip/" + (String)var10000;
+   }
 
-    public static Future lambda$load$1(Boolean bl) {
-        return Future.succeededFuture();
-    }
+   public static Future lambda$load$1(Boolean var0) {
+      return Future.succeededFuture();
+   }
 
-    public void terminate() {
-        logger.debug("Terminated.");
-    }
+   public void terminate() {
+      logger.debug("Terminated.");
+   }
 
-    public static Buffer lambda$load$0(Throwable throwable) {
-        logger.warn("Failed to find '{}' (Suggested for Walmart!). Proceeding without...", (Object)"links.txt".replace("/", ""));
-        return Buffer.buffer((String)"");
-    }
+   public static Buffer lambda$load$0(Throwable var0) {
+      logger.warn("Failed to find '{}' (Suggested for Walmart!). Proceeding without...", "links.txt".replace("/", ""));
+      return Buffer.buffer("");
+   }
 
-    public void initialise() {
-        logger.debug("Initialised");
-    }
+   public void initialise() {
+      logger.debug("Initialised");
+   }
 
-    public RefererStoreController(Vertx vertx) {
-        this.vertx = vertx;
-        this.referers = new ArrayList<String>();
-    }
-
-    static {
-        REFERER_DEVICE_PATH = "links.txt";
-        logger = LogManager.getLogger(DeviceStoreController.class);
-    }
+   public RefererStoreController(Vertx var1) {
+      this.vertx = var1;
+      this.referers = new ArrayList();
+   }
 }

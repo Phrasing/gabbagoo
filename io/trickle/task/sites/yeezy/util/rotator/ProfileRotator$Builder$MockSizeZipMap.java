@@ -1,25 +1,18 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.profile.Profile
- *  io.trickle.task.sites.yeezy.util.rotator.ProfileRotator$Builder$MockZipCodes
- */
 package io.trickle.task.sites.yeezy.util.rotator;
 
 import io.trickle.profile.Profile;
-import io.trickle.task.sites.yeezy.util.rotator.ProfileRotator;
 import java.util.HashMap;
 
 public class ProfileRotator$Builder$MockSizeZipMap {
-    public HashMap<String, ProfileRotator.Builder.MockZipCodes> sizeToZip = new HashMap();
+   public HashMap sizeToZip = new HashMap();
 
-    public void put(String string, Profile profile) {
-        ProfileRotator.Builder.MockZipCodes mockZipCodes = this.sizeToZip.get(string);
-        if (mockZipCodes == null) {
-            mockZipCodes = new ProfileRotator.Builder.MockZipCodes();
-            this.sizeToZip.put(string, mockZipCodes);
-        }
-        mockZipCodes.put(profile.getZip(), profile);
-    }
+   public void put(String var1, Profile var2) {
+      ProfileRotator$Builder$MockZipCodes var3 = (ProfileRotator$Builder$MockZipCodes)this.sizeToZip.get(var1);
+      if (var3 == null) {
+         var3 = new ProfileRotator$Builder$MockZipCodes();
+         this.sizeToZip.put(var1, var3);
+      }
+
+      var3.put(var2.getZip(), var2);
+   }
 }

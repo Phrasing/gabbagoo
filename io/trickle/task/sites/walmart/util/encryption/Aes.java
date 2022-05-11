@@ -1,182 +1,183 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.sites.walmart.util.encryption;
 
 import java.util.Arrays;
 
 public class Aes {
-    public int[][][] tables;
-    public int b;
-    public int[] n;
-    public int m;
-    public int f;
-    public int e;
-    public int[][] key;
-    public int[] c;
-    public int l;
-    public int[] k;
-    public int a;
-    public int o;
-    public int[][] j;
-    public int g;
-    public int[] h;
-    public int[][] q;
-    public int p;
+   public int[][][] tables;
+   public int b;
+   public int[] n;
+   public int m;
+   public int f;
+   public int e;
+   public int[][] key;
+   public int[] c;
+   public int l;
+   public int[] k;
+   public int a;
+   public int o;
+   public int[][] j;
+   public int g;
+   public int[] h;
+   public int[][] q;
+   public int p;
 
-    public static int lambda$cipher$0(long l) {
-        return (int)l;
-    }
+   public static int lambda$cipher$0(long var0) {
+      return (int)var0;
+   }
 
-    public Aes precompute() {
-        this.tables = new int[2][5][256];
-        this.j = this.tables[0];
-        this.q = this.tables[1];
-        this.h = this.j[4];
-        this.n = this.q[4];
-        this.k = new int[256];
-        this.c = new int[256];
-        this.b = -1;
-        this.g = 0;
-        while (this.g < 256) {
-            this.k[this.g] = this.g << 1 ^ (this.g >> 7) * 283;
-            this.c[this.k[this.g] ^ this.g] = this.g;
-            ++this.g;
-        }
-        this.f = 0;
-        this.l = 0;
-        while (this.h[this.l] == 0) {
-            this.o = this.f ^ this.f << 1 ^ this.f << 2 ^ this.f << 3 ^ this.f << 4;
-            this.h[this.l] = this.o = this.o >> 8 ^ this.o & 0xFF ^ 0x63;
-            this.n[this.o] = this.l;
-            this.b = this.k[this.l];
-            this.p = this.k[this.b];
-            this.m = this.k[this.p];
-            this.a = this.m * 0x1010101 ^ this.p * 65537 ^ this.b * 257 ^ this.l * 0x1010100;
-            this.e = this.k[this.o] * 257 ^ this.o * 0x1010100;
-            this.g = 0;
-            while (this.g < 4) {
-                this.j[this.g][this.l] = this.e = this.e << 24 ^ this.e >>> 8;
-                this.q[this.g][this.o] = this.a = this.a << 24 ^ this.a >>> 8;
-                ++this.g;
+   public Aes precompute() {
+      this.tables = new int[2][5][256];
+      this.j = this.tables[0];
+      this.q = this.tables[1];
+      this.h = this.j[4];
+      this.n = this.q[4];
+      this.k = new int[256];
+      this.c = new int[256];
+      this.b = -1;
+
+      for(this.g = 0; this.g < 256; this.c[(this.k[this.g] = this.g << 1 ^ (this.g >> 7) * 283) ^ this.g] = this.g++) {
+      }
+
+      for(this.l = this.f = 0; this.h[this.l] == 0; this.f = this.c[this.f] == 0 ? 1 : this.c[this.f]) {
+         this.o = this.f ^ this.f << 1 ^ this.f << 2 ^ this.f << 3 ^ this.f << 4;
+         this.o = this.o >> 8 ^ this.o & 255 ^ 99;
+         this.h[this.l] = this.o;
+         this.n[this.o] = this.l;
+         this.m = this.k[this.p = this.k[this.b = this.k[this.l]]];
+         this.a = this.m * 16843009 ^ this.p * 65537 ^ this.b * 257 ^ this.l * 16843008;
+         this.e = this.k[this.o] * 257 ^ this.o * 16843008;
+
+         for(this.g = 0; this.g < 4; ++this.g) {
+            this.j[this.g][this.l] = this.e = this.e << 24 ^ this.e >>> 8;
+            this.q[this.g][this.o] = this.a = this.a << 24 ^ this.a >>> 8;
+         }
+
+         this.l ^= this.b == 0 ? 1 : this.b;
+      }
+
+      for(this.g = 0; this.g < 5; ++this.g) {
+         this.j[this.g] = Arrays.copyOf(this.j[this.g], this.j[this.g].length);
+         this.q[this.g] = Arrays.copyOf(this.q[this.g], this.q[this.g].length);
+      }
+
+      return this;
+   }
+
+   public static int[] removeElements(int[] var0, int var1) {
+      int var2 = 0;
+
+      for(int var3 = 0; var3 < var0.length; ++var3) {
+         if (var0[var3] != var1) {
+            var0[var2++] = var0[var3];
+         }
+      }
+
+      return Arrays.copyOf(var0, var2);
+   }
+
+   public int[] encrypt(int[] var1) {
+      return this._crypt(var1, 0);
+   }
+
+   public static long[] removeElements(long[] var0, int var1) {
+      int var2 = 0;
+
+      for(int var3 = 0; var3 < var0.length; ++var3) {
+         if (var0[var3] != (long)var1) {
+            var0[var2++] = var0[var3];
+         }
+      }
+
+      return Arrays.copyOf(var0, var2);
+   }
+
+   public int[] _crypt(int[] var1, int var2) {
+      if (var1.length != 4) {
+         System.err.println("Something went wrong with crypting profile.");
+      }
+
+      int[] var3 = this.key[var2];
+      int var4 = var1[0] ^ var3[0];
+      int var5 = var1[var2 != 0 ? 3 : 1] ^ var3[1];
+      int var6 = var1[2] ^ var3[2];
+      int var7 = var1[var2 != 0 ? 1 : 3] ^ var3[3];
+      int var11 = var3.length / 4 - 2;
+      int var13 = 4;
+      int[] var14 = new int[]{0, 0, 0, 0};
+      int[][] var15 = this.tables[var2];
+      int[] var16 = var15[0];
+      int[] var17 = var15[1];
+      int[] var18 = var15[2];
+      int[] var19 = var15[3];
+      int[] var20 = var15[4];
+
+      int var8;
+      int var12;
+      for(var12 = 0; var12 < var11; ++var12) {
+         var8 = var16[var4 >>> 24] ^ var17[var5 >> 16 & 255] ^ var18[var6 >> 8 & 255] ^ var19[var7 & 255] ^ var3[var13];
+         int var9 = var16[var5 >>> 24] ^ var17[var6 >> 16 & 255] ^ var18[var7 >> 8 & 255] ^ var19[var4 & 255] ^ var3[var13 + 1];
+         int var10 = var16[var6 >>> 24] ^ var17[var7 >> 16 & 255] ^ var18[var4 >> 8 & 255] ^ var19[var5 & 255] ^ var3[var13 + 2];
+         var7 = var16[var7 >>> 24] ^ var17[var4 >> 16 & 255] ^ var18[var5 >> 8 & 255] ^ var19[var6 & 255] ^ var3[var13 + 3];
+         var13 += 4;
+         var4 = var8;
+         var5 = var9;
+         var6 = var10;
+      }
+
+      for(var12 = 0; var12 < 4; ++var12) {
+         var14[var2 != 0 ? 3 & -var12 : var12] = var20[var4 >>> 24] << 24 ^ var20[var5 >> 16 & 255] << 16 ^ var20[var6 >> 8 & 255] << 8 ^ var20[var7 & 255] ^ var3[var13++];
+         var8 = var4;
+         var4 = var5;
+         var5 = var6;
+         var6 = var7;
+         var7 = var8;
+      }
+
+      return var14;
+   }
+
+   public Aes cipher(long[] var1) {
+      int[] var7 = this.tables[0][4];
+      int[][] var8 = this.tables[1];
+      this.a = var1.length;
+      this.b = 1;
+      if (this.a != 4 && this.a != 6 && this.a != 8) {
+         System.err.println("invalid aes key size");
+      }
+
+      long[] var5 = Arrays.copyOf(var1, 256);
+      int[] var6 = new int[256];
+
+      int var2;
+      int var4;
+      for(var2 = this.a; var2 < 4 * this.a + 28; ++var2) {
+         var4 = (int)var5[var2 - 1];
+         if (var2 % this.a == 0 || this.a == 8 && var2 % this.a == 4) {
+            var4 = var7[var4 >>> 24] << 24 ^ var7[var4 >> 16 & 255] << 16 ^ var7[var4 >> 8 & 255] << 8 ^ var7[var4 & 255];
+            if (var2 % this.a == 0) {
+               var4 = var4 << 8 ^ var4 >>> 24 ^ this.b << 24;
+               this.b = this.b << 1 ^ (this.b >> 7) * 283;
             }
-            this.l ^= this.b == 0 ? 1 : this.b;
-            this.f = this.c[this.f] == 0 ? 1 : this.c[this.f];
-        }
-        this.g = 0;
-        while (this.g < 5) {
-            this.j[this.g] = Arrays.copyOf(this.j[this.g], this.j[this.g].length);
-            this.q[this.g] = Arrays.copyOf(this.q[this.g], this.q[this.g].length);
-            ++this.g;
-        }
-        return this;
-    }
+         }
 
-    public static int[] removeElements(int[] nArray, int n) {
-        int n2 = 0;
-        int n3 = 0;
-        while (n3 < nArray.length) {
-            if (nArray[n3] != n) {
-                nArray[n2++] = nArray[n3];
-            }
-            ++n3;
-        }
-        return Arrays.copyOf(nArray, n2);
-    }
+         var5[var2] = var5[var2 - this.a] ^ (long)var4;
+      }
 
-    public int[] encrypt(int[] nArray) {
-        return this._crypt(nArray, 0);
-    }
+      var5 = removeElements((long[])var5, 0);
 
-    public static long[] removeElements(long[] lArray, int n) {
-        int n2 = 0;
-        int n3 = 0;
-        while (n3 < lArray.length) {
-            if (lArray[n3] != (long)n) {
-                lArray[n2++] = lArray[n3];
-            }
-            ++n3;
-        }
-        return Arrays.copyOf(lArray, n2);
-    }
+      for(int var3 = 0; var2 != 0; --var2) {
+         var4 = (int)var5[(var3 & 3) != 0 ? var2 : var2 - 4];
+         if (var2 > 4 && var3 >= 4) {
+            var6[var3] = var8[0][var7[var4 >>> 24]] ^ var8[1][var7[var4 >> 16 & 255]] ^ var8[2][var7[var4 >> 8 & 255]] ^ var8[3][var7[var4 & 255]];
+         } else {
+            var6[var3] = var4;
+         }
 
-    public int[] _crypt(int[] nArray, int n) {
-        int n2;
-        int n3;
-        if (nArray.length != 4) {
-            System.err.println("Something went wrong with crypting profile.");
-        }
-        int[] nArray2 = this.key[n];
-        int n4 = nArray[0] ^ nArray2[0];
-        int n5 = nArray[n != 0 ? 3 : 1] ^ nArray2[1];
-        int n6 = nArray[2] ^ nArray2[2];
-        int n7 = nArray[n != 0 ? 1 : 3] ^ nArray2[3];
-        int n8 = nArray2.length / 4 - 2;
-        int n9 = 4;
-        int[] nArray3 = new int[]{0, 0, 0, 0};
-        int[][] nArray4 = this.tables[n];
-        int[] nArray5 = nArray4[0];
-        int[] nArray6 = nArray4[1];
-        int[] nArray7 = nArray4[2];
-        int[] nArray8 = nArray4[3];
-        int[] nArray9 = nArray4[4];
-        for (n3 = 0; n3 < n8; n9 += 4, ++n3) {
-            n2 = nArray5[n4 >>> 24] ^ nArray6[n5 >> 16 & 0xFF] ^ nArray7[n6 >> 8 & 0xFF] ^ nArray8[n7 & 0xFF] ^ nArray2[n9];
-            int n10 = nArray5[n5 >>> 24] ^ nArray6[n6 >> 16 & 0xFF] ^ nArray7[n7 >> 8 & 0xFF] ^ nArray8[n4 & 0xFF] ^ nArray2[n9 + 1];
-            int n11 = nArray5[n6 >>> 24] ^ nArray6[n7 >> 16 & 0xFF] ^ nArray7[n4 >> 8 & 0xFF] ^ nArray8[n5 & 0xFF] ^ nArray2[n9 + 2];
-            n7 = nArray5[n7 >>> 24] ^ nArray6[n4 >> 16 & 0xFF] ^ nArray7[n5 >> 8 & 0xFF] ^ nArray8[n6 & 0xFF] ^ nArray2[n9 + 3];
-            n4 = n2;
-            n5 = n10;
-            n6 = n11;
-        }
-        n3 = 0;
-        while (n3 < 4) {
-            nArray3[n != 0 ? 3 & -n3 : n3] = nArray9[n4 >>> 24] << 24 ^ nArray9[n5 >> 16 & 0xFF] << 16 ^ nArray9[n6 >> 8 & 0xFF] << 8 ^ nArray9[n7 & 0xFF] ^ nArray2[n9++];
-            n2 = n4;
-            n4 = n5;
-            n5 = n6;
-            n6 = n7;
-            n7 = n2;
-            ++n3;
-        }
-        return nArray3;
-    }
+         ++var3;
+      }
 
-    public Aes cipher(long[] lArray) {
-        int n;
-        int n2;
-        int[] nArray = this.tables[0][4];
-        int[][] nArray2 = this.tables[1];
-        this.a = lArray.length;
-        this.b = 1;
-        if (this.a != 4 && this.a != 6 && this.a != 8) {
-            System.err.println("invalid aes key size");
-        }
-        long[] lArray2 = Arrays.copyOf(lArray, 256);
-        int[] nArray3 = new int[256];
-        for (n2 = this.a; n2 < 4 * this.a + 28; ++n2) {
-            n = (int)lArray2[n2 - 1];
-            if (n2 % this.a == 0 || this.a == 8 && n2 % this.a == 4) {
-                n = nArray[n >>> 24] << 24 ^ nArray[n >> 16 & 0xFF] << 16 ^ nArray[n >> 8 & 0xFF] << 8 ^ nArray[n & 0xFF];
-                if (n2 % this.a == 0) {
-                    n = n << 8 ^ n >>> 24 ^ this.b << 24;
-                    this.b = this.b << 1 ^ (this.b >> 7) * 283;
-                }
-            }
-            lArray2[n2] = lArray2[n2 - this.a] ^ (long)n;
-        }
-        lArray2 = Aes.removeElements(lArray2, 0);
-        int n3 = 0;
-        while (true) {
-            if (n2 == 0) {
-                nArray3 = Aes.removeElements(nArray3, 0);
-                this.key = new int[][]{Arrays.stream(lArray2).mapToInt(Aes::lambda$cipher$0).toArray(), nArray3};
-                return this;
-            }
-            n = (int)lArray2[(n3 & 3) != 0 ? n2 : n2 - 4];
-            nArray3[n3] = n2 <= 4 || n3 < 4 ? n : nArray2[0][nArray[n >>> 24]] ^ nArray2[1][nArray[n >> 16 & 0xFF]] ^ nArray2[2][nArray[n >> 8 & 0xFF]] ^ nArray2[3][nArray[n & 0xFF]];
-            ++n3;
-            --n2;
-        }
-    }
+      var6 = removeElements((int[])var6, 0);
+      this.key = new int[][]{Arrays.stream(var5).mapToInt(Aes::lambda$cipher$0).toArray(), var6};
+      return this;
+   }
 }

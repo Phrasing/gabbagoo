@@ -1,24 +1,9 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.antibot.impl.px.payload.token.Devices
- *  io.trickle.task.antibot.impl.px.payload.token.Devices$Device
- *  io.trickle.task.antibot.impl.px.payload.token.Devices$DeviceImpl
- */
 package io.trickle.task.antibot.impl.px.payload.token;
 
-import io.trickle.task.antibot.impl.px.payload.token.Devices;
-
-public class Devices$3
-extends Devices {
-    public Devices$3() {
-        super(string, n);
-    }
-
-    public Devices.Device get() {
-        Devices.DeviceImpl deviceImpl = new Devices.DeviceImpl(1080, 2094, "4.4.153-17214672", "SM-G955U", "samsung", 28);
-        deviceImpl.disableEthernet();
-        return deviceImpl;
-    }
+public enum Devices$3 {
+   public Devices$Device get() {
+      Devices$DeviceImpl var1 = new Devices$DeviceImpl(1080, 2094, "4.4.153-17214672", "SM-G955U", "samsung", 28);
+      var1.disableEthernet();
+      return var1;
+   }
 }

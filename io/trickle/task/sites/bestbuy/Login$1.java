@@ -1,11 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  javax.mail.Message
- *  javax.mail.MessagingException
- *  javax.mail.search.SearchTerm
- */
 package io.trickle.task.sites.bestbuy;
 
 import java.util.Date;
@@ -13,18 +5,17 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.search.SearchTerm;
 
-public class Login$1
-extends SearchTerm {
-    public boolean match(Message message) {
-        try {
-            Date date = new Date(System.currentTimeMillis() - 300000L);
-            if (!message.getReceivedDate().after(date)) return false;
-            if (!message.getSubject().contains("verification code to complete your BestBuy.com")) return false;
+public class Login$1 extends SearchTerm {
+   public boolean match(Message var1) {
+      try {
+         Date var2 = new Date(System.currentTimeMillis() - 300000L);
+         if (var1.getReceivedDate().after(var2) && var1.getSubject().contains("verification code to complete your BestBuy.com")) {
             return true;
-        }
-        catch (MessagingException messagingException) {
-            messagingException.printStackTrace();
-        }
-        return false;
-    }
+         }
+      } catch (MessagingException var3) {
+         var3.printStackTrace();
+      }
+
+      return false;
+   }
 }

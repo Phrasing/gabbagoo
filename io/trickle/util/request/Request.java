@@ -1,22 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  com.teamdev.jxbrowser.net.HttpHeader
- *  com.teamdev.jxbrowser.net.callback.InterceptUrlRequestCallback$Params
- *  io.trickle.util.concurrent.VertxUtil
- *  io.vertx.core.MultiMap
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.http.HttpMethod
- *  io.vertx.core.http.RequestOptions
- *  io.vertx.core.json.Json
- *  io.vertx.core.json.JsonArray
- *  io.vertx.core.json.JsonObject
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- *  io.vertx.ext.web.client.impl.HttpRequestImpl
- *  io.vertx.ext.web.multipart.MultipartForm
- */
 package io.trickle.util.request;
 
 import com.teamdev.jxbrowser.net.HttpHeader;
@@ -33,352 +14,202 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.impl.HttpRequestImpl;
 import io.vertx.ext.web.multipart.MultipartForm;
-import java.lang.invoke.LambdaMetafactory;
+import java.util.Iterator;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class Request {
-    public static int DEFAULT_DELAY = 3000;
+   public static int DEFAULT_DELAY = 3000;
 
-    public static CompletableFuture executeTillOk(HttpRequest httpRequest, int n) {
-        return Request.execute(httpRequest, true, n);
-    }
+   public static CompletableFuture executeTillOk(HttpRequest var0, int var1) {
+      return execute(var0, true, var1);
+   }
 
-    public static CompletableFuture executeWithResponse(HttpRequest httpRequest, boolean bl, int n) {
-        int n2 = 0;
-        do {
-            try {
-                CompletableFuture completableFuture = Request.send(httpRequest);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Request.async$executeWithResponse(httpRequest, (int)(bl ? 1 : 0), n, n2, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    return CompletableFuture.completedFuture(httpResponse);
-                }
-                if (bl) {
-                    CompletableFuture completableFuture3 = VertxUtil.sleep((long)n);
-                    if (!completableFuture3.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture3;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Request.async$executeWithResponse(httpRequest, (int)(bl ? 1 : 0), n, n2, completableFuture4, httpResponse, 2, arg_0));
-                    }
-                    completableFuture3.join();
-                }
+   public static CompletableFuture executeWithResponse(HttpRequest var0, boolean var1, int var2) {
+      int var3 = 0;
+
+      do {
+         try {
+            CompletableFuture var10000 = send(var0);
+            CompletableFuture var5;
+            if (!var10000.isDone()) {
+               var5 = var10000;
+               return var5.exceptionally(Function.identity()).thenCompose(Request::async$executeWithResponse);
             }
-            catch (Exception exception) {
-                // empty catch block
+
+            HttpResponse var4 = (HttpResponse)var10000.join();
+            if (var4 != null) {
+               return CompletableFuture.completedFuture(var4);
             }
-            if (!bl) return CompletableFuture.completedFuture(null);
-        } while (++n2 < 3);
-        return CompletableFuture.completedFuture(null);
-    }
 
-    public static CompletableFuture executeTillOk(HttpRequest httpRequest, Buffer buffer) {
-        return Request.execute(httpRequest, true, 3000, buffer);
-    }
+            if (var1 != 0) {
+               var10000 = VertxUtil.sleep((long)var2);
+               if (!var10000.isDone()) {
+                  var5 = var10000;
+                  return var5.exceptionally(Function.identity()).thenCompose(Request::async$executeWithResponse);
+               }
 
-    public static CompletableFuture executeTillOk(HttpRequest httpRequest) {
-        return Request.execute(httpRequest, true, 3000);
-    }
-
-    public static CompletableFuture send(HttpRequest httpRequest) {
-        return httpRequest.send().toCompletionStage().toCompletableFuture();
-    }
-
-    public static CompletableFuture send(HttpRequest httpRequest, JsonObject jsonObject) {
-        return httpRequest.sendJson((Object)jsonObject).toCompletionStage().toCompletableFuture();
-    }
-
-    public static CompletableFuture execute(HttpRequest httpRequest, boolean bl, int n, Buffer buffer) {
-        int n2 = 0;
-        do {
-            try {
-                CompletableFuture completableFuture = buffer == null ? Request.send(httpRequest) : Request.send(httpRequest, buffer);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Request.async$execute$1(httpRequest, (int)(bl ? 1 : 0), n, buffer, n2, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    return CompletableFuture.completedFuture(httpResponse.body());
-                }
-                if (bl) {
-                    CompletableFuture completableFuture3 = VertxUtil.sleep((long)n);
-                    if (!completableFuture3.isDone()) {
-                        CompletableFuture completableFuture4 = completableFuture3;
-                        return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> Request.async$execute$1(httpRequest, (int)(bl ? 1 : 0), n, buffer, n2, completableFuture4, httpResponse, 2, arg_0));
-                    }
-                    completableFuture3.join();
-                }
+               var10000.join();
             }
-            catch (Throwable throwable) {
-                ++n2;
+         } catch (Exception var6) {
+         }
+
+         ++var3;
+      } while(var1 != 0 && var3 < 3);
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture executeTillOk(HttpRequest var0, Buffer var1) {
+      return execute(var0, true, 3000, var1);
+   }
+
+   public static CompletableFuture executeTillOk(HttpRequest var0) {
+      return execute(var0, true, 3000);
+   }
+
+   public static CompletableFuture send(HttpRequest var0) {
+      return var0.send().toCompletionStage().toCompletableFuture();
+   }
+
+   public static CompletableFuture send(HttpRequest var0, JsonObject var1) {
+      return var0.sendJson(var1).toCompletionStage().toCompletableFuture();
+   }
+
+   public static CompletableFuture execute(HttpRequest var0, boolean var1, int var2, Buffer var3) {
+      int var4 = 0;
+
+      do {
+         try {
+            CompletableFuture var10000 = var3 == null ? send(var0) : send(var0, var3);
+            CompletableFuture var6;
+            if (!var10000.isDone()) {
+               var6 = var10000;
+               return var6.exceptionally(Function.identity()).thenCompose(Request::async$execute$1);
             }
-            if (!bl) return CompletableFuture.completedFuture(null);
-        } while (n2 < 5);
-        return CompletableFuture.completedFuture(null);
-    }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$executeWithResponse(HttpRequest var0, int var1_1, int var2_2, int var3_3, CompletableFuture var4_4, HttpResponse var5_6, int var6_7, Object var7_8) {
-        switch (var6_7) {
-            case 0: {
-                var3_3 = 0;
-                do {
-                    try {
-                        v0 = Request.send(var0);
-                        if (!v0.isDone()) {
-                            var5_6 = v0;
-                            return var5_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$executeWithResponse(io.vertx.ext.web.client.HttpRequest int int int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HttpRequest)var0, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var5_6, null, (int)1));
-                        }
-lbl10:
-                        // 3 sources
-
-                        while (true) {
-                            var4_4 = (HttpResponse)v0.join();
-                            if (var4_4 != null) {
-                                return CompletableFuture.completedFuture(var4_4);
-                            }
-                            if (var1_1 != 0) {
-                                v1 = VertxUtil.sleep((long)var2_2);
-                                if (!v1.isDone()) {
-                                    var5_6 = v1;
-                                    return var5_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$executeWithResponse(io.vertx.ext.web.client.HttpRequest int int int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HttpRequest)var0, (int)var1_1, (int)var2_2, (int)var3_3, (CompletableFuture)var5_6, (HttpResponse)var4_4, (int)2));
-                                }
-lbl19:
-                                // 3 sources
-
-                                while (true) {
-                                    v1.join();
-                                    ** GOTO lbl26
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    catch (Exception var4_5) {
-                        // empty catch block
-                    }
-lbl26:
-                    // 3 sources
-
-                    if (var1_1 == 0) return CompletableFuture.completedFuture(null);
-                } while (++var3_3 < 3);
-                return CompletableFuture.completedFuture(null);
+            HttpResponse var5 = (HttpResponse)var10000.join();
+            if (var5 != null) {
+               return CompletableFuture.completedFuture(var5.body());
             }
-            case 1: {
-                v0 = var4_4;
-                ** continue;
+
+            if (var1 != 0) {
+               var10000 = VertxUtil.sleep((long)var2);
+               if (!var10000.isDone()) {
+                  var6 = var10000;
+                  return var6.exceptionally(Function.identity()).thenCompose(Request::async$execute$1);
+               }
+
+               var10000.join();
             }
-            case 2: {
-                v1 = var4_4;
-                var4_4 = var5_6;
-                ** continue;
+         } catch (Throwable var7) {
+            ++var4;
+         }
+      } while(var1 != 0 && var4 < 5);
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$executeWithResponse(HttpRequest param0, int param1, int param2, int param3, CompletableFuture param4, HttpResponse param5, int param6, Object param7) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public static String getURI(HttpRequest var0) {
+      try {
+         if (var0.headers().contains("referer")) {
+            return var0.headers().get("referer");
+         } else {
+            HttpRequestImpl var1 = (HttpRequestImpl)var0;
+            return String.format("https://%s%s", var1.host(), var1.uri());
+         }
+      } catch (Throwable var2) {
+         var2.printStackTrace();
+         return null;
+      }
+   }
+
+   public static CompletableFuture send(HttpRequest var0, MultipartForm var1) {
+      return var0.sendMultipartForm(var1).toCompletionStage().toCompletableFuture();
+   }
+
+   public static CompletableFuture execute(HttpRequest var0, boolean var1, int var2) {
+      return execute(var0, var1, var2, (Buffer)null);
+   }
+
+   public static CompletableFuture execute(HttpRequest var0, int var1) {
+      for(int var2 = 1; var2 <= var1; ++var2) {
+         try {
+            CompletableFuture var10000 = send(var0);
+            if (!var10000.isDone()) {
+               CompletableFuture var4 = var10000;
+               return var4.exceptionally(Function.identity()).thenCompose(Request::async$execute);
             }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public static String getURI(HttpRequest httpRequest) {
-        try {
-            if (httpRequest.headers().contains("referer")) {
-                return httpRequest.headers().get("referer");
+            HttpResponse var3 = (HttpResponse)var10000.join();
+            if (var3 != null) {
+               return CompletableFuture.completedFuture(var3.body());
             }
-            HttpRequestImpl httpRequestImpl = (HttpRequestImpl)httpRequest;
-            return String.format("https://%s%s", httpRequestImpl.host(), httpRequestImpl.uri());
-        }
-        catch (Throwable throwable) {
-            throwable.printStackTrace();
-            return null;
-        }
-    }
-
-    public static CompletableFuture send(HttpRequest httpRequest, MultipartForm multipartForm) {
-        return httpRequest.sendMultipartForm(multipartForm).toCompletionStage().toCompletableFuture();
-    }
-
-    public static CompletableFuture execute(HttpRequest httpRequest, boolean bl, int n) {
-        return Request.execute(httpRequest, bl, n, null);
-    }
-
-    public static CompletableFuture execute(HttpRequest httpRequest, int n) {
-        int n2 = 1;
-        while (n2 <= n) {
-            block5: {
-                try {
-                    CompletableFuture completableFuture = Request.send(httpRequest);
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> Request.async$execute(httpRequest, n, n2, completableFuture2, 1, arg_0));
-                    }
-                    HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                    if (httpResponse != null) {
-                        return CompletableFuture.completedFuture(httpResponse.body());
-                    }
-                }
-                catch (Exception exception) {
-                    if (n2 != n || !exception.getMessage().contains("HttpProxyConnectException")) break block5;
-                    return CompletableFuture.failedFuture(new Exception("Invalid Proxy!"));
-                }
+         } catch (Exception var5) {
+            if (var2 == var1 && var5.getMessage().contains("HttpProxyConnectException")) {
+               return CompletableFuture.failedFuture(new Exception("Invalid Proxy!"));
             }
-            ++n2;
-        }
-        return CompletableFuture.failedFuture(new Exception("Failed to execute request"));
-    }
+         }
+      }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$execute$1(HttpRequest var0, int var1_1, int var2_2, Buffer var3_3, int var4_4, CompletableFuture var5_5, HttpResponse var6_7, int var7_8, Object var8_9) {
-        switch (var7_8) {
-            case 0: {
-                var4_4 = 0;
-                do {
-                    try {
-                        v0 = var3_3 == null ? Request.send(var0) : Request.send(var0, var3_3);
-                        if (!v0.isDone()) {
-                            var6_7 = v0;
-                            return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$execute$1(io.vertx.ext.web.client.HttpRequest int int io.vertx.core.buffer.Buffer int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HttpRequest)var0, (int)var1_1, (int)var2_2, (Buffer)var3_3, (int)var4_4, (CompletableFuture)var6_7, null, (int)1));
-                        }
-lbl10:
-                        // 3 sources
+      return CompletableFuture.failedFuture(new Exception("Failed to execute request"));
+   }
 
-                        while (true) {
-                            var5_5 = (HttpResponse)v0.join();
-                            if (var5_5 != null) {
-                                return CompletableFuture.completedFuture(var5_5.body());
-                            }
-                            if (var1_1 != 0) {
-                                v1 = VertxUtil.sleep((long)var2_2);
-                                if (!v1.isDone()) {
-                                    var6_7 = v1;
-                                    return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$execute$1(io.vertx.ext.web.client.HttpRequest int int io.vertx.core.buffer.Buffer int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HttpRequest)var0, (int)var1_1, (int)var2_2, (Buffer)var3_3, (int)var4_4, (CompletableFuture)var6_7, (HttpResponse)var5_5, (int)2));
-                                }
-lbl19:
-                                // 3 sources
+   public static CompletableFuture async$execute$1(HttpRequest param0, int param1, int param2, Buffer param3, int param4, CompletableFuture param5, HttpResponse param6, int param7, Object param8) {
+      // $FF: Couldn't be decompiled
+   }
 
-                                while (true) {
-                                    v1.join();
-                                    ** GOTO lbl26
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    catch (Throwable var5_6) {
-                        ++var4_4;
-                    }
-lbl26:
-                    // 3 sources
+   public static RequestOptions convertToVertx(InterceptUrlRequestCallback.Params var0) {
+      MultiMap var1 = MultiMap.caseInsensitiveMultiMap();
+      Iterator var2 = var0.httpHeaders().iterator();
 
-                    if (var1_1 == 0) return CompletableFuture.completedFuture(null);
-                } while (var4_4 < 5);
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var5_5;
-                ** continue;
-            }
-            case 2: {
-                v1 = var5_5;
-                var5_5 = var6_7;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
+      while(var2.hasNext()) {
+         HttpHeader var3 = (HttpHeader)var2.next();
+         var1.add(var3.name(), var3.value());
+      }
 
-    public static RequestOptions convertToVertx(InterceptUrlRequestCallback.Params params) {
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        for (HttpHeader httpHeader : params.httpHeaders()) {
-            multiMap.add(httpHeader.name(), httpHeader.value());
-        }
-        return new RequestOptions().setMethod(params.urlRequest().method().equalsIgnoreCase("get") ? HttpMethod.GET : HttpMethod.POST).setAbsoluteURI(params.urlRequest().url()).setHeaders(multiMap);
-    }
+      return (new RequestOptions()).setMethod(var0.urlRequest().method().equalsIgnoreCase("get") ? HttpMethod.GET : HttpMethod.POST).setAbsoluteURI(var0.urlRequest().url()).setHeaders(var1);
+   }
 
-    public static CompletableFuture send(HttpRequest httpRequest, Buffer buffer) {
-        return httpRequest.sendBuffer(buffer).toCompletionStage().toCompletableFuture();
-    }
+   public static CompletableFuture send(HttpRequest var0, Buffer var1) {
+      return var0.sendBuffer(var1).toCompletionStage().toCompletableFuture();
+   }
 
-    public static CompletableFuture send(HttpRequest httpRequest, JsonArray jsonArray) {
-        return httpRequest.sendJson((Object)jsonArray).toCompletionStage().toCompletableFuture();
-    }
+   public static CompletableFuture send(HttpRequest var0, JsonArray var1) {
+      return var0.sendJson(var1).toCompletionStage().toCompletableFuture();
+   }
 
-    public static CompletableFuture send(HttpRequest httpRequest, MultiMap multiMap) {
-        return httpRequest.sendForm(multiMap).toCompletionStage().toCompletableFuture();
-    }
+   public static CompletableFuture send(HttpRequest var0, MultiMap var1) {
+      return var0.sendForm(var1).toCompletionStage().toCompletableFuture();
+   }
 
-    public static CompletableFuture send(HttpRequest httpRequest, Object object) {
-        if (object instanceof Buffer) {
-            return Request.send(httpRequest, (Buffer)object);
-        }
-        if (object instanceof JsonObject) {
-            return Request.send(httpRequest, (JsonObject)object);
-        }
-        if (object instanceof JsonArray) {
-            return Request.send(httpRequest, (JsonArray)object);
-        }
-        if (object instanceof MultiMap) {
-            return Request.send(httpRequest, (MultiMap)object);
-        }
-        if (!(object instanceof MultipartForm)) return CompletableFuture.failedFuture(new Exception("Bad body type."));
-        return Request.send(httpRequest, (MultipartForm)object);
-    }
+   public static CompletableFuture send(HttpRequest var0, Object var1) {
+      if (var1 instanceof Buffer) {
+         return send(var0, (Buffer)var1);
+      } else if (var1 instanceof JsonObject) {
+         return send(var0, (JsonObject)var1);
+      } else if (var1 instanceof JsonArray) {
+         return send(var0, (JsonArray)var1);
+      } else if (var1 instanceof MultiMap) {
+         return send(var0, (MultiMap)var1);
+      } else {
+         return var1 instanceof MultipartForm ? send(var0, (MultipartForm)var1) : CompletableFuture.failedFuture(new Exception("Bad body type."));
+      }
+   }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$execute(HttpRequest var0, int var1_1, int var2_2, CompletableFuture var3_3, int var4_5, Object var5_7) {
-        switch (var4_5) {
-            case 0: {
-                var2_2 = 1;
-                while (var2_2 <= var1_1) {
-                    try {
-                        v0 = Request.send(var0);
-                        if (!v0.isDone()) {
-                            var4_6 = v0;
-                            return var4_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$execute(io.vertx.ext.web.client.HttpRequest int int java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HttpRequest)var0, (int)var1_1, (int)var2_2, (CompletableFuture)var4_6, (int)1));
-                        }
-lbl10:
-                        // 3 sources
+   public static CompletableFuture async$execute(HttpRequest param0, int param1, int param2, CompletableFuture param3, int param4, Object param5) {
+      // $FF: Couldn't be decompiled
+   }
 
-                        while (true) {
-                            var3_3 = (HttpResponse)v0.join();
-                            if (var3_3 != null) {
-                                return CompletableFuture.completedFuture(var3_3.body());
-                            }
-                            break;
-                        }
-                    }
-                    catch (Exception var3_4) {
-                        if (var2_2 != var1_1 || !var3_4.getMessage().contains("HttpProxyConnectException")) ** GOTO lbl18
-                        return CompletableFuture.failedFuture(new Exception("Invalid Proxy!"));
-                    }
-lbl18:
-                    // 2 sources
+   public static CompletableFuture send(HttpRequest var0, Json var1) {
+      return var0.sendJson(var1).toCompletionStage().toCompletableFuture();
+   }
 
-                    ++var2_2;
-                }
-                return CompletableFuture.failedFuture(new Exception("Failed to execute request"));
-            }
-            case 1: {
-                v0 = var3_3;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public static CompletableFuture send(HttpRequest httpRequest, Json json) {
-        return httpRequest.sendJson((Object)json).toCompletionStage().toCompletableFuture();
-    }
-
-    public static CompletableFuture execute(HttpRequest httpRequest) {
-        return Request.execute(httpRequest, false, 3000);
-    }
+   public static CompletableFuture execute(HttpRequest var0) {
+      return execute(var0, false, 3000);
+   }
 }

@@ -1,42 +1,35 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.antibot.impl.px.payload.captcha.util;
 
 import java.time.Instant;
 import java.util.Stack;
 
 public class Timer {
-    public Stack<Integer> performanceList;
-    public long creationTime = Instant.now().toEpochMilli();
+   public Stack performanceList = new Stack();
+   public long creationTime = Instant.now().toEpochMilli();
 
-    public int performanceChange() {
-        int n = this.performanceList.pop();
-        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
-        this.performanceList.push(n);
-        return n - n2;
-    }
+   public int performanceChange() {
+      int var1 = (Integer)this.performanceList.pop();
+      int var2 = this.performanceList.isEmpty() ? 0 : (Integer)this.performanceList.peek();
+      this.performanceList.push(var1);
+      return var1 - var2;
+   }
 
-    public Timer() {
-        this.performanceList = new Stack();
-    }
+   public int currentPerformance() {
+      return (Integer)this.performanceList.peek();
+   }
 
-    public int currentPerformance() {
-        return this.performanceList.peek();
-    }
+   public long gennedTimestamp() {
+      return this.creationTime + (long)this.totalChange();
+   }
 
-    public long gennedTimestamp() {
-        return this.creationTime + (long)this.totalChange();
-    }
+   public int totalChange() {
+      int var1 = (Integer)this.performanceList.firstElement();
+      int var2 = (Integer)this.performanceList.peek();
+      return var2 - var1;
+   }
 
-    public int totalChange() {
-        int n = (Integer)this.performanceList.firstElement();
-        int n2 = this.performanceList.peek();
-        return n2 - n;
-    }
-
-    public int performanceNow(int n) {
-        int n2 = this.performanceList.isEmpty() ? 0 : this.performanceList.peek();
-        return this.performanceList.push(n2 + n);
-    }
+   public int performanceNow(int var1) {
+      int var2 = this.performanceList.isEmpty() ? 0 : (Integer)this.performanceList.peek();
+      return (Integer)this.performanceList.push(var2 + var1);
+   }
 }

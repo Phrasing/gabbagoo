@@ -1,45 +1,37 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.antibot.impl.px.payload.token.Battery
- */
 package io.trickle.task.antibot.impl.px.payload.token;
 
-import io.trickle.task.antibot.impl.px.payload.token.Battery;
-
 public interface Devices$Device {
-    public String getCarrier();
+   String getCarrier();
 
-    public boolean isNfc();
+   boolean isNfc();
 
-    public boolean isGps();
+   boolean isGps();
 
-    public String getConnectionType();
+   String getConnectionType();
 
-    public boolean isTouchscreen();
+   boolean isTouchscreen();
 
-    public String getCellular();
+   String getCellular();
 
-    public int getHeight();
+   int getHeight();
 
-    public int getApiLevel();
+   int getApiLevel();
 
-    public String getDeviceName();
+   String getDeviceName();
 
-    public boolean isWifi();
+   boolean isWifi();
 
-    public boolean isGyroscope();
+   boolean isGyroscope();
 
-    public String getOperatingSystem();
+   String getOperatingSystem();
 
-    public Battery getBattery();
+   Battery getBattery();
 
-    public boolean isAccelerometer();
+   boolean isAccelerometer();
 
-    public String getBrand();
+   String getBrand();
 
-    public int getWidth();
+   int getWidth();
 
-    public boolean isEthernet();
+   boolean isEthernet();
 }

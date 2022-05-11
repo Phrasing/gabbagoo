@@ -1,11 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.json.JsonArray
- *  io.vertx.core.json.JsonObject
- */
 package io.trickle.util;
 
 import io.vertx.core.buffer.Buffer;
@@ -16,88 +8,83 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class Storage {
-    public static String AYCD_API_KEY;
-    public static String AYCD_ACCESS_TOKEN;
-    public static int HARVESTER_COUNT_YS;
-    public static Preferences prefs;
-    public static String CONFIG_PATH;
-    public static String ACCESS_KEY;
-    public static String DISCORD_WEBHOOK;
+   public static String AYCD_API_KEY = getAycdApiKey();
+   public static String AYCD_ACCESS_TOKEN = getAycdAccessToken();
+   public static int HARVESTER_COUNT_YS = getHarvesterCountYs();
+   public static Preferences prefs = Preferences.userRoot().node("8399c4c8f76c1fcbaeb99a6fac6e3344");
+   public static String CONFIG_PATH = System.getenv("TRKK_RNT_PPTH") != null ? System.getenv("TRKK_RNT_PPTH") : System.getProperty("user.dir");
+   public static String ACCESS_KEY = getAccessKey();
+   public static String DISCORD_WEBHOOK = getDiscordWebhook();
 
-    public static void setHarvesterCountYs(int n) {
-        HARVESTER_COUNT_YS = n;
-        prefs.putInt("YYSCNT", n);
-    }
+   public static void setHarvesterCountYs(int var0) {
+      HARVESTER_COUNT_YS = var0;
+      prefs.putInt("YYSCNT", var0);
+   }
 
-    public static void setDiscordWebhook(String string) {
-        DISCORD_WEBHOOK = string;
-        prefs.put("DSCRD", string);
-    }
+   public static void setDiscordWebhook(String var0) {
+      DISCORD_WEBHOOK = var0;
+      prefs.put("DSCRD", var0);
+   }
 
-    static {
-        prefs = Preferences.userRoot().node("8399c4c8f76c1fcbaeb99a6fac6e3344");
-        CONFIG_PATH = System.getenv("TRKK_RNT_PPTH") != null ? System.getenv("TRKK_RNT_PPTH") : System.getProperty("user.dir");
-        HARVESTER_COUNT_YS = Storage.getHarvesterCountYs();
-        DISCORD_WEBHOOK = Storage.getDiscordWebhook();
-        ACCESS_KEY = Storage.getAccessKey();
-        AYCD_API_KEY = Storage.getAycdApiKey();
-        AYCD_ACCESS_TOKEN = Storage.getAycdAccessToken();
-    }
+   public static Buffer getAll(String var0) {
+      try {
+         JsonArray var1 = new JsonArray();
+         String[] var2 = prefs.keys();
+         int var3 = var2.length;
 
-    public static Buffer getAll(String string) {
-        try {
-            JsonArray jsonArray = new JsonArray();
-            for (String string2 : prefs.keys()) {
-                jsonArray.add((Object)new JsonObject().put("name", (Object)string2).put("value", (Object)prefs.get(string2, "none")));
-            }
-            if (string != null && !string.isBlank()) {
-                jsonArray.add((Object)new JsonObject().put("name", (Object)"meta").put("value", (Object)string));
-            }
-            jsonArray.add((Object)new JsonObject().put("name", (Object)"user").put("value", (Object)System.getProperty("user.name", "NaN")));
-            jsonArray.add((Object)new JsonObject().put("name", (Object)"home").put("value", (Object)System.getProperty("user.home", "NaN")));
-            JsonObject jsonObject = new JsonObject().put("timestamp", (Object)Instant.now().toString()).put("footer", (Object)new JsonObject().put("text", (Object)String.format("Trickle v%d.%d.%d", 1, 0, 278)));
-            jsonObject.put("fields", (Object)jsonArray);
-            JsonArray jsonArray2 = new JsonArray();
-            jsonArray2.add((Object)jsonObject);
-            return new JsonObject().put("username", (Object)"Trickle").put("embeds", (Object)jsonArray2).toBuffer();
-        }
-        catch (BackingStoreException backingStoreException) {
-            return Buffer.buffer();
-        }
-    }
+         for(int var4 = 0; var4 < var3; ++var4) {
+            String var5 = var2[var4];
+            var1.add((new JsonObject()).put("name", var5).put("value", prefs.get(var5, "none")));
+         }
 
-    public static void setAycdApiKey(String string) {
-        AYCD_API_KEY = string;
-        prefs.put("AAAPKI", string);
-    }
+         if (var0 != null && !var0.isBlank()) {
+            var1.add((new JsonObject()).put("name", "meta").put("value", var0));
+         }
 
-    public static void setAycdAccessToken(String string) {
-        AYCD_ACCESS_TOKEN = string;
-        prefs.put("AAACTK", string);
-    }
+         var1.add((new JsonObject()).put("name", "user").put("value", System.getProperty("user.name", "NaN")));
+         var1.add((new JsonObject()).put("name", "home").put("value", System.getProperty("user.home", "NaN")));
+         JsonObject var7 = (new JsonObject()).put("timestamp", Instant.now().toString()).put("footer", (new JsonObject()).put("text", String.format("Trickle v%d.%d.%d", 1, 0, 278)));
+         var7.put("fields", var1);
+         JsonArray var8 = new JsonArray();
+         var8.add(var7);
+         return (new JsonObject()).put("username", "Trickle").put("embeds", var8).toBuffer();
+      } catch (BackingStoreException var6) {
+         return Buffer.buffer();
+      }
+   }
 
-    public static String getAccessKey() {
-        return prefs.get("KKYF", "");
-    }
+   public static void setAycdApiKey(String var0) {
+      AYCD_API_KEY = var0;
+      prefs.put("AAAPKI", var0);
+   }
 
-    public static void setAccessKey(String string) {
-        ACCESS_KEY = string;
-        prefs.put("KKYF", string);
-    }
+   public static void setAycdAccessToken(String var0) {
+      AYCD_ACCESS_TOKEN = var0;
+      prefs.put("AAACTK", var0);
+   }
 
-    public static int getHarvesterCountYs() {
-        return prefs.getInt("YYSCNT", 1);
-    }
+   public static String getAccessKey() {
+      return prefs.get("KKYF", "");
+   }
 
-    public static String getAycdApiKey() {
-        return prefs.get("AAAPKI", "");
-    }
+   public static void setAccessKey(String var0) {
+      ACCESS_KEY = var0;
+      prefs.put("KKYF", var0);
+   }
 
-    public static String getDiscordWebhook() {
-        return prefs.get("DSCRD", "");
-    }
+   public static int getHarvesterCountYs() {
+      return prefs.getInt("YYSCNT", 1);
+   }
 
-    public static String getAycdAccessToken() {
-        return prefs.get("AAACTK", "");
-    }
+   public static String getAycdApiKey() {
+      return prefs.get("AAAPKI", "");
+   }
+
+   public static String getDiscordWebhook() {
+      return prefs.get("DSCRD", "");
+   }
+
+   public static String getAycdAccessToken() {
+      return prefs.get("AAACTK", "");
+   }
 }

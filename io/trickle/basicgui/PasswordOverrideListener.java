@@ -1,11 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.Controller
- *  io.trickle.core.Engine
- *  io.trickle.task.TaskController
- */
 package io.trickle.basicgui;
 
 import io.trickle.core.Controller;
@@ -17,32 +9,28 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class PasswordOverrideListener
-implements ActionListener,
-KeyListener {
-    public TextField passwordField;
+public class PasswordOverrideListener implements ActionListener, KeyListener {
+   public TextField passwordField;
 
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
-    }
+   public void keyPressed(KeyEvent var1) {
+   }
 
-    public PasswordOverrideListener(TextField textField) {
-        this.passwordField = textField;
-    }
+   public PasswordOverrideListener(TextField var1) {
+      this.passwordField = var1;
+   }
 
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-    }
+   public void keyReleased(KeyEvent var1) {
+   }
 
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
-    }
+   public void keyTyped(KeyEvent var1) {
+   }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        String string = this.passwordField.getText();
-        if (string.isBlank()) return;
-        System.out.println("Password added -> " + string);
-        ((TaskController)Engine.get().getModule(Controller.TASK)).massPassword(string);
-    }
+   public void actionPerformed(ActionEvent var1) {
+      String var2 = this.passwordField.getText();
+      if (!var2.isBlank()) {
+         System.out.println("Password added -> " + var2);
+         ((TaskController)Engine.get().getModule(Controller.TASK)).massPassword(var2);
+      }
+
+   }
 }

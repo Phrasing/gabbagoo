@@ -1,29 +1,5 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.util.Storage
- *  io.trickle.util.concurrent.VertxUtil
- *  io.trickle.util.request.Request
- *  io.trickle.webclient.ClientType
- *  io.trickle.webclient.RealClientFactory
- *  io.vertx.core.Future
- *  io.vertx.core.Promise
- *  io.vertx.core.Vertx
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.http.HttpVersion
- *  io.vertx.core.json.JsonObject
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- *  io.vertx.ext.web.client.WebClient
- *  io.vertx.ext.web.client.WebClientOptions
- *  io.vertx.ext.web.codec.BodyCodec
- *  org.apache.logging.log4j.LogManager
- *  org.apache.logging.log4j.Logger
- */
 package io.trickle.util;
 
-import io.trickle.util.Storage;
 import io.trickle.util.concurrent.VertxUtil;
 import io.trickle.util.request.Request;
 import io.trickle.webclient.ClientType;
@@ -34,11 +10,13 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpVersion;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.ProxyOptions;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -46,189 +24,159 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class LocalClient {
-    public static Logger logger = LogManager.getLogger((String)"CLIENT");
-    public WebClient chromeClient;
-    public WebClient client;
+   public static Logger logger = LogManager.getLogger("CLIENT");
+   public WebClient chromeClient;
+   public WebClient client;
 
-    public static void lambda$fetchUpdates$0(Promise promise, HttpResponse httpResponse) {
-        try {
-            if (httpResponse.statusCode() != 200) return;
-            Buffer buffer = (Buffer)httpResponse.body();
-            if (buffer == null) return;
-            promise.tryComplete((Object)buffer.toJsonObject());
-        }
-        catch (Throwable throwable) {
-            promise.fail(throwable);
-        }
-    }
-
-    public WebClient getClient() {
-        return this.client;
-    }
-
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$deleteDeviceFromAPI(LocalClient var0, String var1_1, JsonObject var2_2, int var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:850)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1055)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:942)
-         *     at org.benf.cfr.reader.Driver.doClass(Driver.java:84)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:78)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompile(CFRDecompiler.java:91)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:122)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.decompileSaveAll(ResourceDecompiling.java:262)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$decompileSaveAll$0(ResourceDecompiling.java:127)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
-
-    public CompletableFuture deleteDeviceFromAPI(String string, JsonObject jsonObject) {
-        int n = 0;
-        while (n++ < 99999999) {
-            try {
-                CompletableFuture completableFuture = Request.send((HttpRequest)this.postAPI(string).as(BodyCodec.buffer()), (JsonObject)jsonObject);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> LocalClient.async$deleteDeviceFromAPI(this, string, jsonObject, n, completableFuture2, null, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 200) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                logger.warn("Posting device: status:'{}'", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep((long)30000L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> LocalClient.async$deleteDeviceFromAPI(this, string, jsonObject, n, completableFuture4, httpResponse, null, 2, arg_0));
-                }
-                completableFuture3.join();
+   public static void lambda$fetchUpdates$0(Promise var0, HttpResponse var1) {
+      try {
+         if (var1.statusCode() == 200) {
+            Buffer var2 = (Buffer)var1.body();
+            if (var2 != null) {
+               var0.tryComplete(var2.toJsonObject());
             }
-            catch (Throwable throwable) {
-                CompletableFuture completableFuture = VertxUtil.hardCodedSleep((long)3000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> LocalClient.async$deleteDeviceFromAPI(this, string, jsonObject, n, completableFuture5, null, throwable, 3, arg_0));
-                }
-                completableFuture.join();
+         }
+      } catch (Throwable var3) {
+         var0.fail(var3);
+      }
+
+   }
+
+   public WebClient getClient() {
+      return this.client;
+   }
+
+   public static CompletableFuture async$deleteDeviceFromAPI(LocalClient param0, String param1, JsonObject param2, int param3, CompletableFuture param4, HttpResponse param5, Throwable param6, int param7, Object param8) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public CompletableFuture deleteDeviceFromAPI(String var1, JsonObject var2) {
+      int var3 = 0;
+
+      while(var3++ < 99999999) {
+         CompletableFuture var5;
+         CompletableFuture var7;
+         try {
+            var7 = Request.send(this.postAPI(var1).as(BodyCodec.buffer()), var2);
+            if (!var7.isDone()) {
+               var5 = var7;
+               return var5.exceptionally(Function.identity()).thenCompose(LocalClient::async$deleteDeviceFromAPI);
             }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
 
-    /*
-     * Exception decompiling
-     */
-    public static CompletableFuture async$fetchDeviceFromAPI(LocalClient var0, String var1_1, String var2_2, int var3_3, CompletableFuture var4_4, HttpResponse var5_6, Throwable var6_7, int var7_8, Object var8_9) {
-        /*
-         * This method has failed to decompile.  When submitting a bug report, please provide this stack trace, and (if you hold appropriate legal rights) the relevant class file.
-         * 
-         * org.benf.cfr.reader.util.ConfusedCFRException: Tried to end blocks [7[CATCHBLOCK]], but top level block is 11[UNCONDITIONALDOLOOP]
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.processEndingBlocks(Op04StructuredStatement.java:435)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op04StructuredStatement.buildNestedBlocks(Op04StructuredStatement.java:484)
-         *     at org.benf.cfr.reader.bytecode.analysis.opgraph.Op03SimpleStatement.createInitialStructuredBlock(Op03SimpleStatement.java:736)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisInner(CodeAnalyser.java:850)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysisOrWrapFail(CodeAnalyser.java:278)
-         *     at org.benf.cfr.reader.bytecode.CodeAnalyser.getAnalysis(CodeAnalyser.java:201)
-         *     at org.benf.cfr.reader.entities.attributes.AttributeCode.analyse(AttributeCode.java:94)
-         *     at org.benf.cfr.reader.entities.Method.analyse(Method.java:531)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseMid(ClassFile.java:1055)
-         *     at org.benf.cfr.reader.entities.ClassFile.analyseTop(ClassFile.java:942)
-         *     at org.benf.cfr.reader.Driver.doClass(Driver.java:84)
-         *     at org.benf.cfr.reader.CfrDriverImpl.analyse(CfrDriverImpl.java:78)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompile(CFRDecompiler.java:91)
-         *     at the.bytecode.club.bytecodeviewer.decompilers.impl.CFRDecompiler.decompileToZip(CFRDecompiler.java:122)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.decompileSaveAll(ResourceDecompiling.java:262)
-         *     at the.bytecode.club.bytecodeviewer.resources.ResourceDecompiling.lambda$decompileSaveAll$0(ResourceDecompiling.java:127)
-         *     at java.base/java.lang.Thread.run(Thread.java:833)
-         */
-        throw new IllegalStateException("Decompilation failed");
-    }
+            HttpResponse var4 = (HttpResponse)var7.join();
+            if (var4 != null) {
+               if (var4.statusCode() == 200) {
+                  return CompletableFuture.completedFuture((Object)null);
+               }
 
-    public CompletableFuture fetchDeviceFromAPI(String string) {
-        return this.fetchDeviceFromAPI(string, null);
-    }
+               logger.warn("Posting device: status:'{}'", var4.statusCode());
+               var7 = VertxUtil.hardCodedSleep(30000L);
+               if (!var7.isDone()) {
+                  var5 = var7;
+                  return var5.exceptionally(Function.identity()).thenCompose(LocalClient::async$deleteDeviceFromAPI);
+               }
 
-    public LocalClient(Vertx vertx) {
-        this.chromeClient = RealClientFactory.createWebClient((Vertx)vertx, (ClientType)ClientType.CHROME, null);
-        this.client = WebClient.create((Vertx)vertx, (WebClientOptions)new WebClientOptions().setLogActivity(false).setUserAgentEnabled(false).setProtocolVersion(HttpVersion.HTTP_2).setUseAlpn(true).setTrustAll(false).setConnectTimeout(150000).setSslHandshakeTimeoutUnit(TimeUnit.SECONDS).setSslHandshakeTimeout(150L).setIdleTimeoutUnit(TimeUnit.SECONDS).setIdleTimeout(150).setKeepAlive(true).setKeepAliveTimeout(30).setHttp2KeepAliveTimeout(100).setHttp2MaxPoolSize(150).setHttp2MultiplexingLimit(200).setPoolCleanerPeriod(15000).setMaxPoolSize(150).setTryUseCompression(true).setTcpFastOpen(true).setTcpKeepAlive(true).setTcpNoDelay(true).setTcpQuickAck(true).setFollowRedirects(false));
-    }
-
-    public CompletableFuture fetchDeviceFromAPI(String string, String string2) {
-        int n = 0;
-        while (n++ < 99999999) {
-            try {
-                CompletableFuture completableFuture = Request.send((HttpRequest)(string2 == null ? this.fetchAPI(string).as(BodyCodec.buffer()) : this.fetchAPI(string).putHeader("ua", string2).as(BodyCodec.buffer())));
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> LocalClient.async$fetchDeviceFromAPI(this, string, string2, n, completableFuture2, null, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse == null) continue;
-                if (httpResponse.statusCode() == 200 && httpResponse.body() != null) {
-                    JsonObject jsonObject = httpResponse.bodyAsJsonObject();
-                    return CompletableFuture.completedFuture(jsonObject);
-                }
-                logger.info(((Buffer)httpResponse.body()).toString());
-                logger.warn("Waiting for sensor: status:'{}'", (Object)httpResponse.statusCode());
-                CompletableFuture completableFuture3 = VertxUtil.hardCodedSleep((long)3000L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> LocalClient.async$fetchDeviceFromAPI(this, string, string2, n, completableFuture4, httpResponse, null, 2, arg_0));
-                }
-                completableFuture3.join();
+               var7.join();
             }
-            catch (Throwable throwable) {
-                CompletableFuture completableFuture = VertxUtil.hardCodedSleep((long)3000L);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture5 = completableFuture;
-                    return ((CompletableFuture)completableFuture5.exceptionally(Function.identity())).thenCompose(arg_0 -> LocalClient.async$fetchDeviceFromAPI(this, string, string2, n, completableFuture5, null, throwable, 3, arg_0));
-                }
-                completableFuture.join();
+         } catch (Throwable var6) {
+            var7 = VertxUtil.hardCodedSleep(3000L);
+            if (!var7.isDone()) {
+               var5 = var7;
+               return var5.exceptionally(Function.identity()).thenCompose(LocalClient::async$deleteDeviceFromAPI);
             }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
 
-    public Future fetchUpdates() {
-        HttpRequest httpRequest = this.client.getAbs("https://loudounchris.xyz/api/patch").putHeader("accept", "application/json").putHeader("content-type", "application/json").putHeader("user-agent", "tomato-agent").putHeader("key", Storage.ACCESS_KEY).as(BodyCodec.buffer());
-        Promise promise = Promise.promise();
-        httpRequest.send().onSuccess(arg_0 -> LocalClient.lambda$fetchUpdates$0(promise, arg_0)).onFailure(arg_0 -> ((Promise)promise).fail(arg_0));
-        return promise.future();
-    }
+            var7.join();
+         }
+      }
 
-    public HttpRequest postAPI(String string) {
-        HttpRequest httpRequest = this.client.postAbs(string).as(BodyCodec.jsonObject());
-        httpRequest.putHeader("accept", "application/json");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", "tomato-agent");
-        httpRequest.putHeader("key", Storage.ACCESS_KEY);
-        return httpRequest;
-    }
+      return CompletableFuture.completedFuture((Object)null);
+   }
 
-    public HttpRequest fetchAPI(String string) {
-        HttpRequest httpRequest = this.client.getAbs(string).as(BodyCodec.jsonObject());
-        httpRequest.putHeader("accept", "application/json");
-        httpRequest.putHeader("content-type", "application/json");
-        httpRequest.putHeader("user-agent", "tomato-agent");
-        httpRequest.putHeader("key", Storage.ACCESS_KEY);
-        return httpRequest;
-    }
+   public static CompletableFuture async$fetchDeviceFromAPI(LocalClient param0, String param1, String param2, int param3, CompletableFuture param4, HttpResponse param5, Throwable param6, int param7, Object param8) {
+      // $FF: Couldn't be decompiled
+   }
 
-    public WebClient getChromeClient() {
-        return this.chromeClient;
-    }
+   public CompletableFuture fetchDeviceFromAPI(String var1) {
+      return this.fetchDeviceFromAPI(var1, (String)null);
+   }
+
+   public LocalClient(Vertx var1) {
+      this.chromeClient = RealClientFactory.createWebClient(var1, ClientType.CHROME, (ProxyOptions)null);
+      this.client = WebClient.create(var1, (new WebClientOptions()).setLogActivity(false).setUserAgentEnabled(false).setProtocolVersion(HttpVersion.HTTP_2).setUseAlpn(true).setTrustAll(false).setConnectTimeout(150000).setSslHandshakeTimeoutUnit(TimeUnit.SECONDS).setSslHandshakeTimeout(150L).setIdleTimeoutUnit(TimeUnit.SECONDS).setIdleTimeout(150).setKeepAlive(true).setKeepAliveTimeout(30).setHttp2KeepAliveTimeout(100).setHttp2MaxPoolSize(150).setHttp2MultiplexingLimit(200).setPoolCleanerPeriod(15000).setMaxPoolSize(150).setTryUseCompression(true).setTcpFastOpen(true).setTcpKeepAlive(true).setTcpNoDelay(true).setTcpQuickAck(true).setFollowRedirects(false));
+   }
+
+   public CompletableFuture fetchDeviceFromAPI(String var1, String var2) {
+      int var3 = 0;
+
+      while(var3++ < 99999999) {
+         CompletableFuture var6;
+         CompletableFuture var8;
+         try {
+            var8 = Request.send(var2 == null ? this.fetchAPI(var1).as(BodyCodec.buffer()) : this.fetchAPI(var1).putHeader("ua", var2).as(BodyCodec.buffer()));
+            if (!var8.isDone()) {
+               var6 = var8;
+               return var6.exceptionally(Function.identity()).thenCompose(LocalClient::async$fetchDeviceFromAPI);
+            }
+
+            HttpResponse var4 = (HttpResponse)var8.join();
+            if (var4 != null) {
+               if (var4.statusCode() == 200 && var4.body() != null) {
+                  JsonObject var5 = var4.bodyAsJsonObject();
+                  return CompletableFuture.completedFuture(var5);
+               }
+
+               logger.info(((Buffer)var4.body()).toString());
+               logger.warn("Waiting for sensor: status:'{}'", var4.statusCode());
+               var8 = VertxUtil.hardCodedSleep(3000L);
+               if (!var8.isDone()) {
+                  var6 = var8;
+                  return var6.exceptionally(Function.identity()).thenCompose(LocalClient::async$fetchDeviceFromAPI);
+               }
+
+               var8.join();
+            }
+         } catch (Throwable var7) {
+            var8 = VertxUtil.hardCodedSleep(3000L);
+            if (!var8.isDone()) {
+               var6 = var8;
+               return var6.exceptionally(Function.identity()).thenCompose(LocalClient::async$fetchDeviceFromAPI);
+            }
+
+            var8.join();
+         }
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public Future fetchUpdates() {
+      HttpRequest var1 = this.client.getAbs("https://loudounchris.xyz/api/patch").putHeader("accept", "application/json").putHeader("content-type", "application/json").putHeader("user-agent", "tomato-agent").putHeader("key", Storage.ACCESS_KEY).as(BodyCodec.buffer());
+      Promise var2 = Promise.promise();
+      Future var10000 = var1.send().onSuccess(LocalClient::lambda$fetchUpdates$0);
+      Objects.requireNonNull(var2);
+      var10000.onFailure(var2::fail);
+      return var2.future();
+   }
+
+   public HttpRequest postAPI(String var1) {
+      HttpRequest var2 = this.client.postAbs(var1).as(BodyCodec.jsonObject());
+      var2.putHeader("accept", "application/json");
+      var2.putHeader("content-type", "application/json");
+      var2.putHeader("user-agent", "tomato-agent");
+      var2.putHeader("key", Storage.ACCESS_KEY);
+      return var2;
+   }
+
+   public HttpRequest fetchAPI(String var1) {
+      HttpRequest var2 = this.client.getAbs(var1).as(BodyCodec.jsonObject());
+      var2.putHeader("accept", "application/json");
+      var2.putHeader("content-type", "application/json");
+      var2.putHeader("user-agent", "tomato-agent");
+      var2.putHeader("key", Storage.ACCESS_KEY);
+      return var2;
+   }
+
+   public WebClient getChromeClient() {
+      return this.chromeClient;
+   }
 }

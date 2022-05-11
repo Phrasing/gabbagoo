@@ -1,49 +1,47 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.netty.handler.codec.http.cookie.Cookie
- */
 package io.trickle.webclient;
 
 import io.netty.handler.codec.http.cookie.Cookie;
 
-public class CookieJar$ExpirableCookie
-implements Comparable {
-    public Cookie wrappedCookie;
-    public long expiryTime;
+public class CookieJar$ExpirableCookie implements Comparable {
+   public Cookie wrappedCookie;
+   public long expiryTime;
 
-    public int compareTo(Object object) {
-        return this.compareTo((Cookie)object);
-    }
+   public int compareTo(Object var1) {
+      return this.compareTo((Cookie)var1);
+   }
 
-    public void setExpiry(long l) {
-        if (this.expiryTime != 0L) return;
-        this.expiryTime = CookieJar$ExpirableCookie.getEpoch() + l;
-    }
+   public void setExpiry(long var1) {
+      if (this.expiryTime == 0L) {
+         this.expiryTime = getEpoch() + var1;
+      }
 
-    public String toString() {
-        return "ExpirableCookie{expiryTime=" + this.expiryTime + ", wrappedCookie=" + this.wrappedCookie + "}";
-    }
+   }
 
-    public int compareTo(Cookie cookie) {
-        return this.wrappedCookie.compareTo((Object)cookie);
-    }
+   public String toString() {
+      return "ExpirableCookie{expiryTime=" + this.expiryTime + ", wrappedCookie=" + this.wrappedCookie + "}";
+   }
 
-    public static long getEpoch() {
-        return System.currentTimeMillis() / 1000L;
-    }
+   public int compareTo(Cookie var1) {
+      return this.wrappedCookie.compareTo(var1);
+   }
 
-    public boolean shouldExpire() {
-        if (this.expiryTime != 0L) return CookieJar$ExpirableCookie.getEpoch() >= this.expiryTime;
-        return false;
-    }
+   public static long getEpoch() {
+      return System.currentTimeMillis() / 1000L;
+   }
 
-    public CookieJar$ExpirableCookie(Cookie cookie) {
-        this.wrappedCookie = cookie;
-    }
+   public boolean shouldExpire() {
+      if (this.expiryTime == 0L) {
+         return false;
+      } else {
+         return getEpoch() >= this.expiryTime;
+      }
+   }
 
-    public Cookie getWrappedCookie() {
-        return this.wrappedCookie;
-    }
+   public CookieJar$ExpirableCookie(Cookie var1) {
+      this.wrappedCookie = var1;
+   }
+
+   public Cookie getWrappedCookie() {
+      return this.wrappedCookie;
+   }
 }

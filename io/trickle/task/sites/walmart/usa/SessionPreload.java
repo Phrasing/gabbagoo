@@ -1,666 +1,643 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.sites.walmart.usa.API
- *  io.trickle.task.sites.walmart.usa.Walmart
- *  io.trickle.task.sites.walmart.usa.WalmartAPI
- *  io.trickle.util.request.Request
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.json.JsonObject
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- */
 package io.trickle.task.sites.walmart.usa;
 
-import io.trickle.task.sites.walmart.usa.API;
-import io.trickle.task.sites.walmart.usa.Walmart;
-import io.trickle.task.sites.walmart.usa.WalmartAPI;
 import io.trickle.util.request.Request;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
-import java.lang.invoke.LambdaMetafactory;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
 public class SessionPreload {
-    public WalmartAPI client;
+   public WalmartAPI client;
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$putLocation(SessionPreload var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = var0.client.putLocation();
-                try {
-                    v0 = Request.send((HttpRequest)var1_1, (Buffer)new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"postalCode\":\"" + var0.client.getTask().getProfile().getZip() + "\",\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\",\"serviceTypes\":\"ALL\"}").toBuffer());
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$putLocation(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-lbl9:
-                    // 3 sources
+   public static CompletableFuture async$putLocation(SessionPreload var0, HttpRequest var1, CompletableFuture var2, int var3, Object var4) {
+      CompletableFuture var10000;
+      boolean var10001;
+      switch (var3) {
+         case 0:
+            var1 = var0.client.putLocation();
 
-                    while (true) {
-                        var2_2 = (HttpResponse)v0.join();
-                        if (var2_2 == null) return CompletableFuture.completedFuture(null);
-                        break;
-                    }
-                }
-                catch (Throwable var2_3) {
-                    // empty catch block
-                }
-                return CompletableFuture.completedFuture(null);
+            try {
+               var10000 = Request.send(var1, (new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"postalCode\":\"" + var0.client.getTask().getProfile().getZip() + "\",\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\",\"serviceTypes\":\"ALL\"}")).toBuffer());
+               if (!var10000.isDone()) {
+                  CompletableFuture var8 = var10000;
+                  return var8.exceptionally(Function.identity()).thenCompose(SessionPreload::async$putLocation);
+               }
+               break;
+            } catch (Throwable var6) {
+               var10001 = false;
+               return CompletableFuture.completedFuture((Object)null);
             }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
+         case 1:
+            var10000 = var2;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      try {
+         HttpResponse var7 = (HttpResponse)var10000.join();
+         if (var7 != null) {
+         }
+      } catch (Throwable var5) {
+         var10001 = false;
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$putCart(SessionPreload var0, HttpRequest var1, CompletableFuture var2, int var3, Object var4) {
+      label35: {
+         CompletableFuture var10000;
+         boolean var10001;
+         switch (var3) {
+            case 0:
+               var1 = var0.client.putCart();
+
+               try {
+                  String var10003 = var0.client.getTask().getProfile().getZip();
+                  var10000 = Request.send(var1, (new JsonObject("{\"currencyCode\":\"USD\",\"location\":{\"postalCode\":\"" + var10003 + "\",\"state\":\"" + var0.client.getTask().getProfile().getState() + "\",\"country\":\"USA\",\"isZipLocated\":false},\"storeIds\":[2648,5434,2031,2280,5426]}")).toBuffer());
+                  if (!var10000.isDone()) {
+                     CompletableFuture var8 = var10000;
+                     return var8.exceptionally(Function.identity()).thenCompose(SessionPreload::async$putCart);
+                  }
+                  break;
+               } catch (Throwable var6) {
+                  var10001 = false;
+                  break label35;
+               }
+            case 1:
+               var10000 = var2;
+               break;
+            default:
+               throw new IllegalArgumentException();
+         }
+
+         try {
+            HttpResponse var7 = (HttpResponse)var10000.join();
+            if (var7 != null) {
             }
-        }
-        throw new IllegalArgumentException();
-    }
+         } catch (Throwable var5) {
+            var10001 = false;
+         }
+      }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$putCart(SessionPreload var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = var0.client.putCart();
-                try {
-                    v0 = Request.send((HttpRequest)var1_1, (Buffer)new JsonObject("{\"currencyCode\":\"USD\",\"location\":{\"postalCode\":\"" + var0.client.getTask().getProfile().getZip() + "\",\"state\":\"" + var0.client.getTask().getProfile().getState() + "\",\"country\":\"USA\",\"isZipLocated\":false},\"storeIds\":[2648,5434,2031,2280,5426]}").toBuffer());
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$putCart(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-lbl9:
-                    // 3 sources
+      var0.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
+      var0.client.getWebClient().cookieStore().removeAnyMatch("CRT");
+      return CompletableFuture.completedFuture((Object)null);
+   }
 
-                    while (true) {
-                        var2_2 = (HttpResponse)v0.join();
-                        if (var2_2 == null) {
-                            // empty if block
-                        }
-                        break;
-                    }
-                }
-                catch (Throwable var2_3) {
-                    // empty catch block
-                }
-                var0.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
-                var0.client.getWebClient().cookieStore().removeAnyMatch("CRT");
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
+   public CompletableFuture fetchCart() {
+      HttpRequest var1 = this.client.getCart();
 
-    public CompletableFuture fetchCart() {
-        HttpRequest httpRequest = this.client.getCart();
-        try {
-            CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchCart(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-            if (httpResponse == null) return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
+      try {
+         CompletableFuture var10000 = Request.send(var1);
+         if (!var10000.isDone()) {
+            CompletableFuture var3 = var10000;
+            return var3.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetchCart);
+         }
 
-    public CompletableFuture fetch() {
-        try {
-            CompletableFuture completableFuture = this.zyDid();
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetch(this, completableFuture2, 1, arg_0));
-            }
-            completableFuture.join();
-            CompletableFuture completableFuture3 = this.fetchCart();
-            if (!completableFuture3.isDone()) {
-                CompletableFuture completableFuture4 = completableFuture3;
-                return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetch(this, completableFuture4, 2, arg_0));
-            }
-            completableFuture3.join();
-            CompletableFuture completableFuture5 = this.updateLocation();
-            if (!completableFuture5.isDone()) {
-                CompletableFuture completableFuture6 = completableFuture5;
-                return ((CompletableFuture)completableFuture6.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetch(this, completableFuture6, 3, arg_0));
-            }
-            completableFuture5.join();
-            CompletableFuture completableFuture7 = this.putLocation();
-            if (!completableFuture7.isDone()) {
-                CompletableFuture completableFuture8 = completableFuture7;
-                return ((CompletableFuture)completableFuture8.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetch(this, completableFuture8, 4, arg_0));
-            }
-            completableFuture7.join();
-            CompletableFuture completableFuture9 = this.doPressoSearch();
-            if (!completableFuture9.isDone()) {
-                CompletableFuture completableFuture10 = completableFuture9;
-                return ((CompletableFuture)completableFuture10.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetch(this, completableFuture10, 5, arg_0));
-            }
-            completableFuture9.join();
-            this.client.getWebClient().cookieStore().put("test_cookie", "CheckForPermission", ".walmart.com");
-            CompletableFuture completableFuture11 = this.fetchTerraFirma();
-            if (!completableFuture11.isDone()) {
-                CompletableFuture completableFuture12 = completableFuture11;
-                return ((CompletableFuture)completableFuture12.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetch(this, completableFuture12, 6, arg_0));
-            }
-            completableFuture11.join();
-            CompletableFuture completableFuture13 = this.fetchMidas();
-            if (!completableFuture13.isDone()) {
-                CompletableFuture completableFuture14 = completableFuture13;
-                return ((CompletableFuture)completableFuture14.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetch(this, completableFuture14, 7, arg_0));
-            }
-            completableFuture13.join();
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        this.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
-        this.client.getWebClient().cookieStore().removeAnyMatch("CRT");
-        return CompletableFuture.completedFuture(null);
-    }
+         HttpResponse var2 = (HttpResponse)var10000.join();
+         if (var2 != null) {
+         }
+      } catch (Throwable var4) {
+      }
 
-    public static CompletableFuture createSession(Walmart walmart) {
-        return new SessionPreload((API)walmart.getClient()).fetch();
-    }
+      return CompletableFuture.completedFuture((Object)null);
+   }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$fetch(SessionPreload var0, CompletableFuture var1_1, int var2_3, Object var3_11) {
-        switch (var2_3) {
-            case 0: {
-                try {
-                    v0 = var0.zyDid();
-                    if (!v0.isDone()) {
-                        var2_4 = v0;
-                        return var2_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetch(io.trickle.task.sites.walmart.usa.SessionPreload java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (CompletableFuture)var2_4, (int)1));
-                    }
-lbl8:
-                    // 3 sources
+   public CompletableFuture fetch() {
+      try {
+         CompletableFuture var10000 = this.zyDid();
+         CompletableFuture var2;
+         if (!var10000.isDone()) {
+            var2 = var10000;
+            return var2.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+         }
 
-                    while (true) {
-                        v0.join();
-                        v1 = var0.fetchCart();
-                        if (!v1.isDone()) {
-                            var2_5 = v1;
-                            return var2_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetch(io.trickle.task.sites.walmart.usa.SessionPreload java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (CompletableFuture)var2_5, (int)2));
-                        }
-lbl15:
-                        // 3 sources
+         var10000.join();
+         var10000 = this.fetchCart();
+         if (!var10000.isDone()) {
+            var2 = var10000;
+            return var2.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+         }
 
-                        while (true) {
-                            v1.join();
-                            v2 = var0.updateLocation();
-                            if (!v2.isDone()) {
-                                var2_6 = v2;
-                                return var2_6.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetch(io.trickle.task.sites.walmart.usa.SessionPreload java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (CompletableFuture)var2_6, (int)3));
-                            }
-lbl22:
-                            // 3 sources
+         var10000.join();
+         var10000 = this.updateLocation();
+         if (!var10000.isDone()) {
+            var2 = var10000;
+            return var2.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+         }
 
-                            while (true) {
-                                v2.join();
-                                v3 = var0.putLocation();
-                                if (!v3.isDone()) {
-                                    var2_7 = v3;
-                                    return var2_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetch(io.trickle.task.sites.walmart.usa.SessionPreload java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (CompletableFuture)var2_7, (int)4));
-                                }
-lbl29:
-                                // 3 sources
+         var10000.join();
+         var10000 = this.putLocation();
+         if (!var10000.isDone()) {
+            var2 = var10000;
+            return var2.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+         }
 
-                                while (true) {
-                                    v3.join();
-                                    v4 = var0.doPressoSearch();
-                                    if (!v4.isDone()) {
-                                        var2_8 = v4;
-                                        return var2_8.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetch(io.trickle.task.sites.walmart.usa.SessionPreload java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (CompletableFuture)var2_8, (int)5));
-                                    }
-lbl36:
-                                    // 3 sources
+         var10000.join();
+         var10000 = this.doPressoSearch();
+         if (!var10000.isDone()) {
+            var2 = var10000;
+            return var2.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+         }
 
-                                    while (true) {
-                                        v4.join();
-                                        var0.client.getWebClient().cookieStore().put("test_cookie", "CheckForPermission", ".walmart.com");
-                                        v5 = var0.fetchTerraFirma();
-                                        if (!v5.isDone()) {
-                                            var2_9 = v5;
-                                            return var2_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetch(io.trickle.task.sites.walmart.usa.SessionPreload java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (CompletableFuture)var2_9, (int)6));
-                                        }
-lbl45:
-                                        // 3 sources
+         var10000.join();
+         this.client.getWebClient().cookieStore().put("test_cookie", "CheckForPermission", ".walmart.com");
+         var10000 = this.fetchTerraFirma();
+         if (!var10000.isDone()) {
+            var2 = var10000;
+            return var2.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+         }
 
-                                        while (true) {
-                                            v5.join();
-                                            v6 = var0.fetchMidas();
-                                            if (!v6.isDone()) {
-                                                var2_10 = v6;
-                                                return var2_10.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetch(io.trickle.task.sites.walmart.usa.SessionPreload java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (CompletableFuture)var2_10, (int)7));
-                                            }
-lbl52:
-                                            // 3 sources
+         var10000.join();
+         var10000 = this.fetchMidas();
+         if (!var10000.isDone()) {
+            var2 = var10000;
+            return var2.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+         }
 
-                                            while (true) {
-                                                v6.join();
-                                                break;
-                                            }
-                                            break;
-                                        }
-                                        break;
+         var10000.join();
+      } catch (Throwable var3) {
+      }
+
+      this.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
+      this.client.getWebClient().cookieStore().removeAnyMatch("CRT");
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture createSession(Walmart var0) {
+      return (new SessionPreload((API)var0.getClient())).fetch();
+   }
+
+   public static CompletableFuture async$fetch(SessionPreload var0, CompletableFuture var1, int var2, Object var3) {
+      label100: {
+         CompletableFuture var10000;
+         boolean var10001;
+         label108: {
+            CompletableFuture var12;
+            label109: {
+               label110: {
+                  label111: {
+                     label86: {
+                        label85: {
+                           switch (var2) {
+                              case 0:
+                                 try {
+                                    var10000 = var0.zyDid();
+                                    if (!var10000.isDone()) {
+                                       var12 = var10000;
+                                       return var12.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
                                     }
                                     break;
-                                }
-                                break;
-                            }
-                            break;
+                                 } catch (Throwable var11) {
+                                    var10001 = false;
+                                    break label100;
+                                 }
+                              case 1:
+                                 var10000 = var1;
+                                 break;
+                              case 2:
+                                 var10000 = var1;
+                                 break label85;
+                              case 3:
+                                 var10000 = var1;
+                                 break label86;
+                              case 4:
+                                 var10000 = var1;
+                                 break label111;
+                              case 5:
+                                 var10000 = var1;
+                                 break label110;
+                              case 6:
+                                 var10000 = var1;
+                                 break label109;
+                              case 7:
+                                 var10000 = var1;
+                                 break label108;
+                              default:
+                                 throw new IllegalArgumentException();
+                           }
+
+                           try {
+                              var10000.join();
+                              var10000 = var0.fetchCart();
+                              if (!var10000.isDone()) {
+                                 var12 = var10000;
+                                 return var12.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+                              }
+                           } catch (Throwable var10) {
+                              var10001 = false;
+                              break label100;
+                           }
                         }
-                        break;
-                    }
-                }
-                catch (Throwable var1_2) {
-                    // empty catch block
-                }
-                var0.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
-                var0.client.getWebClient().cookieStore().removeAnyMatch("CRT");
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var1_1;
-                ** continue;
-            }
-            case 2: {
-                v1 = var1_1;
-                ** continue;
-            }
-            case 3: {
-                v2 = var1_1;
-                ** continue;
-            }
-            case 4: {
-                v3 = var1_1;
-                ** continue;
-            }
-            case 5: {
-                v4 = var1_1;
-                ** continue;
-            }
-            case 6: {
-                v5 = var1_1;
-                ** continue;
-            }
-            case 7: {
-                v6 = var1_1;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public CompletableFuture zyDid() {
-        HttpRequest httpRequest = this.client.updateCheck();
-        try {
-            CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$zyDid(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-            if (httpResponse == null) return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture fetchMidas() {
-        HttpRequest httpRequest = this.client.midasScan();
-        try {
-            CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchMidas(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-            if (httpResponse == null) return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$fetchCart(SessionPreload var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = var0.client.getCart();
-                try {
-                    v0 = Request.send((HttpRequest)var1_1);
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetchCart(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-lbl9:
-                    // 3 sources
-
-                    while (true) {
-                        var2_2 = (HttpResponse)v0.join();
-                        if (var2_2 == null) return CompletableFuture.completedFuture(null);
-                        break;
-                    }
-                }
-                catch (Throwable var2_3) {
-                    // empty catch block
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$zyDid(SessionPreload var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = var0.client.updateCheck();
-                try {
-                    v0 = Request.send((HttpRequest)var1_1);
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$zyDid(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-lbl9:
-                    // 3 sources
-
-                    while (true) {
-                        var2_2 = (HttpResponse)v0.join();
-                        if (var2_2 == null) return CompletableFuture.completedFuture(null);
-                        break;
-                    }
-                }
-                catch (Throwable var2_3) {
-                    // empty catch block
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$doPressoSearch(SessionPreload var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = var0.client.presoSearch();
-                try {
-                    v0 = Request.send((HttpRequest)var1_1);
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$doPressoSearch(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-lbl9:
-                    // 3 sources
-
-                    while (true) {
-                        var2_2 = (HttpResponse)v0.join();
-                        if (var2_2 == null) return CompletableFuture.completedFuture(null);
-                        break;
-                    }
-                }
-                catch (Throwable var2_3) {
-                    // empty catch block
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public CompletableFuture doPressoSearch() {
-        HttpRequest httpRequest = this.client.presoSearch();
-        try {
-            CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$doPressoSearch(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-            if (httpResponse == null) return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture putLocation() {
-        HttpRequest httpRequest = this.client.putLocation();
-        try {
-            CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (Buffer)new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"postalCode\":\"" + this.client.getTask().getProfile().getZip() + "\",\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\",\"serviceTypes\":\"ALL\"}").toBuffer());
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$putLocation(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-            if (httpResponse == null) return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture putCart() {
-        HttpRequest httpRequest = this.client.putCart();
-        try {
-            CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (Buffer)new JsonObject("{\"currencyCode\":\"USD\",\"location\":{\"postalCode\":\"" + this.client.getTask().getProfile().getZip() + "\",\"state\":\"" + this.client.getTask().getProfile().getState() + "\",\"country\":\"USA\",\"isZipLocated\":false},\"storeIds\":[2648,5434,2031,2280,5426]}").toBuffer());
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$putCart(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-            if (httpResponse == null) {
-                // empty if block
-            }
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        this.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
-        this.client.getWebClient().cookieStore().removeAnyMatch("CRT");
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$fetchMidas(SessionPreload var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = var0.client.midasScan();
-                try {
-                    v0 = Request.send((HttpRequest)var1_1);
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetchMidas(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-lbl9:
-                    // 3 sources
-
-                    while (true) {
-                        var2_2 = (HttpResponse)v0.join();
-                        if (var2_2 == null) return CompletableFuture.completedFuture(null);
-                        break;
-                    }
-                }
-                catch (Throwable var2_3) {
-                    // empty catch block
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$updateLocation(SessionPreload var0, HttpRequest var1_1, CompletableFuture var2_2, int var3_4, Object var4_6) {
-        switch (var3_4) {
-            case 0: {
-                var1_1 = var0.client.getLocation();
-                try {
-                    v0 = Request.send((HttpRequest)var1_1, (Buffer)new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\"}").toBuffer());
-                    if (!v0.isDone()) {
-                        var3_5 = v0;
-                        return var3_5.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$updateLocation(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (HttpRequest)var1_1, (CompletableFuture)var3_5, (int)1));
-                    }
-lbl9:
-                    // 3 sources
-
-                    while (true) {
-                        var2_2 = (HttpResponse)v0.join();
-                        if (var2_2 == null) return CompletableFuture.completedFuture(null);
-                        break;
-                    }
-                }
-                catch (Throwable var2_3) {
-                    // empty catch block
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public CompletableFuture fetchTerraFirma() {
-        try {
-            JsonObject jsonObject = new JsonObject("{\"variables\":\"{\\\"casperSlots\\\":{\\\"fulfillmentType\\\":\\\"ACC\\\",\\\"reservationType\\\":\\\"SLOTS\\\"},\\\"postalAddress\\\":{\\\"addressType\\\":\\\"RESIDENTIAL\\\",\\\"countryCode\\\":\\\"USA\\\",\\\"postalCode\\\":\\\"" + this.client.getTask().getProfile().getZip() + "\\\",\\\"stateOrProvinceCode\\\":\\\"" + this.client.getTask().getProfile().getState() + "\\\",\\\"zipLocated\\\":true},\\\"storeFrontIds\\\":[{\\\"distance\\\":2.24,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91672\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91672},{\\\"distance\\\":3.04,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"5936\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":5936},{\\\"distance\\\":3.31,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"90563\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":90563},{\\\"distance\\\":3.41,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91675\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91675},{\\\"distance\\\":5.58,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91121\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91121}],\\\"productId\\\":\\\"152481472\\\",\\\"selected\\\":false}\"}");
-            int n = 0;
-            while (n < 5) {
-                HttpRequest httpRequest = this.client.terraFirma("152481472", ThreadLocalRandom.current().nextBoolean());
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (Buffer)jsonObject.toBuffer());
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$fetchTerraFirma(this, jsonObject, n, httpRequest, completableFuture2, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null && httpResponse.statusCode() != 429) {
-                    return CompletableFuture.completedFuture(null);
-                }
-                ++n;
-            }
-            return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public CompletableFuture updateLocation() {
-        HttpRequest httpRequest = this.client.getLocation();
-        try {
-            CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (Buffer)new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\"}").toBuffer());
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture2 = completableFuture;
-                return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> SessionPreload.async$updateLocation(this, httpRequest, completableFuture2, 1, arg_0));
-            }
-            HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-            if (httpResponse == null) return CompletableFuture.completedFuture(null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    public SessionPreload(API aPI) {
-        this.client = (WalmartAPI)aPI;
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$fetchTerraFirma(SessionPreload var0, JsonObject var1_1, int var2_3, HttpRequest var3_4, CompletableFuture var4_5, int var5_6, Object var6_8) {
-        switch (var5_6) {
-            case 0: {
-                try {
-                    var1_1 = new JsonObject("{\"variables\":\"{\\\"casperSlots\\\":{\\\"fulfillmentType\\\":\\\"ACC\\\",\\\"reservationType\\\":\\\"SLOTS\\\"},\\\"postalAddress\\\":{\\\"addressType\\\":\\\"RESIDENTIAL\\\",\\\"countryCode\\\":\\\"USA\\\",\\\"postalCode\\\":\\\"" + var0.client.getTask().getProfile().getZip() + "\\\",\\\"stateOrProvinceCode\\\":\\\"" + var0.client.getTask().getProfile().getState() + "\\\",\\\"zipLocated\\\":true},\\\"storeFrontIds\\\":[{\\\"distance\\\":2.24,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91672\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91672},{\\\"distance\\\":3.04,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"5936\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":5936},{\\\"distance\\\":3.31,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"90563\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":90563},{\\\"distance\\\":3.41,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91675\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91675},{\\\"distance\\\":5.58,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91121\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91121}],\\\"productId\\\":\\\"152481472\\\",\\\"selected\\\":false}\"}");
-                    var2_3 = 0;
-                    block6: while (var2_3 < 5) {
-                        var3_4 = var0.client.terraFirma("152481472", ThreadLocalRandom.current().nextBoolean());
-                        v0 = Request.send((HttpRequest)var3_4, (Buffer)var1_1.toBuffer());
-                        if (!v0.isDone()) {
-                            var5_7 = v0;
-                            return var5_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$fetchTerraFirma(io.trickle.task.sites.walmart.usa.SessionPreload io.vertx.core.json.JsonObject int io.vertx.ext.web.client.HttpRequest java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((SessionPreload)var0, (JsonObject)var1_1, (int)var2_3, (HttpRequest)var3_4, (CompletableFuture)var5_7, (int)1));
+                        try {
+                           var10000.join();
+                           var10000 = var0.updateLocation();
+                           if (!var10000.isDone()) {
+                              var12 = var10000;
+                              return var12.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+                           }
+                        } catch (Throwable var9) {
+                           var10001 = false;
+                           break label100;
                         }
-lbl12:
-                        // 3 sources
+                     }
 
-                        while (true) {
-                            var4_5 = (HttpResponse)v0.join();
-                            if (var4_5 != null && var4_5.statusCode() != 429) {
-                                return CompletableFuture.completedFuture(null);
-                            }
-                            ++var2_3;
-                            continue block6;
-                            break;
+                     try {
+                        var10000.join();
+                        var10000 = var0.putLocation();
+                        if (!var10000.isDone()) {
+                           var12 = var10000;
+                           return var12.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
                         }
-                    }
-                    return CompletableFuture.completedFuture(null);
-                }
-                catch (Throwable var1_2) {
-                    // empty catch block
-                }
-                return CompletableFuture.completedFuture(null);
+                     } catch (Throwable var8) {
+                        var10001 = false;
+                        break label100;
+                     }
+                  }
+
+                  try {
+                     var10000.join();
+                     var10000 = var0.doPressoSearch();
+                     if (!var10000.isDone()) {
+                        var12 = var10000;
+                        return var12.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+                     }
+                  } catch (Throwable var7) {
+                     var10001 = false;
+                     break label100;
+                  }
+               }
+
+               try {
+                  var10000.join();
+                  var0.client.getWebClient().cookieStore().put("test_cookie", "CheckForPermission", ".walmart.com");
+                  var10000 = var0.fetchTerraFirma();
+                  if (!var10000.isDone()) {
+                     var12 = var10000;
+                     return var12.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+                  }
+               } catch (Throwable var6) {
+                  var10001 = false;
+                  break label100;
+               }
             }
-            case 1: {
-                v0 = var4_5;
-                ** continue;
+
+            try {
+               var10000.join();
+               var10000 = var0.fetchMidas();
+               if (!var10000.isDone()) {
+                  var12 = var10000;
+                  return var12.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetch);
+               }
+            } catch (Throwable var5) {
+               var10001 = false;
+               break label100;
             }
-        }
-        throw new IllegalArgumentException();
-    }
+         }
+
+         try {
+            var10000.join();
+         } catch (Throwable var4) {
+            var10001 = false;
+         }
+      }
+
+      var0.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
+      var0.client.getWebClient().cookieStore().removeAnyMatch("CRT");
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public CompletableFuture zyDid() {
+      HttpRequest var1 = this.client.updateCheck();
+
+      try {
+         CompletableFuture var10000 = Request.send(var1);
+         if (!var10000.isDone()) {
+            CompletableFuture var3 = var10000;
+            return var3.exceptionally(Function.identity()).thenCompose(SessionPreload::async$zyDid);
+         }
+
+         HttpResponse var2 = (HttpResponse)var10000.join();
+         if (var2 != null) {
+         }
+      } catch (Throwable var4) {
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public CompletableFuture fetchMidas() {
+      HttpRequest var1 = this.client.midasScan();
+
+      try {
+         CompletableFuture var10000 = Request.send(var1);
+         if (!var10000.isDone()) {
+            CompletableFuture var3 = var10000;
+            return var3.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetchMidas);
+         }
+
+         HttpResponse var2 = (HttpResponse)var10000.join();
+         if (var2 != null) {
+         }
+      } catch (Throwable var4) {
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$fetchCart(SessionPreload var0, HttpRequest var1, CompletableFuture var2, int var3, Object var4) {
+      CompletableFuture var10000;
+      boolean var10001;
+      switch (var3) {
+         case 0:
+            var1 = var0.client.getCart();
+
+            try {
+               var10000 = Request.send(var1);
+               if (!var10000.isDone()) {
+                  CompletableFuture var8 = var10000;
+                  return var8.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetchCart);
+               }
+               break;
+            } catch (Throwable var6) {
+               var10001 = false;
+               return CompletableFuture.completedFuture((Object)null);
+            }
+         case 1:
+            var10000 = var2;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      try {
+         HttpResponse var7 = (HttpResponse)var10000.join();
+         if (var7 != null) {
+         }
+      } catch (Throwable var5) {
+         var10001 = false;
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$zyDid(SessionPreload var0, HttpRequest var1, CompletableFuture var2, int var3, Object var4) {
+      CompletableFuture var10000;
+      boolean var10001;
+      switch (var3) {
+         case 0:
+            var1 = var0.client.updateCheck();
+
+            try {
+               var10000 = Request.send(var1);
+               if (!var10000.isDone()) {
+                  CompletableFuture var8 = var10000;
+                  return var8.exceptionally(Function.identity()).thenCompose(SessionPreload::async$zyDid);
+               }
+               break;
+            } catch (Throwable var6) {
+               var10001 = false;
+               return CompletableFuture.completedFuture((Object)null);
+            }
+         case 1:
+            var10000 = var2;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      try {
+         HttpResponse var7 = (HttpResponse)var10000.join();
+         if (var7 != null) {
+         }
+      } catch (Throwable var5) {
+         var10001 = false;
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$doPressoSearch(SessionPreload var0, HttpRequest var1, CompletableFuture var2, int var3, Object var4) {
+      CompletableFuture var10000;
+      boolean var10001;
+      switch (var3) {
+         case 0:
+            var1 = var0.client.presoSearch();
+
+            try {
+               var10000 = Request.send(var1);
+               if (!var10000.isDone()) {
+                  CompletableFuture var8 = var10000;
+                  return var8.exceptionally(Function.identity()).thenCompose(SessionPreload::async$doPressoSearch);
+               }
+               break;
+            } catch (Throwable var6) {
+               var10001 = false;
+               return CompletableFuture.completedFuture((Object)null);
+            }
+         case 1:
+            var10000 = var2;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      try {
+         HttpResponse var7 = (HttpResponse)var10000.join();
+         if (var7 != null) {
+         }
+      } catch (Throwable var5) {
+         var10001 = false;
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public CompletableFuture doPressoSearch() {
+      HttpRequest var1 = this.client.presoSearch();
+
+      try {
+         CompletableFuture var10000 = Request.send(var1);
+         if (!var10000.isDone()) {
+            CompletableFuture var3 = var10000;
+            return var3.exceptionally(Function.identity()).thenCompose(SessionPreload::async$doPressoSearch);
+         }
+
+         HttpResponse var2 = (HttpResponse)var10000.join();
+         if (var2 != null) {
+         }
+      } catch (Throwable var4) {
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public CompletableFuture putLocation() {
+      HttpRequest var1 = this.client.putLocation();
+
+      try {
+         CompletableFuture var10000 = Request.send(var1, (new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"postalCode\":\"" + this.client.getTask().getProfile().getZip() + "\",\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\",\"serviceTypes\":\"ALL\"}")).toBuffer());
+         if (!var10000.isDone()) {
+            CompletableFuture var3 = var10000;
+            return var3.exceptionally(Function.identity()).thenCompose(SessionPreload::async$putLocation);
+         }
+
+         HttpResponse var2 = (HttpResponse)var10000.join();
+         if (var2 != null) {
+         }
+      } catch (Throwable var4) {
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public CompletableFuture putCart() {
+      HttpRequest var1 = this.client.putCart();
+
+      try {
+         String var10003 = this.client.getTask().getProfile().getZip();
+         CompletableFuture var10000 = Request.send(var1, (new JsonObject("{\"currencyCode\":\"USD\",\"location\":{\"postalCode\":\"" + var10003 + "\",\"state\":\"" + this.client.getTask().getProfile().getState() + "\",\"country\":\"USA\",\"isZipLocated\":false},\"storeIds\":[2648,5434,2031,2280,5426]}")).toBuffer());
+         if (!var10000.isDone()) {
+            CompletableFuture var3 = var10000;
+            return var3.exceptionally(Function.identity()).thenCompose(SessionPreload::async$putCart);
+         }
+
+         HttpResponse var2 = (HttpResponse)var10000.join();
+         if (var2 != null) {
+         }
+      } catch (Throwable var4) {
+      }
+
+      this.client.getWebClient().cookieStore().removeAnyMatch("hasCRT");
+      this.client.getWebClient().cookieStore().removeAnyMatch("CRT");
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$fetchMidas(SessionPreload var0, HttpRequest var1, CompletableFuture var2, int var3, Object var4) {
+      CompletableFuture var10000;
+      boolean var10001;
+      switch (var3) {
+         case 0:
+            var1 = var0.client.midasScan();
+
+            try {
+               var10000 = Request.send(var1);
+               if (!var10000.isDone()) {
+                  CompletableFuture var8 = var10000;
+                  return var8.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetchMidas);
+               }
+               break;
+            } catch (Throwable var6) {
+               var10001 = false;
+               return CompletableFuture.completedFuture((Object)null);
+            }
+         case 1:
+            var10000 = var2;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      try {
+         HttpResponse var7 = (HttpResponse)var10000.join();
+         if (var7 != null) {
+         }
+      } catch (Throwable var5) {
+         var10001 = false;
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$updateLocation(SessionPreload var0, HttpRequest var1, CompletableFuture var2, int var3, Object var4) {
+      CompletableFuture var10000;
+      boolean var10001;
+      switch (var3) {
+         case 0:
+            var1 = var0.client.getLocation();
+
+            try {
+               var10000 = Request.send(var1, (new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\"}")).toBuffer());
+               if (!var10000.isDone()) {
+                  CompletableFuture var8 = var10000;
+                  return var8.exceptionally(Function.identity()).thenCompose(SessionPreload::async$updateLocation);
+               }
+               break;
+            } catch (Throwable var6) {
+               var10001 = false;
+               return CompletableFuture.completedFuture((Object)null);
+            }
+         case 1:
+            var10000 = var2;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
+
+      try {
+         HttpResponse var7 = (HttpResponse)var10000.join();
+         if (var7 != null) {
+         }
+      } catch (Throwable var5) {
+         var10001 = false;
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public CompletableFuture fetchTerraFirma() {
+      try {
+         String var10002 = this.client.getTask().getProfile().getZip();
+         JsonObject var1 = new JsonObject("{\"variables\":\"{\\\"casperSlots\\\":{\\\"fulfillmentType\\\":\\\"ACC\\\",\\\"reservationType\\\":\\\"SLOTS\\\"},\\\"postalAddress\\\":{\\\"addressType\\\":\\\"RESIDENTIAL\\\",\\\"countryCode\\\":\\\"USA\\\",\\\"postalCode\\\":\\\"" + var10002 + "\\\",\\\"stateOrProvinceCode\\\":\\\"" + this.client.getTask().getProfile().getState() + "\\\",\\\"zipLocated\\\":true},\\\"storeFrontIds\\\":[{\\\"distance\\\":2.24,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91672\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91672},{\\\"distance\\\":3.04,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"5936\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":5936},{\\\"distance\\\":3.31,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"90563\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":90563},{\\\"distance\\\":3.41,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91675\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91675},{\\\"distance\\\":5.58,\\\"inStore\\\":false,\\\"preferred\\\":false,\\\"storeId\\\":\\\"91121\\\",\\\"storeUUID\\\":null,\\\"usStoreId\\\":91121}],\\\"productId\\\":\\\"152481472\\\",\\\"selected\\\":false}\"}");
+
+         for(int var2 = 0; var2 < 5; ++var2) {
+            HttpRequest var3 = this.client.terraFirma("152481472", ThreadLocalRandom.current().nextBoolean());
+            CompletableFuture var10000 = Request.send(var3, var1.toBuffer());
+            if (!var10000.isDone()) {
+               CompletableFuture var5 = var10000;
+               return var5.exceptionally(Function.identity()).thenCompose(SessionPreload::async$fetchTerraFirma);
+            }
+
+            HttpResponse var4 = (HttpResponse)var10000.join();
+            if (var4 != null && var4.statusCode() != 429) {
+               return CompletableFuture.completedFuture((Object)null);
+            }
+         }
+      } catch (Throwable var6) {
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public CompletableFuture updateLocation() {
+      HttpRequest var1 = this.client.getLocation();
+
+      try {
+         CompletableFuture var10000 = Request.send(var1, (new JsonObject("{\"clientName\":\"android\",\"includePickUpLocation\":true,\"persistLocation\":true,\"responseGroup\":\"STOREMETAPLUS\"}")).toBuffer());
+         if (!var10000.isDone()) {
+            CompletableFuture var3 = var10000;
+            return var3.exceptionally(Function.identity()).thenCompose(SessionPreload::async$updateLocation);
+         }
+
+         HttpResponse var2 = (HttpResponse)var10000.join();
+         if (var2 != null) {
+         }
+      } catch (Throwable var4) {
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public SessionPreload(API var1) {
+      this.client = (WalmartAPI)var1;
+   }
+
+   public static CompletableFuture async$fetchTerraFirma(SessionPreload param0, JsonObject param1, int param2, HttpRequest param3, CompletableFuture param4, int param5, Object param6) {
+      // $FF: Couldn't be decompiled
+   }
 }

@@ -1,17 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.actor.TaskActor
- *  io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXAPI3
- *  io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXNEW
- *  io.trickle.task.antibot.impl.px.payload.token.MobilePX
- *  io.trickle.webclient.ClientType
- *  io.trickle.webclient.RealClient
- *  io.trickle.webclient.RealClientFactory
- *  io.vertx.core.Vertx
- *  org.apache.logging.log4j.Logger
- */
 package io.trickle.task.antibot.impl.px;
 
 import io.trickle.core.actor.TaskActor;
@@ -28,96 +14,98 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.Logger;
 
 public abstract class PerimeterX {
-    public static Pattern PXDE_PATTERN;
-    public T result;
-    public String pxhd;
-    public Logger logger;
-    public RealClient client;
-    public static Pattern BAKE_PATTERN;
-    public Vertx vertx;
+   public static Pattern PXDE_PATTERN = Pattern.compile("_pxde\\|330\\|(.*?)\\|");
+   public Object result;
+   public String pxhd;
+   public Logger logger;
+   public RealClient client;
+   public static Pattern BAKE_PATTERN = Pattern.compile("bake\\|.*?\\|.*?\\|(.*?)\\|");
+   public Vertx vertx;
 
-    public void close() {
-        this.client.close();
-        this.client = null;
-        this.reset();
-    }
+   public void close() {
+      this.client.close();
+      this.client = null;
+      this.reset();
+   }
 
-    public abstract String getDeviceSecUA();
+   public abstract String getDeviceSecUA();
 
-    public abstract CompletableFuture solve();
+   public abstract CompletableFuture solve();
 
-    public abstract String getVid();
+   public abstract String getVid();
 
-    public static PerimeterX createMobile(TaskActor taskActor) {
-        return new MobilePX(taskActor);
-    }
+   public static PerimeterX createMobile(TaskActor var0) {
+      return new MobilePX(var0);
+   }
 
-    public PerimeterX(TaskActor taskActor, ClientType clientType) {
-        this(taskActor.getVertx(), taskActor.getLogger(), clientType);
-    }
+   public PerimeterX(TaskActor var1, ClientType var2) {
+      this(var1.getVertx(), var1.getLogger(), var2);
+   }
 
-    public abstract String getDeviceAcceptEncoding();
+   public abstract String getDeviceAcceptEncoding();
 
-    public void restartClient(RealClient realClient) {
-        try {
-            RealClient realClient2 = RealClientFactory.fromOther((Vertx)this.vertx, (RealClient)realClient, (ClientType)this.client.type());
-            this.client.close();
-            this.client = realClient2;
-        }
-        catch (Throwable throwable) {
-            if (!this.logger.isDebugEnabled()) return;
-            this.logger.debug("Failed to restart client: {}", (Object)throwable.getMessage(), (Object)throwable);
-        }
-    }
+   public void restartClient(RealClient var1) {
+      try {
+         RealClient var2 = RealClientFactory.fromOther(this.vertx, var1, this.client.type());
+         this.client.close();
+         this.client = var2;
+      } catch (Throwable var3) {
+         if (this.logger.isDebugEnabled()) {
+            this.logger.debug("Failed to restart client: {}", var3.getMessage(), var3);
+         }
+      }
 
-    public static PerimeterX createDesktopAPI(TaskActor taskActor) {
-        return new DesktopPXAPI3(taskActor);
-    }
+   }
 
-    static {
-        BAKE_PATTERN = Pattern.compile("bake\\|.*?\\|.*?\\|(.*?)\\|");
-        PXDE_PATTERN = Pattern.compile("_pxde\\|330\\|(.*?)\\|");
-    }
+   public static PerimeterX createDesktopAPI(TaskActor var0) {
+      return new DesktopPXAPI3(var0);
+   }
 
-    public abstract CompletableFuture initialise();
+   public abstract CompletableFuture initialise();
 
-    public abstract String getDeviceLang();
+   public abstract String getDeviceLang();
 
-    public Object tokenValue() {
-        return this.result;
-    }
+   public Object tokenValue() {
+      return this.result;
+   }
 
-    public Boolean updatePxhd(String string) {
-        if (string == null) {
-            return null;
-        }
-        this.pxhd = string;
-        return true;
-    }
+   public Boolean updatePxhd(String var1) {
+      if (var1 == null) {
+         return null;
+      } else {
+         this.pxhd = var1;
+         return true;
+      }
+   }
 
-    public abstract String getDeviceUA();
+   public abstract String getDeviceUA();
 
-    public abstract CompletableFuture solveCaptcha(String var1, String var2, String var3);
+   public abstract CompletableFuture solveCaptcha(String var1, String var2, String var3);
 
-    public PerimeterX(Vertx vertx, Logger logger, ClientType clientType) {
-        Objects.requireNonNull(vertx);
-        Objects.requireNonNull(logger);
-        this.vertx = vertx;
-        this.logger = logger;
-        this.client = clientType == null ? RealClientFactory.build((Vertx)vertx, (ClientType)ClientType.BASIC) : RealClientFactory.buildProxied((Vertx)this.vertx, (ClientType)clientType);
-    }
+   public PerimeterX(Vertx var1, Logger var2, ClientType var3) {
+      Objects.requireNonNull(var1);
+      Objects.requireNonNull(var2);
+      this.vertx = var1;
+      this.logger = var2;
+      if (var3 == null) {
+         this.client = RealClientFactory.build(var1, ClientType.BASIC);
+      } else {
+         this.client = RealClientFactory.buildProxied(this.vertx, var3);
+      }
 
-    public PerimeterX(TaskActor taskActor) {
-        Objects.requireNonNull(taskActor.getVertx());
-        Objects.requireNonNull(taskActor.getLogger());
-        this.vertx = taskActor.getVertx();
-        this.logger = taskActor.getLogger();
-        this.client = RealClientFactory.fromOther((Vertx)this.vertx, (RealClient)taskActor.getClient().getWebClient(), (ClientType)ClientType.PX_SDK_PIXEL_3);
-    }
+   }
 
-    public static PerimeterX createDesktop(TaskActor taskActor) {
-        return new DesktopPXNEW(taskActor);
-    }
+   public PerimeterX(TaskActor var1) {
+      Objects.requireNonNull(var1.getVertx());
+      Objects.requireNonNull(var1.getLogger());
+      this.vertx = var1.getVertx();
+      this.logger = var1.getLogger();
+      this.client = RealClientFactory.fromOther(this.vertx, var1.getClient().getWebClient(), ClientType.PX_SDK_PIXEL_3);
+   }
 
-    public abstract void reset();
+   public static PerimeterX createDesktop(TaskActor var0) {
+      return new DesktopPXNEW(var0);
+   }
+
+   public abstract void reset();
 }

@@ -1,59 +1,51 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.util.concurrent.ContextCompletableFuture
- */
 package io.trickle.util.concurrent;
 
-import io.trickle.util.concurrent.ContextCompletableFuture;
 import java.util.Objects;
 
 public class VertxUtil$SignalEntry {
-    public long timerId = 0L;
-    public String signal;
-    public ContextCompletableFuture<Object> call;
+   public long timerId = 0L;
+   public String signal;
+   public ContextCompletableFuture call;
 
-    public static VertxUtil$SignalEntry fromSignal(String string) {
-        return new VertxUtil$SignalEntry(string, new ContextCompletableFuture());
-    }
+   public static VertxUtil$SignalEntry fromSignal(String var0) {
+      return new VertxUtil$SignalEntry(var0, new ContextCompletableFuture());
+   }
 
-    public void complete() {
-        this.cancelTimer();
-        this.call.complete(null);
-    }
+   public void complete() {
+      this.cancelTimer();
+      this.call.complete((Object)null);
+   }
 
-    public int hashCode() {
-        return Objects.hash(this.signal, this.call);
-    }
+   public int hashCode() {
+      return Objects.hash(new Object[]{this.signal, this.call});
+   }
 
-    public void complete(Object object) {
-        this.cancelTimer();
-        this.call.complete(object);
-    }
+   public void complete(Object var1) {
+      this.cancelTimer();
+      this.call.complete(var1);
+   }
 
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (!(object instanceof VertxUtil$SignalEntry)) {
-            return false;
-        }
-        VertxUtil$SignalEntry vertxUtil$SignalEntry = (VertxUtil$SignalEntry)object;
-        return this.signal.equals(vertxUtil$SignalEntry.signal) && this.call.equals(vertxUtil$SignalEntry.call);
-    }
+   public boolean equals(Object var1) {
+      if (this == var1) {
+         return true;
+      } else if (!(var1 instanceof VertxUtil$SignalEntry)) {
+         return false;
+      } else {
+         VertxUtil$SignalEntry var2 = (VertxUtil$SignalEntry)var1;
+         return this.signal.equals(var2.signal) && this.call.equals(var2.call);
+      }
+   }
 
-    public void cancelTimer() {
-        try {
-            this.call.getCtx().owner().cancelTimer(this.timerId);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-    }
+   public void cancelTimer() {
+      try {
+         this.call.getCtx().owner().cancelTimer(this.timerId);
+      } catch (Throwable var2) {
+      }
 
-    public VertxUtil$SignalEntry(String string, ContextCompletableFuture contextCompletableFuture) {
-        this.signal = string;
-        this.call = contextCompletableFuture;
-    }
+   }
+
+   public VertxUtil$SignalEntry(String var1, ContextCompletableFuture var2) {
+      this.signal = var1;
+      this.call = var2;
+   }
 }

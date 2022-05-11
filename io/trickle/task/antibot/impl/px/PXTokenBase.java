@@ -1,12 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.Controller
- *  io.trickle.core.actor.TaskActor
- *  io.trickle.task.antibot.impl.AntiBotServiceBase
- *  io.trickle.webclient.ClientType
- */
 package io.trickle.task.antibot.impl.px;
 
 import io.trickle.core.Controller;
@@ -15,29 +6,28 @@ import io.trickle.task.antibot.impl.AntiBotServiceBase;
 import io.trickle.webclient.ClientType;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class PXTokenBase
-extends AntiBotServiceBase {
-    public PXTokenBase(TaskActor taskActor, ClientType clientType, Controller controller) {
-        super(taskActor, clientType, controller);
-    }
+public abstract class PXTokenBase extends AntiBotServiceBase {
+   public PXTokenBase(TaskActor var1, ClientType var2, Controller var3) {
+      super(var1, var2, var3);
+   }
 
-    public abstract CompletableFuture reInit();
+   public abstract CompletableFuture reInit();
 
-    public abstract String getVid();
+   public abstract String getVid();
 
-    public PXTokenBase(TaskActor taskActor) {
-        super(taskActor);
-    }
+   public PXTokenBase(TaskActor var1) {
+      super(var1);
+   }
 
-    public abstract boolean isTokenCaptcha();
+   public abstract boolean isTokenCaptcha();
 
-    public abstract CompletableFuture solveCaptcha(String var1, String var2);
+   public abstract CompletableFuture solveCaptcha(String var1, String var2);
 
-    public PXTokenBase(TaskActor taskActor, ClientType clientType) {
-        super(taskActor, clientType);
-    }
+   public PXTokenBase(TaskActor var1, ClientType var2) {
+      super(var1, var2);
+   }
 
-    public abstract CompletableFuture awaitInit();
+   public abstract CompletableFuture awaitInit();
 
-    public abstract String getSid();
+   public abstract String getSid();
 }

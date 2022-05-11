@@ -1,192 +1,154 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.sites.Site
- *  io.trickle.util.analytics.webhook.OrderDetails$1
- *  io.vertx.core.json.JsonObject
- */
 package io.trickle.util.analytics.webhook;
 
 import io.trickle.task.sites.Site;
-import io.trickle.util.analytics.webhook.OrderDetails;
 import io.vertx.core.json.JsonObject;
 import java.util.Optional;
 import java.util.function.Function;
 
 public class OrderDetails {
-    public static Function<JsonObject, OrderDetails> SHOPIFY_RESPONSE_PARSER;
-    public static Function<JsonObject, OrderDetails> WALMART_RESPONSE_PARSER;
-    public String imageURI;
-    public String orderNumber;
-    public String cookie;
-    public static Function<JsonObject, OrderDetails> YEEZY_RESPONSE_PARSER;
-    public static Function<JsonObject, OrderDetails> BESTBUY_RESPONSE_PARSER;
-    public String productName;
-    public static Function<JsonObject, OrderDetails> HIBBETT_RESPONSE_PARSER;
-    public static Function<JsonObject, OrderDetails> WALMART_NEW_RESPONSE_PARSER;
+   public static Function SHOPIFY_RESPONSE_PARSER = OrderDetails::lambda$static$3;
+   public static Function WALMART_RESPONSE_PARSER = OrderDetails::lambda$static$0;
+   public String imageURI;
+   public String orderNumber;
+   public String cookie;
+   public static Function YEEZY_RESPONSE_PARSER = OrderDetails::lambda$static$5;
+   public static Function BESTBUY_RESPONSE_PARSER = OrderDetails::lambda$static$4;
+   public String productName;
+   public static Function HIBBETT_RESPONSE_PARSER = OrderDetails::lambda$static$2;
+   public static Function WALMART_NEW_RESPONSE_PARSER = OrderDetails::lambda$static$1;
 
-    static {
-        WALMART_RESPONSE_PARSER = OrderDetails::lambda$static$0;
-        WALMART_NEW_RESPONSE_PARSER = OrderDetails::lambda$static$1;
-        HIBBETT_RESPONSE_PARSER = OrderDetails::lambda$static$2;
-        SHOPIFY_RESPONSE_PARSER = OrderDetails::lambda$static$3;
-        BESTBUY_RESPONSE_PARSER = OrderDetails::lambda$static$4;
-        YEEZY_RESPONSE_PARSER = OrderDetails::lambda$static$5;
-    }
+   public static OrderDetails lambda$static$1(JsonObject var0) {
+      String var1 = null;
+      String var2 = null;
+      String var3 = "ORDER_ID";
+      JsonObject var4 = null;
 
-    public static OrderDetails lambda$static$1(JsonObject jsonObject) {
-        String string = null;
-        String string2 = null;
-        String string3 = "ORDER_ID";
-        JsonObject jsonObject2 = null;
-        try {
-            jsonObject2 = jsonObject.getJsonObject("data").getJsonObject("placeOrder", new JsonObject());
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        if (jsonObject2 == null) return new OrderDetails(string, string2, string3);
-        try {
-            JsonObject jsonObject3 = jsonObject2.getJsonArray("lineItems").getJsonObject(0).getJsonObject("product");
-            string = jsonObject3.getString("name", null);
-            string2 = jsonObject3.getJsonObject("imageInfo").getString("thumbnailUrl", null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        try {
-            string3 = jsonObject2.getJsonObject("order").getString("id", "ORDER_ID");
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, string2, string3);
-    }
+      try {
+         var4 = var0.getJsonObject("data").getJsonObject("placeOrder", new JsonObject());
+      } catch (Throwable var8) {
+      }
 
-    public static OrderDetails lambda$static$3(JsonObject jsonObject) {
-        String string = null;
-        Object var2_2 = null;
-        String string2 = "CHECK EMAIL";
-        try {
-            string = jsonObject.getJsonArray("payments").getJsonObject(0).getJsonObject("checkout").getJsonArray("line_items").getJsonObject(0).getString("title", null);
-            var2_2 = null;
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, var2_2, string2);
-    }
+      if (var4 != null) {
+         try {
+            JsonObject var5 = var4.getJsonArray("lineItems").getJsonObject(0).getJsonObject("product");
+            var1 = var5.getString("name", (String)null);
+            var2 = var5.getJsonObject("imageInfo").getString("thumbnailUrl", (String)null);
+         } catch (Throwable var7) {
+         }
 
-    public static OrderDetails lambda$static$0(JsonObject jsonObject) {
-        String string = null;
-        String string2 = null;
-        String string3 = "ORDER_ID";
-        try {
-            string = jsonObject.getJsonArray("items").getJsonObject(0).getString("productName", null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        try {
-            string3 = jsonObject.getJsonObject("order").getString("orderId", "ORDER_ID");
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        try {
-            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getString("thumbnailUrl", null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, string2, string3);
-    }
+         try {
+            var3 = var4.getJsonObject("order").getString("id", "ORDER_ID");
+         } catch (Throwable var6) {
+         }
+      }
 
-    public static OrderDetails lambda$static$2(JsonObject jsonObject) {
-        String string = null;
-        String string2 = null;
-        String string3 = "ORDER_ID";
-        try {
-            string3 = jsonObject.getString("id", "ORDER_ID");
-            string = jsonObject.getJsonArray("orderItems").getJsonObject(0).getJsonObject("product").getString("name", null);
-            String string4 = jsonObject.getJsonArray("orderItems").getJsonObject(0).getJsonObject("product").getJsonArray("imageIds").getString(0);
-            string2 = jsonObject.getJsonArray("orderItems").getJsonObject(0).getJsonObject("product").getJsonObject("imageResources").getJsonArray(string4).getJsonObject(0).getString("url", null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, string2, string3);
-    }
+      return new OrderDetails(var1, var2, var3);
+   }
 
-    public static Function getDetailsParser(Site site) {
-        switch (1.$SwitchMap$io$trickle$task$sites$Site[site.ordinal()]) {
-            case 1: {
-                return WALMART_RESPONSE_PARSER;
-            }
-            case 2: {
-                return WALMART_NEW_RESPONSE_PARSER;
-            }
-            case 3: {
-                return HIBBETT_RESPONSE_PARSER;
-            }
-            case 4: {
-                return YEEZY_RESPONSE_PARSER;
-            }
-            case 5: {
-                return BESTBUY_RESPONSE_PARSER;
-            }
-        }
-        return SHOPIFY_RESPONSE_PARSER;
-    }
+   public static OrderDetails lambda$static$3(JsonObject var0) {
+      String var1 = null;
+      Object var2 = null;
+      String var3 = "CHECK EMAIL";
 
-    public static OrderDetails lambda$static$4(JsonObject jsonObject) {
-        String string = null;
-        String string2 = null;
-        String string3 = null;
-        try {
-            string = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("shortLabel", null);
-            string3 = jsonObject.getString("customerOrderId", "CHECK EMAIL");
-            string2 = jsonObject.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("imageUrl", null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, string2, string3);
-    }
+      try {
+         var1 = var0.getJsonArray("payments").getJsonObject(0).getJsonObject("checkout").getJsonArray("line_items").getJsonObject(0).getString("title", (String)null);
+         var2 = null;
+      } catch (Throwable var5) {
+      }
 
-    public OrderDetails(String string, String string2, String string3, String string4) {
-        this(string, string2, string3);
-        this.cookie = string4;
-    }
+      return new OrderDetails(var1, (String)var2, var3);
+   }
 
-    public static OrderDetails lambda$static$5(JsonObject jsonObject) {
-        String string = null;
-        String string2 = null;
-        String string3 = "ORDER_ID";
-        try {
-            string3 = jsonObject.getString("orderId", "ORDER_ID");
-            JsonObject jsonObject2 = jsonObject.getJsonArray("shipmentList").getJsonObject(0).getJsonArray("productLineItemList").getJsonObject(0);
-            string = jsonObject2.getString("productName", null);
-            string2 = jsonObject2.getString("productImage", null);
-        }
-        catch (Throwable throwable) {
-            // empty catch block
-        }
-        return new OrderDetails(string, string2, string3);
-    }
+   public static OrderDetails lambda$static$0(JsonObject var0) {
+      String var1 = null;
+      String var2 = null;
+      String var3 = "ORDER_ID";
 
-    public OrderDetails(String string, String string2, String string3) {
-        this.productName = string;
-        this.imageURI = string2;
-        this.orderNumber = string3;
-    }
+      try {
+         var1 = var0.getJsonArray("items").getJsonObject(0).getString("productName", (String)null);
+      } catch (Throwable var7) {
+      }
 
-    public Optional productName() {
-        return Optional.ofNullable(this.productName);
-    }
+      try {
+         var3 = var0.getJsonObject("order").getString("orderId", "ORDER_ID");
+      } catch (Throwable var6) {
+      }
 
-    public static OrderDetails getDefault() {
-        return new OrderDetails(null, null, null);
-    }
+      try {
+         var2 = var0.getJsonArray("items").getJsonObject(0).getString("thumbnailUrl", (String)null);
+      } catch (Throwable var5) {
+      }
+
+      return new OrderDetails(var1, var2, var3);
+   }
+
+   public static OrderDetails lambda$static$2(JsonObject var0) {
+      String var1 = null;
+      String var2 = null;
+      String var3 = "ORDER_ID";
+
+      try {
+         var3 = var0.getString("id", "ORDER_ID");
+         var1 = var0.getJsonArray("orderItems").getJsonObject(0).getJsonObject("product").getString("name", (String)null);
+         String var4 = var0.getJsonArray("orderItems").getJsonObject(0).getJsonObject("product").getJsonArray("imageIds").getString(0);
+         var2 = var0.getJsonArray("orderItems").getJsonObject(0).getJsonObject("product").getJsonObject("imageResources").getJsonArray(var4).getJsonObject(0).getString("url", (String)null);
+      } catch (Throwable var5) {
+      }
+
+      return new OrderDetails(var1, var2, var3);
+   }
+
+   public static Function getDetailsParser(Site var0) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public static OrderDetails lambda$static$4(JsonObject var0) {
+      String var1 = null;
+      String var2 = null;
+      String var3 = null;
+
+      try {
+         var1 = var0.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("shortLabel", (String)null);
+         var3 = var0.getString("customerOrderId", "CHECK EMAIL");
+         var2 = var0.getJsonArray("items").getJsonObject(0).getJsonObject("meta").getString("imageUrl", (String)null);
+      } catch (Throwable var5) {
+      }
+
+      return new OrderDetails(var1, var2, var3);
+   }
+
+   public OrderDetails(String var1, String var2, String var3, String var4) {
+      this(var1, var2, var3);
+      this.cookie = var4;
+   }
+
+   public static OrderDetails lambda$static$5(JsonObject var0) {
+      String var1 = null;
+      String var2 = null;
+      String var3 = "ORDER_ID";
+
+      try {
+         var3 = var0.getString("orderId", "ORDER_ID");
+         JsonObject var4 = var0.getJsonArray("shipmentList").getJsonObject(0).getJsonArray("productLineItemList").getJsonObject(0);
+         var1 = var4.getString("productName", (String)null);
+         var2 = var4.getString("productImage", (String)null);
+      } catch (Throwable var5) {
+      }
+
+      return new OrderDetails(var1, var2, var3);
+   }
+
+   public OrderDetails(String var1, String var2, String var3) {
+      this.productName = var1;
+      this.imageURI = var2;
+      this.orderNumber = var3;
+   }
+
+   public Optional productName() {
+      return Optional.ofNullable(this.productName);
+   }
+
+   public static OrderDetails getDefault() {
+      return new OrderDetails((String)null, (String)null, (String)null);
+   }
 }

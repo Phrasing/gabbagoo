@@ -1,60 +1,50 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.antibot.impl.px.Types
- *  io.trickle.task.antibot.impl.px.payload.Payload
- *  io.trickle.task.sites.Site
- */
 package io.trickle.task.antibot.impl.px.payload;
 
 import io.trickle.task.antibot.impl.px.Types;
-import io.trickle.task.antibot.impl.px.payload.Payload;
 import io.trickle.task.sites.Site;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public interface ExtendedPayload
-extends Payload {
-    public String getSID();
+public interface ExtendedPayload extends Payload {
+   String getSID();
 
-    public Site getSite();
+   Site getSite();
 
-    public Types getType();
+   Types getType();
 
-    public String getUUID();
+   String getUUID();
 
-    public static String decode(String string, int n) {
-        string = string.replace(" ", "+");
-        String string2 = new String(Base64.getDecoder().decode(string.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
-        StringBuilder stringBuilder = new StringBuilder();
-        int n2 = 0;
-        while (n2 < string2.length()) {
-            stringBuilder.append((char)(n ^ Character.codePointAt(string2, n2)));
-            ++n2;
-        }
-        return stringBuilder.toString();
-    }
+   static String decode(String var0, int var1) {
+      var0 = var0.replace(" ", "+");
+      String var2 = new String(Base64.getDecoder().decode(var0.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+      StringBuilder var3 = new StringBuilder();
 
-    public String getVID();
+      for(int var4 = 0; var4 < var2.length(); ++var4) {
+         var3.append((char)(var1 ^ Character.codePointAt(var2, var4)));
+      }
 
-    public String desktopString();
+      return var3.toString();
+   }
 
-    public static String encode(String string, int n) {
-        StringBuilder stringBuilder = new StringBuilder();
-        int n2 = 0;
-        while (n2 < string.length()) {
-            stringBuilder.append((char)(n ^ Character.codePointAt(string, n2)));
-            ++n2;
-        }
-        return new String(Base64.getEncoder().encode(stringBuilder.toString().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
-    }
+   String getVID();
 
-    public String toString();
+   String desktopString();
 
-    public String getUserAgent();
+   static String encode(String var0, int var1) {
+      StringBuilder var2 = new StringBuilder();
 
-    public static String encode(String string, String string2) {
-        return new String(Base64.getEncoder().encode("".getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8).replace(" ", "+");
-    }
+      for(int var3 = 0; var3 < var0.length(); ++var3) {
+         var2.append((char)(var1 ^ Character.codePointAt(var0, var3)));
+      }
+
+      return (new String(Base64.getEncoder().encode(var2.toString().getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8)).replace(" ", "+");
+   }
+
+   String toString();
+
+   String getUserAgent();
+
+   static String encode(String var0, String var1) {
+      return (new String(Base64.getEncoder().encode("".getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8)).replace(" ", "+");
+   }
 }

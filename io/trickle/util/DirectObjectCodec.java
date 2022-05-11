@@ -1,39 +1,31 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.eventbus.MessageCodec
- */
 package io.trickle.util;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.MessageCodec;
 
-public class DirectObjectCodec
-implements MessageCodec {
-    public String name;
+public class DirectObjectCodec implements MessageCodec {
+   public String name;
 
-    public Object decodeFromWire(int n, Buffer buffer) {
-        return null;
-    }
+   public Object decodeFromWire(int var1, Buffer var2) {
+      return null;
+   }
 
-    public byte systemCodecID() {
-        return -1;
-    }
+   public byte systemCodecID() {
+      return -1;
+   }
 
-    public void encodeToWire(Buffer buffer, Object object) {
-    }
+   public void encodeToWire(Buffer var1, Object var2) {
+   }
 
-    public String name() {
-        return this.name + "Codec";
-    }
+   public String name() {
+      return this.name + "Codec";
+   }
 
-    public Object transform(Object object) {
-        return object;
-    }
+   public Object transform(Object var1) {
+      return var1;
+   }
 
-    public DirectObjectCodec(Class clazz) {
-        this.name = clazz.getName();
-    }
+   public DirectObjectCodec(Class var1) {
+      this.name = var1.getName();
+   }
 }

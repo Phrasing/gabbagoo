@@ -1,61 +1,53 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.network.codec.packet.PacketType
- *  io.vertx.core.buffer.Buffer
- */
 package io.trickle.network.codec.packet;
 
-import io.trickle.network.codec.packet.PacketType;
 import io.vertx.core.buffer.Buffer;
 
 public class Packet {
-    public Buffer payload;
-    public PacketType type;
-    public byte opcode;
+   public Buffer payload;
+   public PacketType type;
+   public byte opcode;
 
-    public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (!(object instanceof Packet)) {
+   public boolean equals(Object var1) {
+      if (this == var1) {
+         return true;
+      } else if (!(var1 instanceof Packet)) {
+         return false;
+      } else {
+         Packet var2 = (Packet)var1;
+         if (this.opcode != var2.opcode) {
             return false;
-        }
-        Packet packet = (Packet)object;
-        if (this.opcode != packet.opcode) {
-            return false;
-        }
-        if (this.getSize() == packet.getSize()) return this.payload.equals(packet.payload);
-        return false;
-    }
+         } else {
+            return this.getSize() != var2.getSize() ? false : this.payload.equals(var2.payload);
+         }
+      }
+   }
 
-    public PacketType getType() {
-        return this.type;
-    }
+   public PacketType getType() {
+      return this.type;
+   }
 
-    public Buffer getPayload() {
-        return this.payload;
-    }
+   public Buffer getPayload() {
+      return this.payload;
+   }
 
-    public Packet(byte by, PacketType packetType, Buffer buffer) {
-        this.opcode = by;
-        this.type = packetType;
-        this.payload = buffer;
-    }
+   public Packet(byte var1, PacketType var2, Buffer var3) {
+      this.opcode = var1;
+      this.type = var2;
+      this.payload = var3;
+   }
 
-    public byte getOpcode() {
-        return this.opcode;
-    }
+   public byte getOpcode() {
+      return this.opcode;
+   }
 
-    public int hashCode() {
-        int n = this.opcode;
-        n = 31 * n + this.type.hashCode();
-        n = 31 * n + this.payload.hashCode();
-        return n;
-    }
+   public int hashCode() {
+      int var1 = this.opcode;
+      var1 = 31 * var1 + this.type.hashCode();
+      var1 = 31 * var1 + this.payload.hashCode();
+      return var1;
+   }
 
-    public int getSize() {
-        return this.payload.length();
-    }
+   public int getSize() {
+      return this.payload.length();
+   }
 }

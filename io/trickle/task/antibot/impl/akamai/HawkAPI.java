@@ -1,19 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.core.VertxSingleton
- *  io.trickle.task.antibot.impl.akamai.pixel.Pixel
- *  io.trickle.util.Utils
- *  io.trickle.util.concurrent.VertxUtil
- *  io.trickle.util.request.Request
- *  io.vertx.core.buffer.Buffer
- *  io.vertx.core.json.JsonObject
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- *  io.vertx.ext.web.client.WebClient
- *  io.vertx.ext.web.codec.BodyCodec
- */
 package io.trickle.task.antibot.impl.akamai;
 
 import io.trickle.core.VertxSingleton;
@@ -27,407 +11,210 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.codec.BodyCodec;
-import java.lang.invoke.LambdaMetafactory;
+import java.io.PrintStream;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class HawkAPI
-implements Pixel {
-    public String useragent = null;
-    public static Pattern UA_MAJOR_VERSION_PATTERN;
-    public static String[] api_ua;
+public class HawkAPI implements Pixel {
+   public String useragent = null;
+   public static Pattern UA_MAJOR_VERSION_PATTERN = Pattern.compile("Chrome/([0-9]*)");
+   public static String[] api_ua = new String[]{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"};
 
-    public HttpRequest hawkUserAgent() {
-        return this.client().getAbs("https://ak01-eu.hwkapi.com/akamai/ua").putHeader("X-Api-Key", "ce3cabed-e10f-43b1-a2a2-8d2a9c2a212f").putHeader("X-Sec", "new").timeout(50000L).as(BodyCodec.string());
-    }
+   public HttpRequest hawkUserAgent() {
+      return this.client().getAbs("https://ak01-eu.hwkapi.com/akamai/ua").putHeader("X-Api-Key", "ce3cabed-e10f-43b1-a2a2-8d2a9c2a212f").putHeader("X-Sec", "new").timeout(50000L).as(BodyCodec.string());
+   }
 
-    public CompletableFuture getPixelReqString(String string, String string2, String string3) {
-        HttpRequest httpRequest = this.hawkPixel();
-        Buffer buffer = this.hawkPixelForm(string, string3);
-        int n = 0;
-        while (n++ <= 1000) {
-            try {
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (Buffer)buffer);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$getPixelReqString(this, string, string2, string3, httpRequest, buffer, n, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    String string4 = httpResponse.bodyAsString();
-                    return CompletableFuture.completedFuture(string4);
-                }
-                CompletableFuture completableFuture3 = VertxUtil.randomSleep((long)10000L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$getPixelReqString(this, string, string2, string3, httpRequest, buffer, n, completableFuture4, httpResponse, 2, arg_0));
-                }
-                completableFuture3.join();
+   public CompletableFuture getPixelReqString(String var1, String var2, String var3) {
+      HttpRequest var4 = this.hawkPixel();
+      Buffer var5 = this.hawkPixelForm(var1, var3);
+      int var6 = 0;
+
+      while(var6++ <= 1000) {
+         try {
+            CompletableFuture var12 = Request.send(var4, var5);
+            CompletableFuture var9;
+            if (!var12.isDone()) {
+               var9 = var12;
+               return var9.exceptionally(Function.identity()).thenCompose(HawkAPI::async$getPixelReqString);
             }
-            catch (Exception exception) {
-                if (exception.getMessage().toLowerCase().contains("timeout")) continue;
-                System.out.println("API[H] err: " + exception.getMessage().replace("ak01-eu.hwkapi.com", "remote"));
+
+            HttpResponse var7 = (HttpResponse)var12.join();
+            if (var7 != null) {
+               String var8 = var7.bodyAsString();
+               return CompletableFuture.completedFuture(var8);
             }
-        }
-        return CompletableFuture.completedFuture(null);
-    }
 
-    /*
-     * Unable to fully structure code
-     * Could not resolve type clashes
-     */
-    public static CompletableFuture async$getSensorPayload$1(HawkAPI var0, String var1_1, String var2_2, String var3_3, int var4_4, HttpRequest var5_5, JsonObject var6_6, int var7_7, CompletableFuture var8_8, HttpResponse var9_10, int var10_11, Object var11_14) {
-        switch (var10_11) {
-            case 0: {
-                var5_5 = var0.hawkSensor();
-                var6_6 = var0.hawkSensorForm(var1_1, var2_2, var3_3, (boolean)var4_4);
-                var7_7 = 0;
-                while (var7_7++ <= 1000) {
-                    try {
-                        v0 = Request.send((HttpRequest)var5_5, (JsonObject)var6_6);
-                        if (!v0.isDone()) {
-                            var10_12 = v0;
-                            return var10_12.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$getSensorPayload$1(io.trickle.task.antibot.impl.akamai.HawkAPI java.lang.String java.lang.String java.lang.String int io.vertx.ext.web.client.HttpRequest io.vertx.core.json.JsonObject int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (HttpRequest)var5_5, (JsonObject)var6_6, (int)var7_7, (CompletableFuture)var10_12, null, (int)1));
-                        }
-lbl12:
-                        // 3 sources
-
-                        while (true) {
-                            var8_8 = (HttpResponse)v0.join();
-                            if (var8_8 != null) {
-                                var9_10 /* !! */  = var8_8.bodyAsString("UTF-8").split("\\*\\*\\*")[0];
-                                return CompletableFuture.completedFuture(var9_10 /* !! */ );
-                            }
-                            v1 = VertxUtil.randomSleep((long)10000L);
-                            if (!v1.isDone()) {
-                                var10_13 = v1;
-                                return var10_13.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$getSensorPayload$1(io.trickle.task.antibot.impl.akamai.HawkAPI java.lang.String java.lang.String java.lang.String int io.vertx.ext.web.client.HttpRequest io.vertx.core.json.JsonObject int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (String)var1_1, (String)var2_2, (String)var3_3, (int)var4_4, (HttpRequest)var5_5, (JsonObject)var6_6, (int)var7_7, (CompletableFuture)var10_13, (HttpResponse)var8_8, (int)2));
-                            }
-lbl21:
-                            // 3 sources
-
-                            while (true) {
-                                v1.join();
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                    catch (Exception var8_9) {}
-                }
-                return CompletableFuture.completedFuture(null);
+            var12 = VertxUtil.randomSleep(10000L);
+            if (!var12.isDone()) {
+               var9 = var12;
+               return var9.exceptionally(Function.identity()).thenCompose(HawkAPI::async$getPixelReqString);
             }
-            case 1: {
-                v0 = var8_8;
-                ** continue;
+
+            var12.join();
+         } catch (Exception var10) {
+            if (!var10.getMessage().toLowerCase().contains("timeout")) {
+               PrintStream var11 = System.out;
+               String var10001 = var10.getMessage();
+               var11.println("API[H] err: " + var10001.replace("ak01-eu.hwkapi.com", "remote"));
             }
-            case 2: {
-                v1 = var8_8;
-                var8_8 = var9_10 /* !! */ ;
-                ** continue;
+         }
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$getSensorPayload$1(HawkAPI param0, String param1, String param2, String param3, int param4, HttpRequest param5, JsonObject param6, int param7, CompletableFuture param8, HttpResponse param9, int param10, Object param11) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public void setUseragent(String var1) {
+      this.useragent = var1;
+   }
+
+   public CompletableFuture getSensorPayload(String var1) {
+      HttpRequest var2 = this.hawkSensor();
+      JsonObject var3 = this.hawkSensorForm(var1);
+      int var4 = 0;
+
+      while(var4++ <= 1000) {
+         try {
+            CompletableFuture var9 = Request.send(var2, var3);
+            CompletableFuture var7;
+            if (!var9.isDone()) {
+               var7 = var9;
+               return var7.exceptionally(Function.identity()).thenCompose(HawkAPI::async$getSensorPayload);
             }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public void setUseragent(String string) {
-        this.useragent = string;
-    }
-
-    public CompletableFuture getSensorPayload(String string) {
-        HttpRequest httpRequest = this.hawkSensor();
-        JsonObject jsonObject = this.hawkSensorForm(string);
-        int n = 0;
-        while (n++ <= 1000) {
-            try {
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (JsonObject)jsonObject);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$getSensorPayload(this, string, httpRequest, jsonObject, n, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    String string2 = httpResponse.bodyAsString("UTF-8").split("\\*")[0];
-                    return CompletableFuture.completedFuture(string2);
-                }
-                CompletableFuture completableFuture3 = VertxUtil.randomSleep((long)10000L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$getSensorPayload(this, string, httpRequest, jsonObject, n, completableFuture4, httpResponse, 2, arg_0));
-                }
-                completableFuture3.join();
+            HttpResponse var5 = (HttpResponse)var9.join();
+            if (var5 != null) {
+               String var6 = var5.bodyAsString("UTF-8").split("\\*")[0];
+               return CompletableFuture.completedFuture(var6);
             }
-            catch (Exception exception) {}
-        }
-        return CompletableFuture.completedFuture(null);
-    }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$updateUserAgent(HawkAPI var0, int var1_1, CompletableFuture var2_2, String var3_4, int var4_5, Object var5_6) {
-        switch (var4_5) {
-            case 0: {
-                var1_1 = 0;
-                block7: while (var1_1++ <= 100) {
-                    try {
-                        v0 = Request.executeTillOk((HttpRequest)var0.hawkUserAgent(), (int)5000);
-                        if (!v0.isDone()) {
-                            var3_4 = v0;
-                            return var3_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$updateUserAgent(io.trickle.task.antibot.impl.akamai.HawkAPI int java.util.concurrent.CompletableFuture java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (int)var1_1, (CompletableFuture)var3_4, null, (int)1));
-                        }
-lbl10:
-                        // 3 sources
-
-                        while (true) {
-                            var2_2 = (String)v0.join();
-                            if (Integer.parseInt(Objects.requireNonNull(Utils.quickParseFirst((String)var2_2, (Pattern[])new Pattern[]{HawkAPI.UA_MAJOR_VERSION_PATTERN}))) >= 98) {
-                                var0.useragent = var2_2;
-                                break block7;
-                            }
-                            v1 = VertxUtil.sleep((long)300L);
-                            if (!v1.isDone()) {
-                                var3_4 = v1;
-                                return var3_4.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$updateUserAgent(io.trickle.task.antibot.impl.akamai.HawkAPI int java.util.concurrent.CompletableFuture java.lang.String int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (int)var1_1, (CompletableFuture)var3_4, (String)var2_2, (int)2));
-                            }
-lbl19:
-                            // 3 sources
-
-                            while (true) {
-                                v1.join();
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                    catch (Throwable var2_3) {}
-                }
-                return CompletableFuture.completedFuture(var0.useragent);
-                return CompletableFuture.completedFuture(var0.useragent);
+            var9 = VertxUtil.randomSleep(10000L);
+            if (!var9.isDone()) {
+               var7 = var9;
+               return var7.exceptionally(Function.identity()).thenCompose(HawkAPI::async$getSensorPayload);
             }
-            case 1: {
-                v0 = var2_2;
-                ** continue;
+
+            var9.join();
+         } catch (Exception var8) {
+         }
+      }
+
+      return CompletableFuture.completedFuture((Object)null);
+   }
+
+   public static CompletableFuture async$updateUserAgent(HawkAPI param0, int param1, CompletableFuture param2, String param3, int param4, Object param5) {
+      // $FF: Couldn't be decompiled
+   }
+
+   public CompletableFuture updateUserAgent() {
+      int var1 = 0;
+
+      while(var1++ <= 100) {
+         try {
+            CompletableFuture var5 = Request.executeTillOk(this.hawkUserAgent(), 5000);
+            CompletableFuture var3;
+            if (!var5.isDone()) {
+               var3 = var5;
+               return var3.exceptionally(Function.identity()).thenCompose(HawkAPI::async$updateUserAgent);
             }
-            case 2: {
-                v1 = var2_2;
-                var2_2 = var3_4;
-                ** continue;
+
+            String var2 = (String)var5.join();
+            if (Integer.parseInt((String)Objects.requireNonNull(Utils.quickParseFirst(var2, UA_MAJOR_VERSION_PATTERN))) >= 98) {
+               this.useragent = var2;
+               break;
             }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    static {
-        api_ua = new String[]{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.74 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"};
-        UA_MAJOR_VERSION_PATTERN = Pattern.compile("Chrome/([0-9]*)");
-    }
-
-    public CompletableFuture updateUserAgent() {
-        int n = 0;
-        while (n++ <= 100) {
-            try {
-                CompletableFuture completableFuture = Request.executeTillOk((HttpRequest)this.hawkUserAgent(), (int)5000);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$updateUserAgent(this, n, completableFuture2, null, 1, arg_0));
-                }
-                String string = (String)completableFuture.join();
-                if (Integer.parseInt(Objects.requireNonNull(Utils.quickParseFirst((String)string, (Pattern[])new Pattern[]{UA_MAJOR_VERSION_PATTERN}))) >= 98) {
-                    this.useragent = string;
-                    break;
-                }
-                CompletableFuture completableFuture3 = VertxUtil.sleep((long)300L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$updateUserAgent(this, n, completableFuture4, string, 2, arg_0));
-                }
-                completableFuture3.join();
+            var5 = VertxUtil.sleep(300L);
+            if (!var5.isDone()) {
+               var3 = var5;
+               return var3.exceptionally(Function.identity()).thenCompose(HawkAPI::async$updateUserAgent);
             }
-            catch (Throwable throwable) {}
-        }
-        return CompletableFuture.completedFuture(this.useragent);
-    }
 
-    public CompletableFuture getPixelReqForm(String string, String string2, String string3) {
-        return CompletableFuture.failedFuture(new Exception("Unsupported method"));
-    }
+            var5.join();
+         } catch (Throwable var4) {
+         }
+      }
 
-    public JsonObject hawkSensorForm(String string, String string2, String string3, boolean bl) {
-        return new JsonObject().put("site", (Object)("https://www.yeezysupply.com/products/" + string3)).put("abck", (Object)string).put("bm_sz", (Object)string2).put("type", (Object)"sensor").put("events", (Object)(bl ? (ThreadLocalRandom.current().nextInt(5) == 4 ? "1,1" : "1,0") : "1,0")).put("user_agent", (Object)this.useragent);
-    }
+      return CompletableFuture.completedFuture(this.useragent);
+   }
 
-    public Buffer hawkPixelForm(String string, String string2) {
-        return new JsonObject().put("user_agent", (Object)this.useragent).put("script_id", (Object)string).put("script_secret", (Object)string2).toBuffer();
-    }
+   public CompletableFuture getPixelReqForm(String var1, String var2, String var3) {
+      return CompletableFuture.failedFuture(new Exception("Unsupported method"));
+   }
 
-    public HttpRequest hawkPixel() {
-        return this.client().postAbs("https://ak01-eu.hwkapi.com/akamai/pixel").putHeader("X-Api-Key", "ce3cabed-e10f-43b1-a2a2-8d2a9c2a212f").putHeader("X-Sec", "high").timeout(50000L).as(BodyCodec.buffer());
-    }
+   public JsonObject hawkSensorForm(String var1, String var2, String var3, boolean var4) {
+      return (new JsonObject()).put("site", "https://www.yeezysupply.com/products/" + var3).put("abck", var1).put("bm_sz", var2).put("type", "sensor").put("events", var4 ? (ThreadLocalRandom.current().nextInt(5) == 4 ? "1,1" : "1,0") : "1,0").put("user_agent", this.useragent);
+   }
 
-    public CompletableFuture getSensorPayload(String string, String string2, String string3, boolean bl) {
-        HttpRequest httpRequest = this.hawkSensor();
-        JsonObject jsonObject = this.hawkSensorForm(string, string2, string3, bl);
-        int n = 0;
-        while (n++ <= 1000) {
-            try {
-                CompletableFuture completableFuture = Request.send((HttpRequest)httpRequest, (JsonObject)jsonObject);
-                if (!completableFuture.isDone()) {
-                    CompletableFuture completableFuture2 = completableFuture;
-                    return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$getSensorPayload$1(this, string, string2, string3, (int)(bl ? 1 : 0), httpRequest, jsonObject, n, completableFuture2, null, 1, arg_0));
-                }
-                HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                if (httpResponse != null) {
-                    String string4 = httpResponse.bodyAsString("UTF-8").split("\\*\\*\\*")[0];
-                    return CompletableFuture.completedFuture(string4);
-                }
-                CompletableFuture completableFuture3 = VertxUtil.randomSleep((long)10000L);
-                if (!completableFuture3.isDone()) {
-                    CompletableFuture completableFuture4 = completableFuture3;
-                    return ((CompletableFuture)completableFuture4.exceptionally(Function.identity())).thenCompose(arg_0 -> HawkAPI.async$getSensorPayload$1(this, string, string2, string3, (int)(bl ? 1 : 0), httpRequest, jsonObject, n, completableFuture4, httpResponse, 2, arg_0));
-                }
-                completableFuture3.join();
+   public Buffer hawkPixelForm(String var1, String var2) {
+      return (new JsonObject()).put("user_agent", this.useragent).put("script_id", var1).put("script_secret", var2).toBuffer();
+   }
+
+   public HttpRequest hawkPixel() {
+      return this.client().postAbs("https://ak01-eu.hwkapi.com/akamai/pixel").putHeader("X-Api-Key", "ce3cabed-e10f-43b1-a2a2-8d2a9c2a212f").putHeader("X-Sec", "high").timeout(50000L).as(BodyCodec.buffer());
+   }
+
+   public CompletableFuture getSensorPayload(String var1, String var2, String var3, boolean var4) {
+      HttpRequest var5 = this.hawkSensor();
+      JsonObject var6 = this.hawkSensorForm(var1, var2, var3, (boolean)var4);
+      int var7 = 0;
+
+      while(var7++ <= 1000) {
+         try {
+            CompletableFuture var12 = Request.send(var5, var6);
+            CompletableFuture var10;
+            if (!var12.isDone()) {
+               var10 = var12;
+               return var10.exceptionally(Function.identity()).thenCompose(HawkAPI::async$getSensorPayload$1);
             }
-            catch (Exception exception) {}
-        }
-        return CompletableFuture.completedFuture(null);
-    }
 
-    public HttpRequest hawkSensor() {
-        return this.client().postAbs("https://ak01-eu.hwkapi.com/akamai/generate").putHeader("X-Api-Key", "ce3cabed-e10f-43b1-a2a2-8d2a9c2a212f").putHeader("X-Sec", "high").timeout(50000L).as(BodyCodec.buffer());
-    }
-
-    /*
-     * Unable to fully structure code
-     * Could not resolve type clashes
-     */
-    public static CompletableFuture async$getSensorPayload(HawkAPI var0, String var1_1, HttpRequest var2_2, JsonObject var3_3, int var4_4, CompletableFuture var5_5, HttpResponse var6_7, int var7_8, Object var8_11) {
-        switch (var7_8) {
-            case 0: {
-                var2_2 = var0.hawkSensor();
-                var3_3 = var0.hawkSensorForm(var1_1);
-                var4_4 = 0;
-                while (var4_4++ <= 1000) {
-                    try {
-                        v0 = Request.send((HttpRequest)var2_2, (JsonObject)var3_3);
-                        if (!v0.isDone()) {
-                            var7_9 = v0;
-                            return var7_9.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$getSensorPayload(io.trickle.task.antibot.impl.akamai.HawkAPI java.lang.String io.vertx.ext.web.client.HttpRequest io.vertx.core.json.JsonObject int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (String)var1_1, (HttpRequest)var2_2, (JsonObject)var3_3, (int)var4_4, (CompletableFuture)var7_9, null, (int)1));
-                        }
-lbl12:
-                        // 3 sources
-
-                        while (true) {
-                            var5_5 = (HttpResponse)v0.join();
-                            if (var5_5 != null) {
-                                var6_7 /* !! */  = var5_5.bodyAsString("UTF-8").split("\\*")[0];
-                                return CompletableFuture.completedFuture(var6_7 /* !! */ );
-                            }
-                            v1 = VertxUtil.randomSleep((long)10000L);
-                            if (!v1.isDone()) {
-                                var7_10 = v1;
-                                return var7_10.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$getSensorPayload(io.trickle.task.antibot.impl.akamai.HawkAPI java.lang.String io.vertx.ext.web.client.HttpRequest io.vertx.core.json.JsonObject int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (String)var1_1, (HttpRequest)var2_2, (JsonObject)var3_3, (int)var4_4, (CompletableFuture)var7_10, (HttpResponse)var5_5, (int)2));
-                            }
-lbl21:
-                            // 3 sources
-
-                            while (true) {
-                                v1.join();
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                    catch (Exception var5_6) {}
-                }
-                return CompletableFuture.completedFuture(null);
+            HttpResponse var8 = (HttpResponse)var12.join();
+            if (var8 != null) {
+               String var9 = var8.bodyAsString("UTF-8").split("\\*\\*\\*")[0];
+               return CompletableFuture.completedFuture(var9);
             }
-            case 1: {
-                v0 = var5_5;
-                ** continue;
+
+            var12 = VertxUtil.randomSleep(10000L);
+            if (!var12.isDone()) {
+               var10 = var12;
+               return var10.exceptionally(Function.identity()).thenCompose(HawkAPI::async$getSensorPayload$1);
             }
-            case 2: {
-                v1 = var5_5;
-                var5_5 = var6_7 /* !! */ ;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
 
-    public String getUseragent() {
-        return this.useragent;
-    }
+            var12.join();
+         } catch (Exception var11) {
+         }
+      }
 
-    public WebClient client() {
-        return VertxSingleton.INSTANCE.getLocalClient().getClient();
-    }
+      return CompletableFuture.completedFuture((Object)null);
+   }
 
-    public JsonObject hawkSensorForm(String string) {
-        return new JsonObject().put("site", (Object)"https://www.bestbuy.com/").put("abck", (Object)string).put("type", (Object)"sensor").put("events", (Object)"1,1").put("user_agent", (Object)this.useragent);
-    }
+   public HttpRequest hawkSensor() {
+      return this.client().postAbs("https://ak01-eu.hwkapi.com/akamai/generate").putHeader("X-Api-Key", "ce3cabed-e10f-43b1-a2a2-8d2a9c2a212f").putHeader("X-Sec", "high").timeout(50000L).as(BodyCodec.buffer());
+   }
 
-    /*
-     * Unable to fully structure code
-     * Could not resolve type clashes
-     */
-    public static CompletableFuture async$getPixelReqString(HawkAPI var0, String var1_1, String var2_2, String var3_3, HttpRequest var4_4, Buffer var5_5, int var6_6, CompletableFuture var7_7, HttpResponse var8_9, int var9_10, Object var10_13) {
-        switch (var9_10) {
-            case 0: {
-                var4_4 = var0.hawkPixel();
-                var5_5 = var0.hawkPixelForm(var1_1, var3_3);
-                var6_6 = 0;
-                while (var6_6++ <= 1000) {
-                    try {
-                        v0 = Request.send((HttpRequest)var4_4, (Buffer)var5_5);
-                        if (!v0.isDone()) {
-                            var9_11 = v0;
-                            return var9_11.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$getPixelReqString(io.trickle.task.antibot.impl.akamai.HawkAPI java.lang.String java.lang.String java.lang.String io.vertx.ext.web.client.HttpRequest io.vertx.core.buffer.Buffer int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (String)var1_1, (String)var2_2, (String)var3_3, (HttpRequest)var4_4, (Buffer)var5_5, (int)var6_6, (CompletableFuture)var9_11, null, (int)1));
-                        }
-lbl12:
-                        // 3 sources
+   public static CompletableFuture async$getSensorPayload(HawkAPI param0, String param1, HttpRequest param2, JsonObject param3, int param4, CompletableFuture param5, HttpResponse param6, int param7, Object param8) {
+      // $FF: Couldn't be decompiled
+   }
 
-                        while (true) {
-                            var7_7 = (HttpResponse)v0.join();
-                            if (var7_7 != null) {
-                                var8_9 /* !! */  = var7_7.bodyAsString();
-                                return CompletableFuture.completedFuture(var8_9 /* !! */ );
-                            }
-                            v1 = VertxUtil.randomSleep((long)10000L);
-                            if (!v1.isDone()) {
-                                var9_12 = v1;
-                                return var9_12.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$getPixelReqString(io.trickle.task.antibot.impl.akamai.HawkAPI java.lang.String java.lang.String java.lang.String io.vertx.ext.web.client.HttpRequest io.vertx.core.buffer.Buffer int java.util.concurrent.CompletableFuture io.vertx.ext.web.client.HttpResponse int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((HawkAPI)var0, (String)var1_1, (String)var2_2, (String)var3_3, (HttpRequest)var4_4, (Buffer)var5_5, (int)var6_6, (CompletableFuture)var9_12, (HttpResponse)var7_7, (int)2));
-                            }
-lbl21:
-                            // 3 sources
+   public String getUseragent() {
+      return this.useragent;
+   }
 
-                            while (true) {
-                                v1.join();
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                    catch (Exception var7_8) {
-                        if (var7_8.getMessage().toLowerCase().contains("timeout")) continue;
-                        System.out.println("API[H] err: " + var7_8.getMessage().replace("ak01-eu.hwkapi.com", "remote"));
-                    }
-                }
-                return CompletableFuture.completedFuture(null);
-            }
-            case 1: {
-                v0 = var7_7;
-                ** continue;
-            }
-            case 2: {
-                v1 = var7_7;
-                var7_7 = var8_9 /* !! */ ;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
+   public WebClient client() {
+      return VertxSingleton.INSTANCE.getLocalClient().getClient();
+   }
+
+   public JsonObject hawkSensorForm(String var1) {
+      return (new JsonObject()).put("site", "https://www.bestbuy.com/").put("abck", var1).put("type", "sensor").put("events", "1,1").put("user_agent", this.useragent);
+   }
+
+   public static CompletableFuture async$getPixelReqString(HawkAPI param0, String param1, String param2, String param3, HttpRequest param4, Buffer param5, int param6, CompletableFuture param7, HttpResponse param8, int param9, Object param10) {
+      // $FF: Couldn't be decompiled
+   }
 }

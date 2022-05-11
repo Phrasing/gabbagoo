@@ -1,55 +1,52 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.trickle.task.sites.walmart.util.encryption.Aes
- */
 package io.trickle.task.sites.walmart.util.encryption;
 
-import io.trickle.task.sites.walmart.util.encryption.Aes;
-
 public class CMAC {
-    public static int const_Rb = 135;
+   public static int const_Rb = 135;
 
-    public boolean msbNotZero(int n) {
-        return (n | Integer.MAX_VALUE) != Integer.MAX_VALUE;
-    }
+   public boolean msbNotZero(int var1) {
+      return (var1 | Integer.MAX_VALUE) != Integer.MAX_VALUE;
+   }
 
-    public void leftShift(int[] nArray) {
-        nArray[0] = (nArray[0] & Integer.MAX_VALUE) << 1 | nArray[1] >>> 31;
-        nArray[1] = (nArray[1] & Integer.MAX_VALUE) << 1 | nArray[2] >>> 31;
-        nArray[2] = (nArray[2] & Integer.MAX_VALUE) << 1 | nArray[3] >>> 31;
-        nArray[3] = (nArray[3] & Integer.MAX_VALUE) << 1;
-    }
+   public void leftShift(int[] var1) {
+      var1[0] = (var1[0] & Integer.MAX_VALUE) << 1 | var1[1] >>> 31;
+      var1[1] = (var1[1] & Integer.MAX_VALUE) << 1 | var1[2] >>> 31;
+      var1[2] = (var1[2] & Integer.MAX_VALUE) << 1 | var1[3] >>> 31;
+      var1[3] = (var1[3] & Integer.MAX_VALUE) << 1;
+   }
 
-    public int[] compute(Aes aes, String string) {
-        int[] nArray = new int[]{0, 0, 0, 0};
-        int[] nArray2 = aes.encrypt(nArray);
-        int n = nArray2[0];
-        this.leftShift(nArray2);
-        if (this.msbNotZero(n)) {
-            nArray2[3] = nArray2[3] ^ 0x87;
-        }
-        int n2 = 0;
-        while (n2 < string.length()) {
-            int n3 = n2 >> 2 & 3;
-            nArray[n3] = nArray[n3] ^ (Character.codePointAt(string, n2) & 0xFF) << 8 * (3 - (n2 & 3));
-            if ((++n2 & 0xF) != 0 || n2 >= string.length()) continue;
-            nArray = aes.encrypt(nArray);
-        }
-        if (n2 == 0 || (n2 & 0xF) != 0) {
-            n = nArray2[0];
-            this.leftShift(nArray2);
-            if (this.msbNotZero(n)) {
-                nArray2[3] = nArray2[3] ^ 0x87;
-            }
-            int n4 = n2 >> 2 & 3;
-            nArray[n4] = nArray[n4] ^ 128 << 8 * (3 - (n2 & 3));
-        }
-        nArray[0] = nArray[0] ^ nArray2[0];
-        nArray[1] = nArray[1] ^ nArray2[1];
-        nArray[2] = nArray[2] ^ nArray2[2];
-        nArray[3] = nArray[3] ^ nArray2[3];
-        return aes.encrypt(nArray);
-    }
+   public int[] compute(Aes var1, String var2) {
+      int[] var3 = new int[]{0, 0, 0, 0};
+      int[] var4 = var1.encrypt(var3);
+      int var5 = var4[0];
+      this.leftShift(var4);
+      if (this.msbNotZero(var5)) {
+         var4[3] ^= 135;
+      }
+
+      int var6 = 0;
+
+      while(var6 < var2.length()) {
+         var3[var6 >> 2 & 3] ^= (Character.codePointAt(var2, var6) & 255) << 8 * (3 - (var6 & 3));
+         ++var6;
+         if ((var6 & 15) == 0 && var6 < var2.length()) {
+            var3 = var1.encrypt(var3);
+         }
+      }
+
+      if (var6 == 0 || (var6 & 15) != 0) {
+         var5 = var4[0];
+         this.leftShift(var4);
+         if (this.msbNotZero(var5)) {
+            var4[3] ^= 135;
+         }
+
+         var3[var6 >> 2 & 3] ^= 128 << 8 * (3 - (var6 & 3));
+      }
+
+      var3[0] ^= var4[0];
+      var3[1] ^= var4[1];
+      var3[2] ^= var4[2];
+      var3[3] ^= var4[3];
+      return var1.encrypt(var3);
+   }
 }

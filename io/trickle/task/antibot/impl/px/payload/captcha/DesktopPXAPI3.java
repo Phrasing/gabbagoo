@@ -1,23 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  io.netty.util.AsciiString
- *  io.trickle.core.actor.TaskActor
- *  io.trickle.task.antibot.impl.px.PerimeterX
- *  io.trickle.util.Utils
- *  io.trickle.util.concurrent.VertxUtil
- *  io.trickle.util.request.Request
- *  io.trickle.webclient.RealClient
- *  io.trickle.webclient.TaskApiClient
- *  io.vertx.core.MultiMap
- *  io.vertx.core.json.JsonObject
- *  io.vertx.core.net.ProxyOptions
- *  io.vertx.ext.web.client.HttpRequest
- *  io.vertx.ext.web.client.HttpResponse
- *  io.vertx.ext.web.client.predicate.ResponsePredicate
- *  io.vertx.ext.web.codec.BodyCodec
- */
 package io.trickle.task.antibot.impl.px.payload.captcha;
 
 import io.netty.util.AsciiString;
@@ -26,6 +6,7 @@ import io.trickle.task.antibot.impl.px.PerimeterX;
 import io.trickle.util.Utils;
 import io.trickle.util.concurrent.VertxUtil;
 import io.trickle.util.request.Request;
+import io.trickle.webclient.ClientType;
 import io.trickle.webclient.RealClient;
 import io.trickle.webclient.TaskApiClient;
 import io.vertx.core.MultiMap;
@@ -35,327 +16,227 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.ext.web.codec.BodyCodec;
-import java.lang.invoke.LambdaMetafactory;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class DesktopPXAPI3
-extends PerimeterX {
-    public TaskApiClient delegate;
-    public static CharSequence ONE_VALUE;
-    public String cookie;
-    public static CharSequence RF_VALUE;
-    public static CharSequence CFP_VALUE;
-    public static CharSequence FP_VALUE;
-    public String secUserAgent;
-    public static int TIMEOUT;
-    public static CharSequence PX3_VALUE;
-    public String userAgent;
-    public static int RETRY;
+public class DesktopPXAPI3 extends PerimeterX {
+   public TaskApiClient delegate;
+   public static CharSequence ONE_VALUE = AsciiString.cached("1");
+   public String cookie;
+   public static CharSequence RF_VALUE = AsciiString.cached("_pxff_rf");
+   public static CharSequence CFP_VALUE = AsciiString.cached("_pxff_cfp");
+   public static CharSequence FP_VALUE = AsciiString.cached("_pxff_fp");
+   public String secUserAgent;
+   public static int TIMEOUT = 120000;
+   public static CharSequence PX3_VALUE = AsciiString.cached("_px3");
+   public String userAgent;
+   public static int RETRY = 3000;
 
-    public String getProxyString() {
-        ProxyOptions proxyOptions = this.delegate.getWebClient().getOptions().getProxyOptions();
-        if (proxyOptions != null) return String.format("%s:%s:%s:%s", proxyOptions.getHost(), proxyOptions.getPort(), proxyOptions.getUsername(), proxyOptions.getPassword());
-        return "";
-    }
+   public String getProxyString() {
+      ProxyOptions var1 = this.delegate.getWebClient().getOptions().getProxyOptions();
+      return var1 == null ? "" : String.format("%s:%s:%s:%s", var1.getHost(), var1.getPort(), var1.getUsername(), var1.getPassword());
+   }
 
-    /*
-     * Unable to fully structure code
-     * Could not resolve type clashes
-     */
-    public static CompletableFuture async$solveCaptcha(DesktopPXAPI3 var0, String var1_1, String var2_2, String var3_3, DesktopPXAPI3 var4_4, CompletableFuture var5_5, int var6_6, Object var7_8) {
-        switch (var6_6) {
-            case 0: {
-                v0 = var0;
-                v1 = var0.execute("hold", "https://www.walmart.com/");
-                if (!v1.isDone()) {
-                    var6_7 = v1;
-                    var5_5 = v0;
-                    return var6_7.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$solveCaptcha(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXAPI3 java.lang.String java.lang.String java.lang.String io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXAPI3 java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPXAPI3)var0, (String)var1_1, (String)var2_2, (String)var3_3, (DesktopPXAPI3)var5_5, (CompletableFuture)var6_7, (int)1));
-                }
-                ** GOTO lbl13
+   public static CompletableFuture async$solveCaptcha(DesktopPXAPI3 var0, String var1, String var2, String var3, DesktopPXAPI3 var4, CompletableFuture var5, int var6, Object var7) {
+      DesktopPXAPI3 var10000;
+      CompletableFuture var10001;
+      switch (var6) {
+         case 0:
+            var10000 = var0;
+            var10001 = var0.execute("hold", "https://www.walmart.com/");
+            if (!var10001.isDone()) {
+               CompletableFuture var9 = var10001;
+               return var9.exceptionally(Function.identity()).thenCompose(DesktopPXAPI3::async$solveCaptcha);
             }
-            case 1: {
-                v0 = var4_4;
-                v1 = var5_5;
-lbl13:
-                // 2 sources
+            break;
+         case 1:
+            var10000 = var4;
+            var10001 = var5;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
 
-                v0.cookie = (String)v1.join();
-                var4_4 = MultiMap.caseInsensitiveMultiMap();
-                var4_4.add(DesktopPXAPI3.PX3_VALUE, var0.cookie);
-                return CompletableFuture.completedFuture(var4_4);
+      var10000.cookie = (String)var10001.join();
+      MultiMap var8 = MultiMap.caseInsensitiveMultiMap();
+      var8.add(PX3_VALUE, var0.cookie);
+      return CompletableFuture.completedFuture(var8);
+   }
+
+   public void restartClient(RealClient var1) {
+   }
+
+   public JsonObject apiBody(String var1) {
+      return (new JsonObject()).put("url", var1).put("proxy", this.getProxyString());
+   }
+
+   public CompletableFuture solveCaptcha(String var1, String var2, String var3) {
+      CompletableFuture var10001 = this.execute("hold", "https://www.walmart.com/");
+      if (!var10001.isDone()) {
+         CompletableFuture var6 = var10001;
+         return var6.exceptionally(Function.identity()).thenCompose(DesktopPXAPI3::async$solveCaptcha);
+      } else {
+         this.cookie = (String)var10001.join();
+         MultiMap var4 = MultiMap.caseInsensitiveMultiMap();
+         var4.add(PX3_VALUE, this.cookie);
+         return CompletableFuture.completedFuture(var4);
+      }
+   }
+
+   public String getDeviceUA() {
+      return this.userAgent;
+   }
+
+   public static CompletableFuture async$initialise(DesktopPXAPI3 var0, DesktopPXAPI3 var1, CompletableFuture var2, int var3, Object var4) {
+      DesktopPXAPI3 var10000;
+      CompletableFuture var10001;
+      switch (var3) {
+         case 0:
+            var10000 = var0;
+            var10001 = var0.execute("init", "https://www.walmart.com/");
+            if (!var10001.isDone()) {
+               var2 = var10001;
+               return var2.exceptionally(Function.identity()).thenCompose(DesktopPXAPI3::async$initialise);
             }
-        }
-        throw new IllegalArgumentException();
-    }
+            break;
+         case 1:
+            var10000 = var1;
+            var10001 = var2;
+            break;
+         default:
+            throw new IllegalArgumentException();
+      }
 
-    public void restartClient(RealClient realClient) {
-    }
+      var10000.cookie = (String)var10001.join();
+      return CompletableFuture.completedFuture(true);
+   }
 
-    public JsonObject apiBody(String string) {
-        return new JsonObject().put("url", (Object)string).put("proxy", (Object)this.getProxyString());
-    }
+   public void reset() {
+   }
 
-    public CompletableFuture solveCaptcha(String string, String string2, String string3) {
-        CompletableFuture completableFuture = this.execute("hold", "https://www.walmart.com/");
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            DesktopPXAPI3 desktopPXAPI3 = this;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI3.async$solveCaptcha(this, string, string2, string3, desktopPXAPI3, completableFuture2, 1, arg_0));
-        }
-        this.cookie = (String)completableFuture.join();
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        multiMap.add(PX3_VALUE, (CharSequence)this.cookie);
-        return CompletableFuture.completedFuture(multiMap);
-    }
+   public DesktopPXAPI3(TaskActor var1) {
+      super(var1, (ClientType)null);
+      this.delegate = var1.getClient();
+   }
 
-    public String getDeviceUA() {
-        return this.userAgent;
-    }
+   public static CompletableFuture async$execute(DesktopPXAPI3 param0, String param1, String param2, int param3, CompletableFuture param4, int param5, Object param6) {
+      // $FF: Couldn't be decompiled
+   }
 
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$initialise(DesktopPXAPI3 var0, DesktopPXAPI3 var1_1, CompletableFuture var2_2, int var3_3, Object var4_4) {
-        switch (var3_3) {
-            case 0: {
-                v0 = var0;
-                v1 = var0.execute("init", "https://www.walmart.com/");
-                if (!v1.isDone()) {
-                    var2_2 = v1;
-                    var1_1 = v0;
-                    return var2_2.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$initialise(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXAPI3 io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXAPI3 java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPXAPI3)var0, (DesktopPXAPI3)var1_1, (CompletableFuture)var2_2, (int)1));
-                }
-                ** GOTO lbl13
+   public String getDeviceLang() {
+      return "en-GB,en;q=0.9";
+   }
+
+   public String getDeviceAcceptEncoding() {
+      return "gzip, deflate";
+   }
+
+   public String getDeviceSecUA() {
+      return this.secUserAgent;
+   }
+
+   public CompletableFuture initialise() {
+      CompletableFuture var10001 = this.execute("init", "https://www.walmart.com/");
+      if (!var10001.isDone()) {
+         CompletableFuture var2 = var10001;
+         return var2.exceptionally(Function.identity()).thenCompose(DesktopPXAPI3::async$initialise);
+      } else {
+         this.cookie = (String)var10001.join();
+         return CompletableFuture.completedFuture(true);
+      }
+   }
+
+   public HttpRequest apiRequest(String var1) {
+      return this.client.postAbs("https://px-gateway-dsor72du.uc.gateway.dev/" + var1).timeout(var1.equals("init") ? TimeUnit.SECONDS.toMillis(60L) : TimeUnit.SECONDS.toMillis(120L)).expect(ResponsePredicate.SC_OK).putHeader("x-api-key", "AIzaSyCxU4Wyg87uArwRL0NdlKb5oOAGTNTcX9Q").as(BodyCodec.jsonObject());
+   }
+
+   public CompletableFuture execute(String var1, String var2) {
+      byte var3 = 0;
+
+      while(var3 < 10 && this.delegate.getWebClient().isActive()) {
+         CompletableFuture var10000;
+         CompletableFuture var8;
+         try {
+            var10000 = Request.send(this.apiRequest(var1), this.apiBody(var2));
+            if (!var10000.isDone()) {
+               var8 = var10000;
+               return var8.exceptionally(Function.identity()).thenCompose(DesktopPXAPI3::async$execute);
             }
-            case 1: {
-                v0 = var1_1;
-                v1 = var2_2;
-lbl13:
-                // 2 sources
 
-                v0.cookie = (String)v1.join();
-                return CompletableFuture.completedFuture(true);
+            HttpResponse var4 = (HttpResponse)var10000.join();
+            if (var4 != null) {
+               if (var4.statusCode() == 504) {
+                  this.logger.warn("Unreachable proxy. Rotating");
+                  this.delegate.rotateProxy();
+               } else {
+                  JsonObject var5 = (JsonObject)var4.body();
+                  Objects.requireNonNull(var5, "No Result");
+                  if (this.logger.isDebugEnabled()) {
+                     this.logger.debug("Sensor API for step={} responded with body={}", var1, var5.encode());
+                  }
+
+                  String var6;
+                  if (var5.getBoolean("ok", false)) {
+                     var6 = var5.getString("cookie");
+                     Objects.requireNonNull(var6, "Sensor response none");
+                     String var10 = var5.getString("ua");
+                     Objects.requireNonNull(var10, "Sensor data none");
+                     this.userAgent = var10;
+                     this.parseSecUA(this.userAgent);
+                     return CompletableFuture.completedFuture(var6);
+                  }
+
+                  if (this.logger.isDebugEnabled()) {
+                     this.logger.debug("Sensor request not OK: {}", var5.encode());
+                  }
+
+                  var6 = var5.getString("err", "request failed");
+                  if (var6.equalsIgnoreCase("request failed") || var6.equalsIgnoreCase("exhausted")) {
+                     boolean var7 = this.delegate.rotateProxy();
+                     if (this.logger.isDebugEnabled()) {
+                        this.logger.debug("Rotated proxy after sensor fail ok={}", var7);
+                     }
+                  }
+               }
+            } else {
+               this.logger.warn("Failed to get sensor. Retrying...");
             }
-        }
-        throw new IllegalArgumentException();
-    }
-
-    public void reset() {
-    }
-
-    public DesktopPXAPI3(TaskActor taskActor) {
-        super(taskActor, null);
-        this.delegate = taskActor.getClient();
-    }
-
-    /*
-     * Unable to fully structure code
-     */
-    public static CompletableFuture async$execute(DesktopPXAPI3 var0, String var1_1, String var2_2, int var3_3, CompletableFuture var4_4, int var5_6, Object var6_8) {
-        switch (var5_6) {
-            case 0: {
-                var3_3 = 0;
-                block7: while (var3_3 < 10) {
-                    if (var0.delegate.getWebClient().isActive() == false) return CompletableFuture.failedFuture(new Exception("Exceeded retries"));
-                    try {
-                        v0 = Request.send((HttpRequest)var0.apiRequest(var1_1), (JsonObject)var0.apiBody(var2_2));
-                        if (!v0.isDone()) {
-                            var8_11 = v0;
-                            return var8_11.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$execute(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXAPI3 java.lang.String java.lang.String int java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPXAPI3)var0, (String)var1_1, (String)var2_2, (int)var3_3, (CompletableFuture)var8_11, (int)1));
-                        }
-lbl11:
-                        // 3 sources
-
-                        while (true) {
-                            var4_4 = (HttpResponse)v0.join();
-                            if (var4_4 != null) {
-                                if (var4_4.statusCode() == 504) {
-                                    var0.logger.warn("Unreachable proxy. Rotating");
-                                    var0.delegate.rotateProxy();
-                                } else {
-                                    var5_7 = (JsonObject)var4_4.body();
-                                    Objects.requireNonNull(var5_7, "No Result");
-                                    if (var0.logger.isDebugEnabled()) {
-                                        var0.logger.debug("Sensor API for step={} responded with body={}", (Object)var1_1, (Object)var5_7.encode());
-                                    }
-                                    if (var5_7.getBoolean("ok", Boolean.valueOf(false)).booleanValue()) {
-                                        var6_8 = var5_7.getString("cookie");
-                                        Objects.requireNonNull(var6_8, "Sensor response none");
-                                        var7_10 = var5_7.getString("ua");
-                                        Objects.requireNonNull(var7_10, "Sensor data none");
-                                        var0.userAgent = var7_10;
-                                        var0.parseSecUA(var0.userAgent);
-                                        return CompletableFuture.completedFuture(var6_8);
-                                    }
-                                    if (var0.logger.isDebugEnabled()) {
-                                        var0.logger.debug("Sensor request not OK: {}", (Object)var5_7.encode());
-                                    }
-                                    if ((var6_8 = var5_7.getString("err", "request failed")).equalsIgnoreCase("request failed") || var6_8.equalsIgnoreCase("exhausted")) {
-                                        var7_9 = var0.delegate.rotateProxy();
-                                        if (var0.logger.isDebugEnabled()) {
-                                            var0.logger.debug("Rotated proxy after sensor fail ok={}", (Object)var7_9);
-                                        }
-                                    }
-                                }
-                            } else {
-                                var0.logger.warn("Failed to get sensor. Retrying...");
-                            }
-                            break;
-                        }
-                    }
-                    catch (Throwable var4_5) {
-                        var0.logger.error("Failed to solve sensor: {}. Retrying...", (Object)var4_5.getMessage());
-                        if (!var0.logger.isDebugEnabled()) ** GOTO lbl47
-                        var0.logger.debug((Object)var4_5);
-                    }
-lbl47:
-                    // 5 sources
-
-                    if (!(v1 = VertxUtil.randomSleep((long)3000L)).isDone()) {
-                        var8_12 = v1;
-                        return var8_12.exceptionally(Function.<T>identity()).thenCompose((Function<Object, CompletableFuture>)LambdaMetafactory.metafactory(null, null, null, (Ljava/lang/Object;)Ljava/lang/Object;, async$execute(io.trickle.task.antibot.impl.px.payload.captcha.DesktopPXAPI3 java.lang.String java.lang.String int java.util.concurrent.CompletableFuture int java.lang.Object ), (Ljava/lang/Object;)Ljava/util/concurrent/CompletableFuture;)((DesktopPXAPI3)var0, (String)var1_1, (String)var2_2, (int)var3_3, (CompletableFuture)var8_12, (int)2));
-                    }
-lbl50:
-                    // 3 sources
-
-                    while (true) {
-                        v1.join();
-                        continue block7;
-                        break;
-                    }
-                }
-                return CompletableFuture.failedFuture(new Exception("Exceeded retries"));
+         } catch (Throwable var9) {
+            this.logger.error("Failed to solve sensor: {}. Retrying...", var9.getMessage());
+            if (this.logger.isDebugEnabled()) {
+               this.logger.debug(var9);
             }
-            case 1: {
-                v0 = var4_4;
-                ** continue;
-            }
-            case 2: {
-                v1 = var4_4;
-                ** continue;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
+         }
 
-    public String getDeviceLang() {
-        return "en-GB,en;q=0.9";
-    }
+         var10000 = VertxUtil.randomSleep(3000L);
+         if (!var10000.isDone()) {
+            var8 = var10000;
+            return var8.exceptionally(Function.identity()).thenCompose(DesktopPXAPI3::async$execute);
+         }
 
-    public String getDeviceAcceptEncoding() {
-        return "gzip, deflate";
-    }
+         var10000.join();
+      }
 
-    public String getDeviceSecUA() {
-        return this.secUserAgent;
-    }
+      return CompletableFuture.failedFuture(new Exception("Exceeded retries"));
+   }
 
-    public CompletableFuture initialise() {
-        CompletableFuture completableFuture = this.execute("init", "https://www.walmart.com/");
-        if (!completableFuture.isDone()) {
-            CompletableFuture completableFuture2 = completableFuture;
-            DesktopPXAPI3 desktopPXAPI3 = this;
-            return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI3.async$initialise(this, desktopPXAPI3, completableFuture2, 1, arg_0));
-        }
-        this.cookie = (String)completableFuture.join();
-        return CompletableFuture.completedFuture(true);
-    }
+   public CompletableFuture solve() {
+      MultiMap var1 = MultiMap.caseInsensitiveMultiMap();
+      var1.add(RF_VALUE, ONE_VALUE);
+      var1.add(FP_VALUE, ONE_VALUE);
+      var1.add(CFP_VALUE, ONE_VALUE);
+      var1.add(PX3_VALUE, this.cookie);
+      return CompletableFuture.completedFuture(var1);
+   }
 
-    public HttpRequest apiRequest(String string) {
-        return this.client.postAbs("https://px-gateway-dsor72du.uc.gateway.dev/" + string).timeout(string.equals("init") ? TimeUnit.SECONDS.toMillis(60L) : TimeUnit.SECONDS.toMillis(120L)).expect(ResponsePredicate.SC_OK).putHeader("x-api-key", "AIzaSyCxU4Wyg87uArwRL0NdlKb5oOAGTNTcX9Q").as(BodyCodec.jsonObject());
-    }
+   public String getVid() {
+      return "";
+   }
 
-    public CompletableFuture execute(String string, String string2) {
-        int n = 0;
-        while (n < 10) {
-            block14: {
-                if (!this.delegate.getWebClient().isActive()) return CompletableFuture.failedFuture(new Exception("Exceeded retries"));
-                try {
-                    CompletableFuture completableFuture = Request.send((HttpRequest)this.apiRequest(string), (JsonObject)this.apiBody(string2));
-                    if (!completableFuture.isDone()) {
-                        CompletableFuture completableFuture2 = completableFuture;
-                        return ((CompletableFuture)completableFuture2.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI3.async$execute(this, string, string2, n, completableFuture2, 1, arg_0));
-                    }
-                    HttpResponse httpResponse = (HttpResponse)completableFuture.join();
-                    if (httpResponse != null) {
-                        if (httpResponse.statusCode() == 504) {
-                            this.logger.warn("Unreachable proxy. Rotating");
-                            this.delegate.rotateProxy();
-                        } else {
-                            String string3;
-                            JsonObject jsonObject = (JsonObject)httpResponse.body();
-                            Objects.requireNonNull(jsonObject, "No Result");
-                            if (this.logger.isDebugEnabled()) {
-                                this.logger.debug("Sensor API for step={} responded with body={}", (Object)string, (Object)jsonObject.encode());
-                            }
-                            if (jsonObject.getBoolean("ok", Boolean.valueOf(false)).booleanValue()) {
-                                string3 = jsonObject.getString("cookie");
-                                Objects.requireNonNull(string3, "Sensor response none");
-                                String string4 = jsonObject.getString("ua");
-                                Objects.requireNonNull(string4, "Sensor data none");
-                                this.userAgent = string4;
-                                this.parseSecUA(this.userAgent);
-                                return CompletableFuture.completedFuture(string3);
-                            }
-                            if (this.logger.isDebugEnabled()) {
-                                this.logger.debug("Sensor request not OK: {}", (Object)jsonObject.encode());
-                            }
-                            if ((string3 = jsonObject.getString("err", "request failed")).equalsIgnoreCase("request failed") || string3.equalsIgnoreCase("exhausted")) {
-                                boolean bl = this.delegate.rotateProxy();
-                                if (this.logger.isDebugEnabled()) {
-                                    this.logger.debug("Rotated proxy after sensor fail ok={}", (Object)bl);
-                                }
-                            }
-                        }
-                    } else {
-                        this.logger.warn("Failed to get sensor. Retrying...");
-                    }
-                }
-                catch (Throwable throwable) {
-                    this.logger.error("Failed to solve sensor: {}. Retrying...", (Object)throwable.getMessage());
-                    if (!this.logger.isDebugEnabled()) break block14;
-                    this.logger.debug((Object)throwable);
-                }
-            }
-            CompletableFuture completableFuture = VertxUtil.randomSleep((long)3000L);
-            if (!completableFuture.isDone()) {
-                CompletableFuture completableFuture3 = completableFuture;
-                return ((CompletableFuture)completableFuture3.exceptionally(Function.identity())).thenCompose(arg_0 -> DesktopPXAPI3.async$execute(this, string, string2, n, completableFuture3, 2, arg_0));
-            }
-            completableFuture.join();
-        }
-        return CompletableFuture.failedFuture(new Exception("Exceeded retries"));
-    }
-
-    public CompletableFuture solve() {
-        MultiMap multiMap = MultiMap.caseInsensitiveMultiMap();
-        multiMap.add(RF_VALUE, ONE_VALUE);
-        multiMap.add(FP_VALUE, ONE_VALUE);
-        multiMap.add(CFP_VALUE, ONE_VALUE);
-        multiMap.add(PX3_VALUE, (CharSequence)this.cookie);
-        return CompletableFuture.completedFuture(multiMap);
-    }
-
-    static {
-        TIMEOUT = 120000;
-        RETRY = 3000;
-        RF_VALUE = AsciiString.cached((String)"_pxff_rf");
-        FP_VALUE = AsciiString.cached((String)"_pxff_fp");
-        PX3_VALUE = AsciiString.cached((String)"_px3");
-        CFP_VALUE = AsciiString.cached((String)"_pxff_cfp");
-        ONE_VALUE = AsciiString.cached((String)"1");
-    }
-
-    public String getVid() {
-        return "";
-    }
-
-    public void parseSecUA(String string) {
-        String string2 = Utils.parseChromeVer((String)this.userAgent);
-        this.secUserAgent = "\"Google Chrome\";v=\"" + string2 + "\", \"Chromium\";v=\"" + string2 + "\", \";Not A Brand\";v=\"99\"";
-    }
+   public void parseSecUA(String var1) {
+      String var2 = Utils.parseChromeVer(this.userAgent);
+      this.secUserAgent = "\"Google Chrome\";v=\"" + var2 + "\", \"Chromium\";v=\"" + var2 + "\", \";Not A Brand\";v=\"99\"";
+   }
 }

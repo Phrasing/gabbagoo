@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package io.trickle.task.antibot.impl.akamai.pixel;
 
 import java.util.Base64;
@@ -9,85 +6,92 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface Pixel {
-    public static final Pattern BAZA_PATTERN;
-    public static final Pattern T_PATTERN;
-    public static final Pattern G_INDEX;
-    public static final Pattern AKAM_PATTERN;
-    public static final Pattern HEX_ARRAY;
+   Pattern BAZA_PATTERN = Pattern.compile("baz[A-z]*=?\"([0-9]*?)\"");
+   Pattern T_PATTERN = Pattern.compile("t=([0-z]*)");
+   Pattern G_INDEX = Pattern.compile("g=_\\[([0-9]*?)]");
+   Pattern AKAM_PATTERN = Pattern.compile("(https://www.yeezysupply.com/akam.*?)\"");
+   Pattern HEX_ARRAY = Pattern.compile("=\\[(\".*\\\\x.*?)\\];");
 
-    public CompletableFuture getPixelReqForm(String var1, String var2, String var3);
+   CompletableFuture getPixelReqForm(String var1, String var2, String var3);
 
-    static {
-        HEX_ARRAY = Pattern.compile("=\\[(\".*\\\\x.*?)\\];");
-        G_INDEX = Pattern.compile("g=_\\[([0-9]*?)]");
-        T_PATTERN = Pattern.compile("t=([0-z]*)");
-        BAZA_PATTERN = Pattern.compile("baz[A-z]*=?\"([0-9]*?)\"");
-        AKAM_PATTERN = Pattern.compile("(https://www.yeezysupply.com/akam.*?)\"");
-    }
+   static String[] parseAkam(String var0) {
+      Matcher var1 = AKAM_PATTERN.matcher(var0);
+      String[] var2 = new String[2];
 
-    public static String[] parseAkam(String string) {
-        Matcher matcher = AKAM_PATTERN.matcher(string);
-        String[] stringArray = new String[2];
-        int n = 0;
-        while (true) {
-            if (!matcher.find()) {
-                if (stringArray[1] == null) throw new Exception("No AKAM");
-                return stringArray;
-            }
-            stringArray[n] = matcher.group(1);
-            ++n;
-        }
-    }
+      for(int var3 = 0; var1.find(); ++var3) {
+         var2[var3] = var1.group(1);
+      }
 
-    public static String[] parseHexArray(String string) {
-        Matcher matcher = HEX_ARRAY.matcher(string);
-        if (!matcher.find()) throw new Exception("No HEX ARR");
-        String[] stringArray = matcher.group(1).split(",");
-        return Pixel.decodeArray(stringArray);
-    }
+      if (var2[1] != null) {
+         return var2;
+      } else {
+         throw new Exception("No AKAM");
+      }
+   }
 
-    public static int parseGIndex(String string) {
-        Matcher matcher = G_INDEX.matcher(string);
-        if (!matcher.find()) throw new Exception("No G INDEX");
-        return Integer.parseInt(matcher.group(1));
-    }
+   static String[] parseHexArray(String var0) {
+      Matcher var1 = HEX_ARRAY.matcher(var0);
+      if (var1.find()) {
+         String[] var2 = var1.group(1).split(",");
+         return decodeArray(var2);
+      } else {
+         throw new Exception("No HEX ARR");
+      }
+   }
 
-    public static String parseTValue(String string) {
-        Matcher matcher;
-        String string2 = string.split("\\?")[1];
-        if ((string2 = string2.substring(string2.indexOf("=") + 1)).contains("&")) {
-            string2 = string2.split("&")[0];
-        }
-        if (!(matcher = T_PATTERN.matcher(string2 = new String(Base64.getDecoder().decode(string2)))).find()) throw new Exception("No T val");
-        return matcher.group(1);
-    }
+   static int parseGIndex(String var0) {
+      Matcher var1 = G_INDEX.matcher(var0);
+      if (var1.find()) {
+         return Integer.parseInt(var1.group(1));
+      } else {
+         throw new Exception("No G INDEX");
+      }
+   }
 
-    public static String decodeHexString(String string) {
-        string = string.replace("\\x", "").replace("\"", "");
-        StringBuilder stringBuilder = new StringBuilder();
-        int n = 0;
-        while (n < string.length()) {
-            String string2 = string.substring(n, n + 2);
-            stringBuilder.append((char)Integer.parseInt(string2, 16));
-            n += 2;
-        }
-        return stringBuilder.toString();
-    }
+   static String parseTValue(String var0) {
+      String var1 = var0.split("\\?")[1];
+      var1 = var1.substring(var1.indexOf("=") + 1);
+      if (var1.contains("&")) {
+         var1 = var1.split("&")[0];
+      }
 
-    public CompletableFuture getPixelReqString(String var1, String var2, String var3);
+      var1 = new String(Base64.getDecoder().decode(var1));
+      Matcher var2 = T_PATTERN.matcher(var1);
+      if (var2.find()) {
+         return var2.group(1);
+      } else {
+         throw new Exception("No T val");
+      }
+   }
 
-    public static String parseBaza(String string) {
-        Matcher matcher = BAZA_PATTERN.matcher(string);
-        if (!matcher.find()) throw new Exception("No BAZA");
-        return matcher.group(1);
-    }
+   static String decodeHexString(String var0) {
+      var0 = var0.replace("\\x", "").replace("\"", "");
+      StringBuilder var1 = new StringBuilder();
 
-    public static String[] decodeArray(String[] stringArray) {
-        int n = 0;
-        while (n < stringArray.length) {
-            stringArray[n] = Pixel.decodeHexString(stringArray[n]);
-            ++n;
-        }
-        return stringArray;
-    }
+      for(int var2 = 0; var2 < var0.length(); var2 += 2) {
+         String var3 = var0.substring(var2, var2 + 2);
+         var1.append((char)Integer.parseInt(var3, 16));
+      }
+
+      return var1.toString();
+   }
+
+   CompletableFuture getPixelReqString(String var1, String var2, String var3);
+
+   static String parseBaza(String var0) {
+      Matcher var1 = BAZA_PATTERN.matcher(var0);
+      if (var1.find()) {
+         return var1.group(1);
+      } else {
+         throw new Exception("No BAZA");
+      }
+   }
+
+   static String[] decodeArray(String[] var0) {
+      for(int var1 = 0; var1 < var0.length; ++var1) {
+         var0[var1] = decodeHexString(var0[var1]);
+      }
+
+      return var0;
+   }
 }
